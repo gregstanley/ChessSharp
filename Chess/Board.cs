@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Chess
 {
@@ -106,9 +107,9 @@ namespace Chess
                 }
             }
 
-            if (move is MoveCastle)
+            if (move is MoveCastle castle)
             {
-                var castle = move as MoveCastle;
+                //var castle = move as MoveCastle;
 
                 var kingStartSquare = _squares.Single(x => x.Rank == castle.KingStartPosition.Rank && x.File == castle.KingStartPosition.File);
                 var targetKingSquare = _squares.Single(x => x.Rank == castle.KingEndPosition.Rank && x.File == castle.KingEndPosition.File);
@@ -125,8 +126,8 @@ namespace Chess
 
             var colour = piece.Colour;
 
-            var whiteSquaresUnderAttack = GetSquaresUnderAttack(Colour.White);
-            var blackSquaresUnderAttack = GetSquaresUnderAttack(Colour.Black);
+            var whiteSquaresUnderAttack = GetSquaresUnderThreat(Colour.White);
+            var blackSquaresUnderAttack = GetSquaresUnderThreat(Colour.Black);
 
             var isWhiteCheck = whiteSquaresUnderAttack.Any(x => x.Piece.Type == PieceType.King);
             var isBlackCheck = blackSquaresUnderAttack.Any(x => x.Piece.Type == PieceType.King);
@@ -145,17 +146,20 @@ namespace Chess
             whiteMetrics.PointsChange = WhiteScore - ParentBoard.WhiteScore;
             blackMetrics.PointsChange = BlackScore - ParentBoard.BlackScore;
 
-            whiteMetrics.NumPiecesUnderAttack = (byte)blackSquaresUnderAttack.Count();
-            blackMetrics.NumPiecesUnderAttack = (byte)whiteSquaresUnderAttack.Count();
+            whiteMetrics.NumPiecesUnderThreat = (byte)blackSquaresUnderAttack.Count();
+            blackMetrics.NumPiecesUnderThreat = (byte)whiteSquaresUnderAttack.Count();
 
             var whiteCheckBoost = isBlackCheck ? 9 : 0;
             var blackCheckBoost = isWhiteCheck ? 9 : 0;
 
-            whiteMetrics.NumPiecesUnderAttackValue = (byte)(blackSquaresUnderAttack.Sum(x => x.Piece.Value) + whiteCheckBoost);
-            blackMetrics.NumPiecesUnderAttackValue = (byte)(whiteSquaresUnderAttack.Sum(x => x.Piece.Value) + blackCheckBoost);
+            whiteMetrics.NumPiecesUnderThreatValue = (byte)(whiteSquaresUnderAttack.Sum(x => x.Piece.Value) + blackCheckBoost);
+            blackMetrics.NumPiecesUnderThreatValue = (byte)(blackSquaresUnderAttack.Sum(x => x.Piece.Value) + whiteCheckBoost);
 
-            whiteMetrics.NumCoveredSquares = (byte)GetCoveredSquares(colour).Count();
-            blackMetrics.NumCoveredSquares = (byte)GetCoveredSquares(colour.Opposite()).Count();
+            whiteMetrics.NumAccessibleSquares = (byte)GetCoveredSquares(colour).Count();
+            blackMetrics.NumAccessibleSquares = (byte)GetCoveredSquares(colour.Opposite()).Count();
+
+            whiteMetrics.NumProtectedPieces = (byte)GetProtectedPieces(colour).Count();
+            blackMetrics.NumProtectedPieces = (byte)GetProtectedPieces(colour.Opposite()).Count();
 
             WhiteMetrics = whiteMetrics;
             BlackMetrics = blackMetrics;
@@ -199,10 +203,13 @@ namespace Chess
         public Piece GetPieceOnSquare(RankFile rankFile) =>
             _squares.Single(x => x.Rank == rankFile.Rank && x.File == rankFile.File).Piece;
 
-        public IReadOnlyCollection<Square> GetCoveredSquares(Colour colour) =>
-            _squares.Where(x => x.Piece?.Colour == colour && x.CoveredBy.Any(s => s.Colour == colour)).ToList();
+        public IQueryable<Square> GetCoveredSquares(Colour colour) =>
+            _squares.AsQueryable().Where(x => x.CoveredBy.Any(s => s.Colour == colour));
 
-        public IReadOnlyCollection<Square> GetSquaresUnderAttack(Colour colour) =>
+        public IReadOnlyCollection<Square> GetProtectedPieces(Colour colour) =>
+            GetCoveredSquares(colour).Where(x => x.Piece != null).ToList();
+
+        public IReadOnlyCollection<Square> GetSquaresUnderThreat(Colour colour) =>
             _squares.Where(x => x.Piece?.Colour == colour && x.CoveredBy.Any(s => s.Colour == colour.Opposite()))
             .OrderByDescending(x => x.Piece?.Value)
             .ToList();
@@ -236,7 +243,7 @@ namespace Chess
         {
             var sb = new StringBuilder();
 
-            var squaresUnderAttack = GetSquaresUnderAttack(colour);
+            var squaresUnderAttack = GetSquaresUnderThreat(colour);
 
             foreach(var sua in squaresUnderAttack)
             {
@@ -356,7 +363,7 @@ namespace Chess
 
                 var colourSquares = GetSquaresWithPieceOn(colour);
 
-                foreach (var square in colourSquares)
+                foreach(var square in colourSquares)
                 {
                     var boardsFromSquare = GenerateChildBoardsFromSquare(_squares, square);
 
@@ -365,7 +372,19 @@ namespace Chess
                         boardsWhereKingIsInCheck.AddRange(boardsFromSquare.Where(x => x.IsInCheck(colour)));
                         childBoards.AddRange(boardsFromSquare.Where(x => !x.IsInCheck(colour)));
                     }
-                }
+                };
+
+                //Parallel.ForEach(colourSquares, (square) =>
+                //{
+                //    var boardsFromSquare = GenerateChildBoardsFromSquare(_squares, square);
+
+                //    if (boardsFromSquare.Any())
+                //    {
+                //        boardsWhereKingIsInCheck.AddRange(boardsFromSquare.Where(x => x.IsInCheck(colour)));
+                //        childBoards.AddRange(boardsFromSquare.Where(x => !x.IsInCheck(colour)));
+                //    }
+                //});
+
 
                 ChildBoards = childBoards;
             }
@@ -381,8 +400,12 @@ namespace Chess
             if (--depth <= 0)
                 return;
 
-            foreach (var childBoard in ChildBoards)
+            //foreach (var childBoard in ChildBoards)
+            //    childBoard.GenerateChildBoards(colour.Opposite(), depth);
+            Parallel.ForEach(ChildBoards, (childBoard) =>
+            {
                 childBoard.GenerateChildBoards(colour.Opposite(), depth);
+            });
         }
 
         public string GetCheckDebugString()
@@ -394,6 +417,19 @@ namespace Chess
 
             return sb.ToString();
         }
+
+        public string GetMetricsString() =>
+            $"{GetCode()} " +
+            $"WP+-: {WhiteMetrics.PointsChange} " +
+            $"Mob: {WhiteMetrics.NumAccessibleSquares} " +
+            $"PP: {WhiteMetrics.NumProtectedPieces} " +
+            $"Th: {WhiteMetrics.NumPiecesUnderThreat} " +
+            $"ThV: {WhiteMetrics.NumPiecesUnderThreatValue} " +
+            $"BP+-: {BlackMetrics.PointsChange} " +
+            $"Mob: {BlackMetrics.NumAccessibleSquares} " +
+            $"PP: {WhiteMetrics.NumProtectedPieces} " +
+            $"Th: {BlackMetrics.NumPiecesUnderThreat} " +
+            $"ThV: {BlackMetrics.NumPiecesUnderThreatValue}";
 
         public void Orphan()
         {

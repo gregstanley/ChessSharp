@@ -4,10 +4,12 @@
     {
         public int PointsChange { get; set; }
 
-        public byte NumPiecesUnderAttack { get; set; }
+        public byte NumPiecesUnderThreat { get; set; }
 
-        public byte NumPiecesUnderAttackValue { get; set; }
+        public byte NumPiecesUnderThreatValue { get; set; }
 
-        public byte NumCoveredSquares { get; set; }
+        public byte NumAccessibleSquares { get; set; }
+
+        public byte NumProtectedPieces { get; set; }
     }
 }

@@ -43,14 +43,15 @@ namespace Chess
                 return GetCheckmateBoard(checkmateBoards, colour, sb);
 
             IEnumerable<Board> escapeCheckBoards = null;
-            IEnumerable<Board> escapeBoards = null;
 
             if (board.IsInCheck(colour))
                 escapeCheckBoards = GetEscapeCheckBoards(board, colour, sb);
 
-            var squaresUnderAttack = board.GetSquaresUnderAttack(colour);
+            var squaresUnderAttack = board.GetSquaresUnderThreat(colour);
 
-            var coveredSquares = board.GetCoveredSquares(colour);
+            var coveredSquares = board.GetProtectedPieces(colour);
+
+            IEnumerable<Board> escapeBoards = null;
 
             if (squaresUnderAttack.Any())
             {
@@ -86,11 +87,11 @@ namespace Chess
 
             sb.AppendLine($"Keeping {d1NoCheckmateBoards.Count()} safe boards:");
             foreach(var d1NoCheckmateBoard in d1NoCheckmateBoards)
-                sb.AppendLine($"   {d1NoCheckmateBoard.GetCode()}");
+                sb.AppendLine($"   {d1NoCheckmateBoard.GetMetricsString()}");
 
             sb.AppendLine($"Discarding {d1CheckmateBoards.Count()} dangerous boards:");
             foreach (var dangerousBoard in d1CheckmateBoards)
-                sb.AppendLine($"   {dangerousBoard.GetCode()}");
+                sb.AppendLine($"   {dangerousBoard.GetMetricsString()}");
 
             var d2NoCheckmateBoards = d2LeafBoards.Where(x => d1NoCheckmateBoards.Contains(x.ParentBoard));
 
@@ -121,9 +122,6 @@ namespace Chess
 
             var d1LostLessBoardsGuaranteed = d2BoardsLostLess
                 .Where(x => !x.ChildBoards.Any(y => (myScore - y.GetScore(colour)) <= (opponentScore - y.GetScore(oppositeColour))));
-
-            var allRandomOptionsBoards = board.ChildBoards
-                .Where(x => !x.ParentBoard.IsInCheck(colour));
 
             IEnumerable<Board> optionsBoards = null;
 
@@ -199,12 +197,19 @@ namespace Chess
             if (optionsBoards == null)
             {
                 sb.AppendLine($"Picking random move");
-                optionsBoards = allRandomOptionsBoards;
+
+                optionsBoards = board.ChildBoards
+                    .Where(x => !x.ParentBoard.IsInCheck(colour));
+
+                if (optionsBoards == null || !optionsBoards.Any())
+                    optionsBoards = board.ChildBoards;
             }
 
             var optionsBoardsRanked = optionsBoards
-                .OrderByDescending(x => x.GetMetrics(colour).NumCoveredSquares)
-                .OrderBy(x => x.GetMetrics(colour.Opposite()).NumPiecesUnderAttackValue);
+                .OrderBy(x => x.GetMetrics(colour).NumPiecesUnderThreatValue)
+                .OrderByDescending(x => x.GetMetrics(colour).NumProtectedPieces)
+                .OrderByDescending(x => x.GetMetrics(colour.Opposite()).NumPiecesUnderThreatValue)
+                .OrderByDescending(x => x.GetMetrics(colour).NumAccessibleSquares);
 
             //var range = optionsBoardsRanked.Count();
 

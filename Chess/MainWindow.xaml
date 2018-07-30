@@ -64,17 +64,17 @@
             <Image x:Name="BlackRookPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackRook.png" Canvas.Left="-458" Canvas.Top="630"/>
             <Image x:Name="BlackQueenPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="-458"/>
         </Canvas>
-        <TextBox x:Name="LogText" HorizontalAlignment="Left" Height="784" Margin="10,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="338"/>
+        <TextBox x:Name="LogText" HorizontalAlignment="Left" Height="784" Margin="8,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="338"/>
         <TextBox x:Name="BoardDebug" HorizontalAlignment="Left" Height="768" Margin="1099,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="171" FontFamily="Courier New"/>
         <TextBox x:Name="WhiteScore" HorizontalAlignment="Left" Height="23" Margin="684,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="33"/>
         <TextBox x:Name="BlackScore" HorizontalAlignment="Left" Height="23" Margin="725,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="33"/>
         <Label x:Name="WhiteScoreLabel" Content="White" HorizontalAlignment="Left" Margin="635,35,0,0" VerticalAlignment="Top"/>
         <Label x:Name="BlackScoreLabel" Content="Black" HorizontalAlignment="Left" Margin="763,35,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="LogicLog" HorizontalAlignment="Left" Height="768" Margin="1275,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="471" FontFamily="Courier New"/>
-        <Button x:Name="NewGame" Content="New Game CPU" HorizontalAlignment="Left" Margin="128,10,0,0" VerticalAlignment="Top" Width="102" Click="NewGame_Click" Height="35"/>
+        <TextBox x:Name="LogicLog" Height="768" Margin="1275,66,8,0" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Courier New"/>
+        <Button x:Name="NewGame" Content="New Game CPU" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top" Width="102" Click="NewGame_Click" Height="35"/>
         <Label x:Name="StartPositionUI" Content="Label" HorizontalAlignment="Left" Margin="361,27,0,0" VerticalAlignment="Top" Width="51"/>
         <Label x:Name="EndPositionUI" Content="Label" HorizontalAlignment="Left" Margin="412,27,0,0" VerticalAlignment="Top" Width="51"/>
-        <Button x:Name="NewGameHuman" Content="New Game Human" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHuman_Click" Height="35"/>
+        <Button x:Name="NewGameHuman" Content="New Game Human" HorizontalAlignment="Left" Margin="8,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHuman_Click" Height="35"/>
         <local:PromotionTypeUserControl x:Name="PromotionTypeSelector" HorizontalAlignment="Left" Margin="558,432,0,0" VerticalAlignment="Top" PieceSelected="PromotionTypeSelector_PieceSelected" />
     </Grid>
 </Window>
