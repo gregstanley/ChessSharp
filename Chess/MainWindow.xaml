@@ -1,0 +1,80 @@
+﻿<Window x:Class="Chess.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Chess"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="961.75" Width="1763.866">
+    <Grid Margin="0,0,2,-4" Height="935" VerticalAlignment="Top">
+        <Button x:Name="NextMove" Content="Next Move" HorizontalAlignment="Left" Margin="664,839,0,0" VerticalAlignment="Top" Width="113" Click="NextMove_Click" Height="35"/>
+        <Canvas x:Name="BoardCanvas" HorizontalAlignment="Left" Height="720" Margin="360,114,0,-25" VerticalAlignment="Top" Width="720" MouseDown="BoardCanvas_MouseDown" MouseUp="BoardCanvas_MouseUp">
+            <Image x:Name="BoardUI" Source="Images/chess-36333_960_720.png" Stretch="Fill" Height="720" Width="720"/>
+            <Image x:Name="BlackPawn1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90"/>
+            <Image x:Name="BlackPawn2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="90"/>
+            <Image x:Name="BlackPawn3" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="180"/>
+            <Image x:Name="BlackPawn4" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="270"/>
+            <Image x:Name="BlackPawn5" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="360"/>
+            <Image x:Name="BlackPawn6" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="450"/>
+            <Image x:Name="BlackPawn7" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="540"/>
+            <Image x:Name="BlackPawn8" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="630"/>
+            <Image x:Name="BlackRook2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackRook.png" Canvas.Left="630"/>
+            <Image x:Name="BlackRook1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackRook.png"/>
+            <Image x:Name="BlackKnightRight" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightRight.png" Canvas.Left="90"/>
+            <Image x:Name="BlackKnightLeft" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightLeft.png" Canvas.Left="540"/>
+            <Image x:Name="BlackBishop2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackBishop.png" Canvas.Left="450"/>
+            <Image x:Name="BlackBishop1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackBishop.png" Canvas.Left="180"/>
+            <Image x:Name="BlackQueen" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="270"/>
+            <Image x:Name="BlackKing" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKing.png" Canvas.Left="360"/>
+            <Image x:Name="WhitePawn1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" />
+            <Image x:Name="WhitePawn2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="90"/>
+            <Image x:Name="WhitePawn3" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="180"/>
+            <Image x:Name="WhitePawn4" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="270"/>
+            <Image x:Name="WhitePawn5" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="360"/>
+            <Image x:Name="WhitePawn6" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="450"/>
+            <Image x:Name="WhitePawn7" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="540"/>
+            <Image x:Name="WhitePawn8" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="630"/>
+            <Image x:Name="WhiteRook2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteRook.png" Canvas.Left="630" Canvas.Top="630"/>
+            <Image x:Name="WhiteRook1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteRook.png" Canvas.Top="630"/>
+            <Image x:Name="WhiteKnightRight" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightRight.png" Canvas.Left="90" Canvas.Top="630"/>
+            <Image x:Name="WhiteKnightLeft" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightLeft.png" Canvas.Left="540" Canvas.Top="630"/>
+            <Image x:Name="WhiteBishop2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteBishop.png" Canvas.Left="450" Canvas.Top="630"/>
+            <Image x:Name="WhiteBishop1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteBishop.png" Canvas.Left="180" Canvas.Top="630"/>
+            <Image x:Name="WhiteQueen" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteQueen.png" Canvas.Left="270" Canvas.Top="630"/>
+            <Image x:Name="WhiteKing" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKing.png" Canvas.Left="360" Canvas.Top="630"/>
+            <Label x:Name="GameOver" Content="Game Over" Canvas.Left="235" Canvas.Top="-74" FontSize="48" FontFamily="Segoe UI Semibold">
+                <Label.Effect>
+                    <DropShadowEffect Opacity="0.25"/>
+                </Label.Effect>
+            </Label>
+            <Image x:Name="WhiteQueenPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteQueen.png" Canvas.Left="-568"/>
+            <Image x:Name="WhiteQueenPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteQueen.png" Canvas.Left="-568" Canvas.Top="90"/>
+            <Image x:Name="BlackQueenPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="-458" Canvas.Top="90"/>
+            <Image x:Name="WhiteBishopPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteBishop.png" Canvas.Left="-568" Canvas.Top="180"/>
+            <Image x:Name="WhiteBishopPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteBishop.png" Canvas.Left="-568" Canvas.Top="270"/>
+            <Image x:Name="BlackBishopPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackBishop.png" Canvas.Left="-458" Canvas.Top="180"/>
+            <Image x:Name="BlackBishopPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackBishop.png" Canvas.Left="-458" Canvas.Top="270"/>
+            <Image x:Name="WhiteKnightPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightRight.png" Canvas.Left="-568" Canvas.Top="360"/>
+            <Image x:Name="WhiteKnightPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightRight.png" Canvas.Left="-568" Canvas.Top="450"/>
+            <Image x:Name="BlackKnightPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightRight.png" Canvas.Left="-458" Canvas.Top="360"/>
+            <Image x:Name="BlackKnightPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightRight.png" Canvas.Left="-458" Canvas.Top="450"/>
+            <Image x:Name="WhiteRookPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteRook.png" Canvas.Top="540" Canvas.Left="-568"/>
+            <Image x:Name="WhiteRookPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteRook.png" Canvas.Top="630" Canvas.Left="-568"/>
+            <Image x:Name="BlackRookPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackRook.png" Canvas.Left="-458" Canvas.Top="545"/>
+            <Image x:Name="BlackRookPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackRook.png" Canvas.Left="-458" Canvas.Top="630"/>
+            <Image x:Name="BlackQueenPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="-458"/>
+        </Canvas>
+        <TextBox x:Name="LogText" HorizontalAlignment="Left" Height="784" Margin="10,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="338"/>
+        <TextBox x:Name="BoardDebug" HorizontalAlignment="Left" Height="768" Margin="1099,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="171" FontFamily="Courier New"/>
+        <TextBox x:Name="WhiteScore" HorizontalAlignment="Left" Height="23" Margin="684,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="33"/>
+        <TextBox x:Name="BlackScore" HorizontalAlignment="Left" Height="23" Margin="725,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="33"/>
+        <Label x:Name="WhiteScoreLabel" Content="White" HorizontalAlignment="Left" Margin="635,35,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="BlackScoreLabel" Content="Black" HorizontalAlignment="Left" Margin="763,35,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="LogicLog" HorizontalAlignment="Left" Height="768" Margin="1275,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="471" FontFamily="Courier New"/>
+        <Button x:Name="NewGame" Content="New Game CPU" HorizontalAlignment="Left" Margin="128,10,0,0" VerticalAlignment="Top" Width="102" Click="NewGame_Click" Height="35"/>
+        <Label x:Name="StartPositionUI" Content="Label" HorizontalAlignment="Left" Margin="361,27,0,0" VerticalAlignment="Top" Width="51"/>
+        <Label x:Name="EndPositionUI" Content="Label" HorizontalAlignment="Left" Margin="412,27,0,0" VerticalAlignment="Top" Width="51"/>
+        <Button x:Name="NewGameHuman" Content="New Game Human" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHuman_Click" Height="35"/>
+        <local:PromotionTypeUserControl x:Name="PromotionTypeSelector" HorizontalAlignment="Left" Margin="558,432,0,0" VerticalAlignment="Top" PieceSelected="PromotionTypeSelector_PieceSelected" />
+    </Grid>
+</Window>
