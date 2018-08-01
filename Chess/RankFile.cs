@@ -71,6 +71,75 @@
 
         public File File { get; }
 
+        public SquareFlag GetSquareFlag()
+        {
+            if (File == File.a && Rank == 1) return SquareFlag.A1;
+            if (File == File.b && Rank == 1) return SquareFlag.B1;
+            if (File == File.c && Rank == 1) return SquareFlag.C1;
+            if (File == File.d && Rank == 1) return SquareFlag.D1;
+            if (File == File.e && Rank == 1) return SquareFlag.E1;
+            if (File == File.f && Rank == 1) return SquareFlag.F1;
+            if (File == File.g && Rank == 1) return SquareFlag.G1;
+            if (File == File.h && Rank == 1) return SquareFlag.H1;
+            if (File == File.a && Rank == 2) return SquareFlag.A2;
+            if (File == File.b && Rank == 2) return SquareFlag.B2;
+            if (File == File.c && Rank == 2) return SquareFlag.C2;
+            if (File == File.d && Rank == 2) return SquareFlag.D2;
+            if (File == File.e && Rank == 2) return SquareFlag.E2;
+            if (File == File.f && Rank == 2) return SquareFlag.F2;
+            if (File == File.g && Rank == 2) return SquareFlag.G2;
+            if (File == File.h && Rank == 2) return SquareFlag.H2;
+            if (File == File.a && Rank == 3) return SquareFlag.A3;
+            if (File == File.b && Rank == 3) return SquareFlag.B3;
+            if (File == File.c && Rank == 3) return SquareFlag.C3;
+            if (File == File.d && Rank == 3) return SquareFlag.D3;
+            if (File == File.e && Rank == 3) return SquareFlag.E3;
+            if (File == File.f && Rank == 3) return SquareFlag.F3;
+            if (File == File.g && Rank == 3) return SquareFlag.G3;
+            if (File == File.h && Rank == 3) return SquareFlag.H3;
+            if (File == File.a && Rank == 4) return SquareFlag.A4;
+            if (File == File.b && Rank == 4) return SquareFlag.B4;
+            if (File == File.c && Rank == 4) return SquareFlag.C4;
+            if (File == File.d && Rank == 4) return SquareFlag.D4;
+            if (File == File.e && Rank == 4) return SquareFlag.E4;
+            if (File == File.f && Rank == 4) return SquareFlag.F4;
+            if (File == File.g && Rank == 4) return SquareFlag.G4;
+            if (File == File.h && Rank == 4) return SquareFlag.H4;
+            if (File == File.a && Rank == 5) return SquareFlag.A5;
+            if (File == File.b && Rank == 5) return SquareFlag.B5;
+            if (File == File.c && Rank == 5) return SquareFlag.C5;
+            if (File == File.d && Rank == 5) return SquareFlag.D5;
+            if (File == File.e && Rank == 5) return SquareFlag.E5;
+            if (File == File.f && Rank == 5) return SquareFlag.F5;
+            if (File == File.g && Rank == 5) return SquareFlag.G5;
+            if (File == File.h && Rank == 5) return SquareFlag.H5;
+            if (File == File.a && Rank == 6) return SquareFlag.A6;
+            if (File == File.b && Rank == 6) return SquareFlag.B6;
+            if (File == File.c && Rank == 6) return SquareFlag.C6;
+            if (File == File.d && Rank == 6) return SquareFlag.D6;
+            if (File == File.e && Rank == 6) return SquareFlag.E6;
+            if (File == File.f && Rank == 6) return SquareFlag.F6;
+            if (File == File.g && Rank == 6) return SquareFlag.G6;
+            if (File == File.h && Rank == 6) return SquareFlag.H6;
+            if (File == File.a && Rank == 7) return SquareFlag.A7;
+            if (File == File.b && Rank == 7) return SquareFlag.B7;
+            if (File == File.c && Rank == 7) return SquareFlag.C7;
+            if (File == File.d && Rank == 7) return SquareFlag.D7;
+            if (File == File.e && Rank == 7) return SquareFlag.E7;
+            if (File == File.f && Rank == 7) return SquareFlag.F7;
+            if (File == File.g && Rank == 7) return SquareFlag.G7;
+            if (File == File.h && Rank == 7) return SquareFlag.H7;
+            if (File == File.a && Rank == 8) return SquareFlag.A8;
+            if (File == File.b && Rank == 8) return SquareFlag.B8;
+            if (File == File.c && Rank == 8) return SquareFlag.C8;
+            if (File == File.d && Rank == 8) return SquareFlag.D8;
+            if (File == File.e && Rank == 8) return SquareFlag.E8;
+            if (File == File.f && Rank == 8) return SquareFlag.F8;
+            if (File == File.g && Rank == 8) return SquareFlag.G8;
+            if (File == File.h && Rank == 8) return SquareFlag.H8;
+            return 0;
+        }
+
         private RankFile(int rank, File file)
         {
             Rank = rank;

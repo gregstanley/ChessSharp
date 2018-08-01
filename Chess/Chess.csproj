@@ -57,6 +57,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BitBoard.cs" />
     <Compile Include="BoardMetrics.cs" />
     <Compile Include="ColourExtensions.cs" />
     <Compile Include="CpuPlayer.cs" />

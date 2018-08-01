@@ -47,57 +47,74 @@ namespace Chess
             if (board.IsInCheck(colour))
                 escapeCheckBoards = GetEscapeCheckBoards(board, colour, sb);
 
-            var squaresUnderAttack = board.GetSquaresUnderThreat(colour);
+            //var squaresUnderAttack = board.GetSquaresUnderThreat(colour);
 
-            var coveredSquares = board.GetProtectedPieces(colour);
+            //var coveredSquares = board.GetProtectedPieces(colour);
 
-            IEnumerable<Board> escapeBoards = null;
+            //IEnumerable<Board> escapeBoards = null;
 
-            if (squaresUnderAttack.Any())
-            {
-                var highestValueSquareUnderAttack = squaresUnderAttack.First();
+            //if (squaresUnderAttack.Any())
+            //{
+            //    var highestValueSquareUnderAttack = squaresUnderAttack.First();
 
-                var possibleEscapeRoutes = board.ChildBoards
-                    .Where(x => x.GetMovedFrom().Rank == highestValueSquareUnderAttack.Rank && x.GetMovedFrom().File == highestValueSquareUnderAttack.File);
+            //    var possibleEscapeRoutes = board.ChildBoards
+            //        .Where(x => x.GetMovedFrom().Rank == highestValueSquareUnderAttack.Rank && x.GetMovedFrom().File == highestValueSquareUnderAttack.File);
 
-                if (possibleEscapeRoutes.Any())
-                    escapeBoards = possibleEscapeRoutes;
-            }
+            //    if (possibleEscapeRoutes.Any())
+            //        escapeBoards = possibleEscapeRoutes;
+            //}
+
+            var escapeBoards = FilterLostPieceBoards(board, colour, sb);
 
             var d2LeafBoards = board.FindLeaves();
 
-            var boardsWhereKingBecomesInCheck = d2LeafBoards.Where(x => x.IsInCheck(colour));
+            var acceptableBoards = FilterImmediateCheckmateBoards(board, colour, d2LeafBoards, sb);
 
-            if (boardsWhereKingBecomesInCheck.Any())
-            {
-                sb.AppendLine($"I can see {boardsWhereKingBecomesInCheck.Count()} response boards that leave my King in check. Is it Checkmate?");
+            //var boardsWhereKingBecomesInCheck = d2LeafBoards.Where(x => x.IsInCheck(colour));
 
-                var badParentBoards = new List<Board>();
+            //IEnumerable<Board> d1NoCheckmateBoards = board.ChildBoards;
+            //IEnumerable<Board> d1CheckmateBoards = board.ChildBoards;
 
-                foreach (var boardInCheck in boardsWhereKingBecomesInCheck)
-                {
-                    boardInCheck.GenerateChildBoards(colour, 1);
+            //if (boardsWhereKingBecomesInCheck.Any())
+            //{
+            //    sb.AppendLine($"I can see {boardsWhereKingBecomesInCheck.Count()} response boards that leave my King in check. Is it Checkmate?");
 
-                    sb.AppendLine($"Board: {boardInCheck.ParentBoard.GetCode()}->{boardInCheck.GetCode()} Checkmate: {boardInCheck.IsInCheckmate(colour)}");
-                }
-            }
+            //    foreach (var boardInCheck in boardsWhereKingBecomesInCheck)
+            //    {
+            //        boardInCheck.GenerateChildBoards(colour, 1);
 
-            var d1NoCheckmateBoards = board.ChildBoards.Where(x => !x.ChildBoards.Any(y => y.IsInCheckmate(colour)));
-            var d1CheckmateBoards = board.ChildBoards.Where(x => x.ChildBoards.Any(y => y.IsInCheckmate(colour)));
+            //        sb.AppendLine($"Board: {boardInCheck.ParentBoard.GetCode()}->{boardInCheck.GetCode()} Checkmate: {boardInCheck.IsInCheckmate(colour)}");
+            //    }
 
-            sb.AppendLine($"Keeping {d1NoCheckmateBoards.Count()} safe boards:");
-            foreach(var d1NoCheckmateBoard in d1NoCheckmateBoards)
-                sb.AppendLine($"   {d1NoCheckmateBoard.GetMetricsString()}");
+            //    d1NoCheckmateBoards = board.ChildBoards.Where(x => !x.ChildBoards.Any(y => y.IsInCheckmate(colour)));
 
-            sb.AppendLine($"Discarding {d1CheckmateBoards.Count()} dangerous boards:");
-            foreach (var dangerousBoard in d1CheckmateBoards)
-                sb.AppendLine($"   {dangerousBoard.GetMetricsString()}");
+            //    var noCheckmateCount = boardsWhereKingBecomesInCheck.Count() - d1NoCheckmateBoards.Count();
+            //    var checkmateCount = d1NoCheckmateBoards.Count() - noCheckmateCount;
 
-            var d2NoCheckmateBoards = d2LeafBoards.Where(x => d1NoCheckmateBoards.Contains(x.ParentBoard));
+            //    if (checkmateCount == 0)
+            //    {
+            //        sb.AppendLine("No move leads direct to Checkmate.");
+            //    }
+            //    else
+            //    {
+            //        sb.AppendLine($"Could be. {checkmateCount} moves/s lead direct to Checkmate.");
+            //        sb.AppendLine($"Keeping {d1NoCheckmateBoards.Count()} boards that do not lead to an immediate Chekmate:");
+
+            //        d1CheckmateBoards = board.ChildBoards.Where(x => x.ChildBoards.Any(y => y.IsInCheckmate(colour)));
+
+            //        sb.AppendLine($"Discarding {d1CheckmateBoards.Count()} dangerous boards:");
+
+            //        foreach (var dangerousBoard in d1CheckmateBoards)
+            //            sb.AppendLine($"   {dangerousBoard.GetMetricsString()}");
+            //    }
+                
+            //}
+
+            var d2NoCheckmateBoards = d2LeafBoards.Where(x => acceptableBoards.Contains(x.ParentBoard));
 
             sb.AppendLine($"Leafboards {d2LeafBoards.Count()} filtered to {d2NoCheckmateBoards.Count()}");
 
-            var d1AvoidCheckmateBoards = d1NoCheckmateBoards;
+            var d1AvoidCheckmateBoards = acceptableBoards;
 
             var d2BoardsLosingPieces = d2NoCheckmateBoards
                 .Where(x => x.GetScore(colour) < myScore);
@@ -115,17 +132,19 @@ namespace Chess
             var d1NoLossBoardsGuaranteed = d1NoLossBoards
                 .Where(x => !x.ChildBoards.Any(y => y.GetScore(colour) < myScore));
 
+            //var d2BoardsLostLess = d2NoCheckmateBoards
+            //    .Where(x => (myScore - x.GetScore(colour)) > (opponentScore - x.GetScore(oppositeColour)));
             var d2BoardsLostLess = d2NoCheckmateBoards
-                .Where(x => (myScore - x.GetScore(colour)) > (opponentScore - x.GetScore(oppositeColour)));
+                .Where(x => x.GetMetrics(colour).PointsChange > x.GetMetrics(colour.Opposite()).PointsChange);
 
             var d1LostLessBoards = d2BoardsLostLess.Select(x => x.ParentBoard);
 
-            var d1LostLessBoardsGuaranteed = d2BoardsLostLess
+            var d1LostLessBoardsGuaranteed = d1LostLessBoards
                 .Where(x => !x.ChildBoards.Any(y => (myScore - y.GetScore(colour)) <= (opponentScore - y.GetScore(oppositeColour))));
 
             IEnumerable<Board> optionsBoards = null;
 
-            if (d1CheckmateBoards != null && d1CheckmateBoards.Any())
+            if (acceptableBoards != null && acceptableBoards.Any())
             {
                 sb.AppendLine($"Attempting to avoid a future Checkmate. Looking for Checkmate escapes that capture a piece without loss");
 
@@ -194,7 +213,7 @@ namespace Chess
                 optionsBoards = d1LostLessBoardsGuaranteed;
             }
 
-            if (optionsBoards == null)
+            if (optionsBoards == null || !optionsBoards.Any())
             {
                 sb.AppendLine($"Picking random move");
 
@@ -204,13 +223,20 @@ namespace Chess
                 if (optionsBoards == null || !optionsBoards.Any())
                     optionsBoards = board.ChildBoards;
             }
-
+            /*
             var optionsBoardsRanked = optionsBoards
                 .OrderBy(x => x.GetMetrics(colour).NumPiecesUnderThreatValue)
                 .OrderByDescending(x => x.GetMetrics(colour).NumProtectedPieces)
                 .OrderByDescending(x => x.GetMetrics(colour.Opposite()).NumPiecesUnderThreatValue)
                 .OrderByDescending(x => x.GetMetrics(colour).NumAccessibleSquares);
+                */
+            var optionsBoardsRanked = colour == Colour.White
+                ? optionsBoards.OrderByDescending(x => x.EvaluationScore)
+                : optionsBoards.OrderBy(x => x.EvaluationScore);
 
+            sb.AppendLine($"Final order:");
+            foreach (var optionBoard in optionsBoardsRanked)
+                sb.AppendLine($"   {optionBoard.GetMetricsString()}");
             //var range = optionsBoardsRanked.Count();
 
             //var chosenTargetBoardIndex = _random.Next(range);
@@ -283,6 +309,69 @@ namespace Chess
             }
 
             return escapeCheckBoards;
+        }
+
+        private IEnumerable<Board> FilterLostPieceBoards(Board board, Colour colour, StringBuilder sb)
+        {
+            var squaresUnderAttack = board.GetSquaresUnderThreat(colour);
+
+            var coveredSquares = board.GetProtectedPieces(colour);
+
+            IEnumerable<Board> escapeBoards = null;
+
+            if (squaresUnderAttack.Any())
+            {
+                var highestValueSquareUnderAttack = squaresUnderAttack.First();
+
+                var possibleEscapeRoutes = board.ChildBoards
+                    .Where(x => x.GetMovedFrom().Rank == highestValueSquareUnderAttack.Rank && x.GetMovedFrom().File == highestValueSquareUnderAttack.File);
+
+                if (possibleEscapeRoutes.Any())
+                    escapeBoards = possibleEscapeRoutes;
+            }
+
+            return escapeBoards;
+        }
+
+        private IEnumerable<Board> FilterImmediateCheckmateBoards(Board board, Colour colour, IEnumerable<Board> d2LeafBoards, StringBuilder sb)
+        {
+            var boardsWhereKingBecomesInCheck = d2LeafBoards.Where(x => x.IsInCheck(colour));
+
+            IEnumerable<Board> d1NoCheckmateBoards = board.ChildBoards;
+            IEnumerable<Board> d1CheckmateBoards = board.ChildBoards;
+
+            sb.AppendLine($"I can see {boardsWhereKingBecomesInCheck.Count()} response boards that leave my King in check. Is it Checkmate?");
+
+            foreach (var boardInCheck in boardsWhereKingBecomesInCheck)
+            {
+                boardInCheck.GenerateChildBoards(colour, 1);
+
+                sb.AppendLine($"Board: {boardInCheck.ParentBoard.GetCode()}->{boardInCheck.GetCode()} Checkmate: {boardInCheck.IsInCheckmate(colour)}");
+            }
+
+            d1NoCheckmateBoards = board.ChildBoards.Where(x => !x.ChildBoards.Any(y => y.IsInCheckmate(colour)));
+
+            var noCheckmateCount = boardsWhereKingBecomesInCheck.Count() - d1NoCheckmateBoards.Count();
+            var checkmateCount = d1NoCheckmateBoards.Count() - noCheckmateCount;
+
+            if (checkmateCount == 0)
+            {
+                sb.AppendLine("No move leads direct to Checkmate.");
+            }
+            else
+            {
+                sb.AppendLine($"Could be. {checkmateCount} moves/s lead direct to Checkmate.");
+                sb.AppendLine($"Keeping {d1NoCheckmateBoards.Count()} boards that do not lead to an immediate Chekmate:");
+
+                d1CheckmateBoards = board.ChildBoards.Where(x => x.ChildBoards.Any(y => y.IsInCheckmate(colour)));
+
+                sb.AppendLine($"Discarding {d1CheckmateBoards.Count()} dangerous boards:");
+
+                foreach (var dangerousBoard in d1CheckmateBoards)
+                    sb.AppendLine($"   {dangerousBoard.GetMetricsString()}");
+            }
+
+            return d1NoCheckmateBoards;
         }
 
         private IOrderedEnumerable<Board> MergeOptions(IEnumerable<Board> boards1, IEnumerable<Board> boards2, Colour colour) =>

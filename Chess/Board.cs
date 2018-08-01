@@ -34,6 +34,8 @@ namespace Chess
 
         public byte BlackScore { get; private set; }
 
+        public double EvaluationScore { get; private set; }
+
         public OptionsStats OptionsStats { get; private set; } = new OptionsStats(0, 0, 0, 0, 0);
 
         public BoardMetrics WhiteMetrics { get; private set; }
@@ -52,6 +54,10 @@ namespace Chess
 
         private BoardState _state = BoardState.None;
 
+        private BitBoard _bitBoard;
+
+        //private BoardState _bitBoardState = BoardState.None;
+
         public Board(Board parentBoard, MoveFinder moveFinder)
         {
             ParentBoard = parentBoard;
@@ -62,6 +68,8 @@ namespace Chess
 
             _moveFinder = moveFinder;
 
+            _bitBoard = parentBoard._bitBoard.Clone();
+
             UpdateScores();
         }
 
@@ -71,11 +79,20 @@ namespace Chess
 
             _moveFinder = moveFinder;
 
+            _bitBoard = new BitBoard();
+
             UpdateScores();
+        }
+
+        public void MovePiece2(Move move)
+        {
+            _bitBoard.Move(move);
         }
 
         public void MovePiece(Move move)
         {
+            MovePiece2(move);
+
             _move = move;
 
             var startSquare = _squares.Single(x => x.Rank == move.StartPosition.Rank && x.File == move.StartPosition.File);
@@ -164,7 +181,79 @@ namespace Chess
             WhiteMetrics = whiteMetrics;
             BlackMetrics = blackMetrics;
 
+            EvaluationScore = Evaluate(colour, whiteMetrics, blackMetrics);
+
             Code = GetCode();
+        }
+
+        private double Evaluate(Colour colour, BoardMetrics whiteMetrics, BoardMetrics blackMetrics)
+        {
+            /*
+             f(p) = 200(K-K')
+               + 9(Q-Q')
+               + 5(R-R')
+               + 3(B-B' + N-N')
+               + 1(P-P')
+               - 0.5(D-D' + S-S' + I-I')
+               + 0.1(M-M') + ...
+ 
+            KQRBNP = number of kings, queens, rooks, bishops, knights and pawns
+            D,S,I = doubled, blocked and isolated pawns
+            M = Mobility (the number of legal moves)
+
+            materialScore = kingWt * (wK - bK)
+              + queenWt * (wQ - bQ)
+              + rookWt * (wR - bR)
+              + knightWt * (wN - bN)
+              + bishopWt * (wB - bB)
+              + pawnWt * (wP - bP)
+
+            mobilityScore = mobilityWt * (wMobility - bMobility)
+
+            return the score relative to the side to move (who2Move = +1 for white, -1 for black):
+            eval  = (materialScore + mobilityScore) * who2Move
+            */
+            var kingWeight = 200;
+            var queenWeight = 9;
+            var rookWeight = 5;
+            var knightWeight = 3;
+            var bishopWeight = 3;
+            var pawnWeight = 1;
+            var mobilityWeight = 0.1;
+
+            var whitePieces = GetSquaresWithPieceOn(Colour.White);
+            var blackPieces = GetSquaresWithPieceOn(Colour.Black);
+
+            var whiteKingCount = whitePieces.Where(x => x.Piece.Type == PieceType.King).Count();
+            var blackKingCount = blackPieces.Where(x => x.Piece.Type == PieceType.King).Count();
+
+            var whiteQueenCount = whitePieces.Where(x => x.Piece.Type == PieceType.Queen).Count();
+            var blackQueenCount = blackPieces.Where(x => x.Piece.Type == PieceType.Queen).Count();
+
+            var whiteRookCount = whitePieces.Where(x => x.Piece.Type == PieceType.Rook).Count();
+            var blackRookCount = blackPieces.Where(x => x.Piece.Type == PieceType.Rook).Count();
+
+            var whiteKnightCount = whitePieces.Where(x => x.Piece.Type == PieceType.Knight).Count();
+            var blackKnightCount = blackPieces.Where(x => x.Piece.Type == PieceType.Knight).Count();
+
+            var whiteBishopCount = whitePieces.Where(x => x.Piece.Type == PieceType.Bishop).Count();
+            var blackBishopCount = blackPieces.Where(x => x.Piece.Type == PieceType.Bishop).Count();
+
+            var whitePawnCount = whitePieces.Where(x => x.Piece.Type == PieceType.Pawn).Count();
+            var blackPawnCount = blackPieces.Where(x => x.Piece.Type == PieceType.Pawn).Count();
+
+            var materialScore = kingWeight * (whiteKingCount - blackKingCount)
+              + queenWeight * (whiteQueenCount - blackQueenCount)
+              + rookWeight * (whiteRookCount - blackRookCount)
+              + knightWeight * (whiteKnightCount - blackKnightCount)
+              + bishopWeight * (whiteBishopCount - blackBishopCount)
+              + pawnWeight * (whitePawnCount - blackPawnCount);
+
+            var mobilityScore = mobilityWeight * (whiteMetrics.NumAccessibleSquares - blackMetrics.NumAccessibleSquares);
+
+            var who2move = colour.Opposite() == Colour.White ? 1 : -1;
+
+            return (materialScore + mobilityScore) * who2move;
         }
 
         public BoardMetrics GetMetrics(Colour colour) =>
@@ -420,6 +509,7 @@ namespace Chess
 
         public string GetMetricsString() =>
             $"{GetCode()} " +
+            $"E: {Math.Round(EvaluationScore, 2)} " +
             $"WP+-: {WhiteMetrics.PointsChange} " +
             $"Mob: {WhiteMetrics.NumAccessibleSquares} " +
             $"PP: {WhiteMetrics.NumProtectedPieces} " +
