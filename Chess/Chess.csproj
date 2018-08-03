@@ -57,7 +57,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="BitBoard.cs" />
+    <Compile Include="Bit\BitBoard.cs" />
+    <Compile Include="Bit\BitBoardMoveFinder.cs" />
     <Compile Include="BoardMetrics.cs" />
     <Compile Include="ColourExtensions.cs" />
     <Compile Include="CpuPlayer.cs" />
@@ -74,6 +75,8 @@
     <Compile Include="RankFile.cs" />
     <Compile Include="RelativePosition.cs" />
     <Compile Include="Square.cs" />
+    <Compile Include="SquareExtensions.cs" />
+    <Compile Include="SquareFlagExtensions.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

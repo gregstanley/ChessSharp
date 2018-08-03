@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess.Bit;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,8 @@ namespace Chess
 {
     public class Board
     {
+        private bool _isParallel = false;
+
         private static List<File> _files = new List<File> { File.a, File.b, File.c, File.d, File.e, File.f, File.g, File.h };
 
         public Board ParentBoard { get; private set; }
@@ -56,7 +59,7 @@ namespace Chess
 
         private BitBoard _bitBoard;
 
-        //private BoardState _bitBoardState = BoardState.None;
+        private BitBoardMoveFinder _bbMoveFinder;
 
         public Board(Board parentBoard, MoveFinder moveFinder)
         {
@@ -67,7 +70,7 @@ namespace Chess
             OffBoard = parentBoard.OffBoard.Select(p => p.Clone()).ToList();
 
             _moveFinder = moveFinder;
-
+            _bbMoveFinder = parentBoard._bbMoveFinder;
             _bitBoard = parentBoard._bitBoard.Clone();
 
             UpdateScores();
@@ -80,6 +83,8 @@ namespace Chess
             _moveFinder = moveFinder;
 
             _bitBoard = new BitBoard();
+
+            _bbMoveFinder = new BitBoardMoveFinder();
 
             UpdateScores();
         }
@@ -463,18 +468,6 @@ namespace Chess
                     }
                 };
 
-                //Parallel.ForEach(colourSquares, (square) =>
-                //{
-                //    var boardsFromSquare = GenerateChildBoardsFromSquare(_squares, square);
-
-                //    if (boardsFromSquare.Any())
-                //    {
-                //        boardsWhereKingIsInCheck.AddRange(boardsFromSquare.Where(x => x.IsInCheck(colour)));
-                //        childBoards.AddRange(boardsFromSquare.Where(x => !x.IsInCheck(colour)));
-                //    }
-                //});
-
-
                 ChildBoards = childBoards;
             }
 
@@ -489,12 +482,18 @@ namespace Chess
             if (--depth <= 0)
                 return;
 
-            //foreach (var childBoard in ChildBoards)
-            //    childBoard.GenerateChildBoards(colour.Opposite(), depth);
-            Parallel.ForEach(ChildBoards, (childBoard) =>
+            if (_isParallel)
             {
-                childBoard.GenerateChildBoards(colour.Opposite(), depth);
-            });
+                Parallel.ForEach(ChildBoards, (childBoard) =>
+                {
+                    childBoard.GenerateChildBoards(colour.Opposite(), depth);
+                });
+            }
+            else
+            {
+                foreach (var childBoard in ChildBoards)
+                    childBoard.GenerateChildBoards(colour.Opposite(), depth);
+            }
         }
 
         public string GetCheckDebugString()
@@ -555,7 +554,23 @@ namespace Chess
 
         private IList<Board> GenerateChildBoardsFromSquare(IList<Square> squares, Square square)
         {
+            var bbMoves = _bbMoveFinder.FindMoves(_bitBoard, square.Piece.Colour, square.ToSquareFlag());
+
             var moves = _moveFinder.GetMoves(squares, square);
+
+            foreach(var move in moves)
+            {
+                var code1 = move.GetCode();
+                var match = bbMoves.SingleOrDefault(x => x.GetCode() == code1);
+                //var match2 = bbMoves.SingleOrDefault(x =>
+                //x.StartPosition.Rank == move.StartPosition.Rank
+                //&& x.StartPosition.File == move.StartPosition.File
+                //&& x.EndPosition.Rank == move.EndPosition.Rank
+                //&& x.EndPosition.File == move.EndPosition.File);
+
+                if (match == null)
+                { var bp = true; }
+            }
 
             var childBoards = new List<Board>();
 

@@ -1,4 +1,4 @@
-﻿namespace Chess
+﻿namespace Chess.Bit
 {
     public class BitBoard
     {
@@ -75,7 +75,68 @@
         public SquareFlag Black =>
             BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
 
+        public SquareFlag WhiteThreatened { get; private set; }
+
+        public SquareFlag BlackThreatened { get; private set; }
+
         private BoardState _state = BoardState.None;
+
+        public SquareFlag FindSquares(Colour colour, PieceType type)
+        {
+            if (colour == Colour.White)
+            {
+                if (type == PieceType.King) return WhiteKing;
+            }
+            else
+            {
+                if (type == PieceType.King) return WhiteKing;
+            }
+
+            return 0;
+        }
+
+        public SquareFlag FindThreatendSquares(Colour colour) =>
+            colour == Colour.White ? WhiteThreatened : BlackThreatened;
+
+        public Colour GetPieceColour(SquareFlag square)
+        {
+            if (White.HasFlag(square))
+                return Colour.White;
+
+            if (Black.HasFlag(square))
+                return Colour.Black;
+
+            return Colour.None;
+        }
+
+        public PieceType GetPiece(SquareFlag square)
+        {
+            var colour = GetPieceColour(square);
+
+            if (colour == Colour.None)
+                return PieceType.None;
+
+            if (colour == Colour.White)
+            {
+                if (WhitePawns.HasFlag(square)) return PieceType.Pawn;
+                if (WhiteRooks.HasFlag(square)) return PieceType.Rook;
+                if (WhiteKnights.HasFlag(square)) return PieceType.Knight;
+                if (WhiteBishops.HasFlag(square)) return PieceType.Bishop;
+                if (WhiteQueens.HasFlag(square)) return PieceType.Queen;
+                if (WhiteKing.HasFlag(square)) return PieceType.King;
+            }
+            else
+            {
+                if (BlackPawns.HasFlag(square)) return PieceType.Pawn;
+                if (BlackRooks.HasFlag(square)) return PieceType.Rook;
+                if (BlackKnights.HasFlag(square)) return PieceType.Knight;
+                if (BlackBishops.HasFlag(square)) return PieceType.Bishop;
+                if (BlackQueens.HasFlag(square)) return PieceType.Queen;
+                if (BlackKing.HasFlag(square)) return PieceType.King;
+            }
+
+            throw new System.Exception($"Failed to find piece for {square}");
+        }
 
         public void Move(Move move)
         {
@@ -113,6 +174,23 @@
             }
         }
 
+        public void SetThreatenedSquares(Colour colour, SquareFlag threatendSquares)
+        {
+            if (colour == Colour.White)
+                WhiteThreatened = threatendSquares;
+            else
+                BlackThreatened = threatendSquares;
+            //var squaresWithPieces = GetSquaresWithPieceOn();
+
+            //foreach (var square in squaresWithPieces)
+            //{
+            //    var coveredSquares = _moveFinder.GetCoveredSquares(_squares, square);
+
+            //    foreach (var coveredSquare in coveredSquares)
+            //        coveredSquare.AddCoveredBy(square.Piece);
+            //}
+        }
+
         public BitBoard Clone() =>
             new BitBoard(WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens, WhiteKing,
                 BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing);
@@ -136,62 +214,6 @@
                 BlackBishops &= ~square;
                 BlackQueens &= ~square;
                 BlackKing &= ~square;
-            }
-        }
-
-        private void PromotePiece(Colour colour, PieceType type, SquareFlag square)
-        {
-            if (colour == Colour.White)
-            {
-                if (type == PieceType.Rook)
-                {
-                    WhitePawns &= ~square;
-                    WhiteRooks |= square;
-                }
-
-                if (type == PieceType.Knight)
-                {
-                    WhitePawns &= ~square;
-                    WhiteKnights |= square;
-                }
-
-                if (type == PieceType.Bishop)
-                {
-                    WhitePawns &= ~square;
-                    WhiteBishops |= square;
-                }
-
-                if (type == PieceType.Queen)
-                {
-                    WhitePawns &= ~square;
-                    WhiteQueens |= square;
-                }
-            }
-            else
-            {
-                if (type == PieceType.Rook)
-                {
-                    BlackPawns &= ~square;
-                    BlackRooks |= square;
-                }
-
-                if (type == PieceType.Knight)
-                {
-                    BlackPawns &= ~square;
-                    BlackKnights |= square;
-                }
-
-                if (type == PieceType.Bishop)
-                {
-                    BlackPawns &= ~square;
-                    BlackBishops |= square;
-                }
-
-                if (type == PieceType.Queen)
-                {
-                    BlackPawns &= ~square;
-                    BlackQueens |= square;
-                }
             }
         }
 
@@ -290,6 +312,62 @@
                 {
                     BlackKing &= ~start;
                     BlackKing |= end;
+                }
+            }
+        }
+
+        private void PromotePiece(Colour colour, PieceType promoteTo, SquareFlag square)
+        {
+            if (colour == Colour.White)
+            {
+                if (promoteTo == PieceType.Rook)
+                {
+                    WhitePawns &= ~square;
+                    WhiteRooks |= square;
+                }
+
+                if (promoteTo == PieceType.Knight)
+                {
+                    WhitePawns &= ~square;
+                    WhiteKnights |= square;
+                }
+
+                if (promoteTo == PieceType.Bishop)
+                {
+                    WhitePawns &= ~square;
+                    WhiteBishops |= square;
+                }
+
+                if (promoteTo == PieceType.Queen)
+                {
+                    WhitePawns &= ~square;
+                    WhiteQueens |= square;
+                }
+            }
+            else
+            {
+                if (promoteTo == PieceType.Rook)
+                {
+                    BlackPawns &= ~square;
+                    BlackRooks |= square;
+                }
+
+                if (promoteTo == PieceType.Knight)
+                {
+                    BlackPawns &= ~square;
+                    BlackKnights |= square;
+                }
+
+                if (promoteTo == PieceType.Bishop)
+                {
+                    BlackPawns &= ~square;
+                    BlackBishops |= square;
+                }
+
+                if (promoteTo == PieceType.Queen)
+                {
+                    BlackPawns &= ~square;
+                    BlackQueens |= square;
                 }
             }
         }
