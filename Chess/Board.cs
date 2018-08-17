@@ -1,4 +1,6 @@
 ﻿using Chess.Bit;
+using Chess.Extensions;
+using Chess.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,17 +17,12 @@ namespace Chess
 
         public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
 
-        //public bool IsCapture => _state.HasFlag(BoardState.IsCapture); 
-
-        //public bool IsPawnPromotion => _state.HasFlag(BoardState.IsPawnPromotion);
-
-        //public bool WhiteIsInCheck => _state.HasFlag(BoardState.WhiteIsInCheck);
-
-        //public bool BlackIsInCheck => _state.HasFlag(BoardState.BlackIsInCheck);
-
         public bool WhiteCanCastleKingSide => _bitBoard.WhiteCanCastleKingSide();
+
         public bool WhiteCanCastleQueenSide => _bitBoard.WhiteCanCastleQueenSide();
+
         public bool BlackCanCastleKingSide => _bitBoard.BlackCanCastleKingSide();
+
         public bool BlackCanCastleQueenSide => _bitBoard.BlackCanCastleQueenSide();
 
         public bool WhiteIsInCheckmate => _state.HasFlag(BoardState.WhiteIsInCheckmate);
@@ -52,8 +49,6 @@ namespace Chess
 
         public Board PrimaryVariation { get; private set; }
 
-        private MoveFinder _moveFinder;
-
         private BoardState _state = BoardState.None;
 
         private BitBoard _bitBoard { get; }
@@ -62,10 +57,8 @@ namespace Chess
 
         public int PositionCounter { get; private set; } = 0;
 
-        public Board(MoveFinder moveFinder)
+        public Board()
         {
-            _moveFinder = moveFinder;
-            
             _bitBoard = new BitBoard();
 
             _bitBoardMoveFinder = new BitBoardMoveFinder();
@@ -79,9 +72,9 @@ namespace Chess
             ParentBoard = parentBoard;
 
             _move = move;
-            _bitBoardMoveFinder = moveFinder;
             
             _bitBoard = bitBoard;
+            _bitBoardMoveFinder = moveFinder;
 
             WhiteScore = GetScore(bitBoard, Colour.White);
             BlackScore = GetScore(bitBoard, Colour.Black);
@@ -285,9 +278,6 @@ namespace Chess
 
         public IReadOnlyCollection<Board> GetBoardsWithCheckmate(Colour colour) =>
             ChildBoards.Where(x => colour == Colour.White ? x.WhiteIsInCheckmate : x.BlackIsInCheckmate).ToList();
-
-        //public bool IsInCheck(Colour colour) =>
-        //    colour == Colour.White ? WhiteIsInCheck : BlackIsInCheck;
 
         public bool IsInCheckmate(Colour colour) =>
             colour == Colour.White ? WhiteIsInCheckmate : BlackIsInCheckmate;

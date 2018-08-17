@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Chess.Extensions;
+using Chess.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,7 +40,7 @@ namespace Chess
 
             GameOver.Visibility = Visibility.Collapsed;
 
-            var board = new Board(new MoveFinder());
+            var board = new Board();
 
             if (isHuman)
                 _currentMatch = new Match(board, Colour.White);

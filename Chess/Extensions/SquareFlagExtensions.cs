@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Chess.Models;
+using System.Collections.Generic;
 
-namespace Chess
+namespace Chess.Extensions
 {
     public static class SquareFlagExtensions
     {

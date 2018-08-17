@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using Chess.Models;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace Chess
@@ -11,8 +12,6 @@ namespace Chess
         {
             InitializeComponent();
         }
-
-        //public delegate void PieceSelected<PromotionTypeEventArgs>(object sender, PromotionTypeEventArgs args);
 
         public event PieceSelectedEventDelegate PieceSelected;
 

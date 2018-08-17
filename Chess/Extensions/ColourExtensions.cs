@@ -1,4 +1,6 @@
-﻿namespace Chess
+﻿using Chess.Models;
+
+namespace Chess.Extensions
 {
     public static class ColourExtensions
     {

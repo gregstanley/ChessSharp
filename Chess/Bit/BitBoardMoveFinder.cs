@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Chess.Extensions;
+using Chess.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -20,12 +22,7 @@ namespace Chess.Bit
                 var pieceMoves = FindMoves(board, colour, square, withCastles);
 
                 if (pieceMoves.Any())
-                {
-                    //boardsWhereKingIsInCheck.AddRange(boardsFromSquare.Where(x => x.IsInCheck(colour)));
-                    //childBoards.AddRange(boardsFromSquare.Where(x => !x.IsInCheck(colour)));
-
                     moves.AddRange(pieceMoves);
-                }
             };
 
             return moves;
@@ -166,6 +163,9 @@ namespace Chess.Bit
 
         public Move CanCastle(BitBoard board, Colour colour, SquareFlag square)
         {
+            if (!board.CanCastle(colour))
+                return null;
+
             if (board.GetPieceColour(square) != colour)
                 return null;
 
@@ -212,6 +212,10 @@ namespace Chess.Bit
                 return null;
 
             var targetKingSquare = RankFile.Get(kingRankFile.Rank, kingRankFile.File + (stride * -2));
+
+            if (targetKingSquare == null)
+                throw new Exception($"{colour} King is not in correct square");
+
             var targetRookSquare = RankFile.Get(rookRankFile.Rank, targetKingSquare.File + stride);
 
             return new MoveCastle(colour,
@@ -222,7 +226,6 @@ namespace Chess.Bit
                 targetKingSquare,
                 side);
         }
-
 
         private SquareFlag GetCoveredSquares(BitBoard board, Colour colour, SquareFlag square)
         {

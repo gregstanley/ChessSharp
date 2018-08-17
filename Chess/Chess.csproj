@@ -60,26 +60,22 @@
     <Compile Include="Bit\BitBoard.cs" />
     <Compile Include="Bit\BitBoardMoveFinder.cs" />
     <Compile Include="BoardMetrics.cs" />
-    <Compile Include="ColourExtensions.cs" />
+    <Compile Include="Extensions\ColourExtensions.cs" />
     <Compile Include="CpuPlayer.cs" />
-    <Compile Include="PotentialBoard.cs" />
+    <Compile Include="Extensions\ListSquareFlagExtensions.cs" />
+    <Compile Include="Models\PotentialBoard.cs" />
     <Compile Include="ImageMap.cs" />
-    <Compile Include="ListSquareFlagExtensions.cs" />
     <Compile Include="Match.cs" />
     <Compile Include="AlphaBeta.cs" />
-    <Compile Include="Move.cs" />
-    <Compile Include="MoveCastle.cs" />
-    <Compile Include="MoveFinder.cs" />
-    <Compile Include="PawnPromotionRanks.cs" />
+    <Compile Include="Models\Move.cs" />
+    <Compile Include="Models\MoveCastle.cs" />
     <Compile Include="PromotionTypeEventArgs.cs" />
     <Compile Include="PromotionTypeUserControl.xaml.cs">
       <DependentUpon>PromotionTypeUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RankFile.cs" />
-    <Compile Include="RelativePosition.cs" />
-    <Compile Include="Square.cs" />
-    <Compile Include="SquareExtensions.cs" />
-    <Compile Include="SquareFlagExtensions.cs" />
+    <Compile Include="Models\RankFile.cs" />
+    <Compile Include="Models\RelativePosition.cs" />
+    <Compile Include="Extensions\SquareFlagExtensions.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -89,7 +85,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Board.cs" />
-    <Compile Include="Enums.cs" />
+    <Compile Include="Models\Enums.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -100,7 +96,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Piece.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -172,5 +167,6 @@
   <ItemGroup>
     <Resource Include="Images\chess-36333_960_720.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

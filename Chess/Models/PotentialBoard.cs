@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Chess
+namespace Chess.Models
 {
     public class PotentialBoard
     {
