@@ -16,34 +16,34 @@ namespace Chess
 
         public Board AlphaBetaRoot(Board board, Colour colour, int depth, bool isMax, StringBuilder sb)
         {
-            PotentialBoard bestMove = null;
+            PotentialBoard bestChildBoard = null;
 
-            var moves = _bitBoardMoveFinder.FindMoves(board.BitBoard, colour);
+            var moves = board.FindMoves(colour);
 
             List<PotentialBoard> potentialBoards = new List<PotentialBoard>();
 
             foreach (var move in moves)
             {
-                var childBitBoard = board.BitBoard.Move(move, _bitBoardMoveFinder);
+                var childBoard = board.ApplyMove(move);
 
-                if (childBitBoard.IsCheck(colour))
+                if (childBoard.IsCheck(colour))
                     continue;
 
-                var childBoard = new Board(board, move, childBitBoard, _bitBoardMoveFinder);
+                //var childBoard = new Board(board, move, childBitBoard, _bitBoardMoveFinder);
 
                 //if (board.ChildBoards.SingleOrDefault(x => x.Code == childBoard.GetCode()) == null)
                 //    ChildBoards.Add(childBoard);
 
-                var bestChildMove = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, sb);
+                var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, sb);
 
-                var potentialBoard = new PotentialBoard(childBoard, bestChildMove.PotentialScore, PotentialBoard.NodeType.PV);
+                var potentialBoard = new PotentialBoard(childBoard, currentChildBoard.PotentialScore, PotentialBoard.NodeType.PV);
 
                 potentialBoards.Add(potentialBoard);
 
                 sb.AppendLine($"ROOT: {potentialBoard}");
 
-                if (bestMove == null || bestChildMove.PotentialScore > bestMove.Score)
-                    bestMove = potentialBoard;
+                if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
+                    bestChildBoard = potentialBoard;
             }
 
             sb.AppendLine($"ROOT:");
@@ -51,76 +51,76 @@ namespace Chess
             foreach (var evaluatedBoard in potentialBoards)
                 sb.AppendLine($" - {evaluatedBoard}");
 
-            return bestMove.Board;
+            return bestChildBoard.Board;
         }
 
         private PotentialBoard AlphaBetaInternal(Board board, Colour colour, int depth, double alpha, double beta, bool isMax, StringBuilder sb)
         {
             if (depth == 0)
-            {
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
-            }
 
-            var moves = _bitBoardMoveFinder.FindMoves(board.BitBoard, colour);
+            var moves = board.FindMoves(colour);
 
-            PotentialBoard bestMove;
+            PotentialBoard bestChildBoard;
 
             if (isMax)
             {
-                bestMove = new PotentialBoard(null, double.MaxValue, PotentialBoard.NodeType.PV);
+                bestChildBoard = new PotentialBoard(null, double.MaxValue, PotentialBoard.NodeType.PV);
 
                 foreach (var move in moves)
                 {
-                    var childBitBoard = board.BitBoard.Move(move, _bitBoardMoveFinder);
+                    var childBoard = board.ApplyMove(move);
 
-                    var childBoard = new Board(board, move, childBitBoard, _bitBoardMoveFinder);
+                    if (childBoard.IsCheck(colour))
+                        continue;
 
                     //board.ChildBoards.Add(childBoard);
 
-                    var bestChildMove = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    if (bestChildMove.Score > bestMove.PotentialScore)
-                        bestMove = new PotentialBoard(childBoard, bestChildMove.Score, PotentialBoard.NodeType.PV);
+                    if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
+                        bestChildBoard = currentChildBoard;
 
-                    alpha = Math.Max(alpha, bestMove.PotentialScore);
+                    alpha = Math.Max(alpha, bestChildBoard.PotentialScore);
 
                     if (beta <= alpha)
                     {
                         sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MAX)");
-                        return bestMove.WithType(PotentialBoard.NodeType.Cut);
+                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
                     }
                 }
             }
             else
             {
-                bestMove = new PotentialBoard(null, double.MinValue, PotentialBoard.NodeType.PV);
+                bestChildBoard = new PotentialBoard(null, double.MinValue, PotentialBoard.NodeType.PV);
 
                 foreach (var move in moves)
                 {
-                    var childBitBoard = board.BitBoard.Move(move, _bitBoardMoveFinder);
+                    var childBoard = board.ApplyMove(move);
 
-                    var childBoard = new Board(board, move, childBitBoard, _bitBoardMoveFinder);
+                    if (childBoard.IsCheck(colour))
+                        continue;
 
                     //board.ChildBoards.Add(childBoard);
 
-                    var bestChildMove = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    if (bestChildMove.Score < bestMove.PotentialScore)
-                        bestMove = new PotentialBoard(childBoard, bestChildMove.Score, PotentialBoard.NodeType.PV);
+                    if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
+                        bestChildBoard = currentChildBoard;
 
-                    beta = Math.Min(beta, bestMove.PotentialScore);
+                    beta = Math.Min(beta, bestChildBoard.PotentialScore);
 
                     if (beta <= alpha)
                     {
                         sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
-                        return bestMove.WithType(PotentialBoard.NodeType.Cut);
+                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
                     }
                 }
             }
 
-            sb.AppendLine($"EXACT: {board.GetCode()} Best: {bestMove} ");
+            sb.AppendLine($"EXACT: {board.GetCode()} Best: {bestChildBoard} ");
 
-            return bestMove.WithType(PotentialBoard.NodeType.All);
+            return bestChildBoard.WithType(PotentialBoard.NodeType.All);
         }
     }
 }

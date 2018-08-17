@@ -148,6 +148,13 @@ namespace Chess
             //        sb.AppendLine(offBoardPiece.LongName);
             //}
 
+            EvaluationUI.Content = board.EvaluationScore;
+
+            WhiteCastleKingSideUI.IsChecked = board.WhiteCanCastleKingSide;
+            WhiteCastleQueenSideUI.IsChecked = board.WhiteCanCastleQueenSide;
+            BlackCastleKingSideUI.IsChecked = board.BlackCanCastleKingSide;
+            BlackCastleQueenSideUI.IsChecked = board.BlackCanCastleQueenSide;
+
             sb.AppendLine("== Board ==");
 
             sb.Append(board.BoardToString());

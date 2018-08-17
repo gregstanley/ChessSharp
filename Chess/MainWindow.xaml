@@ -76,5 +76,10 @@
         <Label x:Name="EndPositionUI" Content="Label" HorizontalAlignment="Left" Margin="412,27,0,0" VerticalAlignment="Top" Width="51"/>
         <Button x:Name="NewGameHuman" Content="New Game Human" HorizontalAlignment="Left" Margin="8,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHuman_Click" Height="35"/>
         <local:PromotionTypeUserControl x:Name="PromotionTypeSelector" HorizontalAlignment="Left" Margin="558,432,0,0" VerticalAlignment="Top" PieceSelected="PromotionTypeSelector_PieceSelected" />
+        <Label x:Name="EvaluationUI" Content="Label" HorizontalAlignment="Left" Margin="1029,35,0,0" VerticalAlignment="Top" Width="51"/>
+        <CheckBox x:Name="BlackCastleQueenSideUI" Content="Queen Side" HorizontalAlignment="Left" Margin="360,94,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="BlackCastleKingSideUI" Content="King Side" HorizontalAlignment="Left" Margin="1009,97,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="WhiteCastleQueenSideUI" Content="Queen Side" HorizontalAlignment="Left" Margin="361,839,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="WhiteCastleKingSideUI" Content="King Side" HorizontalAlignment="Left" Margin="1009,839,0,0" VerticalAlignment="Top"/>
     </Grid>
 </Window>

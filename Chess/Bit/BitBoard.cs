@@ -5,6 +5,12 @@ namespace Chess.Bit
 {
     public class BitBoard
     {
+        private const BoardState DefaultState =
+            BoardState.WhiteCanCastleKingSide
+            | BoardState.WhiteCanCastleQueenSide
+            | BoardState.BlackCanCastleKingSide
+            | BoardState.BlackCanCastleQueenSide;
+
         public BitBoard()
         {
             WhitePawns = SquareFlag.A2 | SquareFlag.B2 | SquareFlag.C2 | SquareFlag.D2 | SquareFlag.E2 | SquareFlag.F2 | SquareFlag.G2 | SquareFlag.H2;
@@ -19,6 +25,7 @@ namespace Chess.Bit
             BlackBishops = SquareFlag.C8 | SquareFlag.F8;
             BlackQueens = SquareFlag.D8;
             BlackKing = SquareFlag.E8;
+            _state = DefaultState;
         }
 
         public BitBoard(SquareFlag whitePawns,
@@ -32,7 +39,8 @@ namespace Chess.Bit
             SquareFlag blackKnights,
             SquareFlag blackBishops,
             SquareFlag blackQueens,
-            SquareFlag blackKing)
+            SquareFlag blackKing,
+            BoardState state)
         {
             WhitePawns = whitePawns;
             WhiteRooks = whiteRooks;
@@ -46,6 +54,7 @@ namespace Chess.Bit
             BlackBishops = blackBishops;
             BlackQueens = blackQueens;
             BlackKing = blackKing;
+            _state = state;
         }
 
         public SquareFlag WhitePawns { get; private set; }
@@ -84,6 +93,17 @@ namespace Chess.Bit
 
         private BoardState _state = BoardState.None;
 
+        public bool CanCastle(Colour colour) =>
+            colour == Colour.White
+                ? WhiteCanCastleKingSide() || WhiteCanCastleQueenSide()
+                : BlackCanCastleKingSide() || BlackCanCastleQueenSide();
+
+        public bool CanCastleKingSide(Colour colour) =>
+            colour == Colour.White ? WhiteCanCastleKingSide() : BlackCanCastleKingSide();
+
+        public bool CanCastleQueenSide(Colour colour) =>
+            colour == Colour.White ? WhiteCanCastleQueenSide() : BlackCanCastleQueenSide();
+
         public SquareFlag FindPieceSquares(Colour colour) =>
             colour == Colour.White ? White : Black;
 
@@ -108,7 +128,25 @@ namespace Chess.Bit
         public SquareFlag FindCoveredSquares(Colour colour) =>
             colour == Colour.White ? WhiteCovered : BlackCovered;
 
-        public bool IsCheck(Colour colour) =>
+        public bool WhiteCanCastleKingSide() =>
+            _state.HasFlag(BoardState.WhiteCanCastleKingSide);
+
+        public bool WhiteCanCastleQueenSide() =>
+            _state.HasFlag(BoardState.WhiteCanCastleQueenSide);
+
+        public bool BlackCanCastleKingSide() =>
+            _state.HasFlag(BoardState.BlackCanCastleKingSide);
+
+        public bool BlackCanCastleQueenSide() =>
+            _state.HasFlag(BoardState.BlackCanCastleQueenSide);
+
+        public bool IsCapture() =>
+            _state.HasFlag(BoardState.IsCapture);
+
+        public bool IsPawnPromotion(Colour colour) =>
+            _state.HasFlag(BoardState.IsPawnPromotion);
+
+        public bool IsInCheck(Colour colour) =>
             colour == Colour.White ? BlackCovered.HasFlag(WhiteKing) : WhiteCovered.HasFlag(BlackKing);
 
         public Colour GetPieceColour(SquareFlag square)
@@ -175,7 +213,7 @@ namespace Chess.Bit
             return 0;
         }
 
-        public BitBoard Move(Move move, BitBoardMoveFinder moveFinder)
+        public BitBoard ApplyMove(Move move, BitBoardMoveFinder moveFinder)
         {
             var childBoard = Clone();
 
@@ -191,14 +229,14 @@ namespace Chess.Bit
             if (isCapture)
             {
                 childBoard.RemovePiece(move.PieceColour.Opposite(), endSquareFlag);
-                _state |= BoardState.IsCapture;
+                childBoard._state |= BoardState.IsCapture;
             }
 
             if (move.Type == PieceType.Pawn)
             {
                 if (move.PromotionType != PieceType.None)
                 {
-                    _state |= BoardState.IsPawnPromotion;
+                    childBoard._state |= BoardState.IsPawnPromotion;
 
                     childBoard.PromotePiece(move.PieceColour, move.PromotionType, endSquareFlag);
                 }
@@ -210,6 +248,24 @@ namespace Chess.Bit
                 var kingEndSquareFlag = castle.KingEndPosition.ToSquareFlag();
 
                 childBoard.MovePiece(move.PieceColour, PieceType.King, kingStartSquareFlag, kingEndSquareFlag);
+
+                childBoard.RemoveCastleAvailability(move.PieceColour);
+            }
+            else
+            {
+                if (move.Type == PieceType.King)
+                    childBoard.RemoveCastleAvailability(move.PieceColour);
+
+                if (move.Type == PieceType.Rook)
+                {
+                    var kingSquare = childBoard.FindKingSquare(move.PieceColour).ToRankFile();
+
+                    var relativePostion = kingSquare.To(move.StartPosition);
+
+                    var side = relativePostion.Rank == 3 ? PieceType.King : PieceType.Queen;
+
+                    childBoard.RemoveCastleAvailability(move.PieceColour, side);
+                }
             }
 
             var myCoveredSquares = moveFinder.GetCoveredSquares(childBoard, move.PieceColour);
@@ -221,9 +277,49 @@ namespace Chess.Bit
             return childBoard;
         }
 
-        public BitBoard Clone() =>
-            new BitBoard(WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens, WhiteKing,
-                BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing);
+        private void RemoveCastleAvailability(Colour colour, PieceType side)
+        {
+            if (colour == Colour.White)
+            {
+                if (side == PieceType.King) _state &= ~BoardState.WhiteCanCastleKingSide;
+                if (side == PieceType.Queen) _state &= ~BoardState.WhiteCanCastleQueenSide;
+            }
+            else
+            {
+                if (side == PieceType.King) _state &= ~BoardState.BlackCanCastleKingSide;
+                if (side == PieceType.Queen) _state &= ~BoardState.BlackCanCastleQueenSide;
+            }
+        }
+
+        private void RemoveCastleAvailability(Colour colour)
+        {
+            RemoveCastleAvailability(colour, PieceType.King);
+            RemoveCastleAvailability(colour, PieceType.Queen);
+            //if (colour == Colour.White)
+            //{
+            //    _state &= ~BoardState.WhiteCanCastleKingSide;
+            //    _state &= ~BoardState.WhiteCanCastleQueenSide;
+            //}
+            //else
+            //{
+            //    _state &= ~BoardState.BlackCanCastleKingSide;
+            //    _state &= ~BoardState.BlackCanCastleQueenSide;
+            //}
+        }
+
+        public BitBoard Clone()
+        {
+            var state = _state;
+
+            // Remove transient flags
+            state = state &= ~BoardState.IsCapture;
+            state = state &= ~BoardState.IsPawnPromotion;
+
+            var bitBoard = new BitBoard(WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens, WhiteKing,
+                BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing, state);
+
+            return bitBoard;
+        }
 
         public override string ToString()
         {

@@ -106,6 +106,9 @@ namespace Chess
 
                 if (king == PieceType.King)
                 {
+                    if (!board.CanCastle(colour))
+                        return null;
+
                     var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
 
                     var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
@@ -120,6 +123,9 @@ namespace Chess
 
                 if (rook == PieceType.Rook)
                 {
+                    if (!board.CanCastle(colour))
+                        return null;
+
                     var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
 
                     var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
