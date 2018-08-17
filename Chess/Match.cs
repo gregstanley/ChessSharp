@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Troschuetz.Random.Generators;
 
 namespace Chess
@@ -34,8 +35,14 @@ namespace Chess
         public string GetLastCpuMoveLog() =>
             _cpuPlayer.GetLastMoveLog();
 
-        public Piece GetPieceOnSquare(RankFile rankFile) =>
+        public byte GetInstanceNumber(Colour colour, PieceType type, SquareFlag square) =>
+            GetHeadBoard().GetInstanceNumber(colour, type, square);
+
+        public PieceType GetPieceOnSquareType(RankFile rankFile) =>
             GetHeadBoard().GetPieceOnSquare(rankFile);
+
+        public Colour GetPieceOnSquareColour(RankFile rankFile) =>
+            GetHeadBoard().GetPieceOnSquareColour(rankFile);
 
         public bool CheckForPawnPromotion(RankFile startPosition, RankFile endPosition) =>
             GetHeadBoard().CheckForPawnPromotion(startPosition, endPosition);
@@ -63,7 +70,7 @@ namespace Chess
             if (IsHumanTurn)
                 chosenBoard = DoMove(board, ThisTurnColour, startPosition, endPosition, promotionType);
             else
-                chosenBoard = _cpuPlayer.ChoseMove(board, ThisTurnColour);
+                chosenBoard = _cpuPlayer.ChoseMove(board, ThisTurnColour, ThisTurn);
 
             if (chosenBoard == null)
                 return null;
@@ -80,22 +87,24 @@ namespace Chess
 
         private Board DoMove(Board board, Colour colour, RankFile startPosition, RankFile endPosition, PieceType promotionType)
         {
+            var sb = new StringBuilder();
+
             // Must be 2 for now. Should probably always be even so ends with opponents turn
             board.GenerateChildBoards(colour, 2);
-
+            
             if (!board.ChildBoards.Any())
                 return null;
 
-            var square = board.GetSquare(startPosition);
+            var piece = board.GetPiece(startPosition);
 
-            if (square.Piece == null)
+            if (piece == PieceType.None)
                 return null;
 
-            if (square.Piece.Type == PieceType.Rook)
+            if (piece == PieceType.Rook)
             {
-                var kingSquare = board.GetSquare(endPosition);
+                var king = board.GetPiece(endPosition);
 
-                if (kingSquare.Piece?.Type == PieceType.King)
+                if (king == PieceType.King)
                 {
                     var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
 
@@ -105,11 +114,11 @@ namespace Chess
                         return castleBoard;
                 }
             }
-            else if (square.Piece.Type == PieceType.King)
+            else if (piece == PieceType.King)
             {
-                var rookSquare = board.GetSquare(endPosition);
+                var rook = board.GetPiece(endPosition);
 
-                if (rookSquare.Piece?.Type == PieceType.Rook)
+                if (rook == PieceType.Rook)
                 {
                     var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
 
@@ -120,14 +129,14 @@ namespace Chess
                 }
             }
 
-            var move = new Move(colour, square.Piece.Type, startPosition, endPosition);
+            var move = new Move(colour, piece, startPosition, endPosition);
 
             if (promotionType != PieceType.None)
-                move = new Move(colour, square.Piece.Type, startPosition, endPosition, promotionType);
+                move = new Move(colour, piece, startPosition, endPosition, promotionType);
 
             var code = move.GetCode();
 
-            var boards = board.ChildBoards.Where(x => x.Code == code);
+            var boards = board.ChildBoards.Where(x => x.GetCode() == code);
 
             if (boards == null || !boards.Any())
                 return null;

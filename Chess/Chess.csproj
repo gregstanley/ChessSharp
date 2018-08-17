@@ -62,11 +62,14 @@
     <Compile Include="BoardMetrics.cs" />
     <Compile Include="ColourExtensions.cs" />
     <Compile Include="CpuPlayer.cs" />
+    <Compile Include="PotentialBoard.cs" />
+    <Compile Include="ImageMap.cs" />
+    <Compile Include="ListSquareFlagExtensions.cs" />
     <Compile Include="Match.cs" />
+    <Compile Include="AlphaBeta.cs" />
     <Compile Include="Move.cs" />
     <Compile Include="MoveCastle.cs" />
     <Compile Include="MoveFinder.cs" />
-    <Compile Include="OptionsStats.cs" />
     <Compile Include="PawnPromotionRanks.cs" />
     <Compile Include="PromotionTypeEventArgs.cs" />
     <Compile Include="PromotionTypeUserControl.xaml.cs">

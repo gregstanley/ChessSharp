@@ -11,13 +11,9 @@ namespace Chess
     {
         private bool _isParallel = false;
 
-        private static List<File> _files = new List<File> { File.a, File.b, File.c, File.d, File.e, File.f, File.g, File.h };
-
         public Board ParentBoard { get; private set; }
 
         public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
-
-        public IList<Piece> OffBoard { get; private set; } = new List<Piece>();
 
         public bool IsCapture => _state.HasFlag(BoardState.IsCapture); 
 
@@ -39,120 +35,61 @@ namespace Chess
 
         public double EvaluationScore { get; private set; }
 
-        public OptionsStats OptionsStats { get; private set; } = new OptionsStats(0, 0, 0, 0, 0);
-
         public BoardMetrics WhiteMetrics { get; private set; }
 
         public BoardMetrics BlackMetrics { get; private set; }
 
-        public string Code { get; private set; } = string.Empty;
-
-        private IList<Square> _squares { get; }
+        public string Code { get { return _move == null ? string.Empty : _move.GetCode(); } }
 
         private Move _move { get; set; }
 
-        private IList<Board> _boardsInCheck { get; set; }
+        public Move Move => _move;
+
+        public Board PrimaryVariation { get; private set; }
 
         private MoveFinder _moveFinder;
 
         private BoardState _state = BoardState.None;
 
-        private BitBoard _bitBoard;
+        public BitBoard BitBoard { get; }
 
-        private BitBoardMoveFinder _bbMoveFinder;
+        private BitBoardMoveFinder _bitBoardMoveFinder;
 
-        public Board(Board parentBoard, MoveFinder moveFinder)
-        {
-            ParentBoard = parentBoard;
-
-            _squares = CloneSquaresAndPieces(parentBoard);
-
-            OffBoard = parentBoard.OffBoard.Select(p => p.Clone()).ToList();
-
-            _moveFinder = moveFinder;
-            _bbMoveFinder = parentBoard._bbMoveFinder;
-            _bitBoard = parentBoard._bitBoard.Clone();
-
-            UpdateScores();
-        }
+        public int PositionCounter { get; private set; } = 0;
 
         public Board(MoveFinder moveFinder)
         {
-            _squares = ResetBoard().ToArray();
-
             _moveFinder = moveFinder;
+            
 
-            _bitBoard = new BitBoard();
+            BitBoard = new BitBoard();
 
-            _bbMoveFinder = new BitBoardMoveFinder();
+            _bitBoardMoveFinder = new BitBoardMoveFinder();
 
-            UpdateScores();
+            WhiteScore = GetScore(BitBoard, Colour.White);
+            BlackScore = GetScore(BitBoard, Colour.Black);
         }
 
-        public void MovePiece2(Move move)
+        public Board(Board parentBoard, Move move, BitBoard bitBoard, BitBoardMoveFinder moveFinder)
         {
-            _bitBoard.Move(move);
-        }
-
-        public void MovePiece(Move move)
-        {
-            MovePiece2(move);
+            ParentBoard = parentBoard;
 
             _move = move;
+            _bitBoardMoveFinder = moveFinder;
+            
+            BitBoard = bitBoard;
 
-            var startSquare = _squares.Single(x => x.Rank == move.StartPosition.Rank && x.File == move.StartPosition.File);
-            var targetSquare = _squares.Single(x => x.Rank == move.EndPosition.Rank && x.File == move.EndPosition.File);
-            var piece = startSquare.Piece;
+            WhiteScore = GetScore(bitBoard, Colour.White);
+            BlackScore = GetScore(bitBoard, Colour.Black);
+        }
 
-            if (targetSquare.Piece != null)
-            {
-                _state |= BoardState.IsCapture;
+        public double Evaluate(Colour colour)
+        {
+            var whiteSquaresUnderThreat = GetSquaresUnderThreat(Colour.White);
+            var blackSquaresUnderThreat = GetSquaresUnderThreat(Colour.Black);
 
-                Capture(targetSquare.Piece);
-            }
-
-            targetSquare.SetPiece(piece);
-
-            piece.Move();
-
-            startSquare.RemovePiece();
-
-            if (move.Type == PieceType.Pawn)
-            {
-                var promotionType = move.PromotionType;
-
-                if (promotionType != PieceType.None)
-                {
-                    _state |= BoardState.IsPawnPromotion;
-
-                    targetSquare.SetPiece(Promote(piece, promotionType));
-                }
-            }
-
-            if (move is MoveCastle castle)
-            {
-                //var castle = move as MoveCastle;
-
-                var kingStartSquare = _squares.Single(x => x.Rank == castle.KingStartPosition.Rank && x.File == castle.KingStartPosition.File);
-                var targetKingSquare = _squares.Single(x => x.Rank == castle.KingEndPosition.Rank && x.File == castle.KingEndPosition.File);
-                var king = kingStartSquare.Piece;
-
-                targetKingSquare.SetPiece(king);
-
-                king.Move();
-
-                kingStartSquare.RemovePiece();
-            }
-
-            SetCoveredSquares();
-
-            var colour = piece.Colour;
-
-            var whiteSquaresUnderAttack = GetSquaresUnderThreat(Colour.White);
-            var blackSquaresUnderAttack = GetSquaresUnderThreat(Colour.Black);
-
-            var isWhiteCheck = whiteSquaresUnderAttack.Any(x => x.Piece.Type == PieceType.King);
-            var isBlackCheck = blackSquaresUnderAttack.Any(x => x.Piece.Type == PieceType.King);
+            var isWhiteCheck = whiteSquaresUnderThreat.HasFlag(BitBoard.FindKingSquare(Colour.White));
+            var isBlackCheck = blackSquaresUnderThreat.HasFlag(BitBoard.FindKingSquare(Colour.Black));
 
             if (isWhiteCheck)
                 _state |= BoardState.WhiteIsInCheck;
@@ -160,35 +97,33 @@ namespace Chess
             if (isBlackCheck)
                 _state |= BoardState.BlackIsInCheck;
 
-            UpdateScores();
-
             var whiteMetrics = new BoardMetrics();
             var blackMetrics = new BoardMetrics();
 
             whiteMetrics.PointsChange = WhiteScore - ParentBoard.WhiteScore;
             blackMetrics.PointsChange = BlackScore - ParentBoard.BlackScore;
 
-            whiteMetrics.NumPiecesUnderThreat = (byte)blackSquaresUnderAttack.Count();
-            blackMetrics.NumPiecesUnderThreat = (byte)whiteSquaresUnderAttack.Count();
+            whiteMetrics.NumPiecesUnderThreat = whiteSquaresUnderThreat.Count();
+            blackMetrics.NumPiecesUnderThreat = blackSquaresUnderThreat.Count();
 
-            var whiteCheckBoost = isBlackCheck ? 9 : 0;
-            var blackCheckBoost = isWhiteCheck ? 9 : 0;
+            //var whiteCheckBoost = isBlackCheck ? 9 : 0;
+            //var blackCheckBoost = isWhiteCheck ? 9 : 0;
 
-            whiteMetrics.NumPiecesUnderThreatValue = (byte)(whiteSquaresUnderAttack.Sum(x => x.Piece.Value) + blackCheckBoost);
-            blackMetrics.NumPiecesUnderThreatValue = (byte)(blackSquaresUnderAttack.Sum(x => x.Piece.Value) + whiteCheckBoost);
+            //whiteMetrics.NumPiecesUnderThreatValue = (byte)(whiteSquaresUnderAttack.Sum(x => x.Piece.Value) + blackCheckBoost);
+            //blackMetrics.NumPiecesUnderThreatValue = (byte)(blackSquaresUnderAttack.Sum(x => x.Piece.Value) + whiteCheckBoost);
 
-            whiteMetrics.NumAccessibleSquares = (byte)GetCoveredSquares(colour).Count();
-            blackMetrics.NumAccessibleSquares = (byte)GetCoveredSquares(colour.Opposite()).Count();
+            whiteMetrics.NumAccessibleSquares = GetCoveredSquares(Colour.White).Count();
+            blackMetrics.NumAccessibleSquares = GetCoveredSquares(Colour.Black).Count();
 
-            whiteMetrics.NumProtectedPieces = (byte)GetProtectedPieces(colour).Count();
-            blackMetrics.NumProtectedPieces = (byte)GetProtectedPieces(colour.Opposite()).Count();
+            whiteMetrics.NumProtectedPieces = GetProtectedPieces(Colour.White).Count();
+            blackMetrics.NumProtectedPieces = GetProtectedPieces(Colour.Black).Count();
 
             WhiteMetrics = whiteMetrics;
             BlackMetrics = blackMetrics;
 
             EvaluationScore = Evaluate(colour, whiteMetrics, blackMetrics);
 
-            Code = GetCode();
+            return EvaluationScore;
         }
 
         private double Evaluate(Colour colour, BoardMetrics whiteMetrics, BoardMetrics blackMetrics)
@@ -218,34 +153,37 @@ namespace Chess
             return the score relative to the side to move (who2Move = +1 for white, -1 for black):
             eval  = (materialScore + mobilityScore) * who2Move
             */
-            var kingWeight = 200;
-            var queenWeight = 9;
-            var rookWeight = 5;
-            var knightWeight = 3;
-            var bishopWeight = 3;
-            var pawnWeight = 1;
-            var mobilityWeight = 0.1;
+            var kingWeight = 200d;
+            var queenWeight = 9d;
+            var rookWeight = 5d;
+            var knightWeight = 3d;
+            var bishopWeight = 3d;
+            var pawnWeight = 1d;
+            var mobilityWeight = 0.0d;// 0.1;
+            var threatendWeight = 0.0d;
 
-            var whitePieces = GetSquaresWithPieceOn(Colour.White);
-            var blackPieces = GetSquaresWithPieceOn(Colour.Black);
+            var whiteKingCount = BitBoard.FindKingSquare(Colour.White).Count();
+            var blackKingCount = BitBoard.FindKingSquare(Colour.Black).Count();
 
-            var whiteKingCount = whitePieces.Where(x => x.Piece.Type == PieceType.King).Count();
-            var blackKingCount = blackPieces.Where(x => x.Piece.Type == PieceType.King).Count();
+            var whiteQueenCount = BitBoard.FindQueenSquares(Colour.White).Count();
+            var blackQueenCount = BitBoard.FindQueenSquares(Colour.Black).Count();
 
-            var whiteQueenCount = whitePieces.Where(x => x.Piece.Type == PieceType.Queen).Count();
-            var blackQueenCount = blackPieces.Where(x => x.Piece.Type == PieceType.Queen).Count();
+            var whiteRookCount = BitBoard.FindRookSquares(Colour.White).Count();
+            var blackRookCount = BitBoard.FindRookSquares(Colour.Black).Count();
 
-            var whiteRookCount = whitePieces.Where(x => x.Piece.Type == PieceType.Rook).Count();
-            var blackRookCount = blackPieces.Where(x => x.Piece.Type == PieceType.Rook).Count();
+            var whiteKnightCount = BitBoard.FindKnightSquares(Colour.White).Count();
+            var blackKnightCount = BitBoard.FindKnightSquares(Colour.Black).Count();
 
-            var whiteKnightCount = whitePieces.Where(x => x.Piece.Type == PieceType.Knight).Count();
-            var blackKnightCount = blackPieces.Where(x => x.Piece.Type == PieceType.Knight).Count();
+            var whiteBishopCount = BitBoard.FindBishopSquares(Colour.White).Count();
+            var blackBishopCount = BitBoard.FindBishopSquares(Colour.Black).Count();
 
-            var whiteBishopCount = whitePieces.Where(x => x.Piece.Type == PieceType.Bishop).Count();
-            var blackBishopCount = blackPieces.Where(x => x.Piece.Type == PieceType.Bishop).Count();
+            var whitePawnCount = BitBoard.FindPawnSquares(Colour.White).Count();
+            var blackPawnCount = BitBoard.FindPawnSquares(Colour.Black).Count();
 
-            var whitePawnCount = whitePieces.Where(x => x.Piece.Type == PieceType.Pawn).Count();
-            var blackPawnCount = blackPieces.Where(x => x.Piece.Type == PieceType.Pawn).Count();
+            if(whiteKingCount != 1 || blackKingCount != 1)
+            {
+                var bp = true;
+            }
 
             var materialScore = kingWeight * (whiteKingCount - blackKingCount)
               + queenWeight * (whiteQueenCount - blackQueenCount)
@@ -256,16 +194,21 @@ namespace Chess
 
             var mobilityScore = mobilityWeight * (whiteMetrics.NumAccessibleSquares - blackMetrics.NumAccessibleSquares);
 
-            var who2move = colour.Opposite() == Colour.White ? 1 : -1;
+            var threatendScore = threatendWeight * (whiteMetrics.NumPiecesUnderThreatValue - blackMetrics.NumPiecesUnderThreatValue);
 
-            return (materialScore + mobilityScore) * who2move;
+            var who2move = colour == Colour.White ? 1d : -1d;
+
+            return (materialScore + mobilityScore + threatendScore) * who2move;
         }
+
+        //public void SetPrimaryVariation(Move move) =>
+        //    PrimaryVariation = move;
 
         public BoardMetrics GetMetrics(Colour colour) =>
             Colour.White == colour ? WhiteMetrics : BlackMetrics;
 
         public bool CheckForPawnPromotion(RankFile startPosition, RankFile endPosition) =>
-            _moveFinder.CheckForPawnPromotion(GetSquare(startPosition), endPosition);
+            _bitBoardMoveFinder.CheckForPawnPromotion(BitBoard, startPosition.ToSquareFlag(), endPosition.ToSquareFlag());
 
         public string GetCode() =>
             _move.GetCode();
@@ -282,31 +225,35 @@ namespace Chess
         public Move GetMove() =>
             _move;
 
-        public Square GetSquare(RankFile rankFile) =>
-            _squares.Single(x => x.Rank == rankFile.Rank && x.File == rankFile.File);
+        public PieceType GetPiece(RankFile rankFile) =>
+            BitBoard.GetPiece(rankFile.ToSquareFlag());
 
-        public Square GetKingSquare(Colour colour) =>
-            _squares.Single(x => x.Piece?.Colour == colour && x.Piece?.Type == PieceType.King);
+        public SquareFlag GetKingSquare(Colour colour) =>
+            BitBoard.FindKingSquare(colour);
 
-        public IEnumerable<Square> GetSquaresWithPieceOn() =>
-            _squares.Where(x => x.Piece != null);
+        public SquareFlag GetSquaresWithPieceOn() =>
+            BitBoard.White | BitBoard.Black;
 
-        public IEnumerable<Square> GetSquaresWithPieceOn(Colour colour) =>
-            _squares.Where(x => x.Piece?.Colour == colour);
+        public SquareFlag GetSquaresWithPieceOn(Colour colour) =>
+            BitBoard.FindPieceSquares(colour);
 
-        public Piece GetPieceOnSquare(RankFile rankFile) =>
-            _squares.Single(x => x.Rank == rankFile.Rank && x.File == rankFile.File).Piece;
+        public PieceType GetPieceOnSquare(RankFile rankFile) =>
+            BitBoard.GetPiece(rankFile.ToSquareFlag());
 
-        public IQueryable<Square> GetCoveredSquares(Colour colour) =>
-            _squares.AsQueryable().Where(x => x.CoveredBy.Any(s => s.Colour == colour));
+        public Colour GetPieceOnSquareColour(RankFile rankFile) =>
+            BitBoard.GetPieceColour(rankFile.ToSquareFlag());
 
-        public IReadOnlyCollection<Square> GetProtectedPieces(Colour colour) =>
-            GetCoveredSquares(colour).Where(x => x.Piece != null).ToList();
+        public byte GetInstanceNumber(Colour colour, PieceType type, SquareFlag square) =>
+            BitBoard.GetInstanceNumber(colour, type, square);
 
-        public IReadOnlyCollection<Square> GetSquaresUnderThreat(Colour colour) =>
-            _squares.Where(x => x.Piece?.Colour == colour && x.CoveredBy.Any(s => s.Colour == colour.Opposite()))
-            .OrderByDescending(x => x.Piece?.Value)
-            .ToList();
+        public SquareFlag GetCoveredSquares(Colour colour) =>
+           BitBoard.FindCoveredSquares(colour);
+
+        public SquareFlag GetProtectedPieces(Colour colour) =>
+            BitBoard.FindPieceSquares(colour) & BitBoard.FindCoveredSquares(colour);
+
+        public SquareFlag GetSquaresUnderThreat(Colour colour) =>
+            BitBoard.FindCoveredSquares(colour.Opposite());
 
         public IReadOnlyCollection<Board> GetBoardsWithCheckmate(Colour colour) =>
             ChildBoards.Where(x => colour == Colour.White ? x.WhiteIsInCheckmate : x.BlackIsInCheckmate).ToList();
@@ -316,9 +263,6 @@ namespace Chess
 
         public bool IsInCheckmate(Colour colour) =>
             colour == Colour.White ? WhiteIsInCheckmate : BlackIsInCheckmate;
-
-        public IReadOnlyCollection<Board> GetBoardsWithCheck() =>
-            _boardsInCheck.ToList();
 
         public string MoveToString() =>
             _move != null ? _move.ToString() : string.Empty;
@@ -337,54 +281,22 @@ namespace Chess
         {
             var sb = new StringBuilder();
 
-            var squaresUnderAttack = GetSquaresUnderThreat(colour);
+            var squaresUnderAttack = GetSquaresUnderThreat(colour).ToList();
 
             foreach(var sua in squaresUnderAttack)
             {
-                sb.AppendLine($"{sua.File}{sua.Rank} covered by:");
+                var rf = sua.ToRankFile();
+                sb.AppendLine($"{rf.File}{rf.Rank} covered");// by:");
 
-                foreach (var p in sua.CoveredBy)
-                    sb.AppendLine($" - {p.Colour} {p.Type}");
+                //foreach (var p in sua.CoveredBy)
+                //    sb.AppendLine($" - {p.Colour} {p.Type}");
             }
 
             return sb.ToString();
         }
 
-        public string Diff(Board sourceBoard)
-        {
-            var sb = new StringBuilder();
-            
-            var toString = string.Empty;
-            Piece movingPiece = null;
-
-            foreach (var sourceSquare in sourceBoard._squares)
-            {
-                var square = _squares.Single(x => x.Rank == sourceSquare.Rank && x.File == sourceSquare.File);
-
-                if (sourceSquare.Piece != null && square.Piece == null)
-                    movingPiece = sourceSquare.Piece;
-            }
-
-            if (movingPiece == null)
-            {
-                sb.AppendLine($"Error - no moving piece :-(");
-
-                return sb.ToString();
-            }
-
-            var targetSquare = _squares.Single(x => 
-                x.Piece?.Type == movingPiece.Type
-                && x.Piece?.StartPosition.Rank == movingPiece.StartPosition.Rank
-                && x.Piece?.StartPosition.File == movingPiece.StartPosition.File);
-
-            toString = string.Concat(targetSquare.File, targetSquare.Rank);
-
-            var moveText = _move != null ? _move.ToString() : string.Empty;
-
-            sb.AppendLine($"{movingPiece.Colour} {movingPiece.Type} to {toString} (Move: {moveText})");
-
-            return sb.ToString();
-        }
+        public string Diff(Board sourceBoard) =>
+            _move != null ? _move.ToString() : string.Empty;
 
         public ICollection<Board> FindLeaves()
         {
@@ -411,73 +323,74 @@ namespace Chess
         public int GetScore(Colour colour) =>
             colour == Colour.White ? WhiteScore : BlackScore;
 
-        public string BoardToString()
+        public string BoardToString() =>
+            BitBoard.ToString();
+
+        public string GetMetricsString()
         {
-            var sb = new StringBuilder();
+            if (WhiteMetrics == null)
+                return "No metrics for white";
 
-            var ranks = new List<string>();
+            if (BlackMetrics == null)
+                return "No metrics for black";
 
-            foreach (var square in _squares)
-            {
-                if (square.Piece == null) sb.Append("-");
-                if (square.Piece?.Type == PieceType.Pawn) sb.Append("p");
-                if (square.Piece?.Type == PieceType.Rook) sb.Append("R");
-                if (square.Piece?.Type == PieceType.Knight) sb.Append("N");
-                if (square.Piece?.Type == PieceType.Bishop) sb.Append("B");
-                if (square.Piece?.Type == PieceType.Queen) sb.Append("Q");
-                if (square.Piece?.Type == PieceType.King) sb.Append("K");
+            return
+            $"{GetCode()} " +
+            $"E: {Math.Round(EvaluationScore, 2)} " +
+            $"PV: {PvString()} " +
+            $"WP+-: {WhiteMetrics.PointsChange} " +
+            $"Mob: {WhiteMetrics.NumAccessibleSquares} " +
+            $"PP: {WhiteMetrics.NumProtectedPieces} " +
+            $"Th: {WhiteMetrics.NumPiecesUnderThreat} " +
+            $"ThV: {WhiteMetrics.NumPiecesUnderThreatValue} " +
+            $"BP+-: {BlackMetrics.PointsChange} " +
+            $"Mob: {BlackMetrics.NumAccessibleSquares} " +
+            $"PP: {WhiteMetrics.NumProtectedPieces} " +
+            $"Th: {BlackMetrics.NumPiecesUnderThreat} " +
+            $"ThV: {BlackMetrics.NumPiecesUnderThreatValue}";
+        }
 
-                var index = _squares.IndexOf(square);
+        private string PvString() =>
+            PrimaryVariation == null
+            ? string.Empty
+            : $"{PrimaryVariation.Move} {Math.Round(PrimaryVariation.EvaluationScore, 2)}";
 
-                if (index > 0 && (index + 1) % 8 == 0)
-                {
-                    ranks.Add(sb.ToString());
+        public void Orphan()
+        {
+            ParentBoard = null;
 
-                    sb.Clear();
-                }
-            }
-
-            sb.Clear();
-
-            ranks.Reverse();
-
-            foreach (var rank in ranks)
-                sb.AppendLine(rank);
-
-            return sb.ToString();
+            foreach(var childBoard in ChildBoards)
+                childBoard.Orphan();
         }
 
         public void GenerateChildBoards(Colour colour, int depth)
         {
-            var boardsWhereKingIsInCheck = new List<Board>();
+            if (ChildBoards == null)
+                ChildBoards = new List<Board>();
 
-            if (!ChildBoards.Any())
+            var moves = _bitBoardMoveFinder.FindMoves(BitBoard, colour);
+
+            foreach (var move in moves)
             {
-                var childBoards = new List<Board>();
+                var existingChildBoard = ChildBoards.SingleOrDefault(x => x.Code == move.GetCode());
 
-                var colourSquares = GetSquaresWithPieceOn(colour);
+                if (existingChildBoard != null)
+                    continue;
 
-                foreach(var square in colourSquares)
+                var childBitBoard = BitBoard.Move(move, _bitBoardMoveFinder);
+
+                if (!childBitBoard.IsCheck(colour))
                 {
-                    var boardsFromSquare = GenerateChildBoardsFromSquare(_squares, square);
+                    var childBoard = new Board(this, move, childBitBoard, _bitBoardMoveFinder);
 
-                    if (boardsFromSquare.Any())
-                    {
-                        boardsWhereKingIsInCheck.AddRange(boardsFromSquare.Where(x => x.IsInCheck(colour)));
-                        childBoards.AddRange(boardsFromSquare.Where(x => !x.IsInCheck(colour)));
-                    }
-                };
+                    childBoard.Evaluate(colour);
 
-                ChildBoards = childBoards;
+                    ChildBoards.Add(childBoard);
+                }
             }
-
-            if (boardsWhereKingIsInCheck.Any())
-                _boardsInCheck = boardsWhereKingIsInCheck;
 
             if (!ChildBoards.Any())
                 _state |= colour == Colour.White ? BoardState.WhiteIsInCheckmate : BoardState.BlackIsInCheckmate;
-            else
-                CalculateStats();
 
             if (--depth <= 0)
                 return;
@@ -496,276 +409,15 @@ namespace Chess
             }
         }
 
-        public string GetCheckDebugString()
+        private byte GetScore(BitBoard board, Colour colour)
         {
-            var sb = new StringBuilder();
-
-            foreach (var board in _boardsInCheck)
-                sb.AppendLine($"{board._move.PieceColour} {board._move.Type} to {board._move.EndPosition.File}{board._move.EndPosition.Rank}");
-
-            return sb.ToString();
-        }
-
-        public string GetMetricsString() =>
-            $"{GetCode()} " +
-            $"E: {Math.Round(EvaluationScore, 2)} " +
-            $"WP+-: {WhiteMetrics.PointsChange} " +
-            $"Mob: {WhiteMetrics.NumAccessibleSquares} " +
-            $"PP: {WhiteMetrics.NumProtectedPieces} " +
-            $"Th: {WhiteMetrics.NumPiecesUnderThreat} " +
-            $"ThV: {WhiteMetrics.NumPiecesUnderThreatValue} " +
-            $"BP+-: {BlackMetrics.PointsChange} " +
-            $"Mob: {BlackMetrics.NumAccessibleSquares} " +
-            $"PP: {WhiteMetrics.NumProtectedPieces} " +
-            $"Th: {BlackMetrics.NumPiecesUnderThreat} " +
-            $"ThV: {BlackMetrics.NumPiecesUnderThreatValue}";
-
-        public void Orphan()
-        {
-            ParentBoard = null;
-
-            foreach(var childBoard in ChildBoards)
-                childBoard.Orphan();
-        }
-
-        private void Capture(Piece piece)
-        {
-            piece.Capture();
-
-            OffBoard.Add(piece);
-        }
-
-        private Piece Promote(Piece piece, PieceType promotionType)
-        {
-            OffBoard.Add(piece);
-
-            Piece replacementPiece = replacementPiece = OffBoard.FirstOrDefault(x => x.Colour == piece.Colour && x.Type == promotionType);
-
-            if (replacementPiece == null)
-                throw new Exception("Haven't programmed enough spare pieces for 3+ promotions. D'oh :-(");
-
-            OffBoard.Remove(replacementPiece);
-
-            // Just in case this was a captured piece set it to be not captured
-            replacementPiece.PlaceOnBoard();
-
-            return replacementPiece;
-        }
-
-        private IList<Board> GenerateChildBoardsFromSquare(IList<Square> squares, Square square)
-        {
-            var bbMoves = _bbMoveFinder.FindMoves(_bitBoard, square.Piece.Colour, square.ToSquareFlag());
-
-            var moves = _moveFinder.GetMoves(squares, square);
-
-            foreach(var move in moves)
-            {
-                var code1 = move.GetCode();
-                var match = bbMoves.SingleOrDefault(x => x.GetCode() == code1);
-                //var match2 = bbMoves.SingleOrDefault(x =>
-                //x.StartPosition.Rank == move.StartPosition.Rank
-                //&& x.StartPosition.File == move.StartPosition.File
-                //&& x.EndPosition.Rank == move.EndPosition.Rank
-                //&& x.EndPosition.File == move.EndPosition.File);
-
-                if (match == null)
-                { var bp = true; }
-            }
-
-            var childBoards = new List<Board>();
-
-            foreach (var move in moves)
-            {
-                var board = new Board(this, _moveFinder);
-
-                board.MovePiece(move);
-
-                childBoards.Add(board);
-            }
-
-            return childBoards;
-        }
-
-        private void SetCoveredSquares()
-        {
-            var squaresWithPieces = GetSquaresWithPieceOn();
-
-            foreach (var square in squaresWithPieces)
-            {
-                var coveredSquares = _moveFinder.GetCoveredSquares(_squares, square);
-
-                foreach (var coveredSquare in coveredSquares)
-                    coveredSquare.AddCoveredBy(square.Piece);
-            }
-        }
-
-        private void CalculateStats()
-        {
-            var numBoards = ChildBoards.Count();
-            var avgWhiteScore = ChildBoards.Average(x => x.WhiteScore);
-            var avgBlackScore = ChildBoards.Average(x => x.BlackScore);
-
-            var avgWhitePercentChange = Math.Round(((avgWhiteScore - WhiteScore) / avgWhiteScore) * 10000) * 100;
-            var avgBlackPercentChange = Math.Round(((avgBlackScore - BlackScore) / avgBlackScore) * 10000) * 100;
-
-            OptionsStats = new OptionsStats(numBoards, avgWhiteScore, avgBlackScore, avgWhitePercentChange, avgBlackPercentChange);
-        }
-
-        private byte CalculateScore(Colour colour) =>
-            (byte) GetSquaresWithPieceOn(colour).Sum(x => x.Piece.Value);
-
-        private void UpdateScores()
-        {
-            WhiteScore = CalculateScore(Colour.White);
-            BlackScore = CalculateScore(Colour.Black);
-        }
-
-        private IList<Square> CloneSquaresAndPieces(Board board)
-        {
-            var squares = new List<Square>();
-
-            foreach (var sourceSquare in board._squares)
-            {
-                var newSquare = new Square(RankFile.Get(sourceSquare.Rank, sourceSquare.File));
-
-                if (sourceSquare.Piece != null)
-                    newSquare.SetPiece(sourceSquare.Piece.Clone());
-
-                squares.Add(newSquare);
-            }
-
-            return squares;
-        }
-
-        private IList<Square> ResetBoard()
-        {
-            var squares = new List<Square>();
-
-            // Put some spare pieces in the box
-            OffBoard.Add(new Piece(Colour.White, PieceType.Rook, 5, RankFile.A3));
-            OffBoard.Add(new Piece(Colour.White, PieceType.Rook, 5, RankFile.B3));
-            OffBoard.Add(new Piece(Colour.White, PieceType.Knight, 3, RankFile.C3));
-            OffBoard.Add(new Piece(Colour.White, PieceType.Knight, 3, RankFile.D3));
-            OffBoard.Add(new Piece(Colour.White, PieceType.Bishop, 3, RankFile.E3));
-            OffBoard.Add(new Piece(Colour.White, PieceType.Bishop, 3, RankFile.F3));
-            OffBoard.Add(new Piece(Colour.White, PieceType.Queen, 9, RankFile.G3));
-            OffBoard.Add(new Piece(Colour.White, PieceType.Queen, 9, RankFile.H3));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Rook, 5, RankFile.A6));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Rook, 5, RankFile.B6));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Knight, 3, RankFile.C6));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Knight, 3, RankFile.D6));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Bishop, 3, RankFile.E6));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Bishop, 3, RankFile.F6));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Queen, 9, RankFile.G6));
-            OffBoard.Add(new Piece(Colour.Black, PieceType.Queen, 9, RankFile.H6));
-
-            for (var rank = 1; rank < 9; rank++)
-            {
-                foreach (var file in _files)
-                {
-                    var square = new Square(RankFile.Get(rank, file));
-
-                    if (rank == 1 && file == File.a)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Rook, 5, RankFile.A1));
-
-                    if (rank == 1 && file == File.b)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Knight, 3, RankFile.B1));
-
-                    if (rank == 1 && file == File.c)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Bishop, 3, RankFile.C1));
-
-                    if (rank == 1 && file == File.d)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Queen, 9, RankFile.D1));
-
-                    if (rank == 1 && file == File.e)
-                        square.SetPiece(new Piece(Colour.White, PieceType.King, 0, RankFile.E1));
-
-                    if (rank == 1 && file == File.f)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Bishop, 3, RankFile.F1));
-
-                    if (rank == 1 && file == File.g)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Knight, 3, RankFile.G1));
-
-                    if (rank == 1 && file == File.h)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Rook, 5, RankFile.H1));
-
-                    if (rank == 2 && file == File.a)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.A2));
-
-                    if (rank == 2 && file == File.b)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.B2));
-
-                    if (rank == 2 && file == File.c)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.C2));
-
-                    if (rank == 2 && file == File.d)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.D2));
-
-                    if (rank == 2 && file == File.e)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.E2));
-
-                    if (rank == 2 && file == File.f)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.F2));
-
-                    if (rank == 2 && file == File.g)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.G2));
-
-                    if (rank == 2 && file == File.h)
-                        square.SetPiece(new Piece(Colour.White, PieceType.Pawn, 1, RankFile.H2));
-
-                    if (rank == 7 && file == File.a)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.A7));
-
-                    if (rank == 7 && file == File.b)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.B7));
-
-                    if (rank == 7 && file == File.c)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.C7));
-
-                    if (rank == 7 && file == File.d)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.D7));
-
-                    if (rank == 7 && file == File.e)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.E7));
-
-                    if (rank == 7 && file == File.f)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.F7));
-
-                    if (rank == 7 && file == File.g)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.G7));
-
-                    if (rank == 7 && file == File.h)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Pawn, 1, RankFile.H7));
-
-                    if (rank == 8 && file == File.a)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Rook, 5, RankFile.A8));
-
-                    if (rank == 8 && file == File.b)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Knight, 3, RankFile.B8));
-
-                    if (rank == 8 && file == File.c)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Bishop, 3, RankFile.C8));
-
-                    if (rank == 8 && file == File.d)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Queen, 9, RankFile.D8));
-
-                    if (rank == 8 && file == File.e)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.King, 0, RankFile.E8));
-
-                    if (rank == 8 && file == File.f)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Bishop, 3, RankFile.F8));
-
-                    if (rank == 8 && file == File.g)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Knight, 3, RankFile.G8));
-
-                    if (rank == 8 && file == File.h)
-                        square.SetPiece(new Piece(Colour.Black, PieceType.Rook, 5, RankFile.H8));
-
-                    squares.Add(square);
-                }
-            }
-
-            return squares;
+            byte score = board.FindPawnSquares(colour).Count();
+            score += (byte)(board.FindRookSquares(colour).Count() * 5);
+            score += (byte)(board.FindKnightSquares(colour).Count() * 3);
+            score += (byte)(board.FindBishopSquares(colour).Count() * 3);
+            score += (byte)(board.FindQueenSquares(colour).Count() * 9);
+
+            return score;
         }
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace Chess.Bit
+﻿using System.Collections.Generic;
+using System.Text;
+
+namespace Chess.Bit
 {
     public class BitBoard
     {
@@ -75,28 +78,38 @@
         public SquareFlag Black =>
             BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
 
-        public SquareFlag WhiteThreatened { get; private set; }
+        public SquareFlag WhiteCovered { get; private set; }
 
-        public SquareFlag BlackThreatened { get; private set; }
+        public SquareFlag BlackCovered { get; private set; }
 
         private BoardState _state = BoardState.None;
 
-        public SquareFlag FindSquares(Colour colour, PieceType type)
-        {
-            if (colour == Colour.White)
-            {
-                if (type == PieceType.King) return WhiteKing;
-            }
-            else
-            {
-                if (type == PieceType.King) return WhiteKing;
-            }
+        public SquareFlag FindPieceSquares(Colour colour) =>
+            colour == Colour.White ? White : Black;
 
-            return 0;
-        }
+        public SquareFlag FindPawnSquares(Colour colour) =>
+            colour == Colour.White ? WhitePawns : BlackPawns;
 
-        public SquareFlag FindThreatendSquares(Colour colour) =>
-            colour == Colour.White ? WhiteThreatened : BlackThreatened;
+        public SquareFlag FindRookSquares(Colour colour) =>
+            colour == Colour.White ? WhiteRooks : BlackRooks;
+
+        public SquareFlag FindKnightSquares(Colour colour) =>
+            colour == Colour.White ? WhiteKnights : BlackKnights;
+
+        public SquareFlag FindBishopSquares(Colour colour) =>
+            colour == Colour.White ? WhiteBishops : BlackBishops;
+
+        public SquareFlag FindQueenSquares(Colour colour) =>
+            colour == Colour.White ? WhiteQueens : BlackQueens;
+
+        public SquareFlag FindKingSquare(Colour colour) =>
+            colour == Colour.White ? WhiteKing : BlackKing;
+
+        public SquareFlag FindCoveredSquares(Colour colour) =>
+            colour == Colour.White ? WhiteCovered : BlackCovered;
+
+        public bool IsCheck(Colour colour) =>
+            colour == Colour.White ? BlackCovered.HasFlag(WhiteKing) : WhiteCovered.HasFlag(BlackKing);
 
         public Colour GetPieceColour(SquareFlag square)
         {
@@ -138,20 +151,46 @@
             throw new System.Exception($"Failed to find piece for {square}");
         }
 
-        public void Move(Move move)
+        public byte GetInstanceNumber(Colour colour, PieceType type, SquareFlag square)
         {
-            var startSquareFlag = move.StartPosition.GetSquareFlag();
-            var endSquareFlag = move.EndPosition.GetSquareFlag();
+            if (colour == Colour.White)
+            {
+                if (type == PieceType.Pawn) return WhitePawns.GetInstanceNumber(square);
+                if (type == PieceType.Rook) return WhiteRooks.GetInstanceNumber(square);
+                if (type == PieceType.Knight) return WhiteKnights.GetInstanceNumber(square);
+                if (type == PieceType.Bishop) return WhiteBishops.GetInstanceNumber(square);
+                if (type == PieceType.Queen) return WhiteQueens.GetInstanceNumber(square);
+                if (type == PieceType.King) return WhiteKing.GetInstanceNumber(square);
+            }
+            else
+            {
+                if (type == PieceType.Pawn) return BlackPawns.GetInstanceNumber(square);
+                if (type == PieceType.Rook) return BlackRooks.GetInstanceNumber(square);
+                if (type == PieceType.Knight) return BlackKnights.GetInstanceNumber(square);
+                if (type == PieceType.Bishop) return BlackBishops.GetInstanceNumber(square);
+                if (type == PieceType.Queen) return BlackQueens.GetInstanceNumber(square);
+                if (type == PieceType.King) return BlackKing.GetInstanceNumber(square);
+            }
 
-            MovePiece(move.PieceColour, move.Type, startSquareFlag, endSquareFlag);
+            return 0;
+        }
+
+        public BitBoard Move(Move move, BitBoardMoveFinder moveFinder)
+        {
+            var childBoard = Clone();
+
+            var startSquareFlag = move.StartPosition.ToSquareFlag();
+            var endSquareFlag = move.EndPosition.ToSquareFlag();
 
             var isCapture = move.PieceColour == Colour.White
                 ? Black.HasFlag(endSquareFlag)
                 : White.HasFlag(endSquareFlag);
 
+            childBoard.MovePiece(move.PieceColour, move.Type, startSquareFlag, endSquareFlag);
+
             if (isCapture)
             {
-                RemovePiece(move.PieceColour.Opposite(), endSquareFlag);
+                childBoard.RemovePiece(move.PieceColour.Opposite(), endSquareFlag);
                 _state |= BoardState.IsCapture;
             }
 
@@ -161,39 +200,85 @@
                 {
                     _state |= BoardState.IsPawnPromotion;
 
-                    PromotePiece(move.PieceColour, move.PromotionType, endSquareFlag);
+                    childBoard.PromotePiece(move.PieceColour, move.PromotionType, endSquareFlag);
                 }
             }
 
             if (move is MoveCastle castle)
             {
-                var kingStartSquareFlag = castle.KingStartPosition.GetSquareFlag();
-                var kingEndSquareFlag = castle.KingEndPosition.GetSquareFlag();
+                var kingStartSquareFlag = castle.KingStartPosition.ToSquareFlag();
+                var kingEndSquareFlag = castle.KingEndPosition.ToSquareFlag();
 
-                MovePiece(move.PieceColour, PieceType.King, kingStartSquareFlag, kingEndSquareFlag);
+                childBoard.MovePiece(move.PieceColour, PieceType.King, kingStartSquareFlag, kingEndSquareFlag);
             }
-        }
 
-        public void SetThreatenedSquares(Colour colour, SquareFlag threatendSquares)
-        {
-            if (colour == Colour.White)
-                WhiteThreatened = threatendSquares;
-            else
-                BlackThreatened = threatendSquares;
-            //var squaresWithPieces = GetSquaresWithPieceOn();
+            var myCoveredSquares = moveFinder.GetCoveredSquares(childBoard, move.PieceColour);
+            var opponentCoveredSquares = moveFinder.GetCoveredSquares(childBoard, move.PieceColour.Opposite());
 
-            //foreach (var square in squaresWithPieces)
-            //{
-            //    var coveredSquares = _moveFinder.GetCoveredSquares(_squares, square);
+            childBoard.SetCoveredSquares(move.PieceColour, myCoveredSquares);
+            childBoard.SetCoveredSquares(move.PieceColour.Opposite(), opponentCoveredSquares);
 
-            //    foreach (var coveredSquare in coveredSquares)
-            //        coveredSquare.AddCoveredBy(square.Piece);
-            //}
+            return childBoard;
         }
 
         public BitBoard Clone() =>
             new BitBoard(WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens, WhiteKing,
                 BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing);
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+
+            var ranks = new List<string>();
+
+            ulong bit = 1;
+
+            for (var i = 0; i < 64; ++i)
+            {
+                if (WhitePawns.HasFlag((SquareFlag)bit)) sb.Append("P");
+                else if (WhiteRooks.HasFlag((SquareFlag)bit)) sb.Append("R");
+                else if (WhiteKnights.HasFlag((SquareFlag)bit)) sb.Append("N");
+                else if (WhiteBishops.HasFlag((SquareFlag)bit)) sb.Append("B");
+                else if (WhiteQueens.HasFlag((SquareFlag)bit)) sb.Append("Q");
+                else if (WhiteKing.HasFlag((SquareFlag)bit)) sb.Append("K");
+                else if (BlackPawns.HasFlag((SquareFlag)bit)) sb.Append("p");
+                else if (BlackRooks.HasFlag((SquareFlag)bit)) sb.Append("r");
+                else if (BlackKnights.HasFlag((SquareFlag)bit)) sb.Append("n");
+                else if (BlackBishops.HasFlag((SquareFlag)bit)) sb.Append("b");
+                else if (BlackQueens.HasFlag((SquareFlag)bit)) sb.Append("q");
+                else if (BlackKing.HasFlag((SquareFlag)bit)) sb.Append("k");
+                else sb.Append("-");
+
+                if (i > 0 && (i + 1) % 8 == 0)
+                {
+                    ranks.Add(sb.ToString());
+
+                    sb.Clear();
+                }
+
+                bit = bit << 1;
+            }
+
+            sb.Clear();
+
+            ranks.Reverse();
+
+            foreach (var rank in ranks)
+                sb.AppendLine(rank);
+
+            return sb.ToString();
+        }
+
+        private void SetCoveredSquares(Colour colour, SquareFlag squares)
+        {
+            if (colour == Colour.White)
+            {
+                WhiteCovered = squares;
+                return;
+            }
+
+            BlackCovered = squares;
+        }
 
         private void RemovePiece(Colour colour, SquareFlag square)
         {
@@ -223,55 +308,36 @@
             {
                 if (type == PieceType.Pawn)
                 {
-                    var n = WhitePawns & start;
-                    if (n == 0)
-                    { var bp = true; }
                     WhitePawns &= ~start;
                     WhitePawns |= end;
                 }
 
                 if (type == PieceType.Rook)
                 {
-
-                    var n = WhiteRooks & start;
-                    if (n == 0)
-                    { var bp = true; }
                     WhiteRooks &= ~start;
                     WhiteRooks |= end;
                 }
 
                 if (type == PieceType.Knight)
                 {
-                    var n = WhiteKnights & start;
-                    if (n == 0)
-                    { var bp = true; }
                     WhiteKnights &= ~start;
                     WhiteKnights |= end;
                 }
 
                 if (type == PieceType.Bishop)
                 {
-                    var n = WhiteBishops & start;
-                    if (n == 0)
-                    { var bp = true; }
                     WhiteBishops &= ~start;
                     WhiteBishops |= end;
                 }
 
                 if (type == PieceType.Queen)
                 {
-                    var n = WhiteQueens & start;
-                    if (n == 0)
-                    { var bp = true; }
                     WhiteQueens &= ~start;
                     WhiteQueens |= end;
                 }
 
                 if (type == PieceType.King)
                 {
-                    var n = WhiteKing & start;
-                    if (n == 0)
-                    { var bp = true; }
                     WhiteKing &= ~start;
                     WhiteKing |= end;
                 }

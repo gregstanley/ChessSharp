@@ -1,4 +1,6 @@
-﻿namespace Chess
+﻿using System.Collections.Generic;
+
+namespace Chess
 {
     public static class SquareFlagExtensions
     {
@@ -19,6 +21,42 @@
         public const SquareFlag r6 = SquareFlag.A6 | SquareFlag.B6 | SquareFlag.C6 | SquareFlag.D6 | SquareFlag.E6 | SquareFlag.F6 | SquareFlag.G6 | SquareFlag.H6;
         public const SquareFlag r7 = SquareFlag.A7 | SquareFlag.B7 | SquareFlag.C7 | SquareFlag.D7 | SquareFlag.E7 | SquareFlag.F7 | SquareFlag.G7 | SquareFlag.H7;
         public const SquareFlag r8 = SquareFlag.A8 | SquareFlag.B8 | SquareFlag.C8 | SquareFlag.D8 | SquareFlag.E8 | SquareFlag.F8 | SquareFlag.G8 | SquareFlag.H8;
+
+        public static byte GetInstanceNumber(this SquareFlag squares, SquareFlag square)
+        {
+            byte instanceNumber = 1;
+
+            for (var i = 1ul; i > 0; i = i << 1)
+            {
+                if (square.HasFlag((SquareFlag)i))
+                    return instanceNumber;
+
+                if (squares.HasFlag((SquareFlag)i))
+                    ++instanceNumber;
+            }
+
+            return instanceNumber;
+        }
+
+        public static byte Count(this SquareFlag squares)
+        {
+            byte count = 0;
+
+            for (var i = 1ul; i > 0; i = i << 1)
+                if (squares.HasFlag((SquareFlag)i)) ++count;
+
+            return count;
+        }
+
+        public static IReadOnlyList<SquareFlag> ToList(this SquareFlag squares)
+        {
+            IList<SquareFlag> squaresAsList = new List<SquareFlag>();
+
+            for(var i = 1ul; i > 0; i = i << 1)
+                if (squares.HasFlag((SquareFlag)i)) squaresAsList.Add((SquareFlag)i);
+
+            return (IReadOnlyList<SquareFlag>)squaresAsList;
+        }
 
         public static RankFile ToRankFile(this SquareFlag square)
         {

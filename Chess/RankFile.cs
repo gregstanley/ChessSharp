@@ -71,7 +71,7 @@
 
         public File File { get; }
 
-        public SquareFlag GetSquareFlag()
+        public SquareFlag ToSquareFlag()
         {
             if (File == File.a && Rank == 1) return SquareFlag.A1;
             if (File == File.b && Rank == 1) return SquareFlag.B1;

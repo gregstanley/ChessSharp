@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Windows;
@@ -16,6 +17,8 @@ namespace Chess
 
         private Match _currentMatch { get; set; }
 
+        private IReadOnlyCollection<ImageMap> Images { get; set; }
+
         public MainWindow()
         {
             InitializeComponent();
@@ -23,6 +26,8 @@ namespace Chess
             NextMove.IsEnabled = false;
             PromotionTypeSelector.Visibility = Visibility.Collapsed;
             GameOver.Visibility = Visibility.Collapsed;
+
+            Images = BuildImageMap();
         }
 
         private void StartNewGame(bool isHuman = false)
@@ -130,33 +135,47 @@ namespace Chess
         {
             var sb = new StringBuilder();
 
-            var offBoardPieces = board.OffBoard;
+            //var offBoardPieces = board.OffBoard;
 
-            if (offBoardPieces.Any()) sb.AppendLine("== Captured ==");
+            //if (offBoardPieces.Any()) sb.AppendLine("== Captured ==");
 
-            foreach(var offBoardPiece in offBoardPieces)
-            {
-                var image = GetImage(offBoardPiece);
-                image.Visibility = Visibility.Collapsed;
+            //foreach(var offBoardPiece in offBoardPieces)
+            //{
+            //    var image = GetImage(offBoardPiece);
+            //    image.Visibility = Visibility.Collapsed;
 
-                if (offBoardPiece.Captured)
-                    sb.AppendLine(offBoardPiece.LongName);
-            }
+            //    if (offBoardPiece.Captured)
+            //        sb.AppendLine(offBoardPiece.LongName);
+            //}
 
             sb.AppendLine("== Board ==");
 
             sb.Append(board.BoardToString());
 
-            foreach (var square in board.GetSquaresWithPieceOn())
+            var squaresWithPiecesOn = board.GetSquaresWithPieceOn().ToList();
+
+            var usedImages = new List<Image>();
+
+            foreach (var square in squaresWithPiecesOn)
             {
-                var image = GetImage(square.Piece);
+                var rankFile = square.ToRankFile();
+                //var image = GetImage(square.Piece);
+                var image = GetImage(rankFile);
 
                 image.Visibility = Visibility.Visible;
 
-                var xy = GetScreenPosition(SquarePixels, square.Rank, (int)square.File);
+                usedImages.Add(image);
+
+                var xy = GetScreenPosition(SquarePixels, rankFile.Rank, (int)rankFile.File);
 
                 Canvas.SetLeft(image, xy.X);
                 Canvas.SetTop(image, xy.Y);
+            }
+
+            foreach(var image in Images)
+            {
+                if (!usedImages.Contains(image.Image))
+                    image.Image.Visibility = Visibility.Collapsed;
             }
 
             WhiteScore.Text = board.WhiteScore.ToString();
@@ -225,66 +244,157 @@ namespace Chess
             Canvas.SetTop(image, xy.Y);
         }
 
-        private Image GetImage(RankFile rankFile) =>
-            GetImage(_currentMatch?.GetPieceOnSquare(rankFile));
-
-        private Image GetImage(Piece piece)
+        private Image GetImage(RankFile rankFile)
         {
-            switch (piece?.FullName)
-            {
-                case "WhitePawna2": return WhitePawn1;
-                case "WhitePawnb2": return WhitePawn2;
-                case "WhitePawnc2": return WhitePawn3;
-                case "WhitePawnd2": return WhitePawn4;
-                case "WhitePawne2": return WhitePawn5;
-                case "WhitePawnf2": return WhitePawn6;
-                case "WhitePawng2": return WhitePawn7;
-                case "WhitePawnh2": return WhitePawn8;
-                case "WhiteRooka1": return WhiteRook1;
-                case "WhiteKnightb1": return WhiteKnightRight;
-                case "WhiteBishopc1": return WhiteBishop1;
-                case "WhiteQueend1": return WhiteQueen;
-                case "WhiteKinge1": return WhiteKing;
-                case "WhiteBishopf1": return WhiteBishop2;
-                case "WhiteKnightg1": return WhiteKnightLeft;
-                case "WhiteRookh1": return WhiteRook2;
-                case "BlackPawna7": return BlackPawn1;
-                case "BlackPawnb7": return BlackPawn2;
-                case "BlackPawnc7": return BlackPawn3;
-                case "BlackPawnd7": return BlackPawn4;
-                case "BlackPawne7": return BlackPawn5;
-                case "BlackPawnf7": return BlackPawn6;
-                case "BlackPawng7": return BlackPawn7;
-                case "BlackPawnh7": return BlackPawn8;
-                case "BlackRooka8": return BlackRook1;
-                case "BlackKnightb8": return BlackKnightRight;
-                case "BlackBishopc8": return BlackBishop1;
-                case "BlackQueend8": return BlackQueen;
-                case "BlackKinge8": return BlackKing;
-                case "BlackBishopf8": return BlackBishop2;
-                case "BlackKnightg8": return BlackKnightLeft;
-                case "BlackRookh8": return BlackRook2;
+            if (_currentMatch == null)
+                return null;
 
-                case "WhiteRooka3": return WhiteRookPromotion1;
-                case "WhiteRookb3": return WhiteRookPromotion2;
-                case "WhiteKnightc3": return WhiteKnightPromotion1;
-                case "WhiteKnightd3": return WhiteKnightPromotion2;
-                case "WhiteBishope3": return WhiteBishopPromotion1;
-                case "WhiteBishopf3": return WhiteBishopPromotion2;
-                case "WhiteQueeng3": return WhiteQueenPromotion1;
-                case "WhiteQueenh3": return WhiteQueenPromotion2;
+            var colour = _currentMatch.GetPieceOnSquareColour(rankFile);
 
-                case "BlackRooka6": return BlackRookPromotion1;
-                case "BlackRookb6": return BlackRookPromotion2;
-                case "BlackKnightc6": return BlackKnightPromotion1;
-                case "BlackKnightd6": return BlackKnightPromotion2;
-                case "BlackBishope6": return BlackBishopPromotion1;
-                case "BlackBishopf6": return BlackBishopPromotion2;
-                case "BlackQueeng6": return BlackQueenPromotion1;
-                case "BlackQueenh6": return BlackQueenPromotion2;
-            }
+            if (colour == Colour.None)
+                return null;
 
-            return null;
+            var type = _currentMatch.GetPieceOnSquareType(rankFile);
+
+            if (type == PieceType.None)
+                return null;
+
+            var instanceNumber = _currentMatch.GetInstanceNumber(colour, type, rankFile.ToSquareFlag());
+
+            if (instanceNumber < 1)
+                throw new Exception($"Failed to find any {colour} pieces of type {type}");
+
+            return Images.Where(x => x.Colour == colour && x.PieceType == type)
+                .Skip(instanceNumber - 1)
+                .First()
+                .Image;
         }
+
+        //private Image GetImage(IList<ImageMap> images, RankFile rankFile)
+        //{
+        //    var type = _currentMatch?.GetPieceOnSquareType(rankFile);
+        //    var colour = _currentMatch?.GetPieceOnSquareColour(rankFile);
+
+        //    GetImage(_currentMatch?.GetPieceOnSquare(rankFile));
+        //}
+
+        //private Image GetImage(IList<ImageMap> remainingImages, Colour colour, PieceType type) =>
+        //    remainingImages.First(x => x.Colour == colour && x.PieceType == type).Image;
+
+        private IReadOnlyCollection<ImageMap> BuildImageMap()
+        {
+            var imageMaps = new List<ImageMap>
+            {
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn1),
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn2),
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn3),
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn4),
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn5),
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn6),
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn7),
+                new ImageMap(Colour.White, PieceType.Pawn, WhitePawn8),
+                new ImageMap(Colour.White, PieceType.Rook, WhiteRook1),
+                new ImageMap(Colour.White, PieceType.Rook, WhiteRook2),
+                new ImageMap(Colour.White, PieceType.Rook, WhiteRookPromotion1),
+                new ImageMap(Colour.White, PieceType.Rook, WhiteRookPromotion2),
+                new ImageMap(Colour.White, PieceType.Knight, WhiteKnight1),
+                new ImageMap(Colour.White, PieceType.Knight, WhiteKnight2),
+                new ImageMap(Colour.White, PieceType.Knight, WhiteKnightPromotion1),
+                new ImageMap(Colour.White, PieceType.Knight, WhiteKnightPromotion2),
+                new ImageMap(Colour.White, PieceType.Bishop, WhiteBishop1),
+                new ImageMap(Colour.White, PieceType.Bishop, WhiteBishop2),
+                new ImageMap(Colour.White, PieceType.Bishop, WhiteBishopPromotion1),
+                new ImageMap(Colour.White, PieceType.Bishop, WhiteBishopPromotion2),
+                new ImageMap(Colour.White, PieceType.Queen, WhiteQueen),
+                new ImageMap(Colour.White, PieceType.Queen, WhiteQueenPromotion1),
+                new ImageMap(Colour.White, PieceType.Queen, WhiteQueenPromotion2),
+                new ImageMap(Colour.White, PieceType.King, WhiteKing),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn1),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn2),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn3),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn4),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn5),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn6),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn7),
+                new ImageMap(Colour.Black, PieceType.Pawn, BlackPawn8),
+                new ImageMap(Colour.Black, PieceType.Rook, BlackRook1),
+                new ImageMap(Colour.Black, PieceType.Rook, BlackRook2),
+                new ImageMap(Colour.Black, PieceType.Rook, BlackRookPromotion1),
+                new ImageMap(Colour.Black, PieceType.Rook, BlackRookPromotion2),
+                new ImageMap(Colour.Black, PieceType.Knight, BlackKnight1),
+                new ImageMap(Colour.Black, PieceType.Knight, BlackKnight2),
+                new ImageMap(Colour.Black, PieceType.Knight, BlackKnightPromotion1),
+                new ImageMap(Colour.Black, PieceType.Knight, BlackKnightPromotion2),
+                new ImageMap(Colour.Black, PieceType.Bishop, BlackBishop1),
+                new ImageMap(Colour.Black, PieceType.Bishop, BlackBishop2),
+                new ImageMap(Colour.Black, PieceType.Bishop, BlackBishopPromotion1),
+                new ImageMap(Colour.Black, PieceType.Bishop, BlackBishopPromotion2),
+                new ImageMap(Colour.Black, PieceType.Queen, BlackQueen),
+                new ImageMap(Colour.Black, PieceType.Queen, BlackQueenPromotion1),
+                new ImageMap(Colour.Black, PieceType.Queen, BlackQueenPromotion2),
+                new ImageMap(Colour.Black, PieceType.King, BlackKing)
+            };
+
+            return imageMaps;
+        }
+
+        //private Image GetImage(Piece piece)
+        //{
+        //    switch (piece?.FullName)
+        //    {
+        //        case "WhitePawna2": return WhitePawn1;
+        //        case "WhitePawnb2": return WhitePawn2;
+        //        case "WhitePawnc2": return WhitePawn3;
+        //        case "WhitePawnd2": return WhitePawn4;
+        //        case "WhitePawne2": return WhitePawn5;
+        //        case "WhitePawnf2": return WhitePawn6;
+        //        case "WhitePawng2": return WhitePawn7;
+        //        case "WhitePawnh2": return WhitePawn8;
+        //        case "WhiteRooka1": return WhiteRook1;
+        //        case "WhiteKnightb1": return WhiteKnight1;
+        //        case "WhiteBishopc1": return WhiteBishop1;
+        //        case "WhiteQueend1": return WhiteQueen;
+        //        case "WhiteKinge1": return WhiteKing;
+        //        case "WhiteBishopf1": return WhiteBishop2;
+        //        case "WhiteKnightg1": return WhiteKnight2;
+        //        case "WhiteRookh1": return WhiteRook2;
+        //        case "BlackPawna7": return BlackPawn1;
+        //        case "BlackPawnb7": return BlackPawn2;
+        //        case "BlackPawnc7": return BlackPawn3;
+        //        case "BlackPawnd7": return BlackPawn4;
+        //        case "BlackPawne7": return BlackPawn5;
+        //        case "BlackPawnf7": return BlackPawn6;
+        //        case "BlackPawng7": return BlackPawn7;
+        //        case "BlackPawnh7": return BlackPawn8;
+        //        case "BlackRooka8": return BlackRook1;
+        //        case "BlackKnightb8": return BlackKnight1;
+        //        case "BlackBishopc8": return BlackBishop1;
+        //        case "BlackQueend8": return BlackQueen;
+        //        case "BlackKinge8": return BlackKing;
+        //        case "BlackBishopf8": return BlackBishop2;
+        //        case "BlackKnightg8": return BlackKnight2;
+        //        case "BlackRookh8": return BlackRook2;
+
+        //        case "WhiteRooka3": return WhiteRookPromotion1;
+        //        case "WhiteRookb3": return WhiteRookPromotion2;
+        //        case "WhiteKnightc3": return WhiteKnightPromotion1;
+        //        case "WhiteKnightd3": return WhiteKnightPromotion2;
+        //        case "WhiteBishope3": return WhiteBishopPromotion1;
+        //        case "WhiteBishopf3": return WhiteBishopPromotion2;
+        //        case "WhiteQueeng3": return WhiteQueenPromotion1;
+        //        case "WhiteQueenh3": return WhiteQueenPromotion2;
+
+        //        case "BlackRooka6": return BlackRookPromotion1;
+        //        case "BlackRookb6": return BlackRookPromotion2;
+        //        case "BlackKnightc6": return BlackKnightPromotion1;
+        //        case "BlackKnightd6": return BlackKnightPromotion2;
+        //        case "BlackBishope6": return BlackBishopPromotion1;
+        //        case "BlackBishopf6": return BlackBishopPromotion2;
+        //        case "BlackQueeng6": return BlackQueenPromotion1;
+        //        case "BlackQueenh6": return BlackQueenPromotion2;
+        //    }
+
+        //    return null;
+        //}
     }
 }

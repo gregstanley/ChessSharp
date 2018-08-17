@@ -9,66 +9,29 @@ namespace Chess.Bit
         private static SquareFlag WhitePromotionRank = SquareFlagExtensions.r8;
         private static SquareFlag BlackPromotionRank = SquareFlagExtensions.r1;
 
-        public Move CanCastle(BitBoard board, Colour colour, SquareFlag square)
+        public IList<Move> FindMoves(BitBoard board, Colour colour, bool withCastles = true)
         {
-            if (board.GetPieceColour(square) != colour)
-                return null;
+            var squares = board.FindPieceSquares(colour).ToList();
 
-            var type = board.GetPiece(square);
+            var moves = new List<Move>();
 
-            if (type != PieceType.Rook)
-                return null;
-
-            var kingSquare = board.FindSquares(colour, PieceType.King);
-
-            var threatendSquares = board.FindThreatendSquares(colour);
-
-            if (threatendSquares.HasFlag(kingSquare))
-                return null;
-
-            var kingRankFile = kingSquare.ToRankFile();
-            var rookRankFile = square.ToRankFile();
-
-            var side = Math.Abs(kingRankFile.File - rookRankFile.File) == 3 ? PieceType.King : PieceType.Queen;
-
-            var stride = rookRankFile.File < kingRankFile.File ? 1 : -1;
-
-            var stillCan = true;
-
-            var currentSquare = square;
-
-            while (Next(currentSquare, stride) != kingSquare && stillCan)
+            foreach (var square in squares)
             {
-                currentSquare = Next(currentSquare, stride);
+                var pieceMoves = FindMoves(board, colour, square, withCastles);
 
-                if(board.GetPiece(currentSquare) != PieceType.None)
+                if (pieceMoves.Any())
                 {
-                    stillCan = false;
+                    //boardsWhereKingIsInCheck.AddRange(boardsFromSquare.Where(x => x.IsInCheck(colour)));
+                    //childBoards.AddRange(boardsFromSquare.Where(x => !x.IsInCheck(colour)));
+
+                    moves.AddRange(pieceMoves);
                 }
-                else if (threatendSquares.HasFlag(currentSquare))
-                {
-                    // This is the square next to the Rook and CAN be under attack as the King does not pass through
-                    if (side == PieceType.Queen && currentSquare != Next(square, stride))
-                        stillCan = false;
-                }
-            }
+            };
 
-            if (!stillCan)
-                return null;
-
-            var targetKingSquare = RankFile.Get(kingRankFile.Rank, kingRankFile.File + (stride * -2));
-            var targetRookSquare = RankFile.Get(rookRankFile.Rank, targetKingSquare.File + stride);
-
-            return new MoveCastle(colour,
-                type,
-                RankFile.Get(rookRankFile.Rank, rookRankFile.File),
-                targetRookSquare,
-                RankFile.Get(kingRankFile.Rank, kingRankFile.File),
-                targetKingSquare,
-                side);
+            return moves;
         }
 
-        public IList<Move> FindMoves(BitBoard board, Colour colour, SquareFlag square, bool withCastles = true)
+        private IList<Move> FindMoves(BitBoard board, Colour colour, SquareFlag square, bool withCastles = true)
         {
             var possibleSquares = GetStandardCoveredSquares(board, colour, square);
             var moves = new List<Move>();
@@ -189,14 +152,86 @@ namespace Chess.Bit
             return outSquares;
         }
 
-        public IList<SquareFlag> GetCoveredSquares(BitBoard board, Colour colour, SquareFlag square)
+        public SquareFlag GetCoveredSquares(BitBoard board, Colour colour)
+        {
+            SquareFlag coveredSquares = 0;
+
+            var squaresWithPieces = board.FindPieceSquares(colour).ToList();
+
+            foreach (var square in squaresWithPieces)
+                coveredSquares |= GetCoveredSquares(board, colour, square);
+
+            return coveredSquares;
+        }
+
+        public Move CanCastle(BitBoard board, Colour colour, SquareFlag square)
+        {
+            if (board.GetPieceColour(square) != colour)
+                return null;
+
+            var type = board.GetPiece(square);
+
+            if (type != PieceType.Rook)
+                return null;
+
+            var kingSquare = board.FindKingSquare(colour);
+
+            var coveredSquares = board.FindCoveredSquares(colour.Opposite());
+
+            if (coveredSquares.HasFlag(kingSquare))
+                return null;
+
+            var kingRankFile = kingSquare.ToRankFile();
+            var rookRankFile = square.ToRankFile();
+
+            var side = Math.Abs(kingRankFile.File - rookRankFile.File) == 3 ? PieceType.King : PieceType.Queen;
+
+            var stride = rookRankFile.File < kingRankFile.File ? 1 : -1;
+
+            var stillCan = true;
+
+            var currentSquare = square;
+
+            while (Next(currentSquare, stride) != kingSquare && stillCan)
+            {
+                currentSquare = Next(currentSquare, stride);
+
+                if (board.GetPiece(currentSquare) != PieceType.None)
+                {
+                    stillCan = false;
+                }
+                else if (coveredSquares.HasFlag(currentSquare))
+                {
+                    // This is the square next to the Rook and CAN be under attack as the King does not pass through
+                    if (side == PieceType.Queen && currentSquare != Next(square, stride))
+                        stillCan = false;
+                }
+            }
+
+            if (!stillCan)
+                return null;
+
+            var targetKingSquare = RankFile.Get(kingRankFile.Rank, kingRankFile.File + (stride * -2));
+            var targetRookSquare = RankFile.Get(rookRankFile.Rank, targetKingSquare.File + stride);
+
+            return new MoveCastle(colour,
+                type,
+                RankFile.Get(rookRankFile.Rank, rookRankFile.File),
+                targetRookSquare,
+                RankFile.Get(kingRankFile.Rank, kingRankFile.File),
+                targetKingSquare,
+                side);
+        }
+
+
+        private SquareFlag GetCoveredSquares(BitBoard board, Colour colour, SquareFlag square)
         {
             var outSquares = GetStandardCoveredSquares(board, colour, square);
 
             if (board.GetPiece(square) == PieceType.Pawn)
                 outSquares.AddRange(PawnCovered(board, colour, square));
 
-            return outSquares;
+            return outSquares.ToSquareFlag();
         }
 
         private List<SquareFlag> GetStandardCoveredSquares(BitBoard board, Colour colour, SquareFlag square)

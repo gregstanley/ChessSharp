@@ -20,8 +20,8 @@
             <Image x:Name="BlackPawn8" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackPawn.png" Canvas.Top="90" Canvas.Left="630"/>
             <Image x:Name="BlackRook2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackRook.png" Canvas.Left="630"/>
             <Image x:Name="BlackRook1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackRook.png"/>
-            <Image x:Name="BlackKnightRight" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightRight.png" Canvas.Left="90"/>
-            <Image x:Name="BlackKnightLeft" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightLeft.png" Canvas.Left="540"/>
+            <Image x:Name="BlackKnight1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightLeft.png" Canvas.Left="90"/>
+            <Image x:Name="BlackKnight2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackKnightLeft.png" Canvas.Left="540"/>
             <Image x:Name="BlackBishop2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackBishop.png" Canvas.Left="450"/>
             <Image x:Name="BlackBishop1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackBishop.png" Canvas.Left="180"/>
             <Image x:Name="BlackQueen" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="270"/>
@@ -36,8 +36,8 @@
             <Image x:Name="WhitePawn8" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhitePawn.png" Canvas.Top="540" Canvas.Left="630"/>
             <Image x:Name="WhiteRook2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteRook.png" Canvas.Left="630" Canvas.Top="630"/>
             <Image x:Name="WhiteRook1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteRook.png" Canvas.Top="630"/>
-            <Image x:Name="WhiteKnightRight" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightRight.png" Canvas.Left="90" Canvas.Top="630"/>
-            <Image x:Name="WhiteKnightLeft" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightLeft.png" Canvas.Left="540" Canvas.Top="630"/>
+            <Image x:Name="WhiteKnight1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightLeft.png" Canvas.Left="90" Canvas.Top="630"/>
+            <Image x:Name="WhiteKnight2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKnightLeft.png" Canvas.Left="540" Canvas.Top="630"/>
             <Image x:Name="WhiteBishop2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteBishop.png" Canvas.Left="450" Canvas.Top="630"/>
             <Image x:Name="WhiteBishop1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteBishop.png" Canvas.Left="180" Canvas.Top="630"/>
             <Image x:Name="WhiteQueen" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteQueen.png" Canvas.Left="270" Canvas.Top="630"/>
@@ -70,7 +70,7 @@
         <TextBox x:Name="BlackScore" HorizontalAlignment="Left" Height="23" Margin="725,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="33"/>
         <Label x:Name="WhiteScoreLabel" Content="White" HorizontalAlignment="Left" Margin="635,35,0,0" VerticalAlignment="Top"/>
         <Label x:Name="BlackScoreLabel" Content="Black" HorizontalAlignment="Left" Margin="763,35,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="LogicLog" Height="768" Margin="1275,66,8,0" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Courier New"/>
+        <TextBox x:Name="LogicLog" Height="768" Margin="1275,66,8,0" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Courier New" IsReadOnlyCaretVisible="True" HorizontalScrollBarVisibility="Auto"/>
         <Button x:Name="NewGame" Content="New Game CPU" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top" Width="102" Click="NewGame_Click" Height="35"/>
         <Label x:Name="StartPositionUI" Content="Label" HorizontalAlignment="Left" Margin="361,27,0,0" VerticalAlignment="Top" Width="51"/>
         <Label x:Name="EndPositionUI" Content="Label" HorizontalAlignment="Left" Margin="412,27,0,0" VerticalAlignment="Top" Width="51"/>
