@@ -133,38 +133,24 @@ namespace Chess
         {
             var eval = 0d;
 
-            var whiteKingCount = _bitBoard.FindKingSquare(Colour.White).Count();
-            var blackKingCount = _bitBoard.FindKingSquare(Colour.Black).Count();
-
-            var whiteQueenCount = _bitBoard.FindQueenSquares(Colour.White).Count();
-            var blackQueenCount = _bitBoard.FindQueenSquares(Colour.Black).Count();
-
-            var whiteRookCount = _bitBoard.FindRookSquares(Colour.White).Count();
-            var blackRookCount = _bitBoard.FindRookSquares(Colour.Black).Count();
-
-            var whiteKnightCount = _bitBoard.FindKnightSquares(Colour.White).Count();
-            var blackKnightCount = _bitBoard.FindKnightSquares(Colour.Black).Count();
-
-            var whiteBishopCount = _bitBoard.FindBishopSquares(Colour.White).Count();
-            var blackBishopCount = _bitBoard.FindBishopSquares(Colour.Black).Count();
-
-            var whitePawnCount = _bitBoard.FindPawnSquares(Colour.White).Count();
-            var blackPawnCount = _bitBoard.FindPawnSquares(Colour.Black).Count();
-
             var squaresWithPieces = (_bitBoard.White | _bitBoard.Black).ToList();
 
             foreach(var squareWithPiece in squaresWithPieces)
             {
-                eval += GetAbsolutePieceValue(squareWithPiece);
+                var pieceColour = _bitBoard.GetPieceColour(squareWithPiece);
+
+                var absoluteValue = GetAbsolutePieceValue(squareWithPiece, pieceColour);
+
+                eval += pieceColour == Colour.White ? absoluteValue : -absoluteValue;
             }
 
-            return eval;
+            return Math.Round(eval * 0.1, 2);
         }
 
-        private double GetAbsolutePieceValue(SquareFlag squareWithPiece)
+        private double GetAbsolutePieceValue(SquareFlag squareWithPiece, Colour pieceColour)
         {
             var pieceType = _bitBoard.GetPiece(squareWithPiece);
-            var pieceColour = _bitBoard.GetPieceColour(squareWithPiece);
+            //var pieceColour = _bitBoard.GetPieceColour(squareWithPiece);
             var rf = squareWithPiece.ToRankFile();
             var r = rf.Rank - 1;
             var f = (int)rf.File;
