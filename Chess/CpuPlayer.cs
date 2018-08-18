@@ -22,7 +22,7 @@ namespace Chess
 
         public CpuPlayer()
         {
-            _algorithm = new AlphaBeta(_bitBoardMoveFinder);
+            _algorithm = new AlphaBeta();
         }
 
         public Board ChoseMove(Board board, Colour colour, int ply)
@@ -157,11 +157,15 @@ namespace Chess
                 return chosenBoard;
             }
 
-            chosenBoard = _algorithm.AlphaBetaRoot(board, colour, 3, true, sb);
+            sb.AppendLine($"Running AlphaBeta...");
+
+            var absb = new StringBuilder();
+
+            chosenBoard = _algorithm.AlphaBetaRoot(board, colour, 3, true, absb);
 
             chosenBoard.Evaluate(colour);
 
-            sb.AppendLine($"Analysed {board.PositionCounter} moves.");
+            sb.AppendLine($"Analysed {_algorithm.PositionCounter} moves.");
 
             sb.AppendLine($"Chosen board: {chosenBoard.GetMetricsString()}");
 
@@ -171,6 +175,11 @@ namespace Chess
                 sb.AppendLine($"   {optionBoard.GetMetricsString()}");
 
             board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
+
+            if (false)
+            {
+                sb.Append(absb);
+            }
 
             _moveLog.Add(sb.ToString());
 
@@ -342,10 +351,11 @@ namespace Chess
 
             board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
 
-            if (chosenBoard.GetMove() is MoveCastle moveCastle)
-                sb.AppendLine($"Chosen move: {moveCastle.GetCode()} = Castle");
-            else
-                sb.AppendLine($"Chosen move: {chosenBoard.GetCode()}");
+            //if (chosenBoard.GetMove() is MoveCastle moveCastle)
+            //    sb.AppendLine($"Chosen move: {moveCastle.GetCode()} = Castle");
+            //else
+            //    sb.AppendLine($"Chosen move: {chosenBoard.GetCode()}");
+            sb.AppendLine($"Chosen move: {chosenBoard.GetCode()}");
 
             _moveLog.Add(sb.ToString());
 
@@ -443,7 +453,7 @@ namespace Chess
             {
                 boardInCheck.GenerateChildBoards(colour, 1);
 
-                sb.AppendLine($"Board: {boardInCheck.ParentBoard.GetCode()}->{boardInCheck.GetCode()} Checkmate: {boardInCheck.IsInCheckmate(colour)}");
+                //sb.AppendLine($"Board: {boardInCheck.ParentBoard.GetCode()}->{boardInCheck.GetCode()} Checkmate: {boardInCheck.IsInCheckmate(colour)}");
             }
 
             d1NoCheckmateBoards = board.ChildBoards.Where(x => !x.ChildBoards.Any(y => y.IsInCheckmate(colour)));

@@ -4,7 +4,6 @@ using Chess.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Chess
@@ -14,6 +13,8 @@ namespace Chess
         private bool _isParallel = false;
 
         public Board ParentBoard { get; private set; }
+
+        public Colour Turn { get; }
 
         public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
 
@@ -43,8 +44,6 @@ namespace Chess
 
         public string Code { get { return _move == null ? string.Empty : _move.GetCode(); } }
 
-        private Move _move { get; set; }
-
         public Move Move => _move;
 
         public Board PrimaryVariation { get; private set; }
@@ -53,15 +52,17 @@ namespace Chess
 
         private BitBoard _bitBoard { get; }
 
-        private BitBoardMoveFinder _bitBoardMoveFinder;
+        private Move _move { get; set; }
 
-        public int PositionCounter { get; private set; } = 0;
+        private BitBoardMoveFinder _bitBoardMoveFinder;
 
         public Board()
         {
             _bitBoard = new BitBoard();
 
             _bitBoardMoveFinder = new BitBoardMoveFinder();
+
+            Turn = Colour.White;
 
             WhiteScore = GetScore(_bitBoard, Colour.White);
             BlackScore = GetScore(_bitBoard, Colour.Black);
@@ -70,6 +71,8 @@ namespace Chess
         public Board(Board parentBoard, Move move, BitBoard bitBoard, BitBoardMoveFinder moveFinder)
         {
             ParentBoard = parentBoard;
+
+            Turn = parentBoard.Turn.Opposite();
 
             _move = move;
             
@@ -80,18 +83,12 @@ namespace Chess
             BlackScore = GetScore(bitBoard, Colour.Black);
         }
 
-        public IList<Move> FindMoves(Colour colour) =>
-            _bitBoardMoveFinder.FindMoves(_bitBoard, colour);
-
         public Board ApplyMove(Move move)
         {
             var childBitBoard = _bitBoard.ApplyMove(move, _bitBoardMoveFinder);
 
             return new Board(this, move, childBitBoard, _bitBoardMoveFinder);
         }
-
-        public bool IsCheck(Colour colour) =>
-            _bitBoard.IsInCheck(colour);
 
         public double Evaluate(Colour colour)
         {
@@ -125,11 +122,79 @@ namespace Chess
             WhiteMetrics = whiteMetrics;
             BlackMetrics = blackMetrics;
 
-            EvaluationScore = Evaluate(colour, whiteMetrics, blackMetrics);
+            EvaluationScore = Evaluate2(colour, whiteMetrics, blackMetrics);
 
             var who2move = colour == Colour.White ? 1d : -1d;
 
             return EvaluationScore * who2move;
+        }
+
+        private double Evaluate2(Colour colour, BoardMetrics whiteMetrics, BoardMetrics blackMetrics)
+        {
+            var eval = 0d;
+
+            var whiteKingCount = _bitBoard.FindKingSquare(Colour.White).Count();
+            var blackKingCount = _bitBoard.FindKingSquare(Colour.Black).Count();
+
+            var whiteQueenCount = _bitBoard.FindQueenSquares(Colour.White).Count();
+            var blackQueenCount = _bitBoard.FindQueenSquares(Colour.Black).Count();
+
+            var whiteRookCount = _bitBoard.FindRookSquares(Colour.White).Count();
+            var blackRookCount = _bitBoard.FindRookSquares(Colour.Black).Count();
+
+            var whiteKnightCount = _bitBoard.FindKnightSquares(Colour.White).Count();
+            var blackKnightCount = _bitBoard.FindKnightSquares(Colour.Black).Count();
+
+            var whiteBishopCount = _bitBoard.FindBishopSquares(Colour.White).Count();
+            var blackBishopCount = _bitBoard.FindBishopSquares(Colour.Black).Count();
+
+            var whitePawnCount = _bitBoard.FindPawnSquares(Colour.White).Count();
+            var blackPawnCount = _bitBoard.FindPawnSquares(Colour.Black).Count();
+
+            var squaresWithPieces = (_bitBoard.White | _bitBoard.Black).ToList();
+
+            foreach(var squareWithPiece in squaresWithPieces)
+            {
+                eval += GetAbsolutePieceValue(squareWithPiece);
+            }
+
+            return eval;
+        }
+
+        private double GetAbsolutePieceValue(SquareFlag squareWithPiece)
+        {
+            var pieceType = _bitBoard.GetPiece(squareWithPiece);
+            var pieceColour = _bitBoard.GetPieceColour(squareWithPiece);
+            var rf = squareWithPiece.ToRankFile();
+            var r = rf.Rank - 1;
+            var f = (int)rf.File;
+
+            if (pieceType == PieceType.Pawn)
+            {
+                return 10d + (pieceColour == Colour.White ? PieceValues.WhitePawn[r][f] : PieceValues.BlackPawn[r][f]);
+            }
+            else if (pieceType == PieceType.Rook)
+            {
+                return 50d + (pieceColour == Colour.White ? PieceValues.WhiteRook[r][f] : PieceValues.BlackRook[r][f]);
+            }
+            else if (pieceType == PieceType.Knight)
+            {
+                return 30d + PieceValues.Knight[r][f];
+            }
+            else if (pieceType == PieceType.Bishop)
+            {
+                return 30d + (pieceColour == Colour.White ? PieceValues.WhiteBishop[r][f] : PieceValues.BlackBishop[r][f]);
+            }
+            else if (pieceType == PieceType.Queen)
+            {
+                return 90d + PieceValues.Queen[r][f];
+            }
+            else if (pieceType == PieceType.King)
+            {
+                return 900d + (pieceColour == Colour.White ? PieceValues.WhiteKing[r][f] : PieceValues.BlackKing[r][f]);
+            }
+
+            return 0d;
         }
 
         private double Evaluate(Colour colour, BoardMetrics whiteMetrics, BoardMetrics blackMetrics)
@@ -213,32 +278,20 @@ namespace Chess
         public int GetScore(Colour colour) =>
             colour == Colour.White ? WhiteScore : BlackScore;
 
-        public bool CanCastle(Colour colour) =>
-            _bitBoard.CanCastle(colour);
-
         public BoardMetrics GetMetrics(Colour colour) =>
             Colour.White == colour ? WhiteMetrics : BlackMetrics;
+
+        public IList<Move> FindMoves() =>
+            _bitBoardMoveFinder.FindMoves(_bitBoard, Turn);
 
         public bool CheckForPawnPromotion(RankFile startPosition, RankFile endPosition) =>
             _bitBoardMoveFinder.CheckForPawnPromotion(_bitBoard, startPosition.ToSquareFlag(), endPosition.ToSquareFlag());
 
-        public string GetCode() =>
-            _move.GetCode();
+        public bool IsCheck(Colour colour) =>
+            _bitBoard.IsInCheck(colour);
 
-        public RankFile GetMovedFrom() =>
-            _move.StartPosition;
-
-        public RankFile GetMovedTo() =>
-            _move.EndPosition;
-
-        public PieceType GetMovedPieceType() =>
-            _move.Type;
-
-        public Move GetMove() =>
-            _move;
-
-        public string MoveToString() =>
-            _move != null ? _move.ToString() : string.Empty;
+        public bool CanCastle(Colour colour) =>
+            _bitBoard.CanCastle(colour);
 
         public PieceType GetPiece(RankFile rankFile) =>
             _bitBoard.GetPiece(rankFile.ToSquareFlag());
@@ -276,6 +329,27 @@ namespace Chess
         public bool IsInCheck(Colour colour) =>
             _bitBoard.IsInCheck(colour);
 
+        public string BoardToString() =>
+            _bitBoard.ToString();
+
+        public string GetCode() =>
+            _move.GetCode();
+
+        public RankFile GetMovedFrom() =>
+            _move.StartPosition;
+
+        public RankFile GetMovedTo() =>
+            _move.EndPosition;
+
+        public PieceType GetMovedPieceType() =>
+            _move.Type;
+
+        public Move GetMove() =>
+            _move;
+
+        public string MoveToString() =>
+            _move != null ? _move.ToString() : string.Empty;
+
         public IReadOnlyCollection<Board> GetBoardsWithCheckmate(Colour colour) =>
             ChildBoards.Where(x => colour == Colour.White ? x.WhiteIsInCheckmate : x.BlackIsInCheckmate).ToList();
 
@@ -290,22 +364,6 @@ namespace Chess
                 childBoard.Orphan();
 
             ChildBoards = new List<Board> { chosenChild };
-        }
-
-        public string GetSquaresUnderAttackDebugString(Colour colour)
-        {
-            var sb = new StringBuilder();
-
-            var squaresUnderAttack = GetSquaresUnderThreat(colour).ToList();
-
-            foreach(var sua in squaresUnderAttack)
-            {
-                var rf = sua.ToRankFile();
-
-                sb.AppendLine($"{rf.File}{rf.Rank} covered");
-            }
-
-            return sb.ToString();
         }
 
         public ICollection<Board> FindLeaves()
@@ -330,9 +388,6 @@ namespace Chess
             return leafBoards;
         }
 
-        public string BoardToString() =>
-            _bitBoard.ToString();
-
         public string GetMetricsString()
         {
             if (WhiteMetrics == null)
@@ -356,11 +411,6 @@ namespace Chess
             $"Th: {BlackMetrics.NumPiecesUnderThreat} " +
             $"ThV: {BlackMetrics.NumPiecesUnderThreatValue}";
         }
-
-        private string PvString() =>
-            PrimaryVariation == null
-            ? string.Empty
-            : $"{PrimaryVariation.Move} {Math.Round(PrimaryVariation.EvaluationScore, 2)}";
 
         public void Orphan()
         {
@@ -416,10 +466,8 @@ namespace Chess
             }
         }
 
-        public override string ToString()
-        {
-            return $"{Move.ToString()}";
-        }
+        public override string ToString() =>
+            $"{Move.ToString()}";
 
         private byte GetScore(BitBoard board, Colour colour)
         {
@@ -431,5 +479,10 @@ namespace Chess
 
             return score;
         }
+
+        private string PvString() =>
+            PrimaryVariation == null
+            ? string.Empty
+            : $"{PrimaryVariation.Move} {Math.Round(PrimaryVariation.EvaluationScore, 2)}";
     }
 }

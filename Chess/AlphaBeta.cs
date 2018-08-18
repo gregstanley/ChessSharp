@@ -1,67 +1,73 @@
-﻿using Chess.Bit;
-using Chess.Extensions;
+﻿using Chess.Extensions;
 using Chess.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Chess
 {
     public class AlphaBeta
     {
-        private BitBoardMoveFinder _bitBoardMoveFinder { get; set; }
+        public int PositionCounter => _positionCounter;
 
-        public AlphaBeta(BitBoardMoveFinder bitBoardMoveFinder)
-        {
-            _bitBoardMoveFinder = bitBoardMoveFinder;
-        }
+        private int _positionCounter = 0;
 
         public Board AlphaBetaRoot(Board board, Colour colour, int depth, bool isMax, StringBuilder sb)
         {
+            _positionCounter = 0;
+
             PotentialBoard bestChildBoard = null;
 
-            var moves = board.FindMoves(colour);
+            var moves = board.FindMoves();
 
             List<PotentialBoard> potentialBoards = new List<PotentialBoard>();
 
-            foreach (var move in moves)
+            var internalStringBuilder = new StringBuilder();
+
+            Parallel.ForEach(moves, (move) =>
             {
                 var childBoard = board.ApplyMove(move);
 
-                if (childBoard.IsCheck(colour))
-                    continue;
+                if (!childBoard.IsCheck(colour))
+                {
+                    //var childBoard = new Board(board, move, childBitBoard, _bitBoardMoveFinder);
 
-                //var childBoard = new Board(board, move, childBitBoard, _bitBoardMoveFinder);
+                    //if (board.ChildBoards.SingleOrDefault(x => x.Code == childBoard.GetCode()) == null)
+                    //    ChildBoards.Add(childBoard);
 
-                //if (board.ChildBoards.SingleOrDefault(x => x.Code == childBoard.GetCode()) == null)
-                //    ChildBoards.Add(childBoard);
+                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, internalStringBuilder);
 
-                var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, sb);
+                    var potentialBoard = new PotentialBoard(childBoard, currentChildBoard.PotentialScore, PotentialBoard.NodeType.PV);
 
-                var potentialBoard = new PotentialBoard(childBoard, currentChildBoard.PotentialScore, PotentialBoard.NodeType.PV);
+                    potentialBoards.Add(potentialBoard);
 
-                potentialBoards.Add(potentialBoard);
+                    sb.AppendLine($"ROOT: {potentialBoard}");
 
-                sb.AppendLine($"ROOT: {potentialBoard}");
-
-                if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
-                    bestChildBoard = potentialBoard;
-            }
+                    if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
+                        bestChildBoard = potentialBoard;
+                }
+            });
 
             sb.AppendLine($"ROOT:");
 
             foreach (var evaluatedBoard in potentialBoards)
                 sb.AppendLine($" - {evaluatedBoard}");
 
+            sb.Append(internalStringBuilder);
+
             return bestChildBoard.Board;
         }
 
         private PotentialBoard AlphaBetaInternal(Board board, Colour colour, int depth, double alpha, double beta, bool isMax, StringBuilder sb)
         {
+            Interlocked.Increment(ref _positionCounter);
+
             if (depth == 0)
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
 
-            var moves = board.FindMoves(colour);
+            var moves = board.FindMoves();
 
             PotentialBoard bestChildBoard;
 
@@ -120,7 +126,10 @@ namespace Chess
                 }
             }
 
-            sb.AppendLine($"EXACT: {board.GetCode()} Best: {bestChildBoard} ");
+            if (bestChildBoard.Board == null)
+                sb.AppendLine($"EXACT: {board.GetCode()} No Childboards found");
+            else
+                sb.AppendLine($"EXACT: {board.GetCode()} Best: {bestChildBoard}");
 
             return bestChildBoard.WithType(PotentialBoard.NodeType.All);
         }

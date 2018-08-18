@@ -69,6 +69,7 @@
     <Compile Include="AlphaBeta.cs" />
     <Compile Include="Models\Move.cs" />
     <Compile Include="Models\MoveCastle.cs" />
+    <Compile Include="PieceValues.cs" />
     <Compile Include="PromotionTypeEventArgs.cs" />
     <Compile Include="PromotionTypeUserControl.xaml.cs">
       <DependentUpon>PromotionTypeUserControl.xaml</DependentUpon>
