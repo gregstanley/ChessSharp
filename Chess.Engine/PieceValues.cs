@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 
-namespace Chess
+namespace Chess.Engine
 {
     public class PieceValues
     {
@@ -33,7 +31,6 @@ namespace Chess
                 return _blackPawn;
             }
         }
-
 
         public static readonly double[][] Knight = new double[][]
         {

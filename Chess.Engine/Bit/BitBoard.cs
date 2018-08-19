@@ -1,9 +1,9 @@
-﻿using Chess.Extensions;
-using Chess.Models;
+﻿using Chess.Engine.Extensions;
+using Chess.Engine.Models;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Chess.Bit
+namespace Chess.Engine.Bit
 {
     public class BitBoard
     {

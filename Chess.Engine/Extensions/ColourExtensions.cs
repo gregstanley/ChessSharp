@@ -1,6 +1,6 @@
-﻿using Chess.Models;
+﻿using Chess.Engine.Models;
 
-namespace Chess.Extensions
+namespace Chess.Engine.Extensions
 {
     public static class ColourExtensions
     {

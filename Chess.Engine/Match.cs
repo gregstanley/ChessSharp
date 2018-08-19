@@ -1,11 +1,10 @@
-﻿using Chess.Models;
+﻿using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Troschuetz.Random.Generators;
 
-namespace Chess
+namespace Chess.Engine
 {
     public class Match
     {
@@ -18,8 +17,6 @@ namespace Chess
         public bool IsHumanTurn { get { return HumanColour != Colour.None && ThisTurnColour == HumanColour; } }
 
         private List<Board> _boards = new List<Board>();
-
-        private StandardGenerator _random = new StandardGenerator();
 
         private CpuPlayer _cpuPlayer = new CpuPlayer();
 

@@ -1,12 +1,12 @@
-﻿using Chess.Bit;
-using Chess.Extensions;
-using Chess.Models;
+﻿using Chess.Engine.Bit;
+using Chess.Engine.Extensions;
+using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Chess
+namespace Chess.Engine
 {
     public class Board
     {

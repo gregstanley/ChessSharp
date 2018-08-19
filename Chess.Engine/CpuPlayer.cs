@@ -1,17 +1,14 @@
-﻿using Chess.Bit;
-using Chess.Extensions;
-using Chess.Models;
+﻿using Chess.Engine.Bit;
+using Chess.Engine.Extensions;
+using Chess.Engine.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Troschuetz.Random.Generators;
 
-namespace Chess
+namespace Chess.Engine
 {
     public class CpuPlayer
     {
-        private StandardGenerator _random = new StandardGenerator();
-
         private List<string> _moveLog = new List<string>();
 
         public string GetLastMoveLog() => _moveLog.Any() ? _moveLog.Last() : string.Empty;
@@ -362,14 +359,14 @@ namespace Chess
             return chosenBoard;
         }
 
-        private Board Random(IReadOnlyCollection<Board> boards)
-        {
-            var range = boards.Count();
+        //private Board Random(IReadOnlyCollection<Board> boards)
+        //{
+        //    var range = boards.Count();
 
-            var chosenTargetBoardIndex = _random.Next(range);
+        //    var chosenTargetBoardIndex = _random.Next(range);
 
-            return boards.ElementAt(chosenTargetBoardIndex);
-        }
+        //    return boards.ElementAt(chosenTargetBoardIndex);
+        //}
 
         private Board FindRoot(Board rootBoard, Board currentBoard)
         {

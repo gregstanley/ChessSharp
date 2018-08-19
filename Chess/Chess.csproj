@@ -57,26 +57,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Bit\BitBoard.cs" />
-    <Compile Include="Bit\BitBoardMoveFinder.cs" />
-    <Compile Include="BoardMetrics.cs" />
-    <Compile Include="Extensions\ColourExtensions.cs" />
-    <Compile Include="CpuPlayer.cs" />
-    <Compile Include="Extensions\ListSquareFlagExtensions.cs" />
-    <Compile Include="Models\PotentialBoard.cs" />
     <Compile Include="ImageMap.cs" />
-    <Compile Include="Match.cs" />
-    <Compile Include="AlphaBeta.cs" />
-    <Compile Include="Models\Move.cs" />
-    <Compile Include="Models\MoveCastle.cs" />
-    <Compile Include="PieceValues.cs" />
     <Compile Include="PromotionTypeEventArgs.cs" />
     <Compile Include="PromotionTypeUserControl.xaml.cs">
       <DependentUpon>PromotionTypeUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\RankFile.cs" />
-    <Compile Include="Models\RelativePosition.cs" />
-    <Compile Include="Extensions\SquareFlagExtensions.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -85,8 +70,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Board.cs" />
-    <Compile Include="Models\Enums.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -168,6 +151,11 @@
   <ItemGroup>
     <Resource Include="Images\chess-36333_960_720.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Chess.Engine\Chess.Engine.csproj">
+      <Project>{d6bb767b-223b-4f23-b71f-28c85911e988}</Project>
+      <Name>Chess.Engine</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

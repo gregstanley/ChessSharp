@@ -1,4 +1,4 @@
-﻿namespace Chess.Models
+﻿namespace Chess.Engine.Models
 {
     public class Move
     {

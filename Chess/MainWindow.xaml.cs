@@ -1,5 +1,6 @@
-﻿using Chess.Extensions;
-using Chess.Models;
+﻿using Chess.Engine;
+using Chess.Engine.Extensions;
+using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

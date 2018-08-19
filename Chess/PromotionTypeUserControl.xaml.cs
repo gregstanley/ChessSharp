@@ -1,4 +1,4 @@
-﻿using Chess.Models;
+﻿using Chess.Engine.Models;
 using System.Windows;
 using System.Windows.Controls;
 

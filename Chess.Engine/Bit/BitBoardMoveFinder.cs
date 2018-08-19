@@ -1,10 +1,10 @@
-﻿using Chess.Extensions;
-using Chess.Models;
+﻿using Chess.Engine.Extensions;
+using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Chess.Bit
+namespace Chess.Engine.Bit
 {
     public class BitBoardMoveFinder
     {
