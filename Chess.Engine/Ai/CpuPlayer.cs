@@ -1,11 +1,12 @@
-﻿using Chess.Engine.Bit;
+﻿using Chess.Engine.Ai.Searches;
+using Chess.Engine.Bit;
 using Chess.Engine.Extensions;
 using Chess.Engine.Models;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Chess.Engine
+namespace Chess.Engine.Ai
 {
     public class CpuPlayer
     {

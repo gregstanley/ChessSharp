@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 
-namespace Chess.Engine
+namespace Chess.Engine.Models
 {
     public class PieceValues
     {

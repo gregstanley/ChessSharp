@@ -42,11 +42,6 @@
             <Image x:Name="WhiteBishop1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteBishop.png" Canvas.Left="180" Canvas.Top="630"/>
             <Image x:Name="WhiteQueen" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteQueen.png" Canvas.Left="270" Canvas.Top="630"/>
             <Image x:Name="WhiteKing" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteKing.png" Canvas.Left="360" Canvas.Top="630"/>
-            <Label x:Name="GameOver" Content="Game Over" Canvas.Left="235" Canvas.Top="-74" FontSize="48" FontFamily="Segoe UI Semibold">
-                <Label.Effect>
-                    <DropShadowEffect Opacity="0.25"/>
-                </Label.Effect>
-            </Label>
             <Image x:Name="WhiteQueenPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteQueen.png" Canvas.Left="-568"/>
             <Image x:Name="WhiteQueenPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-WhiteQueen.png" Canvas.Left="-568" Canvas.Top="90"/>
             <Image x:Name="BlackQueenPromotion2" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="-458" Canvas.Top="90"/>
@@ -65,21 +60,41 @@
             <Image x:Name="BlackQueenPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="-458"/>
         </Canvas>
         <TextBox x:Name="LogText" HorizontalAlignment="Left" Height="784" Margin="8,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="338"/>
-        <TextBox x:Name="BoardDebug" HorizontalAlignment="Left" Height="768" Margin="1099,66,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="171" FontFamily="Courier New"/>
-        <TextBox x:Name="WhiteScore" HorizontalAlignment="Left" Height="23" Margin="684,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="33"/>
-        <TextBox x:Name="BlackScore" HorizontalAlignment="Left" Height="23" Margin="725,35,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="33"/>
-        <Label x:Name="WhiteScoreLabel" Content="White" HorizontalAlignment="Left" Margin="635,35,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="BlackScoreLabel" Content="Black" HorizontalAlignment="Left" Margin="763,35,0,0" VerticalAlignment="Top"/>
-        <TextBox x:Name="LogicLog" Height="768" Margin="1275,66,8,0" TextWrapping="Wrap" VerticalAlignment="Top" FontFamily="Courier New" IsReadOnlyCaretVisible="True" HorizontalScrollBarVisibility="Auto"/>
+        <Label x:Name="WhiteScoreLabel" Content="White" HorizontalAlignment="Right" Margin="0,28,1035,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" HorizontalContentAlignment="Right"/>
+        <Label x:Name="BlackScoreLabel" Content="Black" HorizontalAlignment="Left" Margin="721,28,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16"/>
         <Button x:Name="NewGame" Content="New Game CPU" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top" Width="102" Click="NewGame_Click" Height="35"/>
         <Label x:Name="StartPositionUI" Content="Label" HorizontalAlignment="Left" Margin="361,27,0,0" VerticalAlignment="Top" Width="51"/>
         <Label x:Name="EndPositionUI" Content="Label" HorizontalAlignment="Left" Margin="412,27,0,0" VerticalAlignment="Top" Width="51"/>
         <Button x:Name="NewGameHuman" Content="New Game Human" HorizontalAlignment="Left" Margin="8,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHuman_Click" Height="35"/>
         <local:PromotionTypeUserControl x:Name="PromotionTypeSelector" HorizontalAlignment="Left" Margin="558,432,0,0" VerticalAlignment="Top" PieceSelected="PromotionTypeSelector_PieceSelected" />
-        <Label x:Name="EvaluationUI" Content="Label" HorizontalAlignment="Left" Margin="1029,35,0,0" VerticalAlignment="Top" Width="51"/>
-        <CheckBox x:Name="BlackCastleQueenSideUI" Content="Queen Side" HorizontalAlignment="Left" Margin="360,94,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="BlackCastleKingSideUI" Content="King Side" HorizontalAlignment="Left" Margin="1009,97,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="WhiteCastleQueenSideUI" Content="Queen Side" HorizontalAlignment="Left" Margin="361,839,0,0" VerticalAlignment="Top"/>
-        <CheckBox x:Name="WhiteCastleKingSideUI" Content="King Side" HorizontalAlignment="Left" Margin="1009,839,0,0" VerticalAlignment="Top"/>
+        <CheckBox x:Name="BlackCastleQueenSideUI" Content="Queen Side" HorizontalAlignment="Left" Margin="360,95,0,0" VerticalAlignment="Top" IsEnabled="False"/>
+        <CheckBox x:Name="BlackCastleKingSideUI" Content="King Side" HorizontalAlignment="Left" Margin="1009,95,0,0" VerticalAlignment="Top" IsEnabled="False"/>
+        <CheckBox x:Name="WhiteCastleQueenSideUI" Content="Queen Side" HorizontalAlignment="Left" Margin="361,839,0,0" VerticalAlignment="Top" IsEnabled="False"/>
+        <CheckBox x:Name="WhiteCastleKingSideUI" Content="King Side" HorizontalAlignment="Left" Margin="1009,839,0,0" VerticalAlignment="Top" IsEnabled="False"/>
+        <TabControl HorizontalAlignment="Left" Height="388" Margin="1099,114,0,0" VerticalAlignment="Top" Width="645">
+            <TabItem Header="TabItem">
+                <ScrollViewer Background="#FFE5E5E5" VerticalScrollBarVisibility="Auto" CanContentScroll="True" Height="360">
+                    <TextBlock x:Name="LogicLog" HorizontalAlignment="Left" TextWrapping="Wrap" VerticalAlignment="Top" Width="620" ScrollViewer.CanContentScroll="True"/>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="TabItem">
+                <Grid Background="#FFE5E5E5">
+                    <TextBox x:Name="BoardDebug" HorizontalAlignment="Left" Height="340" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="171" FontFamily="Courier New"/>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <TextBlock x:Name="ErrorUi" HorizontalAlignment="Left" Margin="361,50,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="286" Height="39"/>
+        <TextBlock x:Name="WhiteScore" HorizontalAlignment="Left" Margin="664,54,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="55" TextAlignment="Center" FontWeight="Bold" FontSize="14"/>
+        <TextBlock x:Name="BlackScore" HorizontalAlignment="Left" Margin="721,54,0,0" TextWrapping="Wrap" Text="0" VerticalAlignment="Top" Width="50" FontWeight="Bold" FontSize="14" TextAlignment="Center"/>
+        <Ellipse x:Name="WhiteTurnIcon" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="685,21,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
+        <Ellipse x:Name="BlackTurnIcon" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="740,21,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
+        <TextBlock x:Name="BlackIsInCheckUi" HorizontalAlignment="Left" Height="25" Margin="776,37,0,0" TextWrapping="Wrap" Text="Check" VerticalAlignment="Top" Width="108" FontStyle="Italic"/>
+        <TextBlock x:Name="WhiteIsInCheckUi" HorizontalAlignment="Left" Height="25" Margin="552,37,0,0" TextWrapping="Wrap" Text="Check" VerticalAlignment="Top" Width="108" TextAlignment="Right" FontStyle="Italic"/>
+        <TextBlock x:Name="EvaluationUi" HorizontalAlignment="Left" Margin="695,73,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <TextBlock x:Name="CheckmateUi" HorizontalAlignment="Left" Margin="669,83,0,0" TextWrapping="Wrap" Text="Checkmate" VerticalAlignment="Top" FontSize="20" FontWeight="Bold" FontStyle="Italic">
+            <TextBlock.Effect>
+                <DropShadowEffect Opacity="0.25"/>
+            </TextBlock.Effect>
+        </TextBlock>
     </Grid>
 </Window>

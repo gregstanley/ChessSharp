@@ -1,4 +1,5 @@
-﻿using Chess.Engine.Models;
+﻿using Chess.Engine.Ai;
+using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -83,6 +84,17 @@ namespace Chess.Engine
             return chosenBoard;
         }
 
+        public bool IsLegalMove(RankFile startPosition, RankFile endPosition, PieceType promotionType)
+        {
+            var board = GetHeadBoard();
+
+            var colourTurn = (ThisTurn + 1) / 2;
+
+            var chosenBoard = DoMove(board, ThisTurnColour, startPosition, endPosition, promotionType);
+
+            return chosenBoard == null ? false : true;
+        }
+
         private Board DoMove(Board board, Colour colour, RankFile startPosition, RankFile endPosition, PieceType promotionType)
         {
             var sb = new StringBuilder();
@@ -140,7 +152,7 @@ namespace Chess.Engine
 
             var code = move.GetCode();
 
-            var boards = board.ChildBoards.Where(x => x.GetCode() == code);
+            var boards = board.ChildBoards.Where(x => x.GetCode().StartsWith(code));
 
             if (boards == null || !boards.Any())
                 return null;

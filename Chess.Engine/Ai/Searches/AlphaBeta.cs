@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Chess.Engine
+namespace Chess.Engine.Ai.Searches
 {
     public class AlphaBeta
     {
