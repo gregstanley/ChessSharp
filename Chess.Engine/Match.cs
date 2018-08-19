@@ -112,9 +112,10 @@ namespace Chess.Engine
 
             if (piece == PieceType.Rook)
             {
+                var pieceColour = board.GetPieceColour(endPosition);
                 var king = board.GetPiece(endPosition);
 
-                if (king == PieceType.King)
+                if (pieceColour == colour && king == PieceType.King)
                 {
                     if (!board.CanCastle(colour))
                         return null;
@@ -129,9 +130,10 @@ namespace Chess.Engine
             }
             else if (piece == PieceType.King)
             {
+                var pieceColour = board.GetPieceColour(endPosition);
                 var rook = board.GetPiece(endPosition);
-
-                if (rook == PieceType.Rook)
+                
+                if (pieceColour == colour && rook == PieceType.Rook)
                 {
                     if (!board.CanCastle(colour))
                         return null;

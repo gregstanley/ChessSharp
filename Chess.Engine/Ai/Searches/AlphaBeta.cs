@@ -55,7 +55,15 @@ namespace Chess.Engine.Ai.Searches
             foreach (var evaluatedBoard in potentialBoards)
                 sb.AppendLine($" - {evaluatedBoard}");
 
-            sb.Append(internalStringBuilder);
+            try
+            {
+                sb.Append(internalStringBuilder);
+
+            }
+            catch(ArgumentOutOfRangeException ex)
+            {
+                var bp = true;
+            }
 
             return bestChildBoard.Board;
         }

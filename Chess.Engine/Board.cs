@@ -282,6 +282,9 @@ namespace Chess.Engine
         public PieceType GetPiece(RankFile rankFile) =>
             _bitBoard.GetPiece(rankFile.ToSquareFlag());
 
+        public Colour GetPieceColour(RankFile rankFile) =>
+            _bitBoard.GetPieceColour(rankFile.ToSquareFlag());
+
         public SquareFlag GetKingSquare(Colour colour) =>
             _bitBoard.FindKingSquare(colour);
 
