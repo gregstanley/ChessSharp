@@ -18,6 +18,8 @@ namespace Chess.Engine
 
         public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
 
+        public ICollection<PotentialBoard> PotentialChildBoards { get; private set; } = new List<PotentialBoard>();
+
         public bool WhiteCanCastleKingSide => _bitBoard.WhiteCanCastleKingSide();
 
         public bool WhiteCanCastleQueenSide => _bitBoard.WhiteCanCastleQueenSide();
@@ -81,6 +83,16 @@ namespace Chess.Engine
 
             WhiteScore = GetScore(bitBoard, Colour.White);
             BlackScore = GetScore(bitBoard, Colour.Black);
+        }
+
+        public void UpdatePotentialBoard(PotentialBoard potentialBoard)
+        {
+            var existing = PotentialChildBoards.SingleOrDefault(x => x.Board == potentialBoard.Board);
+
+            if (existing != null)
+                PotentialChildBoards.Remove(existing);
+
+            PotentialChildBoards.Add(potentialBoard);
         }
 
         public Board ApplyMove(Move move)
@@ -429,7 +441,7 @@ namespace Chess.Engine
                 {
                     var childBoard = new Board(this, move, childBitBoard, _bitBoardMoveFinder);
 
-                    childBoard.Evaluate(colour);
+                    //childBoard.Evaluate(colour);
 
                     ChildBoards.Add(childBoard);
                 }

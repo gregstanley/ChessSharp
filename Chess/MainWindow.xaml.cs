@@ -171,14 +171,6 @@ namespace Chess
 
                 if (board.BlackIsInCheckmate)
                     GameOver(Colour.White);
-                //CheckmateUi.Visibility = Visibility.Visible;
-                //NextMove.IsEnabled = false;
-
-                //if (board.WhiteIsInCheckmate)
-                //    LogText.AppendText("***** CHECKMATE - Black wins! *****");
-
-                //if (board.BlackIsInCheckmate)
-                //    LogText.AppendText("***** CHECKMATE - White wins! *****");
             }
 
             sb.AppendLine($"== Turn {board.Turn} Board ==");
