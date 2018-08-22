@@ -14,13 +14,13 @@ namespace Chess.Engine.Ai
 
         public string GetLastMoveLog() => _moveLog.Any() ? _moveLog.Last() : string.Empty;
 
-        private AlphaBeta _algorithm { get; set; }
+        private ISearchMoves _search { get; set; }
 
         private BitBoardMoveFinder _bitBoardMoveFinder = new BitBoardMoveFinder();
 
-        public CpuPlayer()
+        public CpuPlayer(ISearchMoves search)
         {
-            _algorithm = new AlphaBeta();
+            _search = search;
         }
 
         public Board ChoseMove(Board board, Colour colour, int ply)
@@ -31,6 +31,7 @@ namespace Chess.Engine.Ai
 
             // Must be 2 for now. Should probably always be even so ends with opponents turn
             board.GenerateChildBoards(colour, 2);
+            board.UpdateStateInfo();
 
             if (!board.ChildBoards.Any())
             {
@@ -111,11 +112,11 @@ namespace Chess.Engine.Ai
 
             var absb = new StringBuilder();
 
-            chosenBoard = _algorithm.AlphaBetaRoot(board, colour, 3, true, absb);
+            chosenBoard = _search.DoSearch(board, colour, 3, true, absb);
 
             chosenBoard.Evaluate(colour);
 
-            sb.AppendLine($"Analysed {_algorithm.PositionCounter} moves.");
+            sb.AppendLine($"Analysed {_search.PositionCounter} moves.");
 
             sb.AppendLine($"Chosen board: {chosenBoard.GetMetricsString()}");
 

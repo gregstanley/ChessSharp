@@ -4,6 +4,7 @@ using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Chess.Engine
 {
@@ -279,13 +280,13 @@ namespace Chess.Engine
             //}
             //else
             //{
-            //foreach (var childBoard in ChildBoards)
-            //    childBoard.GenerateChildBoards(colour.Opposite(), depth);
-            ////}
+                foreach (var childBoard in ChildBoards)
+                    childBoard.GenerateChildBoards(colour.Opposite(), depth);
+            //}
 
-            //if (ChildBoards.All(x => x.ChildBoards.Any(y => y.IsInCheck(colour))))
-            //    _state |= colour == Colour.White ? BoardState.BlackIsInCheckmate : BoardState.WhiteIsInCheckmate;
-        }
+                //if (ChildBoards.All(x => x.ChildBoards.Any(y => y.IsInCheck(colour))))
+                //    _state |= colour == Colour.White ? BoardState.BlackIsInCheckmate : BoardState.WhiteIsInCheckmate;
+            }
 
         public override string ToString() =>
             $"{Move.ToString()}";

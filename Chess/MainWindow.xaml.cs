@@ -1,4 +1,6 @@
 ﻿using Chess.Engine;
+using Chess.Engine.Ai;
+using Chess.Engine.Ai.Searches;
 using Chess.Engine.Extensions;
 using Chess.Engine.Models;
 using CSharpFunctionalExtensions;
@@ -36,7 +38,7 @@ namespace Chess
             Images = BuildImageMap();
         }
 
-        private void StartNewGame(bool isHuman = false)
+        private void StartNewGame(CpuPlayer cpuPlayer, bool isHuman = false)
         {
             BoardDebug.Clear();
 
@@ -47,9 +49,9 @@ namespace Chess
             var board = new Board();
 
             if (isHuman)
-                _currentMatch = new Match(board, Colour.White);
+                _currentMatch = new Match(board, cpuPlayer, Colour.White);
             else
-                _currentMatch = new Match(board, Colour.None);
+                _currentMatch = new Match(board, cpuPlayer, Colour.None);
 
             UpdateUI(board);
         }
@@ -59,7 +61,7 @@ namespace Chess
             NextMove.IsEnabled = true;
             NextMove.Visibility = Visibility.Visible;
 
-            StartNewGame();
+            StartNewGame(new CpuPlayer(new AlphaBeta()));
         }
 
         private void NewGameHuman_Click(object sender, RoutedEventArgs e)
@@ -67,7 +69,15 @@ namespace Chess
             NextMove.IsEnabled = false;
             NextMove.Visibility = Visibility.Collapsed;
 
-            StartNewGame(true);
+            StartNewGame(new CpuPlayer(new RandomMove()), true);
+        }
+
+        private void NewGameHumanHard_Click(object sender, RoutedEventArgs e)
+        {
+            NextMove.IsEnabled = false;
+            NextMove.Visibility = Visibility.Collapsed;
+
+            StartNewGame(new CpuPlayer(new AlphaBeta()), true);
         }
 
         private void NextMove_Click(object sender, RoutedEventArgs e) =>

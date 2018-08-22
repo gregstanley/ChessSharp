@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Chess.Engine.Ai.Searches
 {
-    public class AlphaBeta
+    public class AlphaBeta : ISearchMoves
     {
         public int PositionCounter => _positionCounter;
 
@@ -20,7 +20,7 @@ namespace Chess.Engine.Ai.Searches
             return primary.Concat(secondary.Where(x => !primary.Contains(x)));
         }
 
-        public Board AlphaBetaRoot(Board board, Colour colour, int depth, bool isMax, StringBuilder sb)
+        public Board DoSearch(Board board, Colour colour, int depth, bool isMax, StringBuilder sb)
         {
             _positionCounter = 0;
 

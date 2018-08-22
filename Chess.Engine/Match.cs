@@ -19,11 +19,12 @@ namespace Chess.Engine
 
         private List<Board> _boards = new List<Board>();
 
-        private CpuPlayer _cpuPlayer = new CpuPlayer();
+        private CpuPlayer _cpuPlayer;
 
-        public Match(Board board, Colour humanColour = Colour.None)
+        public Match(Board board, CpuPlayer cpuPlayer, Colour humanColour = Colour.None)
         {
             _boards.Add(board);
+            _cpuPlayer = cpuPlayer;
 
             HumanColour = humanColour;
         }

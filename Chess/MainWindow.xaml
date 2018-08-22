@@ -60,12 +60,12 @@
             <Image x:Name="BlackQueenPromotion1" HorizontalAlignment="Left" Height="90" VerticalAlignment="Top" Width="90" Source="Images/150x150-BlackQueen.png" Canvas.Left="-458"/>
         </Canvas>
         <TextBox x:Name="LogText" HorizontalAlignment="Left" Height="784" Margin="8,50,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="338"/>
-        <Label x:Name="WhiteScoreLabel" Content="White" Margin="656,28,1031,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" HorizontalContentAlignment="Center" RenderTransformOrigin="0.946,0.355"/>
+        <Label x:Name="WhiteScoreLabel" Content="White" Margin="656,28,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" HorizontalContentAlignment="Center" RenderTransformOrigin="0.946,0.355" HorizontalAlignment="Left" Width="67"/>
         <Label x:Name="BlackScoreLabel" Content="Black" HorizontalAlignment="Left" Margin="727,28,0,0" VerticalAlignment="Top" FontWeight="Bold" FontSize="16" HorizontalContentAlignment="Center"/>
-        <Button x:Name="NewGame" Content="New Game CPU" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top" Width="102" Click="NewGame_Click" Height="35"/>
+        <Button x:Name="NewGame" Content="New Game CPU" HorizontalAlignment="Left" Margin="244,10,0,0" VerticalAlignment="Top" Width="102" Click="NewGame_Click" Height="35"/>
         <Label x:Name="StartPositionUI" Content="Label" HorizontalAlignment="Left" Margin="361,27,0,0" VerticalAlignment="Top" Width="51"/>
         <Label x:Name="EndPositionUI" Content="Label" HorizontalAlignment="Left" Margin="412,27,0,0" VerticalAlignment="Top" Width="51"/>
-        <Button x:Name="NewGameHuman" Content="New Game Human" HorizontalAlignment="Left" Margin="8,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHuman_Click" Height="35"/>
+        <Button x:Name="NewGameHuman" Content="New Game" HorizontalAlignment="Left" Margin="8,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHuman_Click" Height="35"/>
         <local:PromotionTypeUserControl x:Name="PromotionTypeSelector" HorizontalAlignment="Left" Margin="558,432,0,0" VerticalAlignment="Top" PieceSelected="PromotionTypeSelector_PieceSelected" />
         <CheckBox x:Name="BlackCastleQueenSideUI" Content="Queen Side" HorizontalAlignment="Left" Margin="360,95,0,0" VerticalAlignment="Top" IsEnabled="False"/>
         <CheckBox x:Name="BlackCastleKingSideUI" Content="King Side" HorizontalAlignment="Left" Margin="1009,95,0,0" VerticalAlignment="Top" IsEnabled="False"/>
@@ -96,5 +96,6 @@
                 <DropShadowEffect Opacity="0.25"/>
             </TextBlock.Effect>
         </TextBlock>
+        <Button x:Name="NewGameHumanHard" Content="New Game (Hard)" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHumanHard_Click" Height="35"/>
     </Grid>
 </Window>
