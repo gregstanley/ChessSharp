@@ -148,8 +148,8 @@ namespace Chess.Engine.Bit
         public bool CanCastleQueenSide(Colour colour) =>
             colour == Colour.White ? WhiteCanCastleQueenSide() : BlackCanCastleQueenSide();
 
-        public bool IsInCheck(Colour colour) =>
-            colour == Colour.White ? BlackCovered.HasFlag(WhiteKing) : WhiteCovered.HasFlag(BlackKing);
+        //public bool IsInCheck(Colour colour) =>
+        //    colour == Colour.White ? BlackCovered.HasFlag(WhiteKing) : WhiteCovered.HasFlag(BlackKing);
 
         public Colour GetPieceColour(SquareFlag square)
         {
@@ -270,12 +270,6 @@ namespace Chess.Engine.Bit
                     childBoard.RemoveCastleAvailability(colour, side);
                 }
             }
-
-            var myCoveredSquares = moveFinder.GetCoveredSquares(childBoard, colour);
-            var opponentCoveredSquares = moveFinder.GetCoveredSquares(childBoard, colour.Opposite());
-
-            childBoard.SetCoveredSquares(colour, myCoveredSquares);
-            childBoard.SetCoveredSquares(colour.Opposite(), opponentCoveredSquares);
 
             return childBoard;
         }

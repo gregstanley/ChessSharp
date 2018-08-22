@@ -136,6 +136,12 @@ namespace Chess
 
         private void UpdateUI(Board board)
         {
+            var checkBoards = board.ChildBoards.Where(x => x.WhiteIsInCheck);
+            if (checkBoards.Any())
+            {
+                var p = true;
+            }
+
             ErrorUi.Text = string.Empty;
 
             WhiteTurnIcon.Visibility = board.Turn == Colour.White ? Visibility.Visible : Visibility.Collapsed;
@@ -157,7 +163,7 @@ namespace Chess
 
             var sb = new StringBuilder();
 
-            EvaluationUi.Text = board.EvaluationScore.ToString();
+            EvaluationUi.Text = board.Evaluation.ToString();
 
             WhiteCastleKingSideUI.IsChecked = board.WhiteCanCastleKingSide;
             WhiteCastleQueenSideUI.IsChecked = board.WhiteCanCastleQueenSide;

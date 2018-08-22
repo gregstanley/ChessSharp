@@ -26,51 +26,38 @@ namespace Chess.Engine.Ai.Searches
 
             PotentialBoard bestChildBoard = null;
 
-            //var moves = board.FindMoves();
             board.GenerateChildBoards(colour, 1);
-
-            //var orderedBoards = board.ChildBoards;
-
-            var primaryBoards = board.PotentialChildBoards
-                .OrderByDescending(x => x.PotentialScore)
-                .Select(x => x.Board);
-
-            var orderedBoards = Prioritise(primaryBoards, board.ChildBoards);
-
-            //List<PotentialBoard> potentialBoards = new List<PotentialBoard>();
+            board.UpdateStateInfo();
 
             var internalStringBuilder = new StringBuilder();
 
+            var orderedBoards = colour == Colour.White
+                ? board.ChildBoards.OrderByDescending(x => x.ProjectedEvaluation).ThenByDescending(x => x.Evaluation)
+                : board.ChildBoards.OrderBy(x => x.ProjectedEvaluation).ThenBy(x => x.Evaluation);
+
             //Parallel.ForEach(moves, (move) =>
             Parallel.ForEach(orderedBoards, (childBoard) =>
+            //foreach(var childBoard in orderedBoards)
             {
-                //var childBoard = board.ApplyMove(move);
+                var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, internalStringBuilder);
 
-                //if (!childBoard.IsCheck(colour))
-                {
-                    //var childBoard = new Board(board, move, childBitBoard, _bitBoardMoveFinder);
+                var potentialBoard = new PotentialBoard(childBoard, currentChildBoard.PotentialScore, PotentialBoard.NodeType.PV);
 
-                    //if (board.ChildBoards.SingleOrDefault(x => x.Code == childBoard.GetCode()) == null)
-                    //    ChildBoards.Add(childBoard);
+                childBoard.UpdateStateInfo();
+                childBoard.ProjectedEvaluation = potentialBoard.PotentialScore;
 
-                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, internalStringBuilder);
-
-                    var potentialBoard = new PotentialBoard(childBoard, currentChildBoard.PotentialScore, PotentialBoard.NodeType.PV);
-
-                    //potentialBoards.Add(potentialBoard);
-                    board.UpdatePotentialBoard(potentialBoard);
-
-                    sb.AppendLine($"ROOT: {potentialBoard}");
-
-                    if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
-                        bestChildBoard = potentialBoard;
-                }
+                if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
+                    bestChildBoard = potentialBoard;
             });
 
-            sb.AppendLine($"ROOT:");
+            //sb.AppendLine($"ROOT:");
 
-            foreach (var evaluatedBoard in board.PotentialChildBoards)
-                sb.AppendLine($" - {evaluatedBoard}");
+            //orderedBoards = colour == Colour.White
+            //    ? board.ChildBoards.OrderByDescending(x => x.ProjectedEvaluation)
+            //    : board.ChildBoards.OrderBy(x => x.ProjectedEvaluation);
+
+            //foreach (var childBoard in orderedBoards)
+            //    sb.AppendLine($" - {childBoard}");
 
             try
             {
@@ -92,36 +79,24 @@ namespace Chess.Engine.Ai.Searches
             if (depth == 0)
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
 
-            //var moves = board.FindMoves();
-
             board.GenerateChildBoards(colour, 1);
 
             PotentialBoard bestChildBoard;
 
             if (isMax)
             {
-                var primaryBoards = board.PotentialChildBoards
-                .OrderByDescending(x => x.PotentialScore)
-                .Select(x => x.Board);
-
-                var orderedBoards = Prioritise(primaryBoards, board.ChildBoards);
-
                 bestChildBoard = new PotentialBoard(null, double.MaxValue, PotentialBoard.NodeType.PV);
 
-                //foreach (var move in moves)
-                //{
-                //    var childBoard = board.ApplyMove(move);
-
-                //    if (childBoard.IsCheck(colour))
-                //        continue;
-
-                //board.ChildBoards.Add(childBoard);
+                var orderedBoards = board.ChildBoards
+                    .OrderByDescending(x => x.ProjectedEvaluation)
+                    .ThenByDescending(x => x.Evaluation);
 
                 foreach (var childBoard in orderedBoards)
                 {
                     var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    board.UpdatePotentialBoard(currentChildBoard);
+                    childBoard.UpdateStateInfo();
+                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
                         bestChildBoard = currentChildBoard;
@@ -137,28 +112,18 @@ namespace Chess.Engine.Ai.Searches
             }
             else
             {
-                var primaryBoards = board.PotentialChildBoards
-                .OrderBy(x => x.PotentialScore)
-                .Select(x => x.Board);
-
-                var orderedBoards = Prioritise(primaryBoards, board.ChildBoards);
+                var orderedBoards = board.ChildBoards
+                    .OrderBy(x => x.ProjectedEvaluation)
+                    .ThenBy(x => x.Evaluation);
 
                 bestChildBoard = new PotentialBoard(null, double.MinValue, PotentialBoard.NodeType.PV);
-
-                //foreach (var move in moves)
-                //{
-                //    var childBoard = board.ApplyMove(move);
-
-                //    if (childBoard.IsCheck(colour))
-                //        continue;
-
-                //board.ChildBoards.Add(childBoard);
 
                 foreach (var childBoard in orderedBoards)
                 {
                     var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    board.UpdatePotentialBoard(currentChildBoard);
+                    childBoard.UpdateStateInfo();
+                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
                         bestChildBoard = currentChildBoard;

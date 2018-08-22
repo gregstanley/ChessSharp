@@ -41,17 +41,6 @@ namespace Chess.Engine.Ai
                 return null;
             }
 
-            //if (ply < 3)
-            //{
-            //    sb.AppendLine($"Ply < 3. Random pick time...");
-
-            //    var randomBoard = Random((IReadOnlyCollection<Board>)board.ChildBoards);
-
-            //    sb.AppendLine($"Chosen board: {randomBoard.GetMetricsString()}");
-
-            //    _moveLog.Add(sb.ToString());
-            //}
-
             if (board.ChildBoards.Count() == 1)
             {
                 sb.AppendLine($"Only one option so may as well play that...");
@@ -81,47 +70,10 @@ namespace Chess.Engine.Ai
             if (checkmateBoards.Any())
                 return GetCheckmateBoard(checkmateBoards, colour, sb);
 
-            var d2LeafBoards = board.FindLeaves();
-
-            var acceptableBoards = FilterImmediateCheckmateBoards(board, colour, d2LeafBoards, sb);
-
-            var d2NoCheckmateBoards = d2LeafBoards.Where(x => acceptableBoards.Contains(x.ParentBoard));
-
-            if (d2NoCheckmateBoards.Count() == 0)
-            {
-                sb.AppendLine($"Almost Checkmate - There are no ways out");
-
-                return board.ChildBoards.First();
-            }
-
             Board chosenBoard;
 
-            if (d2LeafBoards.Count() != d2NoCheckmateBoards.Count())
-            {
-                sb.AppendLine($"Potential Checkmate - Leafboards {d2LeafBoards.Count()} filtered to {d2NoCheckmateBoards.Count()}");
-
-                var optionsBoardsRanked = colour == Colour.White
-                    ? d2NoCheckmateBoards.OrderByDescending(x => x.EvaluationScore)
-                    : d2NoCheckmateBoards.OrderBy(x => x.EvaluationScore);
-
-                sb.AppendLine($"Final order:");
-
-                foreach (var optionBoard in optionsBoardsRanked)
-                    sb.AppendLine($"   {optionBoard.GetMetricsString()}");
-
-                var chosenTargetBoard = optionsBoardsRanked.First();
-
-                chosenBoard = FindRoot(board, chosenTargetBoard);
-
-                board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
-
-                _moveLog.Add(sb.ToString());
-
-                return chosenBoard;
-            }
-
             IEnumerable<Board> escapeCheckBoards = null;
-
+            
             if (board.IsInCheck(colour))
             {
                 escapeCheckBoards = GetEscapeCheckBoards(board, colour, sb);
@@ -136,8 +88,8 @@ namespace Chess.Engine.Ai
                 }
 
                 var optionsBoardsRanked = colour == Colour.White
-                    ? escapeCheckBoards.OrderByDescending(x => x.EvaluationScore)
-                    : escapeCheckBoards.OrderBy(x => x.EvaluationScore);
+                    ? escapeCheckBoards.OrderByDescending(x => x.Evaluation)
+                    : escapeCheckBoards.OrderBy(x => x.Evaluation);
 
                 sb.AppendLine($"Final order:");
 
@@ -169,7 +121,11 @@ namespace Chess.Engine.Ai
 
             sb.AppendLine($"All options:");
 
-            foreach (var optionBoard in board.ChildBoards)
+            var orderedBoards = colour == Colour.White
+                ? board.ChildBoards.OrderByDescending(x => x.ProjectedEvaluation)
+                : board.ChildBoards.OrderBy(x => x.ProjectedEvaluation);
+
+            foreach (var optionBoard in orderedBoards)
                 sb.AppendLine($"   {optionBoard.GetMetricsString()}");
 
             board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
@@ -184,191 +140,6 @@ namespace Chess.Engine.Ai
             return chosenBoard;
         }
 
-        public Board ChoseMoveOld(Board board, Colour colour)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine($"Playing for {colour}. Generating possible moves...");
-
-            // Must be 2 for now. Should probably always be even so ends with opponents turn
-            board.GenerateChildBoards(colour, 2);
-
-            if (!board.ChildBoards.Any())
-            {
-                sb.AppendLine($"Err... no boards available. Not much I can do with that.");
-
-                _moveLog.Add(sb.ToString());
-
-                return null;
-            }
-
-            var oppositeColour = colour.Opposite();
-            var myScore = board.GetScore(colour);
-            var opponentScore = board.GetScore(oppositeColour);
-
-            sb.AppendLine($"There are {board.ChildBoards.Count()} possible moves.");
-
-            var checkmateBoards = board.GetBoardsWithCheckmate(oppositeColour);
-
-            if (checkmateBoards.Any())
-                return GetCheckmateBoard(checkmateBoards, colour, sb);
-
-            IEnumerable<Board> escapeCheckBoards = null;
-
-            if (board.IsInCheck(colour))
-                escapeCheckBoards = GetEscapeCheckBoards(board, colour, sb);
-
-            var escapeBoards = FilterLostPieceBoards(board, colour, sb);
-
-            var d2LeafBoards = board.FindLeaves();
-
-            var acceptableBoards = FilterImmediateCheckmateBoards(board, colour, d2LeafBoards, sb);
-
-            var d2NoCheckmateBoards = d2LeafBoards.Where(x => acceptableBoards.Contains(x.ParentBoard));
-
-            sb.AppendLine($"Leafboards {d2LeafBoards.Count()} filtered to {d2NoCheckmateBoards.Count()}");
-
-            var d1AvoidCheckmateBoards = acceptableBoards;
-
-            var d2BoardsLosingPieces = d2NoCheckmateBoards
-                .Where(x => x.GetScore(colour) < myScore);
-
-            var d2NeutralBoards = d2NoCheckmateBoards
-                .Where(x => myScore == x.GetScore(colour) && opponentScore == x.GetScore(oppositeColour));
-
-            var d2BoardsTakingPiecesWithNoLoss = d2NoCheckmateBoards
-                .Where(x => x.GetScore(colour) == myScore && x.GetScore(oppositeColour) < opponentScore);
-
-            var d1NoLossBoards = d2BoardsTakingPiecesWithNoLoss.Select(x => x.ParentBoard);
-
-            var d1NoLossBoardsGuaranteed = d1NoLossBoards
-                .Where(x => !x.ChildBoards.Any(y => y.GetScore(colour) < myScore));
-
-            var d2BoardsLostLess = d2NoCheckmateBoards
-                .Where(x => x.GetMetrics(colour).PointsChange > x.GetMetrics(colour.Opposite()).PointsChange);
-
-            var d1LostLessBoards = d2BoardsLostLess.Select(x => x.ParentBoard);
-
-            var d1LostLessBoardsGuaranteed = d1LostLessBoards
-                .Where(x => !x.ChildBoards.Any(y => (myScore - y.GetScore(colour)) <= (opponentScore - y.GetScore(oppositeColour))));
-
-            IEnumerable<Board> optionsBoards = null;
-
-            if (acceptableBoards != null && acceptableBoards.Any())
-            {
-                sb.AppendLine($"Attempting to avoid a future Checkmate. Looking for Checkmate escapes that capture a piece without loss");
-
-                optionsBoards = MergeOptions(d1AvoidCheckmateBoards, d1NoLossBoardsGuaranteed, colour);
-
-                if (!optionsBoards.Any())
-                {
-                    sb.AppendLine($"No beneficial routes where I can capture safely");
-
-                    optionsBoards = MergeOptions(d1AvoidCheckmateBoards, d1LostLessBoardsGuaranteed, colour);
-
-                    if (!optionsBoards.Any())
-                    {
-                        sb.AppendLine($"Have to escape Check (go anywhere)");
-                        optionsBoards = d1AvoidCheckmateBoards;
-                    }
-                }
-            }
-            else if (escapeCheckBoards != null && escapeCheckBoards.Any())
-            {
-                sb.AppendLine($"Looking for Check escapes that capture a piece without loss");
-
-                optionsBoards = MergeOptions(escapeCheckBoards, d1NoLossBoardsGuaranteed, colour);
-
-                if (!optionsBoards.Any())
-                {
-                    sb.AppendLine($"No beneficial routes where I can capture safely");
-
-                    optionsBoards = MergeOptions(escapeCheckBoards, d1LostLessBoardsGuaranteed, colour);
-
-                    if (!optionsBoards.Any())
-                    {
-                        sb.AppendLine($"Have to escape Check (go anywhere)");
-                        optionsBoards = escapeCheckBoards;
-                    }
-                }
-            }
-            else if (escapeBoards != null && escapeBoards.Any())
-            {
-                sb.AppendLine($"Piece looking for escapes that capture a piece without loss");
-
-                optionsBoards = MergeOptions(escapeBoards, d1NoLossBoardsGuaranteed, colour);
-
-                if (!optionsBoards.Any())
-                {
-                    sb.AppendLine($"No beneficial routes where I can capture safely");
-                    optionsBoards = MergeOptions(escapeBoards, d1LostLessBoardsGuaranteed, colour);
-
-                    if (!optionsBoards.Any())
-                    {
-                        sb.AppendLine($"Saving piece (go anywhere)");
-                        optionsBoards = escapeBoards;
-                    }
-                }
-            }
-            else if (d1NoLossBoardsGuaranteed.Any())
-            {
-                sb.AppendLine($"Found {d1NoLossBoardsGuaranteed.Count()} safe captures - no lost pieces");
-
-                optionsBoards = d1NoLossBoardsGuaranteed;
-            }
-            else if (d1LostLessBoardsGuaranteed.Any())
-            {
-                sb.AppendLine($"Found {d1LostLessBoardsGuaranteed.Count()} where I should lose fewer points");
-
-                optionsBoards = d1LostLessBoardsGuaranteed;
-            }
-
-            if (optionsBoards == null || !optionsBoards.Any())
-            {
-                sb.AppendLine($"Picking random move");
-
-                optionsBoards = board.ChildBoards
-                    .Where(x => !x.ParentBoard.IsInCheck(colour));
-
-                if (optionsBoards == null || !optionsBoards.Any())
-                    optionsBoards = board.ChildBoards;
-            }
-            
-            var optionsBoardsRanked = colour == Colour.White
-                ? optionsBoards.OrderByDescending(x => x.EvaluationScore)
-                : optionsBoards.OrderBy(x => x.EvaluationScore);
-
-            sb.AppendLine($"Final order:");
-
-            foreach (var optionBoard in optionsBoardsRanked)
-                sb.AppendLine($"   {optionBoard.GetMetricsString()}");
-            
-            var chosenTargetBoard = optionsBoardsRanked.First();
-
-            var chosenBoard = FindRoot(board, chosenTargetBoard);
-
-            board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
-
-            //if (chosenBoard.GetMove() is MoveCastle moveCastle)
-            //    sb.AppendLine($"Chosen move: {moveCastle.GetCode()} = Castle");
-            //else
-            //    sb.AppendLine($"Chosen move: {chosenBoard.GetCode()}");
-            sb.AppendLine($"Chosen move: {chosenBoard.GetCode()}");
-
-            _moveLog.Add(sb.ToString());
-
-            return chosenBoard;
-        }
-
-        //private Board Random(IReadOnlyCollection<Board> boards)
-        //{
-        //    var range = boards.Count();
-
-        //    var chosenTargetBoardIndex = _random.Next(range);
-
-        //    return boards.ElementAt(chosenTargetBoardIndex);
-        //}
-
         private Board FindRoot(Board rootBoard, Board currentBoard)
         {
             while (!rootBoard.ChildBoards.Contains(currentBoard))
@@ -382,14 +153,6 @@ namespace Chess.Engine.Ai
             sb.AppendLine($"Checkmate found!");
 
             var checkmateBoard = checkmateBoards.First();
-
-            //sb.Append(checkmateBoard.GetCheckDebugString());
-
-            //foreach (var bic in checkmateBoard.GetBoardsWithCheck())
-            //{
-            //    sb.AppendLine($">>> {bic.GetCode()}");
-            //    sb.Append(bic.GetSquaresUnderAttackDebugString(colour.Opposite()));
-            //}
 
             _moveLog.Add(sb.ToString());
 
@@ -442,6 +205,9 @@ namespace Chess.Engine.Ai
         private IEnumerable<Board> FilterImmediateCheckmateBoards(Board board, Colour colour, IEnumerable<Board> d2LeafBoards, StringBuilder sb)
         {
             var boardsWhereKingBecomesInCheck = d2LeafBoards.Where(x => x.IsInCheck(colour));
+
+            if (!boardsWhereKingBecomesInCheck.Any())
+                return Enumerable.Empty<Board>();
 
             IEnumerable<Board> d1NoCheckmateBoards = board.ChildBoards;
 

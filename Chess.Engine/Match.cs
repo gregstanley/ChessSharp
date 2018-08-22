@@ -101,8 +101,11 @@ namespace Chess.Engine
 
             // Must be 2 for now. Should probably always be even so ends with opponents turn
             board.GenerateChildBoards(colour, 2);
-            
-            if (!board.ChildBoards.Any())
+            board.UpdateStateInfo();
+
+            var legalMoves = board.GetLegalMoves();
+
+            if (!legalMoves.Any())
                 return null;
 
             var piece = board.GetPiece(startPosition);
@@ -120,7 +123,8 @@ namespace Chess.Engine
                     if (!board.CanCastle(colour))
                         return null;
 
-                    var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
+                    //var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
+                    var possibleBoards = legalMoves.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
 
                     var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
 
@@ -138,7 +142,8 @@ namespace Chess.Engine
                     if (!board.CanCastle(colour))
                         return null;
 
-                    var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
+                    //var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
+                    var possibleBoards = legalMoves.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
 
                     var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
 
@@ -154,7 +159,7 @@ namespace Chess.Engine
 
             var code = move.GetCode();
 
-            var boards = board.ChildBoards.Where(x => x.GetCode().StartsWith(code));
+            var boards = legalMoves.Where(x => x.GetCode().StartsWith(code));
 
             if (boards == null || !boards.Any())
                 return null;

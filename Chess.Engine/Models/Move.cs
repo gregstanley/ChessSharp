@@ -50,6 +50,9 @@
         }
 
         public override string ToString() =>
+            $"{StartPosition.File}{StartPosition.Rank}-{EndPosition.File}{EndPosition.Rank}";
+
+        public string ToFriendlyString() =>
             $"{PieceColour} {Type} to {EndPosition.File}{EndPosition.Rank}"; 
     }
 }

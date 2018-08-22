@@ -149,19 +149,7 @@ namespace Chess.Engine.Bit
             return outSquares;
         }
 
-        public SquareFlag GetCoveredSquares(BitBoard board, Colour colour)
-        {
-            SquareFlag coveredSquares = 0;
-
-            var squaresWithPieces = board.FindPieceSquares(colour).ToList();
-
-            foreach (var square in squaresWithPieces)
-                coveredSquares |= GetCoveredSquares(board, colour, square);
-
-            return coveredSquares;
-        }
-
-        public Move CanCastle(BitBoard board, Colour colour, SquareFlag square)
+        private Move CanCastle(BitBoard board, Colour colour, SquareFlag square)
         {
             if (!board.CanCastle(colour))
                 return null;
@@ -225,6 +213,18 @@ namespace Chess.Engine.Bit
                 RankFile.Get(kingRankFile.Rank, kingRankFile.File),
                 targetKingSquare,
                 side);
+        }
+
+        private SquareFlag GetCoveredSquares(BitBoard board, Colour colour)
+        {
+            SquareFlag coveredSquares = 0;
+
+            var squaresWithPieces = board.FindPieceSquares(colour).ToList();
+
+            foreach (var square in squaresWithPieces)
+                coveredSquares |= GetCoveredSquares(board, colour, square);
+
+            return coveredSquares;
         }
 
         private SquareFlag GetCoveredSquares(BitBoard board, Colour colour, SquareFlag square)
