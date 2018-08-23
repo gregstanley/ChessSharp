@@ -4,6 +4,7 @@ using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Chess.Engine
@@ -293,6 +294,49 @@ namespace Chess.Engine
 
         public string GetMetricsString() =>
             $"{Move.ToString()} Eval: {Evaluation} ProjE: {ProjectedEvaluation} WC: {WhiteIsInCheck} BC: {BlackIsInCheck}";
+
+        public string ToFen()
+        {
+            var sb = new StringBuilder();
+
+            var squareCounter = 1;
+            var consecutiveEmpty = 0;
+
+            for (var i = 1ul; i > 0; i = i << 1)
+            {
+                var squareNotation = _bitBoard.GetSquareNotation((SquareFlag)i);
+
+                if (string.IsNullOrEmpty(squareNotation))
+                {
+                    ++consecutiveEmpty;
+                }
+                else
+                {
+                    if (consecutiveEmpty > 0)
+                    {
+                        sb.Append(consecutiveEmpty);
+                        consecutiveEmpty = 0;
+                    }
+
+                    sb.Append(squareNotation);
+                }
+
+                if (squareCounter % 8 == 0)
+                {
+                    if (consecutiveEmpty > 0)
+                    {
+                        sb.Append(consecutiveEmpty);
+                        consecutiveEmpty = 0;
+                    }
+
+                    sb.Append("/");
+                }
+
+                ++squareCounter;
+            }
+
+            return sb.ToString();
+        }
 
         private byte GetScore(BitBoard board, Colour colour)
         {

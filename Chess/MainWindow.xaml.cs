@@ -148,9 +148,7 @@ namespace Chess
         {
             var checkBoards = board.ChildBoards.Where(x => x.WhiteIsInCheck);
             if (checkBoards.Any())
-            {
-                var p = true;
-            }
+            {var bp = true;}
 
             ErrorUi.Text = string.Empty;
 
@@ -159,6 +157,8 @@ namespace Chess
 
             WhiteIsInCheckUi.Visibility = board.IsInCheck(Colour.White) ? Visibility.Visible : Visibility.Collapsed;
             BlackIsInCheckUi.Visibility = board.IsInCheck(Colour.Black) ? Visibility.Visible : Visibility.Collapsed;
+
+            FenUI.Text = board.ToFen();
 
             var insertText = string.Empty;
 

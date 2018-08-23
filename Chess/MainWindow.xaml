@@ -97,5 +97,6 @@
             </TextBlock.Effect>
         </TextBlock>
         <Button x:Name="NewGameHumanHard" Content="New Game (Hard)" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHumanHard_Click" Height="35"/>
+        <TextBox x:Name="FenUI" HorizontalAlignment="Left" Height="23" Margin="1099,507,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="645"/>
     </Grid>
 </Window>

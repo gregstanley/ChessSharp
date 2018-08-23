@@ -308,6 +308,39 @@ namespace Chess.Engine.Bit
             return bitBoard;
         }
 
+        public string GetSquareNotation(SquareFlag square)
+        {
+            var colour = Colour.None;
+
+            if (White.HasFlag(square))
+                colour = Colour.White;
+
+            if (Black.HasFlag(square))
+                colour = Colour.Black;
+
+            if (colour == Colour.None)
+                return string.Empty;
+
+            if (colour == Colour.White)
+            {
+                if (WhitePawns.HasFlag((SquareFlag)square)) return "P";
+                else if (WhiteRooks.HasFlag((SquareFlag)square)) return "R";
+                else if (WhiteKnights.HasFlag((SquareFlag)square)) return "N";
+                else if (WhiteBishops.HasFlag((SquareFlag)square)) return "B";
+                else if (WhiteQueens.HasFlag((SquareFlag)square)) return "Q";
+                else if (WhiteKing.HasFlag((SquareFlag)square)) return "K";
+            }
+
+            if (BlackPawns.HasFlag((SquareFlag)square)) return "p";
+            else if (BlackRooks.HasFlag((SquareFlag)square)) return "r";
+            else if (BlackKnights.HasFlag((SquareFlag)square)) return "n";
+            else if (BlackBishops.HasFlag((SquareFlag)square)) return "b";
+            else if (BlackQueens.HasFlag((SquareFlag)square)) return "q";
+            else if (BlackKing.HasFlag((SquareFlag)square)) return "k";
+
+            return string.Empty;
+        }
+
         public override string ToString()
         {
             var sb = new StringBuilder();
@@ -318,19 +351,25 @@ namespace Chess.Engine.Bit
 
             for (var i = 0; i < 64; ++i)
             {
-                if (WhitePawns.HasFlag((SquareFlag)bit)) sb.Append("P");
-                else if (WhiteRooks.HasFlag((SquareFlag)bit)) sb.Append("R");
-                else if (WhiteKnights.HasFlag((SquareFlag)bit)) sb.Append("N");
-                else if (WhiteBishops.HasFlag((SquareFlag)bit)) sb.Append("B");
-                else if (WhiteQueens.HasFlag((SquareFlag)bit)) sb.Append("Q");
-                else if (WhiteKing.HasFlag((SquareFlag)bit)) sb.Append("K");
-                else if (BlackPawns.HasFlag((SquareFlag)bit)) sb.Append("p");
-                else if (BlackRooks.HasFlag((SquareFlag)bit)) sb.Append("r");
-                else if (BlackKnights.HasFlag((SquareFlag)bit)) sb.Append("n");
-                else if (BlackBishops.HasFlag((SquareFlag)bit)) sb.Append("b");
-                else if (BlackQueens.HasFlag((SquareFlag)bit)) sb.Append("q");
-                else if (BlackKing.HasFlag((SquareFlag)bit)) sb.Append("k");
-                else sb.Append("-");
+                var squareNotation = GetSquareNotation((SquareFlag)bit);
+
+                if (string.IsNullOrEmpty(squareNotation))
+                    squareNotation = "-";
+
+                sb.Append(squareNotation);
+                //if (WhitePawns.HasFlag((SquareFlag)bit)) sb.Append("P");
+                //else if (WhiteRooks.HasFlag((SquareFlag)bit)) sb.Append("R");
+                //else if (WhiteKnights.HasFlag((SquareFlag)bit)) sb.Append("N");
+                //else if (WhiteBishops.HasFlag((SquareFlag)bit)) sb.Append("B");
+                //else if (WhiteQueens.HasFlag((SquareFlag)bit)) sb.Append("Q");
+                //else if (WhiteKing.HasFlag((SquareFlag)bit)) sb.Append("K");
+                //else if (BlackPawns.HasFlag((SquareFlag)bit)) sb.Append("p");
+                //else if (BlackRooks.HasFlag((SquareFlag)bit)) sb.Append("r");
+                //else if (BlackKnights.HasFlag((SquareFlag)bit)) sb.Append("n");
+                //else if (BlackBishops.HasFlag((SquareFlag)bit)) sb.Append("b");
+                //else if (BlackQueens.HasFlag((SquareFlag)bit)) sb.Append("q");
+                //else if (BlackKing.HasFlag((SquareFlag)bit)) sb.Append("k");
+                //else sb.Append("-");
 
                 if (i > 0 && (i + 1) % 8 == 0)
                 {

@@ -80,6 +80,7 @@ namespace Chess.Engine.Ai.Searches
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
 
             board.GenerateChildBoards(colour, 1);
+            board.UpdateStateInfo();
 
             PotentialBoard bestChildBoard;
 
@@ -95,7 +96,7 @@ namespace Chess.Engine.Ai.Searches
                 {
                     var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    childBoard.UpdateStateInfo();
+                    //childBoard.UpdateStateInfo();
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
@@ -122,7 +123,7 @@ namespace Chess.Engine.Ai.Searches
                 {
                     var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    childBoard.UpdateStateInfo();
+                    //childBoard.UpdateStateInfo();
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
