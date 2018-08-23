@@ -299,12 +299,16 @@ namespace Chess.Engine
         {
             var sb = new StringBuilder();
 
-            var squareCounter = 1;
+            //var squareCounter = 1;
             var consecutiveEmpty = 0;
+            var ranks = new List<string>();
 
-            for (var i = 1ul; i > 0; i = i << 1)
+            ulong bit = 1;
+
+            //for (var i = 1ul; i > 0; i = i << 1)
+            for (var i = 0; i < 64; ++i)
             {
-                var squareNotation = _bitBoard.GetSquareNotation((SquareFlag)i);
+                var squareNotation = _bitBoard.GetSquareNotation((SquareFlag)bit);
 
                 if (string.IsNullOrEmpty(squareNotation))
                 {
@@ -321,7 +325,7 @@ namespace Chess.Engine
                     sb.Append(squareNotation);
                 }
 
-                if (squareCounter % 8 == 0)
+                if (i > 0 && (i + 1) % 8 == 0)
                 {
                     if (consecutiveEmpty > 0)
                     {
@@ -329,11 +333,57 @@ namespace Chess.Engine
                         consecutiveEmpty = 0;
                     }
 
-                    sb.Append("/");
+                    if (i > 8)
+                        sb.Append("/");
+
+                    ranks.Add(sb.ToString());
+
+                    sb.Clear();
                 }
 
-                ++squareCounter;
+                //if (squareCounter % 8 == 0 && squareCounter < 64)
+                //{
+                //    if (consecutiveEmpty > 0)
+                //    {
+                //        sb.Append(consecutiveEmpty);
+                //        consecutiveEmpty = 0;
+                //    }
+
+                //    sb.Append("/");
+                //}
+
+                //++squareCounter;
+                bit = bit << 1;
             }
+
+            sb.Clear();
+
+            ranks.Reverse();
+
+            foreach (var rank in ranks)
+                sb.Append(rank);
+
+            sb.Append(" ");
+            sb.Append(Turn == Colour.White ? "w" : "b");
+
+            sb.Append(" ");
+
+            var castleSubString = new StringBuilder();
+
+            if (WhiteCanCastleKingSide) castleSubString.Append("K");
+            if (WhiteCanCastleQueenSide) castleSubString.Append("Q");
+            if (BlackCanCastleKingSide) castleSubString.Append("k");
+            if (BlackCanCastleKingSide) castleSubString.Append("q");
+            if (castleSubString.Length == 0) castleSubString.Append("-");
+
+            sb.Append(" ");
+            sb.Append(castleSubString);
+            sb.Append(" ");
+
+            if (_move != null && _move.EnPassantSquare != 0)
+                sb.Append(_move.EnPassantSquare.ToString().ToLower());
+            else
+                sb.Append("-");
 
             return sb.ToString();
         }

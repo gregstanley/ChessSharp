@@ -38,48 +38,50 @@ namespace Chess.Engine.Bit
 
             if (pieceType == PieceType.Pawn)
             {
-                var pawnSquares = PawnMoves(board, colour, square);
+                var pawnMoves = PawnMoves(board, colour, square);
+                moves.AddRange(pawnMoves);
+                //var pawnSquares = PawnMoves(board, colour, square);
 
-                var promotionRank = board.GetPieceColour(square) == Colour.White ? WhitePromotionRank : BlackPromotionRank;
+                //var promotionRank = board.GetPieceColour(square) == Colour.White ? WhitePromotionRank : BlackPromotionRank;
 
-                var promotionSquares = pawnSquares.Where(x => promotionRank.HasFlag(x));
+                //var promotionSquares = pawnSquares.Where(x => promotionRank.HasFlag(x));
 
-                if (promotionSquares.Any())
-                {
-                    foreach (var promotionSquare in promotionSquares)
-                    {
-                        var rankFile = promotionSquare.ToRankFile();
+                //if (promotionSquares.Any())
+                //{
+                //    foreach (var promotionSquare in promotionSquares)
+                //    {
+                //        var rankFile = promotionSquare.ToRankFile();
 
-                        moves.Add(new Move(colour,
-                            pieceType,
-                            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                            RankFile.Get(rankFile.Rank, rankFile.File),
-                            PieceType.Queen));
+                //        moves.Add(new Move(colour,
+                //            pieceType,
+                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
+                //            RankFile.Get(rankFile.Rank, rankFile.File),
+                //            PieceType.Queen));
 
-                        moves.Add(new Move(colour,
-                            pieceType,
-                            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                            RankFile.Get(rankFile.Rank, rankFile.File),
-                            PieceType.Rook));
+                //        moves.Add(new Move(colour,
+                //            pieceType,
+                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
+                //            RankFile.Get(rankFile.Rank, rankFile.File),
+                //            PieceType.Rook));
 
-                        moves.Add(new Move(colour,
-                            pieceType,
-                            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                            RankFile.Get(rankFile.Rank, rankFile.File),
-                            PieceType.Bishop));
+                //        moves.Add(new Move(colour,
+                //            pieceType,
+                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
+                //            RankFile.Get(rankFile.Rank, rankFile.File),
+                //            PieceType.Bishop));
 
-                        moves.Add(new Move(colour,
-                            pieceType,
-                            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                            RankFile.Get(rankFile.Rank, rankFile.File),
-                            PieceType.Knight));
-                    }
-                }
-                else
-                {
-                    var nonPromotionSquares = pawnSquares.Where(x => !promotionRank.HasFlag(x));
-                    possibleSquares.AddRange(nonPromotionSquares);
-                }
+                //        moves.Add(new Move(colour,
+                //            pieceType,
+                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
+                //            RankFile.Get(rankFile.Rank, rankFile.File),
+                //            PieceType.Knight));
+                //    }
+                //}
+                //else
+                //{
+                //    var nonPromotionSquares = pawnSquares.Where(x => !promotionRank.HasFlag(x));
+                //    possibleSquares.AddRange(nonPromotionSquares);
+                //}
             }
 
             if (pieceType == PieceType.Rook && withCastles)
@@ -99,7 +101,146 @@ namespace Chess.Engine.Bit
             return moves;
         }
 
-        private List<SquareFlag> PawnMoves(BitBoard board, Colour colour, SquareFlag square)
+        private List<Move> PawnMoves(BitBoard board, Colour colour, SquareFlag square)
+        {
+            var moves = new List<Move>();
+
+            var startRankFile = square.ToRankFile();
+            var stride = board.GetPieceColour(square) == Colour.White ? 8 : -8;
+            var captureStride1 = stride + 1;
+            var captureStride2 = stride - 1;
+            var availableSquare1 = Next(square, stride);
+            var availableCaptureSquare1 = Next(square, captureStride1);
+            var availableCaptureSquare2 = Next(square, captureStride2);
+            var promotionRank = board.GetPieceColour(square) == Colour.White ? WhitePromotionRank : BlackPromotionRank;
+
+            if (availableSquare1 != 0)
+            {
+                if (board.GetPiece(availableSquare1) == PieceType.None)
+                {
+                    var as1rf = availableSquare1.ToRankFile();
+
+                    //outSquares.Add(availableSquare1);
+                    //moves.Add(new Move(colour,
+                    //        PieceType.Pawn,
+                    //        RankFile.Get(startRankFile.Rank, startRankFile.File),
+                    //        RankFile.Get(as1rf.Rank, as1rf.File)
+                    //        ));
+
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableSquare1, promotionRank));
+
+                    var rankFile = square.ToRankFile();
+
+                    // Has this pawn moved?
+                    if (colour == Colour.White && SquareFlagExtensions.r2.HasFlag(square) || colour == Colour.Black && SquareFlagExtensions.r7.HasFlag(square))
+                    {
+                        // This must be 'safe' as it is on starting position
+                        var availableSquare2 = Next(availableSquare1, stride);
+
+                        var as2rf = availableSquare2.ToRankFile();
+
+                        if (board.GetPiece(availableSquare2) == PieceType.None)
+                        {
+                            //outSquares.Add(availableSquare2);
+                            moves.Add(new Move(colour,
+                                PieceType.Pawn,
+                                RankFile.Get(startRankFile.Rank, startRankFile.File),
+                                RankFile.Get(as2rf.Rank, as2rf.File),
+                                availableSquare1
+                                ));
+                        }
+                    }
+                }
+            }
+
+            if (availableCaptureSquare1 != 0)
+            {
+                if (board.GetPiece(availableCaptureSquare1) != PieceType.None
+                    && board.GetPieceColour(availableCaptureSquare1) != colour
+                    && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
+                {
+                    //var acs1rf = availableCaptureSquare1.ToRankFile();
+
+                    //outSquares.Add(availableCaptureSquare1);
+                    //moves.Add(new Move(colour,
+                    //        PieceType.Pawn,
+                    //        RankFile.Get(startRankFile.Rank, startRankFile.File),
+                    //        RankFile.Get(acs1rf.Rank, acs1rf.File)
+                    //        ));
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare1, promotionRank));
+                }
+            }
+
+            if (availableCaptureSquare2 != 0)
+            {
+                if (board.GetPiece(availableCaptureSquare2) != PieceType.None
+                    && board.GetPieceColour(availableCaptureSquare2) != colour
+                    && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
+                {
+                    //var acs2rf = availableCaptureSquare2.ToRankFile();
+
+                    // outSquares.Add(availableCaptureSquare2);
+                    //moves.Add(new Move(colour,
+                    //        PieceType.Pawn,
+                    //        RankFile.Get(startRankFile.Rank, startRankFile.File),
+                    //        RankFile.Get(acs2rf.Rank, acs2rf.File)
+                    //        ));
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare2, promotionRank));
+                }
+            }
+
+            return moves;
+        }
+
+        private List<Move> CreatePawnMove(BitBoard board, Colour colour, RankFile startRankFile, SquareFlag endSquare, SquareFlag promotionRank)
+        {
+            var isPromotion = promotionRank.HasFlag(endSquare);
+
+            var rankFile = endSquare.ToRankFile();
+
+            if (!isPromotion)
+            {
+                return new List<Move>
+                {
+                    new Move(colour,
+                            PieceType.Pawn,
+                            RankFile.Get(startRankFile.Rank, startRankFile.File),
+                            RankFile.Get(rankFile.Rank, rankFile.File)
+                            )
+                };
+            }
+
+            var moves = new List<Move>
+            {
+                new Move(colour,
+                    PieceType.Pawn,
+                    RankFile.Get(startRankFile.Rank, startRankFile.File),
+                    RankFile.Get(rankFile.Rank, rankFile.File),
+                    PieceType.Queen),
+
+                new Move(colour,
+                    PieceType.Pawn,
+                    RankFile.Get(startRankFile.Rank, startRankFile.File),
+                    RankFile.Get(rankFile.Rank, rankFile.File),
+                    PieceType.Rook),
+
+                new Move(colour,
+                    PieceType.Pawn,
+                    RankFile.Get(startRankFile.Rank, startRankFile.File),
+                    RankFile.Get(rankFile.Rank, rankFile.File),
+                    PieceType.Bishop),
+
+                new Move(colour,
+                    PieceType.Pawn,
+                    RankFile.Get(startRankFile.Rank, startRankFile.File),
+                    RankFile.Get(rankFile.Rank, rankFile.File),
+                    PieceType.Knight)
+            };
+
+            return moves;
+        }
+
+        private List<SquareFlag> PawnMovesOrig(BitBoard board, Colour colour, SquareFlag square)
         {
             var outSquares = new List<SquareFlag>();
 

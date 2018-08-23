@@ -10,12 +10,20 @@
 
         public RankFile EndPosition { get; }
 
+        public SquareFlag EnPassantSquare { get; } = 0;
+
         public PieceType PromotionType { get; } = PieceType.None;
 
         public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, PieceType promotionType)
             : this(pieceColour, pieceType, startPosition, endPosition)
         {
             PromotionType = promotionType;
+        }
+
+        public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, SquareFlag enPassantSquare)
+            : this(pieceColour, pieceType, startPosition, endPosition)
+        {
+            EnPassantSquare = enPassantSquare;
         }
 
         public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition)
