@@ -20,7 +20,7 @@ namespace Chess.Engine.Ai.Searches
             return primary.Concat(secondary.Where(x => !primary.Contains(x)));
         }
 
-        public Board DoSearch(Board board, Colour colour, int depth, bool isMax, StringBuilder sb)
+        public Board DoSearch(Board board, Colour colour, int depth, bool isMax)
         {
             _positionCounter = 0;
 
@@ -58,16 +58,6 @@ namespace Chess.Engine.Ai.Searches
 
             //foreach (var childBoard in orderedBoards)
             //    sb.AppendLine($" - {childBoard}");
-
-            try
-            {
-                sb.Append(internalStringBuilder);
-
-            }
-            catch(ArgumentOutOfRangeException ex)
-            {
-                var bp = true;
-            }
 
             return bestChildBoard.Board;
         }

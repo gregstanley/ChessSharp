@@ -9,17 +9,23 @@ namespace Chess.Engine
 {
     public class Match
     {
-        public int ThisTurn { get; private set; } = 1;
+        public int Ply { get; private set; } = 1;
 
-        public Colour ThisTurnColour { get { return ThisTurn % 2 == 1 ? Colour.White : Colour.Black; } }
+        public Colour Turn { get { return Ply % 2 == 1 ? Colour.White : Colour.Black; } }
+
+        public int HalfTurnCounter { get; private set; } = 0;
+
+        public int FullTurnNumber { get { return (int)(Ply + 1) / 2; } }
 
         public Colour HumanColour { get; private set; } = Colour.None;
 
-        public bool IsHumanTurn { get { return HumanColour != Colour.None && ThisTurnColour == HumanColour; } }
+        public bool IsHumanTurn { get { return HumanColour != Colour.None && Turn == HumanColour; } }
 
         private List<Board> _boards = new List<Board>();
 
         private CpuPlayer _cpuPlayer;
+
+        //private readonly List<string> _turnHistory = new List<string>();
 
         public Match(Board board, CpuPlayer cpuPlayer, Colour humanColour = Colour.None)
         {
@@ -29,8 +35,53 @@ namespace Chess.Engine
             HumanColour = humanColour;
         }
 
+        public IReadOnlyCollection<string> GetMatchNotation()
+        {
+            var turns = new List<string>();
+
+            var sb = new StringBuilder();
+
+            var ply = 0;
+            
+            foreach(var board in _boards)
+            {
+                if (ply == 0)
+                {
+                    ++ply;
+                    continue;
+                }
+
+                sb.Append(board.MoveToString());
+
+                if (ply % 2 == 1)
+                {
+                    sb.Append(" ");
+                }
+                else
+                {
+                    turns.Add(sb.ToString());
+                    sb.Clear();
+                }
+
+                ++ply;
+            }
+
+            // Remember the last half turn
+            if (sb.Length > 0)
+                turns.Add(sb.ToString());
+
+            return turns;
+        }
+
+        public string GetFen()
+        {
+            var board = GetHeadBoard();
+
+            return $"{board.ToPartialFen()} {HalfTurnCounter} {FullTurnNumber}";
+        }
+
         public Board GetHeadBoard() =>
-            _boards[ThisTurn - 1];
+            _boards[Ply - 1];
 
         public string GetLastCpuMoveLog() =>
             _cpuPlayer.GetLastMoveLog();
@@ -63,24 +114,29 @@ namespace Chess.Engine
 
             var board = GetHeadBoard();
 
-            var colourTurn = (ThisTurn + 1) / 2;
+            var colourTurn = (Ply + 1) / 2;
 
             Board chosenBoard = null;
 
             if (IsHumanTurn)
-                chosenBoard = DoMove(board, ThisTurnColour, startPosition, endPosition, promotionType);
+                chosenBoard = DoMove(board, Turn, startPosition, endPosition, promotionType);
             else
-                chosenBoard = _cpuPlayer.ChoseMove(board, ThisTurnColour, ThisTurn);
+                chosenBoard = _cpuPlayer.ChoseMove(board, Turn, Ply);
 
             if (chosenBoard == null)
                 return null;
+
+            if (chosenBoard.IsCapture || chosenBoard.Move.Type == PieceType.Pawn)
+                HalfTurnCounter = 0;
+            else
+                ++HalfTurnCounter;
 
             // As we have selected a board we can detach all the unused ones
             board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
 
             _boards.Add(chosenBoard);
 
-            ++ThisTurn;
+            ++Ply;
 
             return chosenBoard;
         }
@@ -89,9 +145,9 @@ namespace Chess.Engine
         {
             var board = GetHeadBoard();
 
-            var colourTurn = (ThisTurn + 1) / 2;
+            var colourTurn = (Ply + 1) / 2;
 
-            var chosenBoard = DoMove(board, ThisTurnColour, startPosition, endPosition, promotionType);
+            var chosenBoard = DoMove(board, Turn, startPosition, endPosition, promotionType);
 
             return chosenBoard == null ? false : true;
         }

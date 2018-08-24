@@ -155,10 +155,21 @@ namespace Chess
             WhiteTurnIcon.Visibility = board.Turn == Colour.White ? Visibility.Visible : Visibility.Collapsed;
             BlackTurnIcon.Visibility = board.Turn == Colour.White ? Visibility.Collapsed : Visibility.Visible;
 
+            WhiteScore.Text = board.WhiteScore.ToString();
+            BlackScore.Text = board.BlackScore.ToString();
+
             WhiteIsInCheckUi.Visibility = board.IsInCheck(Colour.White) ? Visibility.Visible : Visibility.Collapsed;
             BlackIsInCheckUi.Visibility = board.IsInCheck(Colour.Black) ? Visibility.Visible : Visibility.Collapsed;
 
-            FenUI.Text = board.ToFen();
+            EvaluationUi.Text = board.Evaluation.ToString();
+
+            WhiteCastleKingSideUI.IsChecked = board.WhiteCanCastleKingSide;
+            WhiteCastleQueenSideUI.IsChecked = board.WhiteCanCastleQueenSide;
+            BlackCastleKingSideUI.IsChecked = board.BlackCanCastleKingSide;
+            BlackCastleQueenSideUI.IsChecked = board.BlackCanCastleQueenSide;
+
+            if (_currentMatch != null)
+                FenUI.Text = _currentMatch.GetFen();
 
             var insertText = string.Empty;
 
@@ -167,18 +178,25 @@ namespace Chess
 
             var moveText = board.MoveToString() + Environment.NewLine;
 
-            LogText.AppendText($"{_currentMatch.ThisTurn - 1}: {insertText}{moveText}");
+            if (!string.IsNullOrEmpty(moveText))
+                LogText.AppendText($"{_currentMatch.FullTurnNumber}: {insertText}{moveText}");
 
-            LogicLog.Text = _currentMatch.GetLastCpuMoveLog();
+            var turns = _currentMatch.GetMatchNotation();
 
             var sb = new StringBuilder();
 
-            EvaluationUi.Text = board.Evaluation.ToString();
+            sb.Clear();
 
-            WhiteCastleKingSideUI.IsChecked = board.WhiteCanCastleKingSide;
-            WhiteCastleQueenSideUI.IsChecked = board.WhiteCanCastleQueenSide;
-            BlackCastleKingSideUI.IsChecked = board.BlackCanCastleKingSide;
-            BlackCastleQueenSideUI.IsChecked = board.BlackCanCastleQueenSide;
+            var fullTurn = 1;
+
+            foreach (var turn in turns)
+                sb.AppendLine($"{fullTurn++}: {turn}");
+
+            LogText.Text = sb.ToString();
+
+            LogicLog.Text = _currentMatch.GetLastCpuMoveLog();
+
+            sb.Clear();
 
             if (board.IsCheckmate)
             {
@@ -224,9 +242,6 @@ namespace Chess
                 if (!usedImages.Contains(image.Image))
                     image.Image.Visibility = Visibility.Collapsed;
             }
-
-            WhiteScore.Text = board.WhiteScore.ToString();
-            BlackScore.Text = board.BlackScore.ToString();
 
             BoardDebug.Text += sb.ToString();
         }

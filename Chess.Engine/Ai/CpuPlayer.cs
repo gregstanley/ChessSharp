@@ -108,11 +108,7 @@ namespace Chess.Engine.Ai
                 return chosenBoard;
             }
 
-            sb.AppendLine($"Running AlphaBeta...");
-
-            var absb = new StringBuilder();
-
-            chosenBoard = _search.DoSearch(board, colour, 3, true, absb);
+            chosenBoard = _search.DoSearch(board, colour, 3, true);
 
             chosenBoard.Evaluate(colour);
 
@@ -130,11 +126,6 @@ namespace Chess.Engine.Ai
                 sb.AppendLine($"   {optionBoard.GetMetricsString()}");
 
             board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
-
-            if (false)
-            {
-                sb.Append(absb);
-            }
 
             _moveLog.Add(sb.ToString());
 

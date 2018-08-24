@@ -7,6 +7,6 @@ namespace Chess.Engine.Ai.Searches
     {
         int PositionCounter { get; }
 
-        Board DoSearch(Board board, Colour colour, int depth, bool isMax, StringBuilder sb);
+        Board DoSearch(Board board, Colour colour, int depth, bool isMax);
     }
 }

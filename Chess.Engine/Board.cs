@@ -295,7 +295,7 @@ namespace Chess.Engine
         public string GetMetricsString() =>
             $"{Move.ToString()} Eval: {Evaluation} ProjE: {ProjectedEvaluation} WC: {WhiteIsInCheck} BC: {BlackIsInCheck}";
 
-        public string ToFen()
+        public string ToPartialFen()
         {
             var sb = new StringBuilder();
 
@@ -373,11 +373,11 @@ namespace Chess.Engine
             if (WhiteCanCastleKingSide) castleSubString.Append("K");
             if (WhiteCanCastleQueenSide) castleSubString.Append("Q");
             if (BlackCanCastleKingSide) castleSubString.Append("k");
-            if (BlackCanCastleKingSide) castleSubString.Append("q");
+            if (BlackCanCastleQueenSide) castleSubString.Append("q");
             if (castleSubString.Length == 0) castleSubString.Append("-");
 
-            sb.Append(" ");
             sb.Append(castleSubString);
+
             sb.Append(" ");
 
             if (_move != null && _move.EnPassantSquare != 0)

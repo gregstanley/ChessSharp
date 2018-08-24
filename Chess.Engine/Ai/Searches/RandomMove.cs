@@ -11,7 +11,7 @@ namespace Chess.Engine.Ai.Searches
 
         private StandardGenerator _random = new StandardGenerator();
 
-        public Board DoSearch(Board board, Colour colour, int depth, bool isMax, StringBuilder sb)
+        public Board DoSearch(Board board, Colour colour, int depth, bool isMax)
         {
             board.GenerateChildBoards(colour, 2);
             board.UpdateStateInfo();
