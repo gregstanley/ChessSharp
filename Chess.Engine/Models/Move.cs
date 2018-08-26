@@ -10,20 +10,31 @@
 
         public RankFile EndPosition { get; }
 
+        public PieceType CapturePieceType { get; } = PieceType.None;
+
         public SquareFlag EnPassantSquare { get; } = 0;
+
+        public SquareFlag EnPassantCaptureSquare { get; } = 0;
 
         public PieceType PromotionType { get; } = PieceType.None;
 
-        public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, PieceType promotionType)
-            : this(pieceColour, pieceType, startPosition, endPosition)
+        public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, PieceType capturePieceType, PieceType promotionType)
+            : this(pieceColour, pieceType, startPosition, endPosition, capturePieceType)
         {
             PromotionType = promotionType;
         }
 
-        public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, SquareFlag enPassantSquare)
-            : this(pieceColour, pieceType, startPosition, endPosition)
+        public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, PieceType capturePieceType, SquareFlag enPassantSquare, SquareFlag enPassantCaptureSquare)
+            : this(pieceColour, pieceType, startPosition, endPosition, capturePieceType)
         {
             EnPassantSquare = enPassantSquare;
+            EnPassantCaptureSquare = enPassantCaptureSquare;
+        }
+
+        public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, PieceType capturePieceType)
+            : this(pieceColour, pieceType, startPosition, endPosition)
+        {
+            CapturePieceType = capturePieceType;
         }
 
         public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition)
@@ -34,11 +45,33 @@
             EndPosition = endPosition;
         }
 
-        public virtual string GetCode()
+        public string Code => ToString();
+
+        public virtual string GetFriendlyCode()
         {
             var baseString = 
                 $"{PieceColour}{Type}-{StartPosition.File}{StartPosition.Rank}-{EndPosition.File}{EndPosition.Rank}";
 
+            return AppendPromotionString(baseString);
+        }
+
+        public override string ToString()
+        {
+            var baseString = $"{StartPosition.File}{StartPosition.Rank}-{EndPosition.File}{EndPosition.Rank}";
+
+            if (CapturePieceType == PieceType.None)
+                baseString = $"{baseString}";
+            else
+                baseString = $"{baseString}x";
+
+            return AppendPromotionString(baseString);
+        }
+
+        public string ToFriendlyString() =>
+            $"{PieceColour} {Type} to {EndPosition.File}{EndPosition.Rank}";
+
+        private string AppendPromotionString(string baseString)
+        {
             if (PromotionType == PieceType.None)
                 return baseString;
 
@@ -56,11 +89,5 @@
 
             return baseString;
         }
-
-        public override string ToString() =>
-            $"{StartPosition.File}{StartPosition.Rank}-{EndPosition.File}{EndPosition.Rank}";
-
-        public string ToFriendlyString() =>
-            $"{PieceColour} {Type} to {EndPosition.File}{EndPosition.Rank}"; 
     }
 }

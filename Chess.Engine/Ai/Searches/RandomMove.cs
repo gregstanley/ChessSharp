@@ -31,6 +31,9 @@ namespace Chess.Engine.Ai.Searches
                 return new Board(board, null, null, null);
             }
 
+            // Debug En Passasnt
+            //var optionsBoardsRanked = legalMoves.Where(x => x.Move.EnPassantSquare != 0);
+
             var optionsBoardsRanked = colour == Colour.White
                 ? legalMoves.OrderByDescending(x => x.Evaluation)
                 : legalMoves.OrderBy(x => x.Evaluation);

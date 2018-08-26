@@ -11,13 +11,17 @@ namespace Chess.Engine
 {
     public class Board
     {
-        //private bool _isParallel = false;
+        private bool _isParallel = false;
 
         public Board ParentBoard { get; private set; }
 
         public Colour Turn { get; }
 
         public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
+
+        public SquareFlag EnPassantSquare => _move == null ? 0 : _move.EnPassantSquare;
+
+        public SquareFlag EnPassantCaptureSquare => _move == null ? 0 : _move.EnPassantCaptureSquare;
 
         public bool WhiteCanCastleKingSide => _bitBoard.WhiteCanCastleKingSide();
 
@@ -42,9 +46,8 @@ namespace Chess.Engine
 
         public bool IsGameOver => _bitBoard.FindKingSquare(Colour.White) == 0 || _bitBoard.FindKingSquare(Colour.Black) == 0;
 
-        //public byte WhiteScore { get; private set; }
         public byte WhiteScore => GetScore(_bitBoard, Colour.White);
-        //public byte BlackScore { get; private set; }
+
         public byte BlackScore => GetScore(_bitBoard, Colour.Black);
 
         public double Evaluation { get; private set; }
@@ -55,7 +58,7 @@ namespace Chess.Engine
 
         public BoardMetrics BlackMetrics { get; private set; }
 
-        public string Code { get { return _move == null ? string.Empty : _move.GetCode(); } }
+        public string Code { get { return _move == null ? string.Empty : _move.Code; } }
 
         public Move Move => _move;
 
@@ -74,9 +77,6 @@ namespace Chess.Engine
             _bitBoardMoveFinder = new BitBoardMoveFinder();
 
             Turn = Colour.White;
-
-            //WhiteScore = GetScore(_bitBoard, Colour.White);
-            //BlackScore = GetScore(_bitBoard, Colour.Black);
         }
 
         public Board(Board parentBoard, Move move, BitBoard bitBoard, BitBoardMoveFinder moveFinder)
@@ -89,9 +89,6 @@ namespace Chess.Engine
             
             _bitBoard = bitBoard;
             _bitBoardMoveFinder = moveFinder;
-
-            //WhiteScore = GetScore(bitBoard, Colour.White);
-            //BlackScore = GetScore(bitBoard, Colour.Black);
         }
 
         public Board ApplyMove(Move move)
@@ -117,7 +114,7 @@ namespace Chess.Engine
             Colour.White == colour ? WhiteMetrics : BlackMetrics;
 
         public IList<Move> FindMoves() =>
-            _bitBoardMoveFinder.FindMoves(_bitBoard, Turn);
+            _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantCaptureSquare, Turn);
 
         public bool CheckForPawnPromotion(RankFile startPosition, RankFile endPosition) =>
             _bitBoardMoveFinder.CheckForPawnPromotion(_bitBoard, startPosition.ToSquareFlag(), endPosition.ToSquareFlag());
@@ -125,11 +122,12 @@ namespace Chess.Engine
         public bool CanCastle(Colour colour) =>
             _bitBoard.CanCastle(colour);
 
-        public PieceType GetPiece(RankFile rankFile) =>
-            _bitBoard.GetPiece(rankFile.ToSquareFlag());
+        public SquareState GetSquareState(RankFile rankFile)
+        {
+            var square = rankFile.ToSquareFlag();
 
-        public Colour GetPieceColour(RankFile rankFile) =>
-            _bitBoard.GetPieceColour(rankFile.ToSquareFlag());
+            return _bitBoard.GetSquareState(square);
+        }
 
         public SquareFlag GetKingSquare(Colour colour) =>
             _bitBoard.FindKingSquare(colour);
@@ -164,8 +162,8 @@ namespace Chess.Engine
         public string BoardToString() =>
             _bitBoard.ToString();
 
-        public string GetCode() =>
-            _move.GetCode();
+        public string GetFriendlyCode() =>
+            _move.GetFriendlyCode();
 
         public RankFile GetMovedFrom() =>
             _move.StartPosition;
@@ -252,7 +250,7 @@ namespace Chess.Engine
 
             if (!ChildBoards.Any())
             {
-                var moves = _bitBoardMoveFinder.FindMoves(_bitBoard, colour);
+                var moves = _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantSquare, colour);
 
                 foreach (var move in moves)
                 {
@@ -272,22 +270,20 @@ namespace Chess.Engine
             if (--depth <= 0)
                 return;
 
-            //if (_isParallel)
-            //{
-            //    Parallel.ForEach(ChildBoards, (childBoard) =>
-            //    {
-            //        childBoard.GenerateChildBoards(colour.Opposite(), depth);
-            //    });
-            //}
-            //else
-            //{
+            if (_isParallel)
+            {
+                Parallel.ForEach(ChildBoards, (childBoard) =>
+                {
+                    childBoard.GenerateChildBoards(colour.Opposite(), depth);
+                });
+            }
+            else
+            {
                 foreach (var childBoard in ChildBoards)
                     childBoard.GenerateChildBoards(colour.Opposite(), depth);
-            //}
-
-                //if (ChildBoards.All(x => x.ChildBoards.Any(y => y.IsInCheck(colour))))
-                //    _state |= colour == Colour.White ? BoardState.BlackIsInCheckmate : BoardState.WhiteIsInCheckmate;
             }
+
+        }
 
         public override string ToString() =>
             $"{Move.ToString()}";
@@ -299,13 +295,11 @@ namespace Chess.Engine
         {
             var sb = new StringBuilder();
 
-            //var squareCounter = 1;
             var consecutiveEmpty = 0;
             var ranks = new List<string>();
 
             ulong bit = 1;
 
-            //for (var i = 1ul; i > 0; i = i << 1)
             for (var i = 0; i < 64; ++i)
             {
                 var squareNotation = _bitBoard.GetSquareNotation((SquareFlag)bit);
@@ -341,18 +335,6 @@ namespace Chess.Engine
                     sb.Clear();
                 }
 
-                //if (squareCounter % 8 == 0 && squareCounter < 64)
-                //{
-                //    if (consecutiveEmpty > 0)
-                //    {
-                //        sb.Append(consecutiveEmpty);
-                //        consecutiveEmpty = 0;
-                //    }
-
-                //    sb.Append("/");
-                //}
-
-                //++squareCounter;
                 bit = bit << 1;
             }
 

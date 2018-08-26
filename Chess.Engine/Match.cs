@@ -25,8 +25,6 @@ namespace Chess.Engine
 
         private CpuPlayer _cpuPlayer;
 
-        //private readonly List<string> _turnHistory = new List<string>();
-
         public Match(Board board, CpuPlayer cpuPlayer, Colour humanColour = Colour.None)
         {
             _boards.Add(board);
@@ -165,22 +163,20 @@ namespace Chess.Engine
             if (!legalMoves.Any())
                 return null;
 
-            var piece = board.GetPiece(startPosition);
+            var squareState = board.GetSquareState(startPosition);
 
-            if (piece == PieceType.None)
+            if (squareState.Type == PieceType.None)
                 return null;
 
-            if (piece == PieceType.Rook)
+            if (squareState.Type == PieceType.Rook)
             {
-                var pieceColour = board.GetPieceColour(endPosition);
-                var king = board.GetPiece(endPosition);
+                var squareState2 = board.GetSquareState(endPosition);
 
-                if (pieceColour == colour && king == PieceType.King)
+                if (squareState2.Colour == colour && squareState2.Type == PieceType.King)
                 {
                     if (!board.CanCastle(colour))
                         return null;
 
-                    //var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
                     var possibleBoards = legalMoves.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
 
                     var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
@@ -189,17 +185,15 @@ namespace Chess.Engine
                         return castleBoard;
                 }
             }
-            else if (piece == PieceType.King)
+            else if (squareState.Type == PieceType.King)
             {
-                var pieceColour = board.GetPieceColour(endPosition);
-                var rook = board.GetPiece(endPosition);
-                
-                if (pieceColour == colour && rook == PieceType.Rook)
+                var squareState2 = board.GetSquareState(endPosition);
+
+                if (squareState2.Colour == colour && squareState2.Type == PieceType.Rook)
                 {
                     if (!board.CanCastle(colour))
                         return null;
 
-                    //var possibleBoards = board.ChildBoards.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
                     var possibleBoards = legalMoves.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
 
                     var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
@@ -209,14 +203,14 @@ namespace Chess.Engine
                 }
             }
 
-            var move = new Move(colour, piece, startPosition, endPosition);
+            var move = new Move(colour, squareState.Type, startPosition, endPosition);
 
             if (promotionType != PieceType.None)
-                move = new Move(colour, piece, startPosition, endPosition, promotionType);
+                move = new Move(colour, squareState.Type, startPosition, endPosition, PieceType.None, promotionType);
 
-            var code = move.GetCode();
+            var code = move.Code;
 
-            var boards = legalMoves.Where(x => x.GetCode().StartsWith(code));
+            var boards = legalMoves.Where(x => x.Code.StartsWith(code));
 
             if (boards == null || !boards.Any())
                 return null;

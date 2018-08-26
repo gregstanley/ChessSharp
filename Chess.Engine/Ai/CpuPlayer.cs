@@ -88,6 +88,8 @@ namespace Chess.Engine.Ai
                     return null;
                 }
 
+                sb.AppendLine($"I'm in check");
+
                 var optionsBoardsRanked = colour == Colour.White
                     ? escapeCheckBoards.OrderByDescending(x => x.Evaluation)
                     : escapeCheckBoards.OrderBy(x => x.Evaluation);
@@ -162,7 +164,7 @@ namespace Chess.Engine.Ai
 
             if (!escapeCheckBoards.Any())
             {
-                sb.AppendLine($"Err... {colour} {board.GetPiece(kingSquareRankFile)} {kingSquareRankFile.File}{kingSquareRankFile.Rank} can't escape Check (shouldn't happen but never mind). Checkmate.");
+                sb.AppendLine($"Err... {colour} {board.GetSquareState(kingSquareRankFile).Type} {kingSquareRankFile.File}{kingSquareRankFile.Rank} can't escape Check (shouldn't happen but never mind). Checkmate.");
 
                 _moveLog.Add(sb.ToString());
             }

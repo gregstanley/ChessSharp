@@ -16,7 +16,10 @@
             Side = side;
         }
 
-        public override string GetCode() =>
-            Side == PieceType.King ? $"0-0" : "0-0-0";
+        public override string GetFriendlyCode() =>
+            ToString();
+
+        public override string ToString() =>
+            Side == PieceType.King? $"0-0" : "0-0-0";
     }
 }

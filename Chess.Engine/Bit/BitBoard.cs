@@ -148,8 +148,13 @@ namespace Chess.Engine.Bit
         public bool CanCastleQueenSide(Colour colour) =>
             colour == Colour.White ? WhiteCanCastleQueenSide() : BlackCanCastleQueenSide();
 
-        //public bool IsInCheck(Colour colour) =>
-        //    colour == Colour.White ? BlackCovered.HasFlag(WhiteKing) : WhiteCovered.HasFlag(BlackKing);
+        public SquareState GetSquareState(SquareFlag square)
+        {
+            var colour = GetPieceColour(square);
+            var pieceType = GetPiece(square);
+
+            return new SquareState(square, colour, pieceType);
+        }
 
         public Colour GetPieceColour(SquareFlag square)
         {
@@ -237,6 +242,12 @@ namespace Chess.Engine.Bit
 
             if (move.Type == PieceType.Pawn)
             {
+                if (move.EnPassantCaptureSquare != 0)
+                {
+                    childBoard.RemovePiece(colour.Opposite(), move.EnPassantCaptureSquare);
+                    childBoard._state |= BoardState.IsCapture;
+                }
+
                 if (move.PromotionType != PieceType.None)
                 {
                     childBoard._state |= BoardState.IsPawnPromotion;
@@ -357,19 +368,6 @@ namespace Chess.Engine.Bit
                     squareNotation = "-";
 
                 sb.Append(squareNotation);
-                //if (WhitePawns.HasFlag((SquareFlag)bit)) sb.Append("P");
-                //else if (WhiteRooks.HasFlag((SquareFlag)bit)) sb.Append("R");
-                //else if (WhiteKnights.HasFlag((SquareFlag)bit)) sb.Append("N");
-                //else if (WhiteBishops.HasFlag((SquareFlag)bit)) sb.Append("B");
-                //else if (WhiteQueens.HasFlag((SquareFlag)bit)) sb.Append("Q");
-                //else if (WhiteKing.HasFlag((SquareFlag)bit)) sb.Append("K");
-                //else if (BlackPawns.HasFlag((SquareFlag)bit)) sb.Append("p");
-                //else if (BlackRooks.HasFlag((SquareFlag)bit)) sb.Append("r");
-                //else if (BlackKnights.HasFlag((SquareFlag)bit)) sb.Append("n");
-                //else if (BlackBishops.HasFlag((SquareFlag)bit)) sb.Append("b");
-                //else if (BlackQueens.HasFlag((SquareFlag)bit)) sb.Append("q");
-                //else if (BlackKing.HasFlag((SquareFlag)bit)) sb.Append("k");
-                //else sb.Append("-");
 
                 if (i > 0 && (i + 1) % 8 == 0)
                 {

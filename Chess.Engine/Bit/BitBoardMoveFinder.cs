@@ -11,7 +11,7 @@ namespace Chess.Engine.Bit
         private static SquareFlag WhitePromotionRank = SquareFlagExtensions.r8;
         private static SquareFlag BlackPromotionRank = SquareFlagExtensions.r1;
 
-        public IList<Move> FindMoves(BitBoard board, Colour colour, bool withCastles = true)
+        public IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, bool withCastles = true)
         {
             var squares = board.FindPieceSquares(colour).ToList();
 
@@ -19,7 +19,7 @@ namespace Chess.Engine.Bit
 
             foreach (var square in squares)
             {
-                var pieceMoves = FindMoves(board, colour, square, withCastles);
+                var pieceMoves = FindMoves(board, enPassantSquare, colour, square, withCastles);
 
                 if (pieceMoves.Any())
                     moves.AddRange(pieceMoves);
@@ -28,60 +28,18 @@ namespace Chess.Engine.Bit
             return moves;
         }
 
-        private IList<Move> FindMoves(BitBoard board, Colour colour, SquareFlag square, bool withCastles = true)
+        private IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square, bool withCastles = true)
         {
-            var possibleSquares = GetStandardCoveredSquares(board, colour, square);
-            var moves = new List<Move>();
-
             var pieceType = board.GetPiece(square);
+            var possibleSquares = GetStandardCoveredSquares(board, colour, square, pieceType);
+            var moves = new List<Move>();
             var startRankFile = square.ToRankFile();
 
             if (pieceType == PieceType.Pawn)
             {
-                var pawnMoves = PawnMoves(board, colour, square);
+                var pawnMoves = PawnMoves(board, enPassantSquare, colour, square);
+
                 moves.AddRange(pawnMoves);
-                //var pawnSquares = PawnMoves(board, colour, square);
-
-                //var promotionRank = board.GetPieceColour(square) == Colour.White ? WhitePromotionRank : BlackPromotionRank;
-
-                //var promotionSquares = pawnSquares.Where(x => promotionRank.HasFlag(x));
-
-                //if (promotionSquares.Any())
-                //{
-                //    foreach (var promotionSquare in promotionSquares)
-                //    {
-                //        var rankFile = promotionSquare.ToRankFile();
-
-                //        moves.Add(new Move(colour,
-                //            pieceType,
-                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                //            RankFile.Get(rankFile.Rank, rankFile.File),
-                //            PieceType.Queen));
-
-                //        moves.Add(new Move(colour,
-                //            pieceType,
-                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                //            RankFile.Get(rankFile.Rank, rankFile.File),
-                //            PieceType.Rook));
-
-                //        moves.Add(new Move(colour,
-                //            pieceType,
-                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                //            RankFile.Get(rankFile.Rank, rankFile.File),
-                //            PieceType.Bishop));
-
-                //        moves.Add(new Move(colour,
-                //            pieceType,
-                //            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                //            RankFile.Get(rankFile.Rank, rankFile.File),
-                //            PieceType.Knight));
-                //    }
-                //}
-                //else
-                //{
-                //    var nonPromotionSquares = pawnSquares.Where(x => !promotionRank.HasFlag(x));
-                //    possibleSquares.AddRange(nonPromotionSquares);
-                //}
             }
 
             if (pieceType == PieceType.Rook && withCastles)
@@ -94,14 +52,18 @@ namespace Chess.Engine.Bit
 
             foreach (var possibleSquare in possibleSquares)
             {
-                var rankFile = possibleSquare.ToRankFile();
-                moves.Add(new Move(colour, pieceType, RankFile.Get(startRankFile.Rank, startRankFile.File), RankFile.Get(rankFile.Rank, rankFile.File)));
+                var rankFile = possibleSquare.Square.ToRankFile();
+
+                if (possibleSquare.Colour != colour)
+                    moves.Add(new Move(colour, pieceType, RankFile.Get(startRankFile.Rank, startRankFile.File), RankFile.Get(rankFile.Rank, rankFile.File), possibleSquare.Type));
+                else
+                    moves.Add(new Move(colour, pieceType, RankFile.Get(startRankFile.Rank, startRankFile.File), RankFile.Get(rankFile.Rank, rankFile.File)));
             }
 
             return moves;
         }
 
-        private List<Move> PawnMoves(BitBoard board, Colour colour, SquareFlag square)
+        private List<Move> PawnMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square)
         {
             var moves = new List<Move>();
 
@@ -120,14 +82,7 @@ namespace Chess.Engine.Bit
                 {
                     var as1rf = availableSquare1.ToRankFile();
 
-                    //outSquares.Add(availableSquare1);
-                    //moves.Add(new Move(colour,
-                    //        PieceType.Pawn,
-                    //        RankFile.Get(startRankFile.Rank, startRankFile.File),
-                    //        RankFile.Get(as1rf.Rank, as1rf.File)
-                    //        ));
-
-                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableSquare1, promotionRank));
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableSquare1, PieceType.None, promotionRank, 0));
 
                     var rankFile = square.ToRankFile();
 
@@ -141,12 +96,13 @@ namespace Chess.Engine.Bit
 
                         if (board.GetPiece(availableSquare2) == PieceType.None)
                         {
-                            //outSquares.Add(availableSquare2);
                             moves.Add(new Move(colour,
                                 PieceType.Pawn,
                                 RankFile.Get(startRankFile.Rank, startRankFile.File),
                                 RankFile.Get(as2rf.Rank, as2rf.File),
-                                availableSquare1
+                                PieceType.None,
+                                availableSquare1,
+                                0
                                 ));
                         }
                     }
@@ -155,44 +111,36 @@ namespace Chess.Engine.Bit
 
             if (availableCaptureSquare1 != 0)
             {
-                if (board.GetPiece(availableCaptureSquare1) != PieceType.None
-                    && board.GetPieceColour(availableCaptureSquare1) != colour
-                    && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
-                {
-                    //var acs1rf = availableCaptureSquare1.ToRankFile();
+                // I don't *think* you can see you're own en pasant squares as it must be opponent turn
+                var isEnpassantCapture = enPassantSquare != 0 && availableCaptureSquare1 == enPassantSquare;
 
-                    //outSquares.Add(availableCaptureSquare1);
-                    //moves.Add(new Move(colour,
-                    //        PieceType.Pawn,
-                    //        RankFile.Get(startRankFile.Rank, startRankFile.File),
-                    //        RankFile.Get(acs1rf.Rank, acs1rf.File)
-                    //        ));
-                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare1, promotionRank));
+                var isCapture = board.GetPiece(availableCaptureSquare1) != PieceType.None && board.GetPieceColour(availableCaptureSquare1) != colour;
+
+                if ((isCapture || isEnpassantCapture) && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
+                {
+                    var enPassantCaptureSquare = Next(availableCaptureSquare1, -stride);
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare1, PieceType.Pawn, promotionRank, isEnpassantCapture ? enPassantCaptureSquare : 0));
                 }
             }
 
             if (availableCaptureSquare2 != 0)
             {
-                if (board.GetPiece(availableCaptureSquare2) != PieceType.None
-                    && board.GetPieceColour(availableCaptureSquare2) != colour
-                    && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
-                {
-                    //var acs2rf = availableCaptureSquare2.ToRankFile();
+                // I don't *think* you can see you're own en pasant squares as it must be opponent turn
+                var isEnpassantCapture = enPassantSquare != 0 && availableCaptureSquare2 == enPassantSquare;
 
-                    // outSquares.Add(availableCaptureSquare2);
-                    //moves.Add(new Move(colour,
-                    //        PieceType.Pawn,
-                    //        RankFile.Get(startRankFile.Rank, startRankFile.File),
-                    //        RankFile.Get(acs2rf.Rank, acs2rf.File)
-                    //        ));
-                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare2, promotionRank));
+                var isCapture = board.GetPiece(availableCaptureSquare2) != PieceType.None && board.GetPieceColour(availableCaptureSquare2) != colour;
+
+                if ((isCapture || isEnpassantCapture) && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
+                {
+                    var enPassantCaptureSquare = Next(availableCaptureSquare2, -stride);
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare2, PieceType.Pawn, promotionRank, isEnpassantCapture ? enPassantCaptureSquare : 0));
                 }
             }
 
             return moves;
         }
 
-        private List<Move> CreatePawnMove(BitBoard board, Colour colour, RankFile startRankFile, SquareFlag endSquare, SquareFlag promotionRank)
+        private List<Move> CreatePawnMove(BitBoard board, Colour colour, RankFile startRankFile, SquareFlag endSquare, PieceType capturePieceType, SquareFlag promotionRank, SquareFlag enPassantCaptureSquare)
         {
             var isPromotion = promotionRank.HasFlag(endSquare);
 
@@ -200,14 +148,32 @@ namespace Chess.Engine.Bit
 
             if (!isPromotion)
             {
-                return new List<Move>
+                if (enPassantCaptureSquare == 0)
                 {
-                    new Move(colour,
+                    return new List<Move>
+                    {
+                        new Move(colour,
                             PieceType.Pawn,
                             RankFile.Get(startRankFile.Rank, startRankFile.File),
-                            RankFile.Get(rankFile.Rank, rankFile.File)
+                            RankFile.Get(rankFile.Rank, rankFile.File),
+                            capturePieceType
                             )
-                };
+                    };
+                }
+                else
+                {
+                    return new List<Move>
+                    {
+                        new Move(colour,
+                            PieceType.Pawn,
+                            RankFile.Get(startRankFile.Rank, startRankFile.File),
+                            RankFile.Get(rankFile.Rank, rankFile.File),
+                            capturePieceType,
+                            0,
+                            enPassantCaptureSquare
+                            )
+                    };
+                }
             }
 
             var moves = new List<Move>
@@ -216,24 +182,28 @@ namespace Chess.Engine.Bit
                     PieceType.Pawn,
                     RankFile.Get(startRankFile.Rank, startRankFile.File),
                     RankFile.Get(rankFile.Rank, rankFile.File),
+                    capturePieceType,
                     PieceType.Queen),
 
                 new Move(colour,
                     PieceType.Pawn,
                     RankFile.Get(startRankFile.Rank, startRankFile.File),
                     RankFile.Get(rankFile.Rank, rankFile.File),
+                    capturePieceType,
                     PieceType.Rook),
 
                 new Move(colour,
                     PieceType.Pawn,
                     RankFile.Get(startRankFile.Rank, startRankFile.File),
                     RankFile.Get(rankFile.Rank, rankFile.File),
+                    capturePieceType,
                     PieceType.Bishop),
 
                 new Move(colour,
                     PieceType.Pawn,
                     RankFile.Get(startRankFile.Rank, startRankFile.File),
                     RankFile.Get(rankFile.Rank, rankFile.File),
+                    capturePieceType,
                     PieceType.Knight)
             };
 
@@ -305,15 +275,24 @@ namespace Chess.Engine.Bit
 
             var kingSquare = board.FindKingSquare(colour);
 
-            var coveredSquares = board.FindCoveredSquares(colour.Opposite());
-
-            if (coveredSquares.HasFlag(kingSquare))
-                return null;
-
             var kingRankFile = kingSquare.ToRankFile();
             var rookRankFile = square.ToRankFile();
 
+            if (rookRankFile.File != File.a && rookRankFile.File != File.h)
+                return null;
+
             var side = Math.Abs(kingRankFile.File - rookRankFile.File) == 3 ? PieceType.King : PieceType.Queen;
+
+            if (side == PieceType.King && !board.CanCastleKingSide(colour))
+                return null;
+
+            if (side == PieceType.Queen && !board.CanCastleQueenSide(colour))
+                return null;
+
+            var attackingThisSquare = FindPiecesAttackingThisSquare(board, colour, kingSquare);
+
+            if (attackingThisSquare.Any())
+                return null;
 
             var stride = rookRankFile.File < kingRankFile.File ? 1 : -1;
 
@@ -329,10 +308,12 @@ namespace Chess.Engine.Bit
                 {
                     stillCan = false;
                 }
-                else if (coveredSquares.HasFlag(currentSquare))
+                else
                 {
+                    attackingThisSquare = FindPiecesAttackingThisSquare(board, colour, currentSquare);
+
                     // This is the square next to the Rook and CAN be under attack as the King does not pass through
-                    if (side == PieceType.Queen && currentSquare != Next(square, stride))
+                    if (attackingThisSquare.Any() && side == PieceType.Queen && currentSquare != Next(square, stride))
                         stillCan = false;
                 }
             }
@@ -356,33 +337,36 @@ namespace Chess.Engine.Bit
                 side);
         }
 
-        private SquareFlag GetCoveredSquares(BitBoard board, Colour colour)
+
+        private List<SquareState> FindPiecesAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
         {
-            SquareFlag coveredSquares = 0;
+            var squares = new List<SquareState>();
 
-            var squaresWithPieces = board.FindPieceSquares(colour).ToList();
+            // In theory this will hunt for Bishops and Rooks as wells as Queens
+            var attackedByRay = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
+                .Where(x => x.Colour == colour.Opposite()
+                && (x.Type == PieceType.Rook || x.Type == PieceType.Bishop || x.Type == PieceType.Queen));
 
-            foreach (var square in squaresWithPieces)
-                coveredSquares |= GetCoveredSquares(board, colour, square);
+            if (attackedByRay.Any())
+                squares.AddRange(attackedByRay);
 
-            return coveredSquares;
+            var attackedByPawn = AttackedByPawn(board, colour, square);
+
+            if (attackedByPawn.Any())
+                squares.AddRange(attackedByPawn);
+
+            var attackedByKnight = AvailableKnightSquares(board, colour, square)
+                .Where(x => x.Colour == colour.Opposite());
+
+            if (attackedByKnight.Any())
+                squares.AddRange(attackedByKnight);
+
+            return squares;
         }
 
-        private SquareFlag GetCoveredSquares(BitBoard board, Colour colour, SquareFlag square)
+        private List<SquareState> GetStandardCoveredSquares(BitBoard board, Colour colour, SquareFlag square, PieceType pieceType)
         {
-            var outSquares = GetStandardCoveredSquares(board, colour, square);
-
-            if (board.GetPiece(square) == PieceType.Pawn)
-                outSquares.AddRange(PawnCovered(board, colour, square));
-
-            return outSquares.ToSquareFlag();
-        }
-
-        private List<SquareFlag> GetStandardCoveredSquares(BitBoard board, Colour colour, SquareFlag square)
-        {
-            var outSquares = new List<SquareFlag>();
-
-            var pieceType = board.GetPiece(square);
+            var outSquares = new List<SquareState>();
 
             if (pieceType == PieceType.Rook)
             {
@@ -421,10 +405,10 @@ namespace Chess.Engine.Bit
 
             return outSquares;
         }
-
-        private List<SquareFlag> PawnCovered(BitBoard board, Colour colour, SquareFlag square)
+        
+        private List<SquareState> AttackedByPawn(BitBoard board, Colour colour, SquareFlag square)
         {
-            var outSquares = new List<SquareFlag>();
+            var outSquares = new List<SquareState>();
 
             var stride = board.GetPieceColour(square) == Colour.White ? 8 : -8;
             var captureStride1 = stride + 1;
@@ -434,24 +418,32 @@ namespace Chess.Engine.Bit
 
             if (availableCaptureSquare1 != 0)
             {
-                if (!HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
-                    outSquares.Add(availableCaptureSquare1);
+                var squareState = board.GetSquareState(availableCaptureSquare1);
+
+                if (squareState.Colour == colour.Opposite()
+                    && squareState.Type == PieceType.Pawn
+                    && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
+                    outSquares.Add(squareState);
             }
 
             if (availableCaptureSquare2 != 0)
             {
-                if (!HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
-                    outSquares.Add(availableCaptureSquare2);
+                var squareState = board.GetSquareState(availableCaptureSquare2);
+
+                if (squareState.Colour == colour.Opposite()
+                    && squareState.Type == PieceType.Pawn
+                    && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
+                    outSquares.Add(squareState);
             }
 
             return outSquares;
         }
-
-        private IList<SquareFlag> AvailableKnightSquares(BitBoard board, Colour colour, SquareFlag square)
+        
+        private IList<SquareState> AvailableKnightSquares(BitBoard board, Colour colour, SquareFlag square)
         {
             var strides = new[] { -17, -15, -10, -6, 6, 10, 15, 17 };
 
-            var outSquares = new List<SquareFlag>();
+            var outSquares = new List<SquareState>();
 
             foreach (var stride in strides)
             {
@@ -463,26 +455,27 @@ namespace Chess.Engine.Bit
             return outSquares;
         }
 
-        private IList<SquareFlag> AvailableHorizontalSquares(BitBoard board, Colour colour, SquareFlag square, int maxSteps = int.MaxValue)
+        private IList<SquareState> AvailableHorizontalSquares(BitBoard board, Colour colour, SquareFlag square, int maxSteps = int.MaxValue)
         {
             var strides = new[] { -8, -1, 1, 8 };
 
             return CheckAllDirections(board, colour, square, strides, maxSteps);
         }
 
-        private IList<SquareFlag> AvailableDiagonalSquares(BitBoard board, Colour colour, SquareFlag square, int maxSteps = int.MaxValue)
+        private IList<SquareState> AvailableDiagonalSquares(BitBoard board, Colour colour, SquareFlag square, int maxSteps = int.MaxValue)
         {
             var strides = new[] { -9, -7, 7, 9 };
 
             return CheckAllDirections(board, colour, square, strides, maxSteps);
         }
 
-        private IList<SquareFlag> CheckKnight(BitBoard board, Colour colour, SquareFlag square, int stride)
+        private IList<SquareState> CheckKnight(BitBoard board, Colour colour, SquareFlag square, int stride)
         {
-            var outSquares = new List<SquareFlag>();
+            var outSquares = new List<SquareState>();
             var mySquares = colour == Colour.White ? board.White : board.Black;
             var opponentSquares = colour == Colour.White ? board.Black : board.White;
             var currentSquare = square;
+            var opponentColour = colour.Opposite();
 
             currentSquare = Next(currentSquare, stride);
 
@@ -494,14 +487,21 @@ namespace Chess.Engine.Bit
             if (mySquares.HasFlag(currentSquare))
                 return outSquares;
 
-            outSquares.Add(currentSquare);
+            if (opponentSquares.HasFlag(currentSquare))
+            {
+                var pieceType = board.GetPiece(currentSquare);
+
+                outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
+            }
+
+            outSquares.Add(new SquareState(currentSquare));
 
             return outSquares;
         }
 
-        private IList<SquareFlag> CheckAllDirections(BitBoard board, Colour colour, SquareFlag square, int[] strides, int maxSteps)
+        private IList<SquareState> CheckAllDirections(BitBoard board, Colour colour, SquareFlag square, int[] strides, int maxSteps)
         {
-            var outSquares = new List<SquareFlag>();
+            var outSquares = new List<SquareState>();
 
             foreach (var stride in strides)
             {
@@ -513,14 +513,15 @@ namespace Chess.Engine.Bit
             return outSquares;
         }
 
-        private IList<SquareFlag> CheckDirection(BitBoard board, Colour colour, SquareFlag square, int stride, int maxSteps)
+        private IList<SquareState> CheckDirection(BitBoard board, Colour colour, SquareFlag square, int stride, int maxSteps)
         {
-            var outSquares = new List<SquareFlag>();
+            var outSquares = new List<SquareState>();
             var mySquares = colour == Colour.White ? board.White : board.Black;
             var opponentSquares = colour == Colour.White ? board.Black : board.White;
             var currentStep = 1;
             var currentSquare = square;
             var startRankFile = square.ToRankFile();
+            var opponentColour = colour.Opposite();
 
             while (HasNext(currentSquare, stride) && currentStep <= maxSteps)
             {
@@ -536,12 +537,14 @@ namespace Chess.Engine.Bit
 
                 if (opponentSquares.HasFlag(currentSquare))
                 {
-                    outSquares.Add(currentSquare);
+                    var pieceType = board.GetPiece(currentSquare);
+                    
+                    outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
 
                     return outSquares;
                 }
 
-                outSquares.Add(currentSquare);
+                outSquares.Add(new SquareState(currentSquare));
 
                 ++currentStep;
             }

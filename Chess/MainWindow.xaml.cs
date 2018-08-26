@@ -87,7 +87,6 @@ namespace Chess
         {
             PromotionTypeSelector.Visibility = Visibility.Collapsed;
 
-            //ProcessNextMove(args.PieceType);
             RunTasks(args.PieceType);
         }
 
@@ -152,6 +151,9 @@ namespace Chess
 
             ErrorUi.Text = string.Empty;
 
+            EnPassantUi.Text = board.EnPassantSquare.ToString();
+            EnPassantCaptureUi.Text = board.EnPassantCaptureSquare.ToString();
+
             WhiteTurnIcon.Visibility = board.Turn == Colour.White ? Visibility.Visible : Visibility.Collapsed;
             BlackTurnIcon.Visibility = board.Turn == Colour.White ? Visibility.Collapsed : Visibility.Visible;
 
@@ -167,6 +169,9 @@ namespace Chess
             WhiteCastleQueenSideUI.IsChecked = board.WhiteCanCastleQueenSide;
             BlackCastleKingSideUI.IsChecked = board.BlackCanCastleKingSide;
             BlackCastleQueenSideUI.IsChecked = board.BlackCanCastleQueenSide;
+
+            WhiteCastleAvailableKingUi.Visibility = board.ChildBoards.Where(x => x.Code == "0-0").Any() ? Visibility.Visible : Visibility.Collapsed;
+            WhiteCastleAvailableQueenUi.Visibility = board.ChildBoards.Where(x => x.Code == "0-0-0").Any() ? Visibility.Visible : Visibility.Collapsed;
 
             if (_currentMatch != null)
                 FenUI.Text = _currentMatch.GetFen();

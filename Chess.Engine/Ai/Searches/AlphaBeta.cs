@@ -29,15 +29,20 @@ namespace Chess.Engine.Ai.Searches
             board.GenerateChildBoards(colour, 1);
             board.UpdateStateInfo();
 
+            var legalMoves = board.GetLegalMoves();
+
+            if (!legalMoves.Any())
+                return null;
+
             var internalStringBuilder = new StringBuilder();
 
             var orderedBoards = colour == Colour.White
-                ? board.ChildBoards.OrderByDescending(x => x.ProjectedEvaluation).ThenByDescending(x => x.Evaluation)
-                : board.ChildBoards.OrderBy(x => x.ProjectedEvaluation).ThenBy(x => x.Evaluation);
+                ? legalMoves.OrderByDescending(x => x.ProjectedEvaluation).ThenByDescending(x => x.Evaluation)
+                : legalMoves.OrderBy(x => x.ProjectedEvaluation).ThenBy(x => x.Evaluation);
 
             //Parallel.ForEach(moves, (move) =>
-            Parallel.ForEach(orderedBoards, (childBoard) =>
-            //foreach(var childBoard in orderedBoards)
+            //Parallel.ForEach(orderedBoards, (childBoard) =>
+            foreach(var childBoard in orderedBoards)
             {
                 var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, internalStringBuilder);
 
@@ -48,16 +53,7 @@ namespace Chess.Engine.Ai.Searches
 
                 if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
                     bestChildBoard = potentialBoard;
-            });
-
-            //sb.AppendLine($"ROOT:");
-
-            //orderedBoards = colour == Colour.White
-            //    ? board.ChildBoards.OrderByDescending(x => x.ProjectedEvaluation)
-            //    : board.ChildBoards.OrderBy(x => x.ProjectedEvaluation);
-
-            //foreach (var childBoard in orderedBoards)
-            //    sb.AppendLine($" - {childBoard}");
+            };
 
             return bestChildBoard.Board;
         }
@@ -72,13 +68,18 @@ namespace Chess.Engine.Ai.Searches
             board.GenerateChildBoards(colour, 1);
             board.UpdateStateInfo();
 
+            var legalMoves = board.GetLegalMoves();
+
+            if (!legalMoves.Any())
+                return null;
+
             PotentialBoard bestChildBoard;
 
             if (isMax)
             {
                 bestChildBoard = new PotentialBoard(null, double.MaxValue, PotentialBoard.NodeType.PV);
 
-                var orderedBoards = board.ChildBoards
+                var orderedBoards = legalMoves
                     .OrderByDescending(x => x.ProjectedEvaluation)
                     .ThenByDescending(x => x.Evaluation);
 
@@ -86,7 +87,6 @@ namespace Chess.Engine.Ai.Searches
                 {
                     var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    //childBoard.UpdateStateInfo();
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
@@ -103,7 +103,7 @@ namespace Chess.Engine.Ai.Searches
             }
             else
             {
-                var orderedBoards = board.ChildBoards
+                var orderedBoards = legalMoves
                     .OrderBy(x => x.ProjectedEvaluation)
                     .ThenBy(x => x.Evaluation);
 
@@ -113,7 +113,6 @@ namespace Chess.Engine.Ai.Searches
                 {
                     var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    //childBoard.UpdateStateInfo();
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
@@ -130,9 +129,9 @@ namespace Chess.Engine.Ai.Searches
             }
 
             if (bestChildBoard.Board == null)
-                sb.AppendLine($"EXACT: {board.GetCode()} No Childboards found");
+                sb.AppendLine($"EXACT: {board.GetFriendlyCode()} No Childboards found");
             else
-                sb.AppendLine($"EXACT: {board.GetCode()} Best: {bestChildBoard}");
+                sb.AppendLine($"EXACT: {board.GetFriendlyCode()} Best: {bestChildBoard}");
 
             return bestChildBoard.WithType(PotentialBoard.NodeType.All);
         }

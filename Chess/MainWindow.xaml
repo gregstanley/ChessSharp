@@ -98,5 +98,13 @@
         </TextBlock>
         <Button x:Name="NewGameHumanHard" Content="New Game (Hard)" HorizontalAlignment="Left" Margin="126,10,0,0" VerticalAlignment="Top" Width="113" Click="NewGameHumanHard_Click" Height="35"/>
         <TextBox x:Name="FenUI" HorizontalAlignment="Left" Height="23" Margin="1099,507,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="645"/>
+        <TextBlock x:Name="EnPassantUi" HorizontalAlignment="Left" Margin="999,32,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <Label x:Name="EnPassantLabel" Content="En passant:" HorizontalAlignment="Left" Margin="903,27,0,0" VerticalAlignment="Top" Width="91" HorizontalContentAlignment="Right"/>
+        <Label x:Name="EnPassantCaptureLabel" Content="En passant capture:" HorizontalAlignment="Left" Margin="872,55,0,0" VerticalAlignment="Top" Width="122" HorizontalContentAlignment="Right"/>
+        <TextBlock x:Name="EnPassantCaptureUi" HorizontalAlignment="Left" Margin="999,60,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top"/>
+        <Ellipse x:Name="BlackCastleAvailableQueenUi" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="451,96,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
+        <Ellipse x:Name="BlackCastleAvailableKingUi" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="992,96,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
+        <Ellipse x:Name="WhiteCastleAvailableQueenUi" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="451,841,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
+        <Ellipse x:Name="WhiteCastleAvailableKingUi" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="992,841,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
     </Grid>
 </Window>
