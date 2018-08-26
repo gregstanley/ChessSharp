@@ -208,7 +208,7 @@ namespace Chess.Engine
             if (promotionType != PieceType.None)
                 move = new Move(colour, squareState.Type, startPosition, endPosition, PieceType.None, promotionType);
 
-            var code = move.Code;
+            var code = move.UiCode;
 
             var boards = legalMoves.Where(x => x.Code.StartsWith(code));
 

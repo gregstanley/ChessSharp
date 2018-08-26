@@ -58,7 +58,7 @@ namespace Chess.Engine
 
         public BoardMetrics BlackMetrics { get; private set; }
 
-        public string Code { get { return _move == null ? string.Empty : _move.Code; } }
+        public string Code { get { return _move == null ? string.Empty : _move.UiCode; } }
 
         public Move Move => _move;
 

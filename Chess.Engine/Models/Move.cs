@@ -45,7 +45,7 @@
             EndPosition = endPosition;
         }
 
-        public string Code => ToString();
+        public string UiCode => AppendPromotionString(BaseString);
 
         public virtual string GetFriendlyCode()
         {
@@ -57,7 +57,7 @@
 
         public override string ToString()
         {
-            var baseString = $"{StartPosition.File}{StartPosition.Rank}-{EndPosition.File}{EndPosition.Rank}";
+            var baseString = BaseString;
 
             if (CapturePieceType == PieceType.None)
                 baseString = $"{baseString}";
@@ -69,6 +69,9 @@
 
         public string ToFriendlyString() =>
             $"{PieceColour} {Type} to {EndPosition.File}{EndPosition.Rank}";
+
+        private string BaseString =>
+            $"{StartPosition.File}{StartPosition.Rank}-{EndPosition.File}{EndPosition.Rank}";
 
         private string AppendPromotionString(string baseString)
         {
