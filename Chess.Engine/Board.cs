@@ -260,11 +260,15 @@ namespace Chess.Engine
 
             //var stationaryKingMoves = ChildBoards.Where(x => x.Move.Type != PieceType.King);
 
-            var inCheck = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Turn, _bitBoard.FindKingSquare(Turn));
-
+            var inCheckWhite = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.White, _bitBoard.FindKingSquare(Colour.White));
+            var inCheckBlack = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.Black, _bitBoard.FindKingSquare(Colour.Black));
             //if (stationaryKingMoves.Any(x => x.IsInCheck(Turn)))
-            if (inCheck.Any())
-                _state |= Turn == Colour.White ? BoardState.WhiteIsInCheck : BoardState.BlackIsInCheck;
+
+            if (inCheckWhite.Any())
+                _state |= BoardState.WhiteIsInCheck;
+
+            if (inCheckBlack.Any())
+                _state |= BoardState.BlackIsInCheck;
 
             if (!GetLegalMoves().Any())
                 _state |= Turn == Colour.White ? BoardState.WhiteIsInCheckmate : BoardState.BlackIsInCheckmate;

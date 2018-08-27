@@ -40,21 +40,36 @@ namespace Chess.Engine.Tests
 
             var fenBoard = new Board(board2, null, bitBoard, bitBoardMoveFinder);
 
-            fenBoard.GenerateChildBoards(Colour.White, 4);
+            fenBoard.GenerateChildBoards(Colour.White, 3);
             //board.UpdateStateInfo();
-            RecursiveUpdateStateInfo(fenBoard, Colour.White, 4);
+            RecursiveUpdateStateInfo(fenBoard, Colour.White, 3);
 
             var d1 = fenBoard.GetLegalMoves();
 
-            var d1Count = d1.Count();
+            var d1LegalCount = d1.Count();
             var isWhiteInCheck = d1.Where(x => x.WhiteIsInCheck);
             var isBlackInCheck = d1.Where(x => x.BlackIsInCheck);
             var totalChecks = isWhiteInCheck.Count() + isBlackInCheck.Count();
             var isCapture = d1.Where(x => x.IsCapture);
+            var isCaptureCount = isCapture.Count();
 
-            Assert.Equal(14, d1Count);
-            Assert.Equal(1, isCapture.Count());
+            Assert.Equal(14, d1LegalCount);
+            Assert.Equal(1, isCaptureCount);
             Assert.Equal(2, totalChecks);
+
+            var d2 = d1.SelectMany(x => x.GetLegalMoves());
+
+            var d2LegalCount = d2.Count();
+
+            var isWhiteInCheck2 = d2.Where(x => x.WhiteIsInCheck);
+            var isBlackInCheck2 = d2.Where(x => x.BlackIsInCheck);
+            var totalChecks2 = isWhiteInCheck2.Count() + isBlackInCheck2.Count();
+            var isCapture2 = d2.Where(x => x.IsCapture);
+            var isCaptureCount2 = isCapture2.Count();
+
+            Assert.Equal(191, d2LegalCount);
+            Assert.Equal(14, isCaptureCount2);
+            Assert.Equal(10, totalChecks2);
         }
 
         [Fact]
@@ -233,6 +248,11 @@ namespace Chess.Engine.Tests
                     {
                         var bp = true;
                     }
+                }
+
+                if (childBoard.Code.StartsWith("a5-a6"))
+                {
+                    var bp = true;
                 }
 
                 childBoard.UpdateStateInfo();

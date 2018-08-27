@@ -355,7 +355,8 @@ namespace Chess.Engine.Bit
                 squares.AddRange(attackedByPawn);
 
             var attackedByKnight = AvailableKnightSquares(board, colour, square)
-                .Where(x => x.Colour == colour.Opposite());
+                .Where(x => x.Colour == colour.Opposite()
+                && x.Type == PieceType.Knight);
 
             if (attackedByKnight.Any())
                 squares.AddRange(attackedByKnight);
