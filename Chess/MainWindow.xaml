@@ -106,5 +106,6 @@
         <Ellipse x:Name="BlackCastleAvailableKingUi" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="992,96,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
         <Ellipse x:Name="WhiteCastleAvailableQueenUi" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="451,841,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
         <Ellipse x:Name="WhiteCastleAvailableKingUi" Fill="#FFF4F4F5" HorizontalAlignment="Left" Height="12" Margin="992,841,0,0" Stroke="Black" VerticalAlignment="Top" Width="12" RenderTransformOrigin="0.583,-0.167"/>
+        <Button x:Name="NewGame_Fen" Content="Go!" HorizontalAlignment="Left" Margin="1099,535,0,0" VerticalAlignment="Top" Width="75"/>
     </Grid>
 </Window>

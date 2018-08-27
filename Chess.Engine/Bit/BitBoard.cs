@@ -13,6 +13,58 @@ namespace Chess.Engine.Bit
             | BoardState.BlackCanCastleKingSide
             | BoardState.BlackCanCastleQueenSide;
 
+        public static BitBoard FromFen(Fen fen)
+        {
+            var squares = fen.GetSquaresStates();
+
+            var whitePawns = (SquareFlag)0;
+            var whiteRooks = (SquareFlag)0;
+            var whiteKnights = (SquareFlag)0;
+            var whiteBishops = (SquareFlag)0;
+            var whiteQueens = (SquareFlag)0;
+            var whiteKing = (SquareFlag)0;
+            var blackPawns = (SquareFlag)0;
+            var blackRooks = (SquareFlag)0;
+            var blackKnights = (SquareFlag)0;
+            var blackBishops = (SquareFlag)0;
+            var blackQueens = (SquareFlag)0;
+            var blackKing = (SquareFlag)0;
+
+            foreach (var square in squares)
+            {
+                if (square.Colour == Colour.None)
+                    continue;
+
+                if (square.Colour == Colour.White)
+                {
+                    switch (square.Type)
+                    {
+                        case PieceType.Pawn:   whitePawns |= square.Square; break;
+                        case PieceType.Rook:   whiteRooks |= square.Square; break;
+                        case PieceType.Knight: whiteKnights |= square.Square; break;
+                        case PieceType.Bishop: whiteBishops |= square.Square; break;
+                        case PieceType.Queen:  whiteQueens |= square.Square; break;
+                        case PieceType.King:   whiteKing |= square.Square; break;
+                    }
+                }
+                else
+                {
+                    switch (square.Type)
+                    {
+                        case PieceType.Pawn:   blackPawns |= square.Square; break;
+                        case PieceType.Rook:   blackRooks |= square.Square; break;
+                        case PieceType.Knight: blackKnights |= square.Square; break;
+                        case PieceType.Bishop: blackBishops |= square.Square; break;
+                        case PieceType.Queen:  blackQueens |= square.Square; break;
+                        case PieceType.King:   blackKing |= square.Square; break;
+                    }
+                }
+            }
+
+            return new BitBoard(whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueens, whiteKing,
+                blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.CastlingRights);
+        }
+
         public BitBoard()
         {
             WhitePawns = SquareFlag.A2 | SquareFlag.B2 | SquareFlag.C2 | SquareFlag.D2 | SquareFlag.E2 | SquareFlag.F2 | SquareFlag.G2 | SquareFlag.H2;
@@ -150,10 +202,21 @@ namespace Chess.Engine.Bit
 
         public SquareState GetSquareState(SquareFlag square)
         {
-            var colour = GetPieceColour(square);
-            var pieceType = GetPiece(square);
+            //var colour = GetPieceColour(square);
+            //var pieceType = GetPieceType(square);
 
-            return new SquareState(square, colour, pieceType);
+            //return new SquareState(square, colour, pieceType);
+
+            var piece = GetPiece(square);
+            return new SquareState(square, piece);
+        }
+
+        public Piece GetPiece(SquareFlag square)
+        {
+            var colour = GetPieceColour(square);
+            var pieceType = GetPieceType(square);
+
+            return new Piece(colour, pieceType);
         }
 
         public Colour GetPieceColour(SquareFlag square)
@@ -167,7 +230,7 @@ namespace Chess.Engine.Bit
             return Colour.None;
         }
 
-        public PieceType GetPiece(SquareFlag square)
+        public PieceType GetPieceType(SquareFlag square)
         {
             var colour = GetPieceColour(square);
 
@@ -228,13 +291,14 @@ namespace Chess.Engine.Bit
             var startSquareFlag = move.StartPosition.ToSquareFlag();
             var endSquareFlag = move.EndPosition.ToSquareFlag();
 
-            var isCapture = move.PieceColour == Colour.White
-                ? Black.HasFlag(endSquareFlag)
-                : White.HasFlag(endSquareFlag);
+            //var isCapture = move.PieceColour == Colour.White
+            //    ? Black.HasFlag(endSquareFlag)
+            //    : White.HasFlag(endSquareFlag);
 
             childBoard.MovePiece(move.PieceColour, move.Type, startSquareFlag, endSquareFlag);
 
-            if (isCapture)
+            //if (isCapture)
+            if (move.CapturePieceType != PieceType.None)
             {
                 childBoard.RemovePiece(colour.Opposite(), endSquareFlag);
                 childBoard._state |= BoardState.IsCapture;

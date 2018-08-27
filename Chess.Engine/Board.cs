@@ -70,6 +70,15 @@ namespace Chess.Engine
 
         private BitBoardMoveFinder _bitBoardMoveFinder;
 
+        public static Board FromFen(Fen fen)
+        {
+            var bitBoard = new BitBoard();
+
+            var bitBoardMoveFinder = new BitBoardMoveFinder();
+
+            return new Board(null, null, bitBoard, bitBoardMoveFinder);
+        }
+
         public Board()
         {
             _bitBoard = new BitBoard();
@@ -86,7 +95,7 @@ namespace Chess.Engine
             Turn = parentBoard.Turn.Opposite();
 
             _move = move;
-            
+
             _bitBoard = bitBoard;
             _bitBoardMoveFinder = moveFinder;
         }
@@ -139,7 +148,7 @@ namespace Chess.Engine
             _bitBoard.FindPieceSquares(colour);
 
         public PieceType GetPieceOnSquare(RankFile rankFile) =>
-            _bitBoard.GetPiece(rankFile.ToSquareFlag());
+            _bitBoard.GetPieceType(rankFile.ToSquareFlag());
 
         public Colour GetPieceOnSquareColour(RankFile rankFile) =>
             _bitBoard.GetPieceColour(rankFile.ToSquareFlag());
@@ -156,8 +165,23 @@ namespace Chess.Engine
         public SquareFlag GetSquaresUnderThreat(Colour colour) =>
             _bitBoard.FindCoveredSquares(colour.Opposite());
 
-        public bool IsCapture =>
-            _bitBoard.IsCapture();
+        public bool IsCapture
+        {
+            get
+            {
+                var bbis = _bitBoard.IsCapture();
+
+                if (_move != null)
+                {
+                    var mis = _move.CapturePieceType != PieceType.None;
+
+                    if (bbis != mis)
+                    { var bp = true; }
+                }
+
+                return bbis;
+            }
+        }
 
         public string BoardToString() =>
             _bitBoard.ToString();
@@ -234,13 +258,35 @@ namespace Chess.Engine
             if (ChildBoards == null || !ChildBoards.Any())
                 return;
 
-            var stationaryKingMoves = ChildBoards.Where(x => x.Move.Type != PieceType.King);
+            //var stationaryKingMoves = ChildBoards.Where(x => x.Move.Type != PieceType.King);
 
-            if (stationaryKingMoves.Any(x => x.IsInCheck(Turn)))
+            var inCheck = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Turn, _bitBoard.FindKingSquare(Turn));
+
+            //if (stationaryKingMoves.Any(x => x.IsInCheck(Turn)))
+            if (inCheck.Any())
                 _state |= Turn == Colour.White ? BoardState.WhiteIsInCheck : BoardState.BlackIsInCheck;
 
             if (!GetLegalMoves().Any())
                 _state |= Turn == Colour.White ? BoardState.WhiteIsInCheckmate : BoardState.BlackIsInCheckmate;
+        }
+
+        public string MoveHistory
+        {
+            get
+            {
+                var parentBoard = ParentBoard;
+
+                var sb = new StringBuilder();
+
+                while (parentBoard != null)
+                {
+                    sb.Append($"{parentBoard.GetFriendlyCode()} ");
+
+                    parentBoard = parentBoard.ParentBoard;
+                }
+
+                return sb.ToString();
+            }
         }
 
         public void GenerateChildBoards(Colour colour, int depth)
@@ -401,7 +447,7 @@ namespace Chess.Engine
 
         private double GetAbsolutePieceValue(SquareFlag squareWithPiece, Colour pieceColour)
         {
-            var pieceType = _bitBoard.GetPiece(squareWithPiece);
+            var pieceType = _bitBoard.GetPieceType(squareWithPiece);
             var rf = squareWithPiece.ToRankFile();
             var r = rf.Rank - 1;
             var f = (int)rf.File;

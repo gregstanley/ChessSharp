@@ -30,7 +30,7 @@ namespace Chess.Engine.Bit
 
         private IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square, bool withCastles = true)
         {
-            var pieceType = board.GetPiece(square);
+            var pieceType = board.GetPieceType(square);
             var possibleSquares = GetStandardCoveredSquares(board, colour, square, pieceType);
             var moves = new List<Move>();
             var startRankFile = square.ToRankFile();
@@ -78,7 +78,7 @@ namespace Chess.Engine.Bit
 
             if (availableSquare1 != 0)
             {
-                if (board.GetPiece(availableSquare1) == PieceType.None)
+                if (board.GetPieceType(availableSquare1) == PieceType.None)
                 {
                     var as1rf = availableSquare1.ToRankFile();
 
@@ -94,7 +94,7 @@ namespace Chess.Engine.Bit
 
                         var as2rf = availableSquare2.ToRankFile();
 
-                        if (board.GetPiece(availableSquare2) == PieceType.None)
+                        if (board.GetPieceType(availableSquare2) == PieceType.None)
                         {
                             moves.Add(new Move(colour,
                                 PieceType.Pawn,
@@ -114,7 +114,7 @@ namespace Chess.Engine.Bit
                 // I don't *think* you can see you're own en pasant squares as it must be opponent turn
                 var isEnpassantCapture = enPassantSquare != 0 && availableCaptureSquare1 == enPassantSquare;
 
-                var isCapture = board.GetPiece(availableCaptureSquare1) != PieceType.None && board.GetPieceColour(availableCaptureSquare1) != colour;
+                var isCapture = board.GetPieceType(availableCaptureSquare1) != PieceType.None && board.GetPieceColour(availableCaptureSquare1) != colour;
 
                 if ((isCapture || isEnpassantCapture) && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
                 {
@@ -128,7 +128,7 @@ namespace Chess.Engine.Bit
                 // I don't *think* you can see you're own en pasant squares as it must be opponent turn
                 var isEnpassantCapture = enPassantSquare != 0 && availableCaptureSquare2 == enPassantSquare;
 
-                var isCapture = board.GetPiece(availableCaptureSquare2) != PieceType.None && board.GetPieceColour(availableCaptureSquare2) != colour;
+                var isCapture = board.GetPieceType(availableCaptureSquare2) != PieceType.None && board.GetPieceColour(availableCaptureSquare2) != colour;
 
                 if ((isCapture || isEnpassantCapture) && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
                 {
@@ -223,7 +223,7 @@ namespace Chess.Engine.Bit
 
             if (availableSquare1 != 0)
             {
-                if (board.GetPiece(availableSquare1) == PieceType.None)
+                if (board.GetPieceType(availableSquare1) == PieceType.None)
                 {
                     outSquares.Add(availableSquare1);
 
@@ -235,7 +235,7 @@ namespace Chess.Engine.Bit
                         // This must be 'safe' as it is on starting position
                         var availableSquare2 = Next(availableSquare1, stride);
 
-                        if (board.GetPiece(availableSquare2) == PieceType.None)
+                        if (board.GetPieceType(availableSquare2) == PieceType.None)
                             outSquares.Add(availableSquare2);
                     }
                 }
@@ -243,7 +243,7 @@ namespace Chess.Engine.Bit
 
             if (availableCaptureSquare1 != 0)
             {
-                if (board.GetPiece(availableCaptureSquare1) != PieceType.None
+                if (board.GetPieceType(availableCaptureSquare1) != PieceType.None
                     && board.GetPieceColour(availableCaptureSquare1) != colour
                     && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
                     outSquares.Add(availableCaptureSquare1);
@@ -251,7 +251,7 @@ namespace Chess.Engine.Bit
 
             if (availableCaptureSquare2 != 0)
             {
-                if (board.GetPiece(availableCaptureSquare2) != PieceType.None
+                if (board.GetPieceType(availableCaptureSquare2) != PieceType.None
                     && board.GetPieceColour(availableCaptureSquare2) != colour
                     && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
                     outSquares.Add(availableCaptureSquare2);
@@ -268,7 +268,7 @@ namespace Chess.Engine.Bit
             if (board.GetPieceColour(square) != colour)
                 return null;
 
-            var type = board.GetPiece(square);
+            var type = board.GetPieceType(square);
 
             if (type != PieceType.Rook)
                 return null;
@@ -304,7 +304,7 @@ namespace Chess.Engine.Bit
             {
                 currentSquare = Next(currentSquare, stride);
 
-                if (board.GetPiece(currentSquare) != PieceType.None)
+                if (board.GetPieceType(currentSquare) != PieceType.None)
                 {
                     stillCan = false;
                 }
@@ -337,8 +337,7 @@ namespace Chess.Engine.Bit
                 side);
         }
 
-
-        private List<SquareState> FindPiecesAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
+        public List<SquareState> FindPiecesAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
         {
             var squares = new List<SquareState>();
 
@@ -489,9 +488,10 @@ namespace Chess.Engine.Bit
 
             if (opponentSquares.HasFlag(currentSquare))
             {
-                var pieceType = board.GetPiece(currentSquare);
+                var pieceType = board.GetPieceType(currentSquare);
 
-                outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
+                //outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
+                outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
             }
 
             outSquares.Add(new SquareState(currentSquare));
@@ -537,9 +537,10 @@ namespace Chess.Engine.Bit
 
                 if (opponentSquares.HasFlag(currentSquare))
                 {
-                    var pieceType = board.GetPiece(currentSquare);
+                    var pieceType = board.GetPieceType(currentSquare);
                     
-                    outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
+                    //outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
+                    outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
 
                     return outSquares;
                 }
@@ -554,7 +555,7 @@ namespace Chess.Engine.Bit
 
         public bool CheckForPawnPromotion(BitBoard board, SquareFlag startSquare, SquareFlag endSquare)
         {
-            if (board.GetPiece(startSquare) != PieceType.Pawn)
+            if (board.GetPieceType(startSquare) != PieceType.Pawn)
                 return false;
 
             if (board.GetPieceColour(startSquare) == Colour.White && WhitePromotionRank.HasFlag(endSquare))

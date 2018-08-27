@@ -25,6 +25,12 @@ namespace Chess.Engine
 
         private CpuPlayer _cpuPlayer;
 
+        public static Match FromFen(Fen fen, CpuPlayer cpuPlayer, Colour humanColour = Colour.None)
+        {
+            var board = Board.FromFen(fen);
+            return new Match(board, cpuPlayer, humanColour);
+        }
+
         public Match(Board board, CpuPlayer cpuPlayer, Colour humanColour = Colour.None)
         {
             _boards.Add(board);
