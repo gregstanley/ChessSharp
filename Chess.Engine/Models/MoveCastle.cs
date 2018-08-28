@@ -20,6 +20,6 @@
             ToString();
 
         public override string ToString() =>
-            Side == PieceType.King? $"0-0" : "0-0-0";
+            Side == PieceType.King ? $"0-0" : "0-0-0";
     }
 }

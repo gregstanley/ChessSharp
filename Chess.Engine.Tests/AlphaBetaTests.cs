@@ -17,10 +17,65 @@ namespace Chess.Engine.Tests
 
         public AlphaBetaTests()
         {
-
             _log = new LoggerConfiguration()
                 .WriteTo.File("log.txt", rollingInterval: RollingInterval.Day)
                 .CreateLogger();
+        }
+
+        [Fact]
+        public void AlphaBeta_Position2()
+        {
+            // "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+            var fen = Fen.Parse(Fen.Position2);
+
+            var bitBoard = BitBoard.FromFen(fen);
+            var bitBoardMoveFinder = new BitBoardMoveFinder();
+
+            // Provide a default root board
+            var board = new Board();
+
+            // TODO: Have to do this to flip current colour
+            var board2 = new Board(board, null, bitBoard, bitBoardMoveFinder);
+
+            var fenBoard = new Board(board2, null, bitBoard, bitBoardMoveFinder);
+
+            fenBoard.GenerateChildBoards(Colour.White, 3);
+            //board.UpdateStateInfo();
+            RecursiveUpdateStateInfo(fenBoard, Colour.White, 3);
+
+            var d1 = fenBoard.GetLegalMoves();
+
+            var d1LegalCount = d1.Count();
+            var isWhiteInCheck = d1.Where(x => x.WhiteIsInCheck);
+            var isBlackInCheck = d1.Where(x => x.BlackIsInCheck);
+            var totalChecks = isWhiteInCheck.Count() + isBlackInCheck.Count();
+            var isCapture = d1.Where(x => x.IsCapture);
+            var isCaptureCount = isCapture.Count();
+            var castles = d1.Where(x => x.Notation.StartsWith("0-0"));
+
+            LogBoards(fenBoard);
+
+            Assert.Equal(48, d1LegalCount);
+            Assert.Equal(8, isCaptureCount);
+            Assert.Equal(0, totalChecks);
+            Assert.Equal(2, castles.Count());
+
+            var d2 = d1.SelectMany(x => x.GetLegalMoves());
+
+            var d2LegalCount = d2.Count();
+
+            var isWhiteInCheck2 = d2.Where(x => x.WhiteIsInCheck);
+            var isBlackInCheck2 = d2.Where(x => x.BlackIsInCheck);
+            var totalChecks2 = isWhiteInCheck2.Count() + isBlackInCheck2.Count();
+            var isCapture2 = d2.Where(x => x.IsCapture);
+            var isCaptureCount2 = isCapture2.Count();
+            var castles2 = d2.Where(x => x.Notation.StartsWith("0-0"));
+            
+            Assert.Equal(351, isCaptureCount2);
+            //Assert.Equal(1, enPassant);
+            Assert.Equal(3, totalChecks2);
+            Assert.Equal(91, castles2.Count());
+            Assert.Equal(2039, d2LegalCount);
         }
 
         [Fact]
@@ -150,16 +205,27 @@ namespace Chess.Engine.Tests
 
             _log.Information("Perft3");
 
+            LogBoards(board);
+
+            var parents = d1toh5s.Where(x => x.ParentBoard.Code.StartsWith("e7"));
+
+            Assert.Equal(34, isCapture.Count());
+            Assert.Equal(12, totalChecks);
+            Assert.Equal(8902, d3CountLegal);
+        }
+
+        private void LogBoards(Board board)
+        {
             var nodeCount1 = 1;
 
             var runningNodeCount3 = 1;
 
-            foreach(var childBoard1 in board.ChildBoards)
+            foreach (var childBoard1 in board.ChildBoards)
             {
-               var nodeCount2 = 1;
+                var nodeCount2 = 1;
 
                 _log.Information($"{nodeCount1}) {childBoard1.GetFriendlyCode()}   ({childBoard1.ChildBoards.Count()})");
-
+                /*
                 foreach (var childBoard2 in childBoard1.ChildBoards)
                 {
                     var nodeCount3 = 1;
@@ -176,17 +242,11 @@ namespace Chess.Engine.Tests
 
                     ++nodeCount2;
                 }
-
+                */
                 ++nodeCount1;
             }
 
             _log.Information($"Total nodes 3: {runningNodeCount3 - 1})");
-
-            var parents = d1toh5s.Where(x => x.ParentBoard.Code.StartsWith("e7"));
-
-            Assert.Equal(34, isCapture.Count());
-            Assert.Equal(12, totalChecks);
-            //Assert.Equal(8902, d3CountLegal);
         }
 
         [Fact]
@@ -242,19 +302,20 @@ namespace Chess.Engine.Tests
             {
                 RecursiveUpdateStateInfo(childBoard, colour.Opposite(), depth);
 
-                if (board.Code.StartsWith("f7"))
+                if (board.Code.StartsWith("f3-g4"))
                 {
-                    if (childBoard.Code.StartsWith("d1-h5"))
+                    //if (childBoard.Code.StartsWith("d1-h5"))
                     {
                         var bp = true;
                     }
                 }
-
-                if (childBoard.Code.StartsWith("a5-a6"))
+                if (board.Code.StartsWith("a5-a6"))
                 {
-                    var bp = true;
+                    if (childBoard.Code.StartsWith("h5"))
+                    {
+                        var bp = true;
+                    }
                 }
-
                 childBoard.UpdateStateInfo();
             }
 

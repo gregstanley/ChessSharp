@@ -102,10 +102,13 @@ namespace Chess.Engine
 
         public Board ApplyMove(Move move)
         {
-            var childBitBoard = _bitBoard.ApplyMove(move, _bitBoardMoveFinder);
+            var childBitBoard = _bitBoard.ApplyMove(move);
 
             return new Board(this, move, childBitBoard, _bitBoardMoveFinder);
         }
+
+        public string Notation =>
+            _move == null ? string.Empty : _move.Notation;
 
         public double Evaluate(Colour colour)
         {
@@ -187,7 +190,7 @@ namespace Chess.Engine
             _bitBoard.ToString();
 
         public string GetFriendlyCode() =>
-            _move.GetFriendlyCode();
+            _move == null ? string.Empty : _move.GetFriendlyCode();
 
         public RankFile GetMovedFrom() =>
             _move.StartPosition;
@@ -252,12 +255,12 @@ namespace Chess.Engine
 
         public IEnumerable<Board> GetLegalMoves() =>
             ChildBoards.Where(x => !x.IsInCheck(Turn));
-
+        
         public void UpdateStateInfo()
         {
             if (ChildBoards == null || !ChildBoards.Any())
                 return;
-
+            /*
             //var stationaryKingMoves = ChildBoards.Where(x => x.Move.Type != PieceType.King);
 
             var inCheckWhite = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.White, _bitBoard.FindKingSquare(Colour.White));
@@ -269,11 +272,12 @@ namespace Chess.Engine
 
             if (inCheckBlack.Any())
                 _state |= BoardState.BlackIsInCheck;
-
+            
             if (!GetLegalMoves().Any())
                 _state |= Turn == Colour.White ? BoardState.WhiteIsInCheckmate : BoardState.BlackIsInCheckmate;
+            */
         }
-
+        
         public string MoveHistory
         {
             get
@@ -304,17 +308,30 @@ namespace Chess.Engine
 
                 foreach (var move in moves)
                 {
-                    var childBitBoard = _bitBoard.ApplyMove(move, _bitBoardMoveFinder);
+                    var childBitBoard = _bitBoard.ApplyMove(move);
 
                     var childBoard = new Board(this, move, childBitBoard, _bitBoardMoveFinder);
 
                     ChildBoards.Add(childBoard);
 
-                    var kingSquare = childBitBoard.FindKingSquare(colour.Opposite());
+                    //var kingSquare = childBitBoard.FindKingSquare(colour.Opposite());
 
-                    if (kingSquare == 0)
-                        _state |= colour.Opposite() == Colour.White ? BoardState.WhiteIsInCheck : BoardState.BlackIsInCheck;
+                    //if (kingSquare == 0)
+                    //    _state |= colour.Opposite() == Colour.White ? BoardState.WhiteIsInCheck : BoardState.BlackIsInCheck;
+                    var whiteKingSquare = childBitBoard.FindKingSquare(Colour.White);
+                    var blackKingSquare = childBitBoard.FindKingSquare(Colour.Black);
+                    var whiteChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(childBitBoard, Colour.White, whiteKingSquare);
+                    var blackChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(childBitBoard, Colour.Black, blackKingSquare);
+
+                    if (whiteChecks.Any())
+                        childBoard._state |= BoardState.WhiteIsInCheck;
+
+                    if (blackChecks.Any())
+                        childBoard._state |= BoardState.BlackIsInCheck;
                 }
+
+                if (!GetLegalMoves().Any())
+                    _state |= Turn == Colour.White ? BoardState.WhiteIsInCheckmate : BoardState.BlackIsInCheckmate;
             }
 
             if (--depth <= 0)

@@ -283,7 +283,7 @@ namespace Chess.Engine.Bit
             return 0;
         }
 
-        public BitBoard ApplyMove(Move move, BitBoardMoveFinder moveFinder)
+        public BitBoard ApplyMove(Move move)
         {
             var childBoard = Clone();
 
@@ -453,16 +453,16 @@ namespace Chess.Engine.Bit
             return sb.ToString();
         }
 
-        private void SetCoveredSquares(Colour colour, SquareFlag squares)
-        {
-            if (colour == Colour.White)
-            {
-                WhiteCovered = squares;
-                return;
-            }
+        //private void SetCoveredSquares(Colour colour, SquareFlag squares)
+        //{
+        //    if (colour == Colour.White)
+        //    {
+        //        WhiteCovered = squares;
+        //        return;
+        //    }
 
-            BlackCovered = squares;
-        }
+        //    BlackCovered = squares;
+        //}
 
         private void RemovePiece(Colour colour, SquareFlag square)
         {

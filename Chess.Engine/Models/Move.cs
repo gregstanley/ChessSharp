@@ -55,6 +55,9 @@
             return AppendPromotionString(baseString);
         }
 
+        public virtual string Notation =>
+            ToString();
+
         public override string ToString()
         {
             var baseString = BaseString;

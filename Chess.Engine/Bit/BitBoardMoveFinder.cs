@@ -342,12 +342,26 @@ namespace Chess.Engine.Bit
             var squares = new List<SquareState>();
 
             // In theory this will hunt for Bishops and Rooks as wells as Queens
-            var attackedByRay = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
+            var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
                 .Where(x => x.Colour == colour.Opposite()
-                && (x.Type == PieceType.Rook || x.Type == PieceType.Bishop || x.Type == PieceType.Queen));
+                && x.Type == PieceType.Queen);
 
-            if (attackedByRay.Any())
-                squares.AddRange(attackedByRay);
+            if (attackedByQueen.Any())
+                squares.AddRange(attackedByQueen);
+
+            var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
+                .Where(x => x.Colour == colour.Opposite()
+                && x.Type == PieceType.Rook);
+
+            if (attackedByRook.Any())
+                squares.AddRange(attackedByRook);
+
+            var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
+                .Where(x => x.Colour == colour.Opposite()
+                && x.Type == PieceType.Bishop);
+
+            if (attackedByBishop.Any())
+                squares.AddRange(attackedByBishop);
 
             var attackedByPawn = AttackedByPawn(board, colour, square);
 
@@ -493,6 +507,8 @@ namespace Chess.Engine.Bit
 
                 //outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
                 outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
+
+                return outSquares;
             }
 
             outSquares.Add(new SquareState(currentSquare));
