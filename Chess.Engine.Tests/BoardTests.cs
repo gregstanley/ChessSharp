@@ -129,22 +129,26 @@ namespace Chess.Engine.Tests
         }
 
         [Fact]
-        public void GenerateChildBoards_Position3_ToDepth3()
+        public void GenerateChildBoards_Position3_ToDepth5()
         {
             // "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -"
             var fen = Fen.Parse(Fen.Position3);
 
             var board = Board.FromFen(fen);
 
-            board.GenerateChildBoards(Colour.White, 3);
+            board.GenerateChildBoards(Colour.White, 5);
 
             var d1 = board.GetLegalMoves();
             var d2 = d1.SelectMany(x => x.GetLegalMoves());
             var d3 = d2.SelectMany(x => x.GetLegalMoves());
+            var d4 = d3.SelectMany(x => x.GetLegalMoves());
+            var d5 = d4.SelectMany(x => x.GetLegalMoves());
 
             var metrics1 = GetDepthMetrics(d1);
             var metrics2 = GetDepthMetrics(d2);
             var metrics3 = GetDepthMetrics(d3);
+            var metrics4 = GetDepthMetrics(d4);
+            var metrics5 = GetDepthMetrics(d5);
 
             Assert.Equal(14, metrics1.Legal);
             Assert.Equal(1, metrics1.Captures);
@@ -160,7 +164,17 @@ namespace Chess.Engine.Tests
             Assert.Equal(209, metrics3.Captures);
             Assert.Equal(2, metrics3.EnPassantCaptures);
             Assert.Equal(0, metrics3.Castles);
-            Assert.Equal(267, metrics3.Checks); 
+            Assert.Equal(267, metrics3.Checks);
+            Assert.Equal(43238, metrics4.Legal);
+            Assert.Equal(3348, metrics4.Captures);
+            Assert.Equal(123, metrics4.EnPassantCaptures);
+            Assert.Equal(0, metrics4.Castles);
+            Assert.Equal(1680, metrics4.Checks);
+            Assert.Equal(674624, metrics5.Legal);
+            Assert.Equal(52051, metrics5.Captures);
+            Assert.Equal(1165, metrics5.EnPassantCaptures);
+            Assert.Equal(0, metrics5.Castles);
+            Assert.Equal(52950, metrics5.Checks);
         }
 
         [Fact]
