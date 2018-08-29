@@ -72,20 +72,41 @@ namespace Chess.Engine
 
         public static Board FromFen(Fen fen)
         {
-            var bitBoard = new BitBoard();
+            Move move = null;
 
-            var bitBoardMoveFinder = new BitBoardMoveFinder();
+            if (fen.EnPassantSquare != 0)
+            {
+                if (SquareFlagExtensions.r3.HasFlag(fen.EnPassantSquare))
+                {
+                    // TODO: See if we can get away with the nulls
+                    move = new Move(Colour.White, PieceType.Pawn, null, null);
+                }
+                else if (SquareFlagExtensions.r6.HasFlag(fen.EnPassantSquare))
+                {
+                    move = new Move(Colour.Black, PieceType.Pawn, null, null);
+                }
+            }
 
-            return new Board(null, null, bitBoard, bitBoardMoveFinder);
+            var bitBoard = BitBoard.FromFen(fen);
+
+            return new Board(fen.ToPlay, move, bitBoard);
         }
 
         public Board()
+            : this(Colour.White, null, new BitBoard())
         {
-            _bitBoard = new BitBoard();
+;
+        }
+
+        public Board(Colour turn, Move move, BitBoard bitBoard)
+        {
+            _bitBoard = bitBoard;
 
             _bitBoardMoveFinder = new BitBoardMoveFinder();
 
-            Turn = Colour.White;
+            Turn = turn;
+
+            _move = move;
         }
 
         public Board(Board parentBoard, Move move, BitBoard bitBoard, BitBoardMoveFinder moveFinder)

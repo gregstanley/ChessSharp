@@ -28,22 +28,13 @@ namespace Chess.Engine.Tests
             // "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
             var fen = Fen.Parse(Fen.Position2);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardMoveFinder = new BitBoardMoveFinder();
+            var board = Board.FromFen(fen);
 
-            // Provide a default root board
-            var board = new Board();
+            board.GenerateChildBoards(Colour.White, 3);
+            
+            RecursiveUpdateStateInfo(board, Colour.White, 3);
 
-            // TODO: Have to do this to flip current colour
-            var board2 = new Board(board, null, bitBoard, bitBoardMoveFinder);
-
-            var fenBoard = new Board(board2, null, bitBoard, bitBoardMoveFinder);
-
-            fenBoard.GenerateChildBoards(Colour.White, 3);
-            //board.UpdateStateInfo();
-            RecursiveUpdateStateInfo(fenBoard, Colour.White, 3);
-
-            var d1 = fenBoard.GetLegalMoves();
+            var d1 = board.GetLegalMoves();
 
             var d1LegalCount = d1.Count();
             var isWhiteInCheck = d1.Where(x => x.WhiteIsInCheck);
@@ -53,7 +44,7 @@ namespace Chess.Engine.Tests
             var isCaptureCount = isCapture.Count();
             var castles = d1.Where(x => x.Notation.StartsWith("0-0"));
 
-            LogBoards(fenBoard);
+            LogBoards(board);
 
             Assert.Equal(48, d1LegalCount);
             Assert.Equal(8, isCaptureCount);
@@ -70,12 +61,31 @@ namespace Chess.Engine.Tests
             var isCapture2 = d2.Where(x => x.IsCapture);
             var isCaptureCount2 = isCapture2.Count();
             var castles2 = d2.Where(x => x.Notation.StartsWith("0-0"));
-            
+            var castles2Count = castles2.Count();
+
             Assert.Equal(351, isCaptureCount2);
             //Assert.Equal(1, enPassant);
             Assert.Equal(3, totalChecks2);
-            Assert.Equal(91, castles2.Count());
+            Assert.Equal(91, castles2Count);
             Assert.Equal(2039, d2LegalCount);
+
+            var d3 = d2.SelectMany(x => x.GetLegalMoves());
+
+            var d3LegalCount = d3.Count();
+
+            var isWhiteInCheck3 = d3.Where(x => x.WhiteIsInCheck);
+            var isBlackInCheck3 = d3.Where(x => x.BlackIsInCheck);
+            var totalChecks3 = isWhiteInCheck3.Count() + isBlackInCheck3.Count();
+            var isCapture3 = d3.Where(x => x.IsCapture);
+            var isCaptureCount3 = isCapture3.Count();
+            var castles3 = d3.Where(x => x.Notation.StartsWith("0-0"));
+            var castles3Count = castles3.Count();
+
+            Assert.Equal(17102, isCaptureCount3);
+            //Assert.Equal(1, enPassant);
+            Assert.Equal(993, totalChecks3);
+            Assert.Equal(3162, castles3Count);
+            Assert.Equal(97862, d3LegalCount);
         }
 
         [Fact]
@@ -84,22 +94,13 @@ namespace Chess.Engine.Tests
             // "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -"
             var fen = Fen.Parse(Fen.Position3);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardMoveFinder = new BitBoardMoveFinder();
+            var board = Board.FromFen(fen);
 
-            // Provide a default root board
-            var board = new Board();
+            board.GenerateChildBoards(Colour.White, 3);
 
-            // TODO: Have to do this to flip current colour
-            var board2 = new Board(board, null, bitBoard, bitBoardMoveFinder);
+            RecursiveUpdateStateInfo(board, Colour.White, 3);
 
-            var fenBoard = new Board(board2, null, bitBoard, bitBoardMoveFinder);
-
-            fenBoard.GenerateChildBoards(Colour.White, 3);
-            //board.UpdateStateInfo();
-            RecursiveUpdateStateInfo(fenBoard, Colour.White, 3);
-
-            var d1 = fenBoard.GetLegalMoves();
+            var d1 = board.GetLegalMoves();
 
             var d1LegalCount = d1.Count();
             var isWhiteInCheck = d1.Where(x => x.WhiteIsInCheck);
@@ -249,7 +250,7 @@ namespace Chess.Engine.Tests
             _log.Information($"Total nodes 3: {runningNodeCount3 - 1})");
         }
 
-        [Fact]
+        [Fact (Skip = "Too deep")]
         public void AlphaBeta_Perft_4()
         {
             var ab = new AlphaBeta();
@@ -302,9 +303,9 @@ namespace Chess.Engine.Tests
             {
                 RecursiveUpdateStateInfo(childBoard, colour.Opposite(), depth);
 
-                if (board.Code.StartsWith("f3-g4"))
+                if (board.Code.StartsWith("e5"))
                 {
-                    //if (childBoard.Code.StartsWith("d1-h5"))
+                    if (childBoard.Notation.StartsWith("0-0"))
                     {
                         var bp = true;
                     }

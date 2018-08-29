@@ -312,8 +312,10 @@ namespace Chess.Engine.Bit
                 {
                     attackingThisSquare = FindPiecesAttackingThisSquare(board, colour, currentSquare);
 
+                    var queenSideSafeSpace = side == PieceType.Queen && currentSquare == Next(square, stride);
+
                     // This is the square next to the Rook and CAN be under attack as the King does not pass through
-                    if (attackingThisSquare.Any() && side == PieceType.Queen && currentSquare != Next(square, stride))
+                    if (attackingThisSquare.Any() && !queenSideSafeSpace)
                         stillCan = false;
                 }
             }
@@ -341,7 +343,6 @@ namespace Chess.Engine.Bit
         {
             var squares = new List<SquareState>();
 
-            // In theory this will hunt for Bishops and Rooks as wells as Queens
             var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
                 .Where(x => x.Colour == colour.Opposite()
                 && x.Type == PieceType.Queen);
@@ -424,7 +425,8 @@ namespace Chess.Engine.Bit
         {
             var outSquares = new List<SquareState>();
 
-            var stride = board.GetPieceColour(square) == Colour.White ? 8 : -8;
+            //var stride = board.GetPieceColour(square) == Colour.White ? 8 : -8;
+            var stride = colour == Colour.White ? 8 : -8;
             var captureStride1 = stride + 1;
             var captureStride2 = stride - 1;
             var availableCaptureSquare1 = Next(square, captureStride1);
@@ -504,6 +506,9 @@ namespace Chess.Engine.Bit
             if (opponentSquares.HasFlag(currentSquare))
             {
                 var pieceType = board.GetPieceType(currentSquare);
+
+                if (board.FindKingSquare(Colour.Black) == SquareFlag.E8 && currentSquare == SquareFlag.G6 && pieceType == PieceType.Knight)
+                { var bp = true; }
 
                 //outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
                 outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
