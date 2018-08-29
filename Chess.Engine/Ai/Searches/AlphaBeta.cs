@@ -70,8 +70,8 @@ namespace Chess.Engine.Ai.Searches
 
             var legalMoves = board.GetLegalMoves();
 
-            if (!legalMoves.Any())
-                return null;
+            //if (!legalMoves.Any())
+            //    return null;
 
             PotentialBoard bestChildBoard;
 
