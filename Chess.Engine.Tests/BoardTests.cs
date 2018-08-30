@@ -66,31 +66,48 @@ namespace Chess.Engine.Tests
 
             var board = Board.FromFen(fen);
 
-            board.GenerateChildBoards(Colour.White, 3);
+            board.GenerateChildBoards(Colour.White, 4);
 
             var d1 = board.GetLegalMoves();
             var d2 = d1.SelectMany(x => x.GetLegalMoves());
             var d3 = d2.SelectMany(x => x.GetLegalMoves());
+            var d4 = d3.SelectMany(x => x.GetLegalMoves());
+
+            // Need to look one ahead for the Checks to see if they are Checkmate
+            var d4InCheck = d4.Where(x => x.WhiteIsInCheck);
+
+            foreach (var d4board in d4InCheck)
+                d4board.GenerateChildBoards(Colour.White, 1);
 
             var metrics1 = GetDepthMetrics(d1);
             var metrics2 = GetDepthMetrics(d2);
             var metrics3 = GetDepthMetrics(d3);
+            var metrics4 = GetDepthMetrics(d4);
 
             Assert.Equal(20, metrics1.Legal);
             Assert.Equal(0, metrics1.Captures);
             Assert.Equal(0, metrics1.EnPassantCaptures);
             Assert.Equal(0, metrics1.Castles);
             Assert.Equal(0, metrics1.Checks);
+            Assert.Equal(0, metrics1.Checkmates);
             Assert.Equal(400, metrics2.Legal);
             Assert.Equal(0, metrics2.Captures);
             Assert.Equal(0, metrics2.EnPassantCaptures);
             Assert.Equal(0, metrics2.Castles);
             Assert.Equal(0, metrics2.Checks);
+            Assert.Equal(0, metrics2.Checkmates);
             Assert.Equal(8902, metrics3.Legal);
             Assert.Equal(34, metrics3.Captures);
             Assert.Equal(0, metrics3.EnPassantCaptures);
             Assert.Equal(0, metrics3.Castles);
             Assert.Equal(12, metrics3.Checks);
+            Assert.Equal(0, metrics3.Checkmates);
+            Assert.Equal(197281, metrics4.Legal);
+            Assert.Equal(1576, metrics4.Captures);
+            Assert.Equal(0, metrics4.EnPassantCaptures);
+            Assert.Equal(0, metrics4.Castles);
+            Assert.Equal(469, metrics4.Checks);
+            Assert.Equal(8, metrics4.Checkmates);
         }
 
         [Fact]
@@ -106,6 +123,12 @@ namespace Chess.Engine.Tests
             var d1 = board.GetLegalMoves();
             var d2 = d1.SelectMany(x => x.GetLegalMoves());
             var d3 = d2.SelectMany(x => x.GetLegalMoves());
+
+            // Need to look one ahead for the Checks to see if they are Checkmate
+            var d3InCheck = d3.Where(x => x.BlackIsInCheck);
+
+            foreach (var d3board in d3InCheck)
+                d3board.GenerateChildBoards(Colour.Black, 1);
 
             var metrics1 = GetDepthMetrics(d1);
             var metrics2 = GetDepthMetrics(d2);
@@ -126,6 +149,7 @@ namespace Chess.Engine.Tests
             Assert.Equal(45, metrics3.EnPassantCaptures);
             Assert.Equal(3162, metrics3.Castles);  
             Assert.Equal(993, metrics3.Checks);
+            Assert.Equal(1, metrics3.Checkmates);
         }
 
         [Fact]

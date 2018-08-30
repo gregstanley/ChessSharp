@@ -162,7 +162,7 @@ namespace Chess.Engine
 
             // Must be 2 for now. Should probably always be even so ends with opponents turn
             board.GenerateChildBoards(colour, 2);
-            board.UpdateStateInfo();
+            //board.UpdateStateInfo();
 
             var legalMoves = board.GetLegalMoves();
 

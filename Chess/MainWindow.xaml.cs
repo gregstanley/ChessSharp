@@ -26,6 +26,8 @@ namespace Chess
 
         private IReadOnlyCollection<ImageMap> Images { get; set; }
 
+        private bool _isThinking = false;
+
         public MainWindow()
         {
             InitializeComponent();
@@ -34,6 +36,11 @@ namespace Chess
             NextMove.Visibility = Visibility.Collapsed;
             PromotionTypeSelector.Visibility = Visibility.Collapsed;
             CheckmateUi.Visibility = Visibility.Collapsed;
+
+            WhiteIsInCheckUi.Visibility = Visibility.Collapsed;
+            BlackIsInCheckUi.Visibility = Visibility.Collapsed;
+
+            IsThinking = false;
 
             Images = BuildImageMap();
         }
@@ -145,9 +152,9 @@ namespace Chess
 
         private void UpdateUI(Board board)
         {
-            var checkBoards = board.ChildBoards.Where(x => x.WhiteIsInCheck);
-            if (checkBoards.Any())
-            {var bp = true;}
+            //var checkBoards = board.ChildBoards.Where(x => x.WhiteIsInCheck);
+            //if (checkBoards.Any())
+            //{var bp = true;}
 
             ErrorUi.Text = string.Empty;
 
@@ -170,8 +177,8 @@ namespace Chess
             BlackCastleKingSideUI.IsChecked = board.BlackCanCastleKingSide;
             BlackCastleQueenSideUI.IsChecked = board.BlackCanCastleQueenSide;
 
-            WhiteCastleAvailableKingUi.Visibility = board.ChildBoards.Where(x => x.Code == "0-0").Any() ? Visibility.Visible : Visibility.Collapsed;
-            WhiteCastleAvailableQueenUi.Visibility = board.ChildBoards.Where(x => x.Code == "0-0-0").Any() ? Visibility.Visible : Visibility.Collapsed;
+            WhiteCastleAvailableKingUi.Visibility = board.ChildBoards.Where(x => x.Notation == "0-0").Any() ? Visibility.Visible : Visibility.Collapsed;
+            WhiteCastleAvailableQueenUi.Visibility = board.ChildBoards.Where(x => x.Notation == "0-0-0").Any() ? Visibility.Visible : Visibility.Collapsed;
 
             if (_currentMatch != null)
                 FenUI.Text = _currentMatch.GetFen();
@@ -264,6 +271,9 @@ namespace Chess
             if (_currentMatch == null)
                 return;
 
+            if (_isThinking)
+                return;
+
             Point p = e.GetPosition(this);
             double x = p.X - BoardCanvas.Margin.Left;
             double y = p.Y - BoardCanvas.Margin.Top;
@@ -301,15 +311,18 @@ namespace Chess
                 {
                     if (taskA.Result.Error == "Pawn promotion")
                     {
+                        IsThinking = false;
                         PromotionTypeSelector.Visibility = Visibility.Visible;
                     }
                     if (taskA.Result.Error == "Checkmate")
                     {
+                        IsThinking = false;
                         // TODO: This should be better
                         GameOver(Colour.Black);
                     }
                     else
                     {
+                        IsThinking = false;
                         ErrorUi.Text = taskA.Result.Error;
 
                         if (image != null)
@@ -329,19 +342,37 @@ namespace Chess
                     taskB
                     .OnFailure(() =>
                     {
+                        IsThinking = false;
                         ErrorUi.Text = taskB.Result.Error;
                     })
                     .OnSuccess((boardB) =>
                     {
+                        IsThinking = false;
                         UpdateUI(boardB);
                     });
                 });
+        }
+
+        private bool IsThinking
+        {
+            get { return _isThinking; }
+            set
+            {
+                _isThinking = value;
+
+                ThinkingUI.Visibility = _isThinking ? Visibility.Visible : Visibility.Collapsed;
+            }
         }
 
         private void BoardCanvas_MouseUp(object sender, System.Windows.Input.MouseButtonEventArgs e)
         {
             if (_currentMatch == null)
                 return;
+
+            if (_isThinking)
+                return;
+
+            IsThinking = true;
 
             Point p = e.GetPosition(this);
             double x = p.X - BoardCanvas.Margin.Left;
@@ -357,7 +388,10 @@ namespace Chess
             Image image = GetImage(StartPosition);
 
             if (image == null)
+            {
+                IsThinking = false;
                 return;
+            }
 
             var xy = GetScreenPosition(SquarePixels, (int)rank, (int)file);
 

@@ -376,6 +376,10 @@ namespace Chess.Engine.Bit
             if (attackedByKnight.Any())
                 squares.AddRange(attackedByKnight);
 
+            var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
+                .Where(x => x.Colour == colour.Opposite()
+                && x.Type == PieceType.King);
+
             return squares;
         }
 

@@ -26,8 +26,8 @@ namespace Chess.Engine.Ai.Searches
 
             PotentialBoard bestChildBoard = null;
 
-            board.GenerateChildBoards(colour, 1);
-            board.UpdateStateInfo();
+            board.GenerateChildBoards(colour, 2);
+            //board.UpdateStateInfo();
 
             var legalMoves = board.GetLegalMoves();
 
@@ -44,18 +44,150 @@ namespace Chess.Engine.Ai.Searches
             //Parallel.ForEach(orderedBoards, (childBoard) =>
             foreach(var childBoard in orderedBoards)
             {
-                var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, internalStringBuilder);
+                var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, -10000, 10000, !isMax, internalStringBuilder);
 
                 var potentialBoard = new PotentialBoard(childBoard, currentChildBoard.PotentialScore, PotentialBoard.NodeType.PV);
 
-                childBoard.UpdateStateInfo();
+                //childBoard.UpdateStateInfo();
                 childBoard.ProjectedEvaluation = potentialBoard.PotentialScore;
 
                 if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
                     bestChildBoard = potentialBoard;
             };
 
-            return bestChildBoard.Board;
+            var actualBoard = board.ChildBoards.Single(x => x.Notation == bestChildBoard.Board.Notation);
+
+            return actualBoard;
+            //return bestChildBoard.Board;
+        }
+
+        private PotentialBoard AlphaBetaInternal2(Board board, Colour colour, int depth, double alpha, double beta, bool isMax, StringBuilder sb)
+        {
+            Interlocked.Increment(ref _positionCounter);
+
+            if (depth == 0)
+                return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
+
+            //board.GenerateChildBoards(colour, 1);
+
+            var moves = board.FindMoves();
+
+            //var legalMoves = board.GetLegalMoves();
+
+            PotentialBoard bestChildBoard;
+
+            var childBoard = new Board(board, colour.Opposite());
+
+            if (isMax)
+            {
+                bestChildBoard = new PotentialBoard(null, double.MaxValue, PotentialBoard.NodeType.PV);
+                
+                foreach (var move in moves)
+                {
+                    var previousState = childBoard.MakeMove(move);
+ 
+                    var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+
+                    childBoard.UnMakeMove(previousState);
+
+                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
+
+                    if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
+                        bestChildBoard = currentChildBoard;
+
+                    alpha = Math.Max(alpha, bestChildBoard.PotentialScore);
+
+                    if (beta <= alpha)
+                    {
+                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MAX)");
+
+                        //bestChildBoard.Board.Orphan();
+
+                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                    }
+                }
+                /*
+                foreach (var childBoard in orderedBoards)
+                {
+                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+
+                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
+
+                    if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
+                        bestChildBoard = currentChildBoard;
+
+                    alpha = Math.Max(alpha, bestChildBoard.PotentialScore);
+
+                    if (beta <= alpha)
+                    {
+                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MAX)");
+
+                        //bestChildBoard.Board.Orphan();
+
+                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                    }
+                }*/
+            }
+            else
+            {
+                bestChildBoard = new PotentialBoard(null, double.MinValue, PotentialBoard.NodeType.PV);
+
+                foreach (var move in moves)
+                {
+                    var previousState = childBoard.MakeMove(move);
+
+                    var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+
+                    childBoard.UnMakeMove(previousState);
+
+                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
+
+                    if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
+                        bestChildBoard = currentChildBoard;
+
+                    beta = Math.Min(beta, bestChildBoard.PotentialScore);
+
+                    if (beta <= alpha)
+                    {
+                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
+
+                        bestChildBoard.Board.Orphan();
+
+                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                    }
+                }
+
+                /*
+                foreach (var childBoard in orderedBoards)
+                {
+                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+
+                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
+
+                    if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
+                        bestChildBoard = currentChildBoard;
+
+                    beta = Math.Min(beta, bestChildBoard.PotentialScore);
+
+                    if (beta <= alpha)
+                    {
+                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
+
+                        bestChildBoard.Board.Orphan();
+
+                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                    }
+                }*/
+            }
+
+            //if (bestChildBoard.Board == null)
+            //    sb.AppendLine($"EXACT: {board.GetFriendlyCode()} No Childboards found");
+            //else
+            //    sb.AppendLine($"EXACT: {board.GetFriendlyCode()} Best: {bestChildBoard}");
+
+            //bestChildBoard.Board.Orphan();
+
+            return bestChildBoard.WithType(PotentialBoard.NodeType.All);
         }
 
         private PotentialBoard AlphaBetaInternal(Board board, Colour colour, int depth, double alpha, double beta, bool isMax, StringBuilder sb)
@@ -66,7 +198,7 @@ namespace Chess.Engine.Ai.Searches
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
 
             board.GenerateChildBoards(colour, 1);
-            board.UpdateStateInfo();
+            //board.UpdateStateInfo();
 
             var legalMoves = board.GetLegalMoves();
 
@@ -96,7 +228,10 @@ namespace Chess.Engine.Ai.Searches
 
                     if (beta <= alpha)
                     {
-                        sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MAX)");
+                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MAX)");
+
+                        bestChildBoard.Board.Orphan();
+
                         return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
                     }
                 }
@@ -122,16 +257,21 @@ namespace Chess.Engine.Ai.Searches
 
                     if (beta <= alpha)
                     {
-                        sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
+                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
+
+                        bestChildBoard.Board.Orphan();
+
                         return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
                     }
                 }
             }
 
-            if (bestChildBoard.Board == null)
-                sb.AppendLine($"EXACT: {board.GetFriendlyCode()} No Childboards found");
-            else
-                sb.AppendLine($"EXACT: {board.GetFriendlyCode()} Best: {bestChildBoard}");
+            //if (bestChildBoard.Board == null)
+            //    sb.AppendLine($"EXACT: {board.GetFriendlyCode()} No Childboards found");
+            //else
+            //    sb.AppendLine($"EXACT: {board.GetFriendlyCode()} Best: {bestChildBoard}");
+
+            bestChildBoard.Board.Orphan();
 
             return bestChildBoard.WithType(PotentialBoard.NodeType.All);
         }

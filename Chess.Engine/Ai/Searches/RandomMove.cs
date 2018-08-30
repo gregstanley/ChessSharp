@@ -14,7 +14,7 @@ namespace Chess.Engine.Ai.Searches
         public Board DoSearch(Board board, Colour colour, int depth, bool isMax)
         {
             board.GenerateChildBoards(colour, 2);
-            board.UpdateStateInfo();
+            //board.UpdateStateInfo();
 
             foreach (var childBoard in board.ChildBoards)
                 childBoard.Evaluate(colour);
