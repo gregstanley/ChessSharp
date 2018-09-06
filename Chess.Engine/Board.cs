@@ -54,9 +54,9 @@ namespace Chess.Engine
 
         public double ProjectedEvaluation { get; set; }
 
-        public BoardMetrics WhiteMetrics { get; private set; }
+        //public BoardMetrics WhiteMetrics { get; private set; }
 
-        public BoardMetrics BlackMetrics { get; private set; }
+        //public BoardMetrics BlackMetrics { get; private set; }
 
         public string Code { get { return _move == null ? string.Empty : _move.UiCode; } }
 
@@ -70,6 +70,10 @@ namespace Chess.Engine
         public BitBoard BitBoard => _bitBoard;
 
         private Move _move { get; set; }
+
+        private IList<Move> _moves { get; set; }
+
+        private IReadOnlyCollection<SquareState> _invalidMoves { get; set; } = new List<SquareState>();
 
         private BitBoardMoveFinder _bitBoardMoveFinder;
 
@@ -122,6 +126,28 @@ namespace Chess.Engine
 
             _bitBoard = bitBoard;
             _bitBoardMoveFinder = moveFinder;
+
+            var invalidMoves = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour, move.StartPosition.ToSquareFlag());
+            var invalidMovesMine = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour.Opposite(), move.StartPosition.ToSquareFlag());
+            var invalidMoves2 = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour, move.EndPosition.ToSquareFlag());
+            var invalidMovesMine2 = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour.Opposite(), move.EndPosition.ToSquareFlag());
+
+            invalidMoves.AddRange(invalidMovesMine);
+            invalidMoves.AddRange(invalidMoves2);
+            invalidMoves.AddRange(invalidMovesMine2);
+
+            if (move.Notation.StartsWith("d1-h5"))
+            { var bp = true; }
+            var unblockedPawns = _bitBoardMoveFinder.FindBlockedPawns(_bitBoard, move.PieceColour, move.StartPosition.ToSquareFlag());
+            var blockedPawns = _bitBoardMoveFinder.FindBlockedPawns(_bitBoard, move.PieceColour, move.EndPosition.ToSquareFlag());
+
+            invalidMoves.AddRange(unblockedPawns);
+            invalidMoves.AddRange(blockedPawns);
+
+            invalidMoves.Add(_bitBoard.GetSquareState(move.StartPosition.ToSquareFlag()));
+            invalidMoves.Add(_bitBoard.GetSquareState(move.EndPosition.ToSquareFlag()));
+
+            _invalidMoves = invalidMoves;
         }
 
         public Board(Board parentBoard, Colour turn)
@@ -129,6 +155,8 @@ namespace Chess.Engine
             ParentBoard = parentBoard ?? throw new ArgumentNullException("parentBoard must be specified");
 
             _bitBoardMoveFinder = ParentBoard._bitBoardMoveFinder;
+
+            Turn = turn;
         }
 
         public Board ApplyMove(Move move)
@@ -144,6 +172,41 @@ namespace Chess.Engine
 
             _move = move;
             _bitBoard = ParentBoard._bitBoard.ApplyMove(move);
+
+            if (Notation.StartsWith("d1-h5"))
+            { var bp = true; }
+            var invalidMoves = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour, move.StartPosition.ToSquareFlag());
+            var invalidMovesMine = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour.Opposite(), move.StartPosition.ToSquareFlag());
+            var invalidMoves2 = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour, move.EndPosition.ToSquareFlag());
+            var invalidMovesMine2 = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, move.PieceColour.Opposite(), move.EndPosition.ToSquareFlag());
+
+            invalidMoves.AddRange(invalidMovesMine);
+            invalidMoves.AddRange(invalidMoves2);
+            invalidMoves.AddRange(invalidMovesMine2);
+
+            var unblockedPawns = _bitBoardMoveFinder.FindBlockedPawns(_bitBoard, move.PieceColour, move.StartPosition.ToSquareFlag());
+            var blockedPawns = _bitBoardMoveFinder.FindBlockedPawns(_bitBoard, move.PieceColour, move.EndPosition.ToSquareFlag());
+
+            invalidMoves.AddRange(unblockedPawns);
+            invalidMoves.AddRange(blockedPawns);
+
+            invalidMoves.Add(_bitBoard.GetSquareState(move.StartPosition.ToSquareFlag()));
+            invalidMoves.Add(_bitBoard.GetSquareState(move.EndPosition.ToSquareFlag()));
+
+            _invalidMoves = invalidMoves;
+
+            var stride = Turn == Colour.White ? -8 : 8;
+
+            var blockedSquare = _bitBoardMoveFinder.Next(move.EndPosition.ToSquareFlag(), stride);
+
+            var blockedState = _bitBoard.GetSquareState(blockedSquare);
+
+            // If this piece has landed in front of it's own pawn then flag invalid
+            if (blockedState.Type == PieceType.Pawn && blockedState.Colour == move.PieceColour)
+                invalidMoves.Add(blockedState);
+
+            if (invalidMoves.Any())
+            { var bp = true; }
 
             var whiteKingSquare = _bitBoard.FindKingSquare(Colour.White);
             var blackKingSquare = _bitBoard.FindKingSquare(Colour.Black);
@@ -190,11 +253,119 @@ namespace Chess.Engine
         public int GetScore(Colour colour) =>
             colour == Colour.White ? WhiteScore : BlackScore;
 
-        public BoardMetrics GetMetrics(Colour colour) =>
-            Colour.White == colour ? WhiteMetrics : BlackMetrics;
+        //public BoardMetrics GetMetrics(Colour colour) =>
+        //    Colour.White == colour ? WhiteMetrics : BlackMetrics;
 
         public IList<Move> FindMoves() =>
             _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantCaptureSquare, Turn);
+
+        public IList<Move> GetUnplayedParentMoves()
+        {
+            if (ParentBoard == null)
+            {
+                return new List<Move>();
+            }
+
+            var unplayedMoves = ParentBoard._moves.Where(x => x.Notation != _move.Notation);
+
+            return unplayedMoves.ToList();
+        }
+
+        public IEnumerable<Move> FindMoves2()
+        {
+            var generatedMoves = FindMoves();
+
+            if (ParentBoard?.ParentBoard == null)
+            {
+                _moves = generatedMoves;
+                return _moves;
+            }
+
+            if (ParentBoard.Notation.StartsWith("0-0"))
+            {
+                _moves = generatedMoves;
+                return _moves;
+            }
+
+            if (ParentBoard.EnPassantSquare != 0 || EnPassantSquare != 0)
+            {
+                //_moves = generatedMoves;
+                //return _moves;
+            }
+
+            var invalid = ParentBoard._invalidMoves
+                //.Concat(ParentBoard._invalidMoves)
+                .Concat(_invalidMoves)
+                .ToArray();
+
+            if (invalid == null || !invalid.Any())
+            {
+                return ParentBoard.ParentBoard._moves;
+            }
+
+            var invalidSquares = invalid.Select(x => x.Square);
+
+            var validUnplayedParentMoves = ParentBoard.GetUnplayedParentMoves()
+                .Where(x =>
+                    x.EnPassantSquare != Move.EndPosition.ToSquareFlag()
+                    && x.EnPassantSquare != ParentBoard.Move.EndPosition.ToSquareFlag()
+                    && !invalidSquares.Contains(x.StartPosition.ToSquareFlag()));
+                    //&& x.EndPosition.ToSquareFlag() != ParentBoard.Move.EndPosition.ToSquareFlag());
+
+            var unplayedParentMoves = ParentBoard.GetUnplayedParentMoves();
+
+            var unplayedParentMovesWhereNotStart = unplayedParentMoves.Where(x => !invalidSquares.Contains(x.StartPosition.ToSquareFlag()));
+
+            if (!validUnplayedParentMoves.Any())
+            {
+                _moves = generatedMoves;
+                return _moves;
+            }
+
+            //var validUnplayedMoves = unplayedParentMoves.Where(x =>
+            //!invalidSquares.Contains(x.StartPosition.ToSquareFlag())
+            //&& !invalidSquares.Contains(x.EndPosition.ToSquareFlag()));
+
+            var squareStates = invalidSquares.Select(x => _bitBoard.GetSquareState(x))
+                .Where(x => x.Colour == Turn)
+                //.DistinctBy(x => x.Square)
+                .ToList();
+
+            var dic = new Dictionary<SquareFlag, SquareState>();
+
+            foreach(var squareState in squareStates)
+            {
+                if (!dic.ContainsKey(squareState.Square))
+                    dic.Add(squareState.Square, squareState);
+            }
+
+            //if (squareStates.Count != invalidSquares.Count())
+            //{ var bp = true; }
+
+            var distinctSquares = dic.Values;
+
+            var newMoves = _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantCaptureSquare, Turn, distinctSquares);
+
+            var availableMoves = validUnplayedParentMoves.Concat(newMoves);
+
+            var a = availableMoves.Select(x => x.Notation);
+            var g = generatedMoves.Select(x => x.Notation);
+
+            var missing = g.Except(a);
+            var extra = a.Except(g);
+
+            if (missing.Any() || extra.Any())
+            {
+                var bp = true;
+            }
+
+            _moves = availableMoves.ToList();
+
+            if (_moves.Any(x => x.Notation.StartsWith("d1-c1")))
+            { var bp = true; }
+
+            return _moves;
+        }
 
         public bool CheckForPawnPromotion(RankFile startPosition, RankFile endPosition) =>
             _bitBoardMoveFinder.CheckForPawnPromotion(_bitBoard, startPosition.ToSquareFlag(), endPosition.ToSquareFlag());
@@ -329,11 +500,16 @@ namespace Chess.Engine
             if (!ChildBoards.Any())
             {
                 //ChildBoards = new List<Board>();
-                
-                var moves = _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantSquare, colour);
+
+                //var moves = _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantSquare, colour);
+                var moves = FindMoves2();
+
+                _moves = moves.ToList();
 
                 foreach (var move in moves)
                 {
+                    if (move.Notation.StartsWith("e1-d1"))
+                    { var bp = true; }
                     var childBitBoard = _bitBoard.ApplyMove(move);
 
                     var childBoard = new Board(this, move, childBitBoard, _bitBoardMoveFinder);

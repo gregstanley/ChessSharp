@@ -70,7 +70,7 @@ namespace Chess.Engine.Ai.Searches
 
             //board.GenerateChildBoards(colour, 1);
 
-            var moves = board.FindMoves();
+            var moves = board.FindMoves2();
 
             //var legalMoves = board.GetLegalMoves();
 
@@ -151,7 +151,7 @@ namespace Chess.Engine.Ai.Searches
                     {
                         //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
 
-                        bestChildBoard.Board.Orphan();
+                        //bestChildBoard.Board.Orphan();
 
                         return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
                     }

@@ -28,6 +28,22 @@ namespace Chess.Engine.Bit
             return moves;
         }
 
+
+        public IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, IReadOnlyCollection<SquareState> squareStates, bool withCastles = true)
+        {
+            var moves = new List<Move>();
+
+            foreach (var squareState in squareStates)
+            {
+                var pieceMoves = FindMoves(board, enPassantSquare, colour, squareState.Square, withCastles);
+
+                if (pieceMoves.Any())
+                    moves.AddRange(pieceMoves);
+            };
+
+            return moves;
+        }
+
         private IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square, bool withCastles = true)
         {
             var pieceType = board.GetPieceType(square);
@@ -339,6 +355,58 @@ namespace Chess.Engine.Bit
                 side);
         }
 
+        public List<SquareState> FindBlockedPawns(BitBoard board, Colour colour, SquareFlag square)
+        {
+            var outSquares = new List<SquareState>();
+
+            // Stride reversed when looking for blocks
+            var stride = colour == Colour.White ? -8 : 8;
+
+            var possiblePawnMine = Next(square, stride);
+            var possiblePawnOpponent = Next(square, -stride);
+
+            if (possiblePawnMine != 0)
+            {
+                var squareState = board.GetSquareState(possiblePawnMine);
+
+                if (squareState.Type == PieceType.Pawn
+                    && !HasWrapped(stride, To(square, possiblePawnMine)))
+                    outSquares.Add(squareState);
+            }
+
+            if (possiblePawnOpponent != 0)
+            {
+                var squareState = board.GetSquareState(possiblePawnOpponent);
+
+                if (squareState.Type == PieceType.Pawn
+                    && !HasWrapped(-stride, To(square, possiblePawnOpponent)))
+                    outSquares.Add(squareState);
+            }
+
+            possiblePawnMine = Next(possiblePawnMine, stride);
+            possiblePawnOpponent = Next(possiblePawnOpponent, -stride);
+
+            if (possiblePawnMine != 0)
+            {
+                var squareState = board.GetSquareState(possiblePawnMine);
+
+                if (squareState.Type == PieceType.Pawn
+                    && !HasWrapped(stride, To(square, possiblePawnMine)))
+                    outSquares.Add(squareState);
+            }
+
+            if (possiblePawnOpponent != 0)
+            {
+                var squareState = board.GetSquareState(possiblePawnOpponent);
+
+                if (squareState.Type == PieceType.Pawn
+                    && !HasWrapped(-stride, To(square, possiblePawnOpponent)))
+                    outSquares.Add(squareState);
+            }
+
+            return outSquares;
+        }
+
         public List<SquareState> FindPiecesAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
         {
             var squares = new List<SquareState>();
@@ -379,6 +447,9 @@ namespace Chess.Engine.Bit
             var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
                 .Where(x => x.Colour == colour.Opposite()
                 && x.Type == PieceType.King);
+
+            if (attackedByKing.Any())
+                squares.AddRange(attackedByKing);
 
             return squares;
         }
@@ -617,7 +688,8 @@ namespace Chess.Engine.Bit
             return true;
         }
 
-        private SquareFlag Next(SquareFlag currentSquare, int stride)
+        // TODO: Move this to a general helper area
+        public SquareFlag Next(SquareFlag currentSquare, int stride)
         {
             ulong nextSquare = 0;
 
