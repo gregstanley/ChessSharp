@@ -70,7 +70,7 @@ namespace Chess.Engine.Ai.Searches
 
             //board.GenerateChildBoards(colour, 1);
 
-            var moves = board.FindMoves2();
+            var moves = board.FindMoves2(colour);
 
             //var legalMoves = board.GetLegalMoves();
 

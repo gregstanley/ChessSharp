@@ -3,6 +3,7 @@ using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 
 namespace Chess.Engine.Bit
 {
@@ -10,6 +11,11 @@ namespace Chess.Engine.Bit
     {
         private static SquareFlag WhitePromotionRank = SquareFlagExtensions.r8;
         private static SquareFlag BlackPromotionRank = SquareFlagExtensions.r1;
+
+        private static int[] StridesKnight = new[] { -17, -15, -10, -6, 6, 10, 15, 17 };
+        private static int[] StridesHorizontal = new[] { -8, -1, 1, 8 };
+        private static int[] StridesDiagonal = new[] { -9, -7, 7, 9 };
+        private static int[] StridesQueen = new[] { -9, -8, -7, -1, 1, 7, 8, 9 };
 
         public IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, bool withCastles = true)
         {
@@ -411,42 +417,79 @@ namespace Chess.Engine.Bit
         {
             var squares = new List<SquareState>();
 
+            Func<SquareState, bool> opponentColour = ss => ss.Colour == colour.Opposite();
+            //Func<SquareState, bool> anyColour = ss => ss.Colour != Colour.None;
+            Func<SquareState, bool> anyColour = ss => true;
+            Func<SquareState, bool> whereColour = colour == Colour.None ? anyColour : opponentColour;
+            
+            Func<SquareState, bool> whereQueen = ss => whereColour(ss) && ss.Type == PieceType.Queen;
+            Func<SquareState, bool> whereRook = ss => whereColour(ss) && ss.Type == PieceType.Rook;
+            Func<SquareState, bool> whereBishop = ss => whereColour(ss) && ss.Type == PieceType.Bishop;
+            Func<SquareState, bool> wherePawn = ss => whereColour(ss) && ss.Type == PieceType.Pawn;
+            Func<SquareState, bool> whereKnight = ss => whereColour(ss) && ss.Type == PieceType.Knight;
+            Func<SquareState, bool> whereKing = ss => whereColour(ss) && ss.Type == PieceType.King;
+
             var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
-                .Where(x => x.Colour == colour.Opposite()
-                && x.Type == PieceType.Queen);
+                .Where(whereQueen);
+                //.Where(x => x.Colour == colour.Opposite()
+                //&& x.Type == PieceType.Queen);
 
             if (attackedByQueen.Any())
                 squares.AddRange(attackedByQueen);
 
             var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
-                .Where(x => x.Colour == colour.Opposite()
-                && x.Type == PieceType.Rook);
+                .Where(whereRook);
+                //.Where(x => x.Colour == colour.Opposite()
+                //&& x.Type == PieceType.Rook);
 
             if (attackedByRook.Any())
                 squares.AddRange(attackedByRook);
 
             var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
-                .Where(x => x.Colour == colour.Opposite()
-                && x.Type == PieceType.Bishop);
+                .Where(whereBishop);
+                //.Where(x => x.Colour == colour.Opposite()
+                //&& x.Type == PieceType.Bishop);
 
             if (attackedByBishop.Any())
                 squares.AddRange(attackedByBishop);
 
-            var attackedByPawn = AttackedByPawn(board, colour, square);
+            //var attackedByPawn = AttackedByPawn(board, colour, square);
 
-            if (attackedByPawn.Any())
-                squares.AddRange(attackedByPawn);
+            //if (attackedByPawn.Any())
+            //    squares.AddRange(attackedByPawn);
+
+            if (colour == Colour.None)
+            {
+                var attackedByPawnWhite = AttackedByPawn(board, Colour.White, square);
+
+                if (attackedByPawnWhite.Any())
+                    squares.AddRange(attackedByPawnWhite);
+
+                var attackedByPawnBlack = AttackedByPawn(board, Colour.Black, square);
+
+                if (attackedByPawnBlack.Any())
+                    squares.AddRange(attackedByPawnBlack);
+            }
+            else
+            {
+                var attackedByPawn = AttackedByPawn(board, colour, square);
+
+                if (attackedByPawn.Any())
+                    squares.AddRange(attackedByPawn);
+            }
 
             var attackedByKnight = AvailableKnightSquares(board, colour, square)
-                .Where(x => x.Colour == colour.Opposite()
-                && x.Type == PieceType.Knight);
+                .Where(whereKnight);
+                //.Where(x => x.Colour == colour.Opposite()
+                //&& x.Type == PieceType.Knight);
 
             if (attackedByKnight.Any())
                 squares.AddRange(attackedByKnight);
 
             var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
-                .Where(x => x.Colour == colour.Opposite()
-                && x.Type == PieceType.King);
+                .Where(whereKing);
+                //.Where(x => x.Colour == colour.Opposite()
+                //&& x.Type == PieceType.King);
 
             if (attackedByKing.Any())
                 squares.AddRange(attackedByKing);
@@ -500,7 +543,6 @@ namespace Chess.Engine.Bit
         {
             var outSquares = new List<SquareState>();
 
-            //var stride = board.GetPieceColour(square) == Colour.White ? 8 : -8;
             var stride = colour == Colour.White ? 8 : -8;
             var captureStride1 = stride + 1;
             var captureStride2 = stride - 1;
@@ -511,7 +553,11 @@ namespace Chess.Engine.Bit
             {
                 var squareState = board.GetSquareState(availableCaptureSquare1);
 
-                if (squareState.Colour == colour.Opposite()
+                var colourOk = colour == Colour.None
+                    ? true
+                    : squareState.Colour == colour.Opposite();
+
+                if (colourOk
                     && squareState.Type == PieceType.Pawn
                     && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
                     outSquares.Add(squareState);
@@ -521,7 +567,11 @@ namespace Chess.Engine.Bit
             {
                 var squareState = board.GetSquareState(availableCaptureSquare2);
 
-                if (squareState.Colour == colour.Opposite()
+                var colourOk = colour == Colour.None
+                    ? true
+                    : squareState.Colour == colour.Opposite();
+
+                if (colourOk
                     && squareState.Type == PieceType.Pawn
                     && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
                     outSquares.Add(squareState);
@@ -532,11 +582,11 @@ namespace Chess.Engine.Bit
         
         private IList<SquareState> AvailableKnightSquares(BitBoard board, Colour colour, SquareFlag square)
         {
-            var strides = new[] { -17, -15, -10, -6, 6, 10, 15, 17 };
+            //var strides = new[] { -17, -15, -10, -6, 6, 10, 15, 17 };
 
             var outSquares = new List<SquareState>();
 
-            foreach (var stride in strides)
+            foreach (var stride in StridesKnight)
             {
                 var directionSquares = CheckKnight(board, colour, square, stride);
 
@@ -548,25 +598,32 @@ namespace Chess.Engine.Bit
 
         private IList<SquareState> AvailableHorizontalSquares(BitBoard board, Colour colour, SquareFlag square, int maxSteps = int.MaxValue)
         {
-            var strides = new[] { -8, -1, 1, 8 };
+            //var strides = new[] { -8, -1, 1, 8 };
 
-            return CheckAllDirections(board, colour, square, strides, maxSteps);
+            return CheckAllDirections(board, colour, square, StridesHorizontal, maxSteps);
         }
 
         private IList<SquareState> AvailableDiagonalSquares(BitBoard board, Colour colour, SquareFlag square, int maxSteps = int.MaxValue)
         {
-            var strides = new[] { -9, -7, 7, 9 };
+            //var strides = new[] { -9, -7, 7, 9 };
 
-            return CheckAllDirections(board, colour, square, strides, maxSteps);
+            return CheckAllDirections(board, colour, square, StridesDiagonal, maxSteps);
         }
 
         private IList<SquareState> CheckKnight(BitBoard board, Colour colour, SquareFlag square, int stride)
         {
             var outSquares = new List<SquareState>();
             var mySquares = colour == Colour.White ? board.White : board.Black;
-            var opponentSquares = colour == Colour.White ? board.Black : board.White;
+            //var opponentSquares = colour == Colour.White ? board.Black : board.White;
             var currentSquare = square;
             var opponentColour = colour.Opposite();
+            var opponentSquares = board.FindPieceSquares(opponentColour);
+
+            if (colour == Colour.None)
+            {
+                mySquares = 0;
+                opponentSquares = board.White | board.Black;
+            }
 
             currentSquare = Next(currentSquare, stride);
 
@@ -578,20 +635,21 @@ namespace Chess.Engine.Bit
             if (mySquares.HasFlag(currentSquare))
                 return outSquares;
 
+            var ss = board.GetSquareState(currentSquare);
+
             if (opponentSquares.HasFlag(currentSquare))
             {
-                var pieceType = board.GetPieceType(currentSquare);
+                //var pieceType = board.GetPieceType(currentSquare);
 
-                if (board.FindKingSquare(Colour.Black) == SquareFlag.E8 && currentSquare == SquareFlag.G6 && pieceType == PieceType.Knight)
-                { var bp = true; }
+                //outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
 
-                //outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
-                outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
+                outSquares.Add(ss);
 
                 return outSquares;
             }
 
-            outSquares.Add(new SquareState(currentSquare));
+            //outSquares.Add(new SquareState(currentSquare));
+            outSquares.Add(ss);
 
             return outSquares;
         }
@@ -614,11 +672,19 @@ namespace Chess.Engine.Bit
         {
             var outSquares = new List<SquareState>();
             var mySquares = colour == Colour.White ? board.White : board.Black;
-            var opponentSquares = colour == Colour.White ? board.Black : board.White;
+
+            //var opponentSquares = colour == Colour.White ? board.Black : board.White;
             var currentStep = 1;
             var currentSquare = square;
             var startRankFile = square.ToRankFile();
             var opponentColour = colour.Opposite();
+            var opponentSquares = board.FindPieceSquares(opponentColour);
+
+            if (colour == Colour.None)
+            {
+                mySquares = 0;
+                opponentSquares = board.White | board.Black;
+            }
 
             while (HasNext(currentSquare, stride) && currentStep <= maxSteps)
             {
@@ -636,7 +702,6 @@ namespace Chess.Engine.Bit
                 {
                     var pieceType = board.GetPieceType(currentSquare);
                     
-                    //outSquares.Add(new SquareState(currentSquare, opponentColour, pieceType));
                     outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
 
                     return outSquares;

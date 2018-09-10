@@ -73,70 +73,137 @@
 
         public SquareFlag ToSquareFlag()
         {
-            if (File == File.a && Rank == 1) return SquareFlag.A1;
-            if (File == File.b && Rank == 1) return SquareFlag.B1;
-            if (File == File.c && Rank == 1) return SquareFlag.C1;
-            if (File == File.d && Rank == 1) return SquareFlag.D1;
-            if (File == File.e && Rank == 1) return SquareFlag.E1;
-            if (File == File.f && Rank == 1) return SquareFlag.F1;
-            if (File == File.g && Rank == 1) return SquareFlag.G1;
-            if (File == File.h && Rank == 1) return SquareFlag.H1;
-            if (File == File.a && Rank == 2) return SquareFlag.A2;
-            if (File == File.b && Rank == 2) return SquareFlag.B2;
-            if (File == File.c && Rank == 2) return SquareFlag.C2;
-            if (File == File.d && Rank == 2) return SquareFlag.D2;
-            if (File == File.e && Rank == 2) return SquareFlag.E2;
-            if (File == File.f && Rank == 2) return SquareFlag.F2;
-            if (File == File.g && Rank == 2) return SquareFlag.G2;
-            if (File == File.h && Rank == 2) return SquareFlag.H2;
-            if (File == File.a && Rank == 3) return SquareFlag.A3;
-            if (File == File.b && Rank == 3) return SquareFlag.B3;
-            if (File == File.c && Rank == 3) return SquareFlag.C3;
-            if (File == File.d && Rank == 3) return SquareFlag.D3;
-            if (File == File.e && Rank == 3) return SquareFlag.E3;
-            if (File == File.f && Rank == 3) return SquareFlag.F3;
-            if (File == File.g && Rank == 3) return SquareFlag.G3;
-            if (File == File.h && Rank == 3) return SquareFlag.H3;
-            if (File == File.a && Rank == 4) return SquareFlag.A4;
-            if (File == File.b && Rank == 4) return SquareFlag.B4;
-            if (File == File.c && Rank == 4) return SquareFlag.C4;
-            if (File == File.d && Rank == 4) return SquareFlag.D4;
-            if (File == File.e && Rank == 4) return SquareFlag.E4;
-            if (File == File.f && Rank == 4) return SquareFlag.F4;
-            if (File == File.g && Rank == 4) return SquareFlag.G4;
-            if (File == File.h && Rank == 4) return SquareFlag.H4;
-            if (File == File.a && Rank == 5) return SquareFlag.A5;
-            if (File == File.b && Rank == 5) return SquareFlag.B5;
-            if (File == File.c && Rank == 5) return SquareFlag.C5;
-            if (File == File.d && Rank == 5) return SquareFlag.D5;
-            if (File == File.e && Rank == 5) return SquareFlag.E5;
-            if (File == File.f && Rank == 5) return SquareFlag.F5;
-            if (File == File.g && Rank == 5) return SquareFlag.G5;
-            if (File == File.h && Rank == 5) return SquareFlag.H5;
-            if (File == File.a && Rank == 6) return SquareFlag.A6;
-            if (File == File.b && Rank == 6) return SquareFlag.B6;
-            if (File == File.c && Rank == 6) return SquareFlag.C6;
-            if (File == File.d && Rank == 6) return SquareFlag.D6;
-            if (File == File.e && Rank == 6) return SquareFlag.E6;
-            if (File == File.f && Rank == 6) return SquareFlag.F6;
-            if (File == File.g && Rank == 6) return SquareFlag.G6;
-            if (File == File.h && Rank == 6) return SquareFlag.H6;
-            if (File == File.a && Rank == 7) return SquareFlag.A7;
-            if (File == File.b && Rank == 7) return SquareFlag.B7;
-            if (File == File.c && Rank == 7) return SquareFlag.C7;
-            if (File == File.d && Rank == 7) return SquareFlag.D7;
-            if (File == File.e && Rank == 7) return SquareFlag.E7;
-            if (File == File.f && Rank == 7) return SquareFlag.F7;
-            if (File == File.g && Rank == 7) return SquareFlag.G7;
-            if (File == File.h && Rank == 7) return SquareFlag.H7;
-            if (File == File.a && Rank == 8) return SquareFlag.A8;
-            if (File == File.b && Rank == 8) return SquareFlag.B8;
-            if (File == File.c && Rank == 8) return SquareFlag.C8;
-            if (File == File.d && Rank == 8) return SquareFlag.D8;
-            if (File == File.e && Rank == 8) return SquareFlag.E8;
-            if (File == File.f && Rank == 8) return SquareFlag.F8;
-            if (File == File.g && Rank == 8) return SquareFlag.G8;
-            if (File == File.h && Rank == 8) return SquareFlag.H8;
+            switch (File)
+            {
+                case File.a when Rank == 1:
+                    return SquareFlag.A1;
+                case File.b when Rank == 1:
+                    return SquareFlag.B1;
+                case File.c when Rank == 1:
+                    return SquareFlag.C1;
+                case File.d when Rank == 1:
+                    return SquareFlag.D1;
+                case File.e when Rank == 1:
+                    return SquareFlag.E1;
+                case File.f when Rank == 1:
+                    return SquareFlag.F1;
+                case File.g when Rank == 1:
+                    return SquareFlag.G1;
+                case File.h when Rank == 1:
+                    return SquareFlag.H1;
+                case File.a when Rank == 2:
+                    return SquareFlag.A2;
+                case File.b when Rank == 2:
+                    return SquareFlag.B2;
+                case File.c when Rank == 2:
+                    return SquareFlag.C2;
+                case File.d when Rank == 2:
+                    return SquareFlag.D2;
+                case File.e when Rank == 2:
+                    return SquareFlag.E2;
+                case File.f when Rank == 2:
+                    return SquareFlag.F2;
+                case File.g when Rank == 2:
+                    return SquareFlag.G2;
+                case File.h when Rank == 2:
+                    return SquareFlag.H2;
+                case File.a when Rank == 3:
+                    return SquareFlag.A3;
+                case File.b when Rank == 3:
+                    return SquareFlag.B3;
+                case File.c when Rank == 3:
+                    return SquareFlag.C3;
+                case File.d when Rank == 3:
+                    return SquareFlag.D3;
+                case File.e when Rank == 3:
+                    return SquareFlag.E3;
+                case File.f when Rank == 3:
+                    return SquareFlag.F3;
+                case File.g when Rank == 3:
+                    return SquareFlag.G3;
+                case File.h when Rank == 3:
+                    return SquareFlag.H3;
+                case File.a when Rank == 4:
+                    return SquareFlag.A4;
+                case File.b when Rank == 4:
+                    return SquareFlag.B4;
+                case File.c when Rank == 4:
+                    return SquareFlag.C4;
+                case File.d when Rank == 4:
+                    return SquareFlag.D4;
+                case File.e when Rank == 4:
+                    return SquareFlag.E4;
+                case File.f when Rank == 4:
+                    return SquareFlag.F4;
+                case File.g when Rank == 4:
+                    return SquareFlag.G4;
+                case File.h when Rank == 4:
+                    return SquareFlag.H4;
+                case File.a when Rank == 5:
+                    return SquareFlag.A5;
+                case File.b when Rank == 5:
+                    return SquareFlag.B5;
+                case File.c when Rank == 5:
+                    return SquareFlag.C5;
+                case File.d when Rank == 5:
+                    return SquareFlag.D5;
+                case File.e when Rank == 5:
+                    return SquareFlag.E5;
+                case File.f when Rank == 5:
+                    return SquareFlag.F5;
+                case File.g when Rank == 5:
+                    return SquareFlag.G5;
+                case File.h when Rank == 5:
+                    return SquareFlag.H5;
+                case File.a when Rank == 6:
+                    return SquareFlag.A6;
+                case File.b when Rank == 6:
+                    return SquareFlag.B6;
+                case File.c when Rank == 6:
+                    return SquareFlag.C6;
+                case File.d when Rank == 6:
+                    return SquareFlag.D6;
+                case File.e when Rank == 6:
+                    return SquareFlag.E6;
+                case File.f when Rank == 6:
+                    return SquareFlag.F6;
+                case File.g when Rank == 6:
+                    return SquareFlag.G6;
+                case File.h when Rank == 6:
+                    return SquareFlag.H6;
+                case File.a when Rank == 7:
+                    return SquareFlag.A7;
+                case File.b when Rank == 7:
+                    return SquareFlag.B7;
+                case File.c when Rank == 7:
+                    return SquareFlag.C7;
+                case File.d when Rank == 7:
+                    return SquareFlag.D7;
+                case File.e when Rank == 7:
+                    return SquareFlag.E7;
+                case File.f when Rank == 7:
+                    return SquareFlag.F7;
+                case File.g when Rank == 7:
+                    return SquareFlag.G7;
+                case File.h when Rank == 7:
+                    return SquareFlag.H7;
+                case File.a when Rank == 8:
+                    return SquareFlag.A8;
+                case File.b when Rank == 8:
+                    return SquareFlag.B8;
+                case File.c when Rank == 8:
+                    return SquareFlag.C8;
+                case File.d when Rank == 8:
+                    return SquareFlag.D8;
+                case File.e when Rank == 8:
+                    return SquareFlag.E8;
+                case File.f when Rank == 8:
+                    return SquareFlag.F8;
+                case File.g when Rank == 8:
+                    return SquareFlag.G8;
+                case File.h when Rank == 8:
+                    return SquareFlag.H8;
+            }
             return 0;
         }
 
@@ -148,70 +215,137 @@
 
         public static RankFile Get(int rank, File file)
         {
-            if (file == File.a && rank == 1) return A1;
-            if (file == File.b && rank == 1) return B1;
-            if (file == File.c && rank == 1) return C1;
-            if (file == File.d && rank == 1) return D1;
-            if (file == File.e && rank == 1) return E1;
-            if (file == File.f && rank == 1) return F1;
-            if (file == File.g && rank == 1) return G1;
-            if (file == File.h && rank == 1) return H1;
-            if (file == File.a && rank == 2) return A2;
-            if (file == File.b && rank == 2) return B2;
-            if (file == File.c && rank == 2) return C2;
-            if (file == File.d && rank == 2) return D2;
-            if (file == File.e && rank == 2) return E2;
-            if (file == File.f && rank == 2) return F2;
-            if (file == File.g && rank == 2) return G2;
-            if (file == File.h && rank == 2) return H2;
-            if (file == File.a && rank == 3) return A3;
-            if (file == File.b && rank == 3) return B3;
-            if (file == File.c && rank == 3) return C3;
-            if (file == File.d && rank == 3) return D3;
-            if (file == File.e && rank == 3) return E3;
-            if (file == File.f && rank == 3) return F3;
-            if (file == File.g && rank == 3) return G3;
-            if (file == File.h && rank == 3) return H3;
-            if (file == File.a && rank == 4) return A4;
-            if (file == File.b && rank == 4) return B4;
-            if (file == File.c && rank == 4) return C4;
-            if (file == File.d && rank == 4) return D4;
-            if (file == File.e && rank == 4) return E4;
-            if (file == File.f && rank == 4) return F4;
-            if (file == File.g && rank == 4) return G4;
-            if (file == File.h && rank == 4) return H4;
-            if (file == File.a && rank == 5) return A5;
-            if (file == File.b && rank == 5) return B5;
-            if (file == File.c && rank == 5) return C5;
-            if (file == File.d && rank == 5) return D5;
-            if (file == File.e && rank == 5) return E5;
-            if (file == File.f && rank == 5) return F5;
-            if (file == File.g && rank == 5) return G5;
-            if (file == File.h && rank == 5) return H5;
-            if (file == File.a && rank == 6) return A6;
-            if (file == File.b && rank == 6) return B6;
-            if (file == File.c && rank == 6) return C6;
-            if (file == File.d && rank == 6) return D6;
-            if (file == File.e && rank == 6) return E6;
-            if (file == File.f && rank == 6) return F6;
-            if (file == File.g && rank == 6) return G6;
-            if (file == File.h && rank == 6) return H6;
-            if (file == File.a && rank == 7) return A7;
-            if (file == File.b && rank == 7) return B7;
-            if (file == File.c && rank == 7) return C7;
-            if (file == File.d && rank == 7) return D7;
-            if (file == File.e && rank == 7) return E7;
-            if (file == File.f && rank == 7) return F7;
-            if (file == File.g && rank == 7) return G7;
-            if (file == File.h && rank == 7) return H7;
-            if (file == File.a && rank == 8) return A8;
-            if (file == File.b && rank == 8) return B8;
-            if (file == File.c && rank == 8) return C8;
-            if (file == File.d && rank == 8) return D8;
-            if (file == File.e && rank == 8) return E8;
-            if (file == File.f && rank == 8) return F8;
-            if (file == File.g && rank == 8) return G8;
-            if (file == File.h && rank == 8) return H8;
+            switch (file)
+            {
+                case File.a when rank == 1:
+                    return A1;
+                case File.b when rank == 1:
+                    return B1;
+                case File.c when rank == 1:
+                    return C1;
+                case File.d when rank == 1:
+                    return D1;
+                case File.e when rank == 1:
+                    return E1;
+                case File.f when rank == 1:
+                    return F1;
+                case File.g when rank == 1:
+                    return G1;
+                case File.h when rank == 1:
+                    return H1;
+                case File.a when rank == 2:
+                    return A2;
+                case File.b when rank == 2:
+                    return B2;
+                case File.c when rank == 2:
+                    return C2;
+                case File.d when rank == 2:
+                    return D2;
+                case File.e when rank == 2:
+                    return E2;
+                case File.f when rank == 2:
+                    return F2;
+                case File.g when rank == 2:
+                    return G2;
+                case File.h when rank == 2:
+                    return H2;
+                case File.a when rank == 3:
+                    return A3;
+                case File.b when rank == 3:
+                    return B3;
+                case File.c when rank == 3:
+                    return C3;
+                case File.d when rank == 3:
+                    return D3;
+                case File.e when rank == 3:
+                    return E3;
+                case File.f when rank == 3:
+                    return F3;
+                case File.g when rank == 3:
+                    return G3;
+                case File.h when rank == 3:
+                    return H3;
+                case File.a when rank == 4:
+                    return A4;
+                case File.b when rank == 4:
+                    return B4;
+                case File.c when rank == 4:
+                    return C4;
+                case File.d when rank == 4:
+                    return D4;
+                case File.e when rank == 4:
+                    return E4;
+                case File.f when rank == 4:
+                    return F4;
+                case File.g when rank == 4:
+                    return G4;
+                case File.h when rank == 4:
+                    return H4;
+                case File.a when rank == 5:
+                    return A5;
+                case File.b when rank == 5:
+                    return B5;
+                case File.c when rank == 5:
+                    return C5;
+                case File.d when rank == 5:
+                    return D5;
+                case File.e when rank == 5:
+                    return E5;
+                case File.f when rank == 5:
+                    return F5;
+                case File.g when rank == 5:
+                    return G5;
+                case File.h when rank == 5:
+                    return H5;
+                case File.a when rank == 6:
+                    return A6;
+                case File.b when rank == 6:
+                    return B6;
+                case File.c when rank == 6:
+                    return C6;
+                case File.d when rank == 6:
+                    return D6;
+                case File.e when rank == 6:
+                    return E6;
+                case File.f when rank == 6:
+                    return F6;
+                case File.g when rank == 6:
+                    return G6;
+                case File.h when rank == 6:
+                    return H6;
+                case File.a when rank == 7:
+                    return A7;
+                case File.b when rank == 7:
+                    return B7;
+                case File.c when rank == 7:
+                    return C7;
+                case File.d when rank == 7:
+                    return D7;
+                case File.e when rank == 7:
+                    return E7;
+                case File.f when rank == 7:
+                    return F7;
+                case File.g when rank == 7:
+                    return G7;
+                case File.h when rank == 7:
+                    return H7;
+                case File.a when rank == 8:
+                    return A8;
+                case File.b when rank == 8:
+                    return B8;
+                case File.c when rank == 8:
+                    return C8;
+                case File.d when rank == 8:
+                    return D8;
+                case File.e when rank == 8:
+                    return E8;
+                case File.f when rank == 8:
+                    return F8;
+                case File.g when rank == 8:
+                    return G8;
+                case File.h when rank == 8:
+                    return H8;
+            }
             return null;
         }
 

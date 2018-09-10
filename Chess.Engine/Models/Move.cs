@@ -18,6 +18,10 @@
 
         public PieceType PromotionType { get; } = PieceType.None;
 
+        public SquareFlag StartPositionSquareFlag { get; }
+
+        public SquareFlag EndPositionSquareFlag { get; }
+
         public Move(Colour pieceColour, PieceType pieceType, RankFile startPosition, RankFile endPosition, PieceType capturePieceType, PieceType promotionType)
             : this(pieceColour, pieceType, startPosition, endPosition, capturePieceType)
         {
@@ -43,6 +47,9 @@
             Type = pieceType;
             StartPosition = startPosition;
             EndPosition = endPosition;
+
+            StartPositionSquareFlag = StartPosition.ToSquareFlag();
+            EndPositionSquareFlag = EndPosition.ToSquareFlag();
         }
 
         public string UiCode => AppendPromotionString(BaseString);

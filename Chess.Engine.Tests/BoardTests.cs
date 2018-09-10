@@ -168,6 +168,10 @@ namespace Chess.Engine.Tests
             var d4 = d3.SelectMany(x => x.GetLegalMoves());
             var d5 = d4.SelectMany(x => x.GetLegalMoves());
 
+            LogBoards(board);
+            var d2x = d2.Where(x => x.Move.CapturePieceType != PieceType.None);
+            var d2checks = d2.Where(x => x.WhiteIsInCheck || x.BlackIsInCheck);
+
             var metrics1 = GetDepthMetrics(d1);
             var metrics2 = GetDepthMetrics(d2);
             var metrics3 = GetDepthMetrics(d3);
@@ -293,24 +297,24 @@ namespace Chess.Engine.Tests
                 var nodeCount2 = 1;
 
                 _log.Information($"{nodeCount1}) {childBoard1.GetFriendlyCode()}   ({childBoard1.ChildBoards.Count()})");
-                /*
+                
                 foreach (var childBoard2 in childBoard1.ChildBoards)
                 {
                     var nodeCount3 = 1;
 
                     _log.Information($"    {nodeCount2}) {childBoard2.GetFriendlyCode()}   ({childBoard2.ChildBoards.Count()})");
 
-                    foreach (var childBoard3 in childBoard2.ChildBoards)
-                    {
-                        _log.Information($"        {nodeCount3}) {childBoard3.GetFriendlyCode()}   ({childBoard3.ChildBoards.Count()})");
+                    //foreach (var childBoard3 in childBoard2.ChildBoards)
+                    //{
+                    //    _log.Information($"        {nodeCount3}) {childBoard3.GetFriendlyCode()}   ({childBoard3.ChildBoards.Count()})");
 
-                        ++nodeCount3;
-                        ++runningNodeCount3;
-                    }
+                    //    ++nodeCount3;
+                    //    ++runningNodeCount3;
+                    //}
 
                     ++nodeCount2;
                 }
-                */
+                
                 ++nodeCount1;
             }
 
