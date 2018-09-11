@@ -32,7 +32,7 @@ namespace Chess.Engine.Ai.Searches
             }
 
             // Debug En Passasnt
-            var optionsBoardsRanked = legalMoves.Where(x => x.Move.EnPassantSquare != 0);
+            var optionsBoardsRanked = legalMoves.Where(x => x.EnPassantSquare != 0);
 
             //var optionsBoardsRanked = colour == Colour.White
             //    ? legalMoves.OrderByDescending(x => x.Evaluation)

@@ -141,10 +141,6 @@ namespace Chess.Engine.Bit
         public SquareFlag Black =>
             BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
 
-        public SquareFlag WhiteCovered { get; private set; }
-
-        public SquareFlag BlackCovered { get; private set; }
-
         private BoardState _state = BoardState.None;
 
         public SquareFlag FindPieceSquares(Colour colour) =>
@@ -167,9 +163,6 @@ namespace Chess.Engine.Bit
 
         public SquareFlag FindKingSquare(Colour colour) =>
             colour == Colour.White ? WhiteKing : BlackKing;
-
-        public SquareFlag FindCoveredSquares(Colour colour) =>
-            colour == Colour.White ? WhiteCovered : BlackCovered;
 
         public bool WhiteCanCastleKingSide() =>
             _state.HasFlag(BoardState.WhiteCanCastleKingSide);
@@ -202,12 +195,8 @@ namespace Chess.Engine.Bit
 
         public SquareState GetSquareState(SquareFlag square)
         {
-            //var colour = GetPieceColour(square);
-            //var pieceType = GetPieceType(square);
-
-            //return new SquareState(square, colour, pieceType);
-
             var piece = GetPiece(square);
+
             return new SquareState(square, piece);
         }
 
@@ -288,16 +277,11 @@ namespace Chess.Engine.Bit
             var childBoard = Clone();
 
             var colour = move.PieceColour;
-            var startSquareFlag = move.StartPosition.ToSquareFlag();
-            var endSquareFlag = move.EndPosition.ToSquareFlag();
-
-            //var isCapture = move.PieceColour == Colour.White
-            //    ? Black.HasFlag(endSquareFlag)
-            //    : White.HasFlag(endSquareFlag);
+            var startSquareFlag = move.StartPositionSquareFlag;
+            var endSquareFlag = move.EndPositionSquareFlag;
 
             childBoard.MovePiece(move.PieceColour, move.Type, startSquareFlag, endSquareFlag);
 
-            //if (isCapture)
             if (move.CapturePieceType != PieceType.None)
             {
                 childBoard.RemovePiece(colour.Opposite(), endSquareFlag);
@@ -452,17 +436,6 @@ namespace Chess.Engine.Bit
 
             return sb.ToString();
         }
-
-        //private void SetCoveredSquares(Colour colour, SquareFlag squares)
-        //{
-        //    if (colour == Colour.White)
-        //    {
-        //        WhiteCovered = squares;
-        //        return;
-        //    }
-
-        //    BlackCovered = squares;
-        //}
 
         private void RemovePiece(Colour colour, SquareFlag square)
         {

@@ -25,6 +25,6 @@ namespace Chess.Engine.Models
             new PotentialBoard(Board, Score, type);
 
         public override string ToString() =>
-            $"{Board.Move} {Type} {Math.Round(Score, 2)}";
+            $"{Board.MoveToString()} {Type} {Math.Round(Score, 2)}";
     }
 }

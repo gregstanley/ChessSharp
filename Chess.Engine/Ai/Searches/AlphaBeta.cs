@@ -27,7 +27,6 @@ namespace Chess.Engine.Ai.Searches
             PotentialBoard bestChildBoard = null;
 
             board.GenerateChildBoards(colour, 2);
-            //board.UpdateStateInfo();
 
             var legalMoves = board.GetLegalMoves();
 
@@ -48,17 +47,13 @@ namespace Chess.Engine.Ai.Searches
 
                 var potentialBoard = new PotentialBoard(childBoard, currentChildBoard.PotentialScore, PotentialBoard.NodeType.PV);
 
-                //childBoard.UpdateStateInfo();
                 childBoard.ProjectedEvaluation = potentialBoard.PotentialScore;
 
                 if (bestChildBoard == null || currentChildBoard.PotentialScore > bestChildBoard.Score)
                     bestChildBoard = potentialBoard;
             };
 
-            var actualBoard = board.ChildBoards.Single(x => x.Notation == bestChildBoard.Board.Notation);
-
-            return actualBoard;
-            //return bestChildBoard.Board;
+            return board.ChildBoards.Single(x => x.Notation == bestChildBoard.Board.Notation);
         }
 
         private PotentialBoard AlphaBetaInternal2(Board board, Colour colour, int depth, double alpha, double beta, bool isMax, StringBuilder sb)
@@ -68,11 +63,7 @@ namespace Chess.Engine.Ai.Searches
             if (depth == 0)
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
 
-            //board.GenerateChildBoards(colour, 1);
-
             var moves = board.FindMoves2(colour);
-
-            //var legalMoves = board.GetLegalMoves();
 
             PotentialBoard bestChildBoard;
 
@@ -98,35 +89,8 @@ namespace Chess.Engine.Ai.Searches
                     alpha = Math.Max(alpha, bestChildBoard.PotentialScore);
 
                     if (beta <= alpha)
-                    {
-                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MAX)");
-
-                        //bestChildBoard.Board.Orphan();
-
                         return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
-                    }
                 }
-                /*
-                foreach (var childBoard in orderedBoards)
-                {
-                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
-
-                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
-
-                    if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
-                        bestChildBoard = currentChildBoard;
-
-                    alpha = Math.Max(alpha, bestChildBoard.PotentialScore);
-
-                    if (beta <= alpha)
-                    {
-                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MAX)");
-
-                        //bestChildBoard.Board.Orphan();
-
-                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
-                    }
-                }*/
             }
             else
             {
@@ -148,44 +112,9 @@ namespace Chess.Engine.Ai.Searches
                     beta = Math.Min(beta, bestChildBoard.PotentialScore);
 
                     if (beta <= alpha)
-                    {
-                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
-
-                        //bestChildBoard.Board.Orphan();
-
                         return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
-                    }
                 }
-
-                /*
-                foreach (var childBoard in orderedBoards)
-                {
-                    var currentChildBoard = AlphaBetaInternal(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
-
-                    childBoard.ProjectedEvaluation = currentChildBoard.Score;
-
-                    if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
-                        bestChildBoard = currentChildBoard;
-
-                    beta = Math.Min(beta, bestChildBoard.PotentialScore);
-
-                    if (beta <= alpha)
-                    {
-                        //sb.AppendLine($" >>> CUT {beta} <= {alpha} (D: {depth} Board: {board.Code} MIN)");
-
-                        bestChildBoard.Board.Orphan();
-
-                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
-                    }
-                }*/
             }
-
-            //if (bestChildBoard.Board == null)
-            //    sb.AppendLine($"EXACT: {board.GetFriendlyCode()} No Childboards found");
-            //else
-            //    sb.AppendLine($"EXACT: {board.GetFriendlyCode()} Best: {bestChildBoard}");
-
-            //bestChildBoard.Board.Orphan();
 
             return bestChildBoard.WithType(PotentialBoard.NodeType.All);
         }
@@ -198,12 +127,8 @@ namespace Chess.Engine.Ai.Searches
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
 
             board.GenerateChildBoards(colour, 1);
-            //board.UpdateStateInfo();
 
             var legalMoves = board.GetLegalMoves();
-
-            //if (!legalMoves.Any())
-            //    return null;
 
             PotentialBoard bestChildBoard;
 

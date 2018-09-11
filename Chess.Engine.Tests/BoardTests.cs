@@ -169,7 +169,7 @@ namespace Chess.Engine.Tests
             var d5 = d4.SelectMany(x => x.GetLegalMoves());
 
             LogBoards(board);
-            var d2x = d2.Where(x => x.Move.CapturePieceType != PieceType.None);
+            var d2x = d2.Where(x => x.IsCapture);
             var d2checks = d2.Where(x => x.WhiteIsInCheck || x.BlackIsInCheck);
 
             var metrics1 = GetDepthMetrics(d1);

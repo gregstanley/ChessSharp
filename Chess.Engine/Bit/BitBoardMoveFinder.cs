@@ -3,7 +3,6 @@ using Chess.Engine.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace Chess.Engine.Bit
 {
@@ -133,7 +132,6 @@ namespace Chess.Engine.Bit
 
             if (availableCaptureSquare1 != 0)
             {
-                // I don't *think* you can see you're own en pasant squares as it must be opponent turn
                 var isEnpassantCapture = enPassantSquare != 0 && availableCaptureSquare1 == enPassantSquare;
 
                 var isCapture = board.GetPieceType(availableCaptureSquare1) != PieceType.None && board.GetPieceColour(availableCaptureSquare1) != colour;
@@ -147,7 +145,6 @@ namespace Chess.Engine.Bit
 
             if (availableCaptureSquare2 != 0)
             {
-                // I don't *think* you can see you're own en pasant squares as it must be opponent turn
                 var isEnpassantCapture = enPassantSquare != 0 && availableCaptureSquare2 == enPassantSquare;
 
                 var isCapture = board.GetPieceType(availableCaptureSquare2) != PieceType.None && board.GetPieceColour(availableCaptureSquare2) != colour;
@@ -182,20 +179,18 @@ namespace Chess.Engine.Bit
                             )
                     };
                 }
-                else
+                
+                return new List<Move>
                 {
-                    return new List<Move>
-                    {
-                        new Move(colour,
-                            PieceType.Pawn,
-                            RankFile.Get(startRankFile.Rank, startRankFile.File),
-                            RankFile.Get(rankFile.Rank, rankFile.File),
-                            capturePieceType,
-                            0,
-                            enPassantCaptureSquare
-                            )
-                    };
-                }
+                    new Move(colour,
+                        PieceType.Pawn,
+                        RankFile.Get(startRankFile.Rank, startRankFile.File),
+                        RankFile.Get(rankFile.Rank, rankFile.File),
+                        capturePieceType,
+                        0,
+                        enPassantCaptureSquare
+                        )
+                };
             }
 
             var moves = new List<Move>
@@ -418,7 +413,6 @@ namespace Chess.Engine.Bit
             var squares = new List<SquareState>();
 
             Func<SquareState, bool> opponentColour = ss => ss.Colour == colour.Opposite();
-            //Func<SquareState, bool> anyColour = ss => ss.Colour != Colour.None;
             Func<SquareState, bool> anyColour = ss => true;
             Func<SquareState, bool> whereColour = colour == Colour.None ? anyColour : opponentColour;
             
@@ -429,67 +423,52 @@ namespace Chess.Engine.Bit
             Func<SquareState, bool> whereKnight = ss => whereColour(ss) && ss.Type == PieceType.Knight;
             Func<SquareState, bool> whereKing = ss => whereColour(ss) && ss.Type == PieceType.King;
 
-            var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
-                .Where(whereQueen);
-                //.Where(x => x.Colour == colour.Opposite()
-                //&& x.Type == PieceType.Queen);
-
-            if (attackedByQueen.Any())
-                squares.AddRange(attackedByQueen);
-
-            var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
-                .Where(whereRook);
-                //.Where(x => x.Colour == colour.Opposite()
-                //&& x.Type == PieceType.Rook);
-
-            if (attackedByRook.Any())
-                squares.AddRange(attackedByRook);
-
-            var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
-                .Where(whereBishop);
-                //.Where(x => x.Colour == colour.Opposite()
-                //&& x.Type == PieceType.Bishop);
-
-            if (attackedByBishop.Any())
-                squares.AddRange(attackedByBishop);
-
-            //var attackedByPawn = AttackedByPawn(board, colour, square);
-
-            //if (attackedByPawn.Any())
-            //    squares.AddRange(attackedByPawn);
-
             if (colour == Colour.None)
             {
-                var attackedByPawnWhite = AttackedByPawn(board, Colour.White, square);
+                var attackedByPawnWhite = FindPawnsAttackingThisSquare(board, Colour.White, square);
 
                 if (attackedByPawnWhite.Any())
                     squares.AddRange(attackedByPawnWhite);
 
-                var attackedByPawnBlack = AttackedByPawn(board, Colour.Black, square);
+                var attackedByPawnBlack = FindPawnsAttackingThisSquare(board, Colour.Black, square);
 
                 if (attackedByPawnBlack.Any())
                     squares.AddRange(attackedByPawnBlack);
             }
             else
             {
-                var attackedByPawn = AttackedByPawn(board, colour, square);
+                var attackedByPawn = FindPawnsAttackingThisSquare(board, colour, square);
 
                 if (attackedByPawn.Any())
                     squares.AddRange(attackedByPawn);
             }
 
+            var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
+                .Where(whereRook);
+
+            if (attackedByRook.Any())
+                squares.AddRange(attackedByRook);
+
             var attackedByKnight = AvailableKnightSquares(board, colour, square)
                 .Where(whereKnight);
-                //.Where(x => x.Colour == colour.Opposite()
-                //&& x.Type == PieceType.Knight);
 
             if (attackedByKnight.Any())
                 squares.AddRange(attackedByKnight);
 
+            var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
+                .Where(whereBishop);
+
+            if (attackedByBishop.Any())
+                squares.AddRange(attackedByBishop);
+
+            var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
+                .Where(whereQueen);
+
+            if (attackedByQueen.Any())
+                squares.AddRange(attackedByQueen);
+
             var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
                 .Where(whereKing);
-                //.Where(x => x.Colour == colour.Opposite()
-                //&& x.Type == PieceType.King);
 
             if (attackedByKing.Any())
                 squares.AddRange(attackedByKing);
@@ -501,45 +480,57 @@ namespace Chess.Engine.Bit
         {
             var outSquares = new List<SquareState>();
 
-            if (pieceType == PieceType.Rook)
+            switch (pieceType)
             {
-                var horizontals = AvailableHorizontalSquares(board, colour, square);
+                case PieceType.Rook:
+                    {
+                        var horizontals = AvailableHorizontalSquares(board, colour, square);
 
-                outSquares.AddRange(horizontals);
-            }
-            else if (pieceType == PieceType.Knight)
-            {
-                var knights = AvailableKnightSquares(board, colour, square);
+                        outSquares.AddRange(horizontals);
+                        break;
+                    }
 
-                outSquares.AddRange(knights);
-            }
-            else if (pieceType == PieceType.Bishop)
-            {
-                var diagonals = AvailableDiagonalSquares(board, colour, square);
+                case PieceType.Knight:
+                    {
+                        var knights = AvailableKnightSquares(board, colour, square);
 
-                outSquares.AddRange(diagonals);
-            }
-            else if (pieceType == PieceType.Queen)
-            {
-                var horizontals = AvailableHorizontalSquares(board, colour, square);
-                var diagonals = AvailableDiagonalSquares(board, colour, square);
+                        outSquares.AddRange(knights);
+                        break;
+                    }
 
-                outSquares.AddRange(horizontals);
-                outSquares.AddRange(diagonals);
-            }
-            else if (pieceType == PieceType.King)
-            {
-                var horizontals = AvailableHorizontalSquares(board, colour, square, 1);
-                var diagonals = AvailableDiagonalSquares(board, colour, square, 1);
+                case PieceType.Bishop:
+                    {
+                        var diagonals = AvailableDiagonalSquares(board, colour, square);
 
-                outSquares.AddRange(horizontals);
-                outSquares.AddRange(diagonals);
+                        outSquares.AddRange(diagonals);
+                        break;
+                    }
+
+                case PieceType.Queen:
+                    {
+                        var horizontals = AvailableHorizontalSquares(board, colour, square);
+                        var diagonals = AvailableDiagonalSquares(board, colour, square);
+
+                        outSquares.AddRange(horizontals);
+                        outSquares.AddRange(diagonals);
+                        break;
+                    }
+
+                case PieceType.King:
+                    {
+                        var horizontals = AvailableHorizontalSquares(board, colour, square, 1);
+                        var diagonals = AvailableDiagonalSquares(board, colour, square, 1);
+
+                        outSquares.AddRange(horizontals);
+                        outSquares.AddRange(diagonals);
+                        break;
+                    }
             }
 
             return outSquares;
         }
         
-        private List<SquareState> AttackedByPawn(BitBoard board, Colour colour, SquareFlag square)
+        public List<SquareState> FindPawnsAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
         {
             var outSquares = new List<SquareState>();
 

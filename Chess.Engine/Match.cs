@@ -130,7 +130,7 @@ namespace Chess.Engine
             if (chosenBoard == null)
                 return null;
 
-            if (chosenBoard.IsCapture || chosenBoard.Move.Type == PieceType.Pawn)
+            if (chosenBoard.IsCapture || chosenBoard.MovePieceType == PieceType.Pawn)
                 HalfTurnCounter = 0;
             else
                 ++HalfTurnCounter;
@@ -162,7 +162,6 @@ namespace Chess.Engine
 
             // Must be 2 for now. Should probably always be even so ends with opponents turn
             board.GenerateChildBoards(colour, 2);
-            //board.UpdateStateInfo();
 
             var legalMoves = board.GetLegalMoves();
 
@@ -185,7 +184,8 @@ namespace Chess.Engine
 
                     var possibleBoards = legalMoves.Where(x => x.GetMovedFrom().Rank == startPosition.Rank && x.GetMovedFrom().File == startPosition.File);
 
-                    var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
+                    //var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
+                    var castleBoard = possibleBoards.SingleOrDefault(x => x.IsCastle);
 
                     if (castleBoard != null)
                         return castleBoard;
@@ -202,7 +202,8 @@ namespace Chess.Engine
 
                     var possibleBoards = legalMoves.Where(x => x.GetMovedFrom().Rank == endPosition.Rank && x.GetMovedFrom().File == endPosition.File);
 
-                    var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
+                    //var castleBoard = possibleBoards.SingleOrDefault(x => x.GetMove() as MoveCastle != null);
+                    var castleBoard = possibleBoards.SingleOrDefault(x => x.IsCastle);
 
                     if (castleBoard != null)
                         return castleBoard;
@@ -216,7 +217,7 @@ namespace Chess.Engine
 
             var code = move.UiCode;
 
-            var boards = legalMoves.Where(x => x.Code.StartsWith(code));
+            var boards = legalMoves.Where(x => x.UiCode.StartsWith(code));
 
             if (boards == null || !boards.Any())
                 return null;

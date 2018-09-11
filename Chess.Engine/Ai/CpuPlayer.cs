@@ -31,7 +31,6 @@ namespace Chess.Engine.Ai
 
             // Must be 2 for now. Should probably always be even so ends with opponents turn
             board.GenerateChildBoards(colour, 2);
-            //board.UpdateStateInfo();
 
             if (!board.ChildBoards.Any())
             {
@@ -174,26 +173,31 @@ namespace Chess.Engine.Ai
 
         private IEnumerable<Board> FilterLostPieceBoards(Board board, Colour colour, StringBuilder sb)
         {
-            var squaresUnderAttack = board.GetSquaresUnderThreat(colour);
+            // TODO: This early appraoch has been gutted so might need re-visiting
+            var legalMoves = board.GetLegalMoves();
 
-            var coveredSquares = board.GetProtectedPieces(colour);
+            return legalMoves;
 
-            IEnumerable<Board> escapeBoards = null;
+            //var squaresUnderAttack = board.GetSquaresUnderThreat(colour);
 
-            if (squaresUnderAttack != 0)
-            {
-                var sua = squaresUnderAttack.ToList();
+            //var coveredSquares = board.GetProtectedPieces(colour);
 
-                var highestValueSquareUnderAttack = sua.First();
-                var rankFile = highestValueSquareUnderAttack.ToRankFile();
-                var possibleEscapeRoutes = board.ChildBoards
-                    .Where(x => x.GetMovedFrom().Rank == rankFile.Rank && x.GetMovedFrom().File == rankFile.File);
+            //IEnumerable<Board> escapeBoards = null;
 
-                if (possibleEscapeRoutes.Any())
-                    escapeBoards = possibleEscapeRoutes;
-            }
+            //if (squaresUnderAttack != 0)
+            //{
+            //    var sua = squaresUnderAttack.ToList();
 
-            return escapeBoards;
+            //    var highestValueSquareUnderAttack = sua.First();
+            //    var rankFile = highestValueSquareUnderAttack.ToRankFile();
+            //    var possibleEscapeRoutes = board.ChildBoards
+            //        .Where(x => x.GetMovedFrom().Rank == rankFile.Rank && x.GetMovedFrom().File == rankFile.File);
+
+            //    if (possibleEscapeRoutes.Any())
+            //        escapeBoards = possibleEscapeRoutes;
+            //}
+
+            //return escapeBoards;
         }
 
         private IEnumerable<Board> FilterImmediateCheckmateBoards(Board board, Colour colour, IEnumerable<Board> d2LeafBoards, StringBuilder sb)
