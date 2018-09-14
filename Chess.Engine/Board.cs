@@ -17,82 +17,27 @@ namespace Chess.Engine
 
         public Colour Turn { get; }
 
-        public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
-
-        public bool WhiteCanCastleKingSide => _bitBoard.WhiteCanCastleKingSide();
-
-        public bool WhiteCanCastleQueenSide => _bitBoard.WhiteCanCastleQueenSide();
-
-        public bool BlackCanCastleKingSide => _bitBoard.BlackCanCastleKingSide();
-
-        public bool BlackCanCastleQueenSide => _bitBoard.BlackCanCastleQueenSide();
-
-        public bool WhiteIsInCheck => _state.HasFlag(BoardState.WhiteIsInCheck);
-
-        public bool BlackIsInCheck => _state.HasFlag(BoardState.BlackIsInCheck);
-
-        public bool WhiteIsInCheckmate => _state.HasFlag(BoardState.WhiteIsInCheckmate);
-
-        public bool BlackIsInCheckmate => _state.HasFlag(BoardState.BlackIsInCheckmate);
-
-        public bool IsInCheck(Colour colour) =>
-            colour == Colour.White ? WhiteIsInCheck : BlackIsInCheck;
-
-        public bool IsCheckmate => WhiteIsInCheckmate || BlackIsInCheckmate;
-
-        public bool IsGameOver => _bitBoard.FindKingSquare(Colour.White) == 0 || _bitBoard.FindKingSquare(Colour.Black) == 0;
-
-        public byte WhiteScore => GetScore(_bitBoard, Colour.White);
-
-        public byte BlackScore => GetScore(_bitBoard, Colour.Black);
-
         public double Evaluation { get; private set; }
 
         public double ProjectedEvaluation { get; set; }
 
-        public string UiCode { get { return _move == null ? string.Empty : _move.UiCode; } }
-
-        public string Notation => _move == null ? string.Empty : _move.Notation;
-
-        public SquareFlag EnPassantSquare => _move == null ? 0 : _move.EnPassantSquare;
-
-        public SquareFlag EnPassantCaptureSquare => _move == null ? 0 : _move.EnPassantCaptureSquare;
-
-        public PieceType MovePieceType => _move == null ? PieceType.None : _move.Type;
-
-        public bool IsCapture => _move == null ? false : _move.CapturePieceType != PieceType.None;
-
-        public string GetFriendlyCode() =>
-            _move == null ? string.Empty : _move.GetFriendlyCode();
-
-        public RankFile GetMovedFrom() =>
-             _move.StartPosition;
-
-        public RankFile GetMovedTo() =>
-            _move.EndPosition;
-
-        public bool IsCastle => _move as MoveCastle != null;
-
-        public string MoveToString() =>
-            _move != null ? _move.ToString() : string.Empty;
-
-        // TODO: Hide again - just using for AlphaBeta tests
-        public BitBoard BitBoard => _bitBoard;
-
-        public string BoardToString() =>
-            _bitBoard.ToString();
-
-        private BoardState _state = BoardState.None;
+        public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
 
         private BitBoard _bitBoard { get; set; }
+
+        private BitBoardMoveFinder _bitBoardMoveFinder;
 
         private Move _move { get; set; }
 
         private IList<Move> _moves { get; set; }
 
+        private BoardState _state = BoardState.None;
+
         private SquareFlag _invalidFlags { get; set; } = 0;
 
-        private BitBoardMoveFinder _bitBoardMoveFinder;
+        private BoardState _previousState = BoardState.None;
+
+        private SquareFlag _previousInvalidFlags { get; set; } = 0;
 
         public static Board FromFen(Fen fen)
         {
@@ -132,6 +77,15 @@ namespace Chess.Engine
             _move = move;
         }
 
+        public Board(Board parentBoard, Colour turn)
+        {
+            ParentBoard = parentBoard ?? throw new ArgumentNullException("parentBoard must be specified");
+
+            _bitBoardMoveFinder = ParentBoard._bitBoardMoveFinder;
+
+            Turn = turn;
+        }
+
         public Board(Board parentBoard, Move move, BitBoard bitBoard, BitBoardMoveFinder moveFinder)
         {
             ParentBoard = parentBoard ?? throw new ArgumentNullException("parentBoard must be specified");
@@ -146,57 +100,164 @@ namespace Chess.Engine
             _invalidFlags = CalculateInvalidSquares(move);
         }
 
-        public Board(Board parentBoard, Colour turn)
+        public bool WhiteIsInCheck => _state.HasFlag(BoardState.WhiteIsInCheck);
+
+        public bool BlackIsInCheck => _state.HasFlag(BoardState.BlackIsInCheck);
+
+        public bool WhiteIsInCheckmate => _state.HasFlag(BoardState.WhiteIsInCheckmate);
+
+        public bool BlackIsInCheckmate => _state.HasFlag(BoardState.BlackIsInCheckmate);
+
+        public bool IsInCheck(Colour colour) =>
+            colour == Colour.White ? WhiteIsInCheck : BlackIsInCheck;
+
+        public bool IsCheckmate => WhiteIsInCheckmate || BlackIsInCheckmate;
+
+        public bool IsInCheckmate(Colour colour) =>
+            colour == Colour.White ? WhiteIsInCheckmate : BlackIsInCheckmate;
+
+        public IReadOnlyCollection<Board> GetBoardsWithCheckmate(Colour colour) =>
+            ChildBoards.Where(x => colour == Colour.White
+                ? x.WhiteIsInCheckmate
+                : x.BlackIsInCheckmate)
+            .ToList();
+
+        public IEnumerable<Board> GetLegalMoves() =>
+            ChildBoards.Where(x => !x.IsInCheck(Turn));
+
+        public string MoveHistory
         {
-            ParentBoard = parentBoard ?? throw new ArgumentNullException("parentBoard must be specified");
+            get
+            {
+                var parentBoard = ParentBoard;
 
-            _bitBoardMoveFinder = ParentBoard._bitBoardMoveFinder;
+                var sb = new StringBuilder();
 
-            Turn = turn;
+                while (parentBoard != null)
+                {
+                    if (sb.Length > 0)
+                        sb.Append($" ");
+
+                    sb.Append($"{parentBoard.GetFriendlyCode()}");
+
+                    parentBoard = parentBoard.ParentBoard;
+                }
+
+                return sb.ToString();
+            }
         }
 
-        public Board ApplyMove(Move move)
+        // TODO: Hide again - just using for AlphaBeta tests
+        //public BitBoard BitBoard => _bitBoard;
+
+        public bool WhiteCanCastleKingSide => _bitBoard.WhiteCanCastleKingSide();
+
+        public bool WhiteCanCastleQueenSide => _bitBoard.WhiteCanCastleQueenSide();
+
+        public bool BlackCanCastleKingSide => _bitBoard.BlackCanCastleKingSide();
+
+        public bool BlackCanCastleQueenSide => _bitBoard.BlackCanCastleQueenSide();
+
+        public bool CanCastle(Colour colour) => _bitBoard.CanCastle(colour);
+
+        public byte WhiteScore => GetScore(_bitBoard, Colour.White);
+
+        public byte BlackScore => GetScore(_bitBoard, Colour.Black);
+
+        public byte GetScore(Colour colour) =>
+                    colour == Colour.White ? WhiteScore : BlackScore;
+
+        public SquareState GetSquareState(RankFile rankFile) =>
+            _bitBoard.GetSquareState(rankFile.ToSquareFlag());
+
+        public SquareFlag GetKingSquare(Colour colour) =>
+            _bitBoard.FindKingSquare(colour);
+
+        public SquareFlag GetSquaresWithPieceOn() =>
+            _bitBoard.White | _bitBoard.Black;
+
+        public SquareFlag GetSquaresWithPieceOn(Colour colour) =>
+            _bitBoard.FindPieceSquares(colour);
+
+        public PieceType GetPieceOnSquare(RankFile rankFile) =>
+            _bitBoard.GetPieceType(rankFile.ToSquareFlag());
+
+        public Colour GetPieceOnSquareColour(RankFile rankFile) =>
+            _bitBoard.GetPieceColour(rankFile.ToSquareFlag());
+
+        public byte GetInstanceNumber(Colour colour, PieceType type, SquareFlag square) =>
+            _bitBoard.GetInstanceNumber(colour, type, square);
+
+        public string BoardToString() => _bitBoard.ToString();
+
+        public bool CheckForPawnPromotion(RankFile startPosition, RankFile endPosition) =>
+            _bitBoardMoveFinder.CheckForPawnPromotion(_bitBoard, startPosition.ToSquareFlag(), endPosition.ToSquareFlag());
+
+        public string UiCode => _move == null ? string.Empty : _move.UiCode;
+
+        public string Notation => _move == null ? string.Empty : _move.Notation;
+
+        public SquareFlag EnPassantSquare => _move == null ? 0 : _move.EnPassantSquare;
+
+        public SquareFlag EnPassantCaptureSquare => _move == null ? 0 : _move.EnPassantCaptureSquare;
+
+        public PieceType MovePieceType => _move == null ? PieceType.None : _move.Type;
+
+        public bool IsCapture => _move == null ? false : _move.CapturePieceType != PieceType.None;
+
+        public string GetFriendlyCode() => _move == null ? string.Empty : _move.GetFriendlyCode();
+
+        public RankFile GetMovedFrom() => _move.StartPosition;
+
+        public RankFile GetMovedTo() => _move.EndPosition;
+
+        public bool IsCastle => _move as MoveCastle != null;
+
+        public string MoveToString() => _move != null ? _move.ToString() : string.Empty;
+
+        public Board CreateChildBoardFromMove(Move move)
         {
             var childBitBoard = _bitBoard.ApplyMove(move);
 
             return new Board(this, move, childBitBoard, _bitBoardMoveFinder);
         }
 
-        public BoardState MakeMove(Move move)
+        public void MakeMove(Move move)
         {
-            var state = _state;
+            _previousState = _state;
+            _previousInvalidFlags = _invalidFlags;
 
             _move = move;
             _bitBoard = ParentBoard._bitBoard.ApplyMove(move);
 
-            var colour = move.PieceColour;
+            _state = CheckForCheck(move.PieceColour, _bitBoard, _bitBoardMoveFinder, _state);
 
-            var whiteKingSquare = _bitBoard.FindKingSquare(Colour.White);
-            var blackKingSquare = _bitBoard.FindKingSquare(Colour.Black);
-            var whiteChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.White, whiteKingSquare);
-            var blackChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.Black, blackKingSquare);
+            _invalidFlags = CalculateInvalidSquares(move);
 
-            if (whiteChecks.Any())
-            {
-                if (colour == Colour.Black && !blackChecks.Any())
-                    _state |= BoardState.WhiteIsInCheck;
-            }
-            else if (blackChecks.Any())
-            {
-                if (colour == Colour.White && !whiteChecks.Any())
-                    _state |= BoardState.BlackIsInCheck;
-            }
+            //var colour = move.PieceColour;
 
-            var invalidFlags = CalculateInvalidSquares(move);
+            //var whiteKingSquare = _bitBoard.FindKingSquare(Colour.White);
+            //var blackKingSquare = _bitBoard.FindKingSquare(Colour.Black);
+            //var whiteChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.White, whiteKingSquare);
+            //var blackChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.Black, blackKingSquare);
 
-            _invalidFlags = invalidFlags;
-
-            return state;
+            //if (whiteChecks.Any())
+            //{
+            //    if (colour == Colour.Black && !blackChecks.Any())
+            //        _state |= BoardState.WhiteIsInCheck;
+            //}
+            //else if (blackChecks.Any())
+            //{
+            //    if (colour == Colour.White && !whiteChecks.Any())
+            //        _state |= BoardState.BlackIsInCheck;
+            //}
         }
 
-        public void UnMakeMove(BoardState state)
+        public void UnMakeMove()
         {
-            _state = state;
+            _state = _previousState;
+
+            _invalidFlags = _previousInvalidFlags;
         }
 
         public double Evaluate(Colour colour)
@@ -208,10 +269,7 @@ namespace Chess.Engine
             return Evaluation * who2move;
         }
 
-        public int GetScore(Colour colour) =>
-            colour == Colour.White ? WhiteScore : BlackScore;
-
-        public IList<Move> GetUnplayedParentMoves(Colour colour, IEnumerable<SquareFlag> invalidSquares)
+        public IEnumerable<Move> GetUnplayedParentMoves(Colour colour, IEnumerable<SquareFlag> invalidSquares)
         {
             if (ParentBoard == null || ParentBoard._move == null)
                 return new List<Move>();
@@ -224,7 +282,7 @@ namespace Chess.Engine
             if (IsInCheck(colour))
                 unplayedMoves = unplayedMoves.Where(x => !x.Notation.StartsWith("0-0")).ToList();
 
-            return unplayedMoves.ToList();
+            return unplayedMoves;
         }
 
         public IList<Move> FindMoves(Colour colour) =>
@@ -263,7 +321,8 @@ namespace Chess.Engine
                 return _moves;
             }
 
-            var squareStates = invalidSquaresArray.Select(x => _bitBoard.GetSquareState(x))
+            var squareStates = invalidSquaresArray
+                .Select(x => _bitBoard.GetSquareState(x))
                 .Where(x => x.Colour == colour)
                 .ToList();
 
@@ -294,43 +353,6 @@ namespace Chess.Engine
             return _moves;
         }
 
-        public bool CheckForPawnPromotion(RankFile startPosition, RankFile endPosition) =>
-            _bitBoardMoveFinder.CheckForPawnPromotion(_bitBoard, startPosition.ToSquareFlag(), endPosition.ToSquareFlag());
-
-        public bool CanCastle(Colour colour) =>
-            _bitBoard.CanCastle(colour);
-
-        public SquareState GetSquareState(RankFile rankFile)
-        {
-            var square = rankFile.ToSquareFlag();
-
-            return _bitBoard.GetSquareState(square);
-        }
-
-        public SquareFlag GetKingSquare(Colour colour) =>
-            _bitBoard.FindKingSquare(colour);
-
-        public SquareFlag GetSquaresWithPieceOn() =>
-            _bitBoard.White | _bitBoard.Black;
-
-        public SquareFlag GetSquaresWithPieceOn(Colour colour) =>
-            _bitBoard.FindPieceSquares(colour);
-
-        public PieceType GetPieceOnSquare(RankFile rankFile) =>
-            _bitBoard.GetPieceType(rankFile.ToSquareFlag());
-
-        public Colour GetPieceOnSquareColour(RankFile rankFile) =>
-            _bitBoard.GetPieceColour(rankFile.ToSquareFlag());
-
-        public byte GetInstanceNumber(Colour colour, PieceType type, SquareFlag square) =>
-            _bitBoard.GetInstanceNumber(colour, type, square);
-
-        public IReadOnlyCollection<Board> GetBoardsWithCheckmate(Colour colour) =>
-            ChildBoards.Where(x => colour == Colour.White ? x.WhiteIsInCheckmate : x.BlackIsInCheckmate).ToList();
-
-        public bool IsInCheckmate(Colour colour) =>
-            colour == Colour.White ? WhiteIsInCheckmate : BlackIsInCheckmate;
-
         public void OrphanOtherChildBoardSiblingBoards(Board chosenChild)
         {
             var childBoardsToOrphan = ChildBoards.Where(x => x != chosenChild);
@@ -347,28 +369,6 @@ namespace Chess.Engine
 
             foreach(var childBoard in ChildBoards)
                 childBoard.Orphan();
-        }
-
-        public IEnumerable<Board> GetLegalMoves() =>
-            ChildBoards.Where(x => !x.IsInCheck(Turn));
-        
-        public string MoveHistory
-        {
-            get
-            {
-                var parentBoard = ParentBoard;
-
-                var sb = new StringBuilder();
-
-                while (parentBoard != null)
-                {
-                    sb.Append($"{parentBoard.GetFriendlyCode()} ");
-
-                    parentBoard = parentBoard.ParentBoard;
-                }
-
-                return sb.ToString();
-            }
         }
 
         public void GenerateChildBoards(Colour colour, int depth)
@@ -519,6 +519,27 @@ namespace Chess.Engine
                 sb.Append("-");
 
             return sb.ToString();
+        }
+
+        private BoardState CheckForCheck(Colour colour, BitBoard bitBoard, BitBoardMoveFinder bitBoardMoveFinder, BoardState state)
+        {
+            var whiteKingSquare = bitBoard.FindKingSquare(Colour.White);
+            var blackKingSquare = bitBoard.FindKingSquare(Colour.Black);
+            var whiteChecks = bitBoardMoveFinder.FindPiecesAttackingThisSquare(bitBoard, Colour.White, whiteKingSquare);
+            var blackChecks = bitBoardMoveFinder.FindPiecesAttackingThisSquare(bitBoard, Colour.Black, blackKingSquare);
+
+            if (whiteChecks.Any())
+            {
+                if (colour == Colour.Black && !blackChecks.Any())
+                    state |= BoardState.WhiteIsInCheck;
+            }
+            else if (blackChecks.Any())
+            {
+                if (colour == Colour.White && !whiteChecks.Any())
+                    state |= BoardState.BlackIsInCheck;
+            }
+
+            return state;
         }
 
         private byte GetScore(BitBoard board, Colour colour)

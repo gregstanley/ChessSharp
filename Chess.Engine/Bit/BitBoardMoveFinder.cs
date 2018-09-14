@@ -260,16 +260,22 @@ namespace Chess.Engine.Bit
 
             if (availableCaptureSquare1 != 0)
             {
-                if (board.GetPieceType(availableCaptureSquare1) != PieceType.None
-                    && board.GetPieceColour(availableCaptureSquare1) != colour
+                var piece = board.GetPiece(availableCaptureSquare1);
+
+                //if (board.GetPieceType(availableCaptureSquare1) != PieceType.None
+                //    && board.GetPieceColour(availableCaptureSquare1) != colour
+                if(piece.Type != PieceType.None && piece.Colour != colour
                     && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
                     outSquares.Add(availableCaptureSquare1);
             }
 
             if (availableCaptureSquare2 != 0)
             {
-                if (board.GetPieceType(availableCaptureSquare2) != PieceType.None
-                    && board.GetPieceColour(availableCaptureSquare2) != colour
+                var piece = board.GetPiece(availableCaptureSquare2);
+
+                //if (board.GetPieceType(availableCaptureSquare2) != PieceType.None
+                //    && board.GetPieceColour(availableCaptureSquare2) != colour
+                if (piece.Type != PieceType.None && piece.Colour != colour
                     && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
                     outSquares.Add(availableCaptureSquare2);
             }

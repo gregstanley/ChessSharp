@@ -193,12 +193,8 @@ namespace Chess.Engine.Bit
         public bool CanCastleQueenSide(Colour colour) =>
             colour == Colour.White ? WhiteCanCastleQueenSide() : BlackCanCastleQueenSide();
 
-        public SquareState GetSquareState(SquareFlag square)
-        {
-            var piece = GetPiece(square);
-
-            return new SquareState(square, piece);
-        }
+        public SquareState GetSquareState(SquareFlag square) =>
+            new SquareState(square, GetPiece(square));
 
         public Piece GetPiece(SquareFlag square)
         {

@@ -65,6 +65,13 @@ namespace Chess.Engine.Ai.Searches
 
             var moves = board.FindMoves2(colour);
 
+            moves = moves.OrderByDescending(x => x.CapturePieceType == PieceType.Pawn)
+                .OrderByDescending(x => x.CapturePieceType == PieceType.Knight)
+                .OrderByDescending(x => x.CapturePieceType == PieceType.Bishop)
+                .OrderByDescending(x => x.CapturePieceType == PieceType.Rook)
+                .OrderByDescending(x => x.CapturePieceType == PieceType.Queen)
+                .OrderByDescending(x => x.CapturePieceType == PieceType.King);
+
             PotentialBoard bestChildBoard;
 
             var childBoard = new Board(board, colour.Opposite());
@@ -75,11 +82,11 @@ namespace Chess.Engine.Ai.Searches
                 
                 foreach (var move in moves)
                 {
-                    var previousState = childBoard.MakeMove(move);
+                    childBoard.MakeMove(move);
  
                     var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    childBoard.UnMakeMove(previousState);
+                    childBoard.UnMakeMove();
 
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
@@ -98,11 +105,11 @@ namespace Chess.Engine.Ai.Searches
 
                 foreach (var move in moves)
                 {
-                    var previousState = childBoard.MakeMove(move);
+                    childBoard.MakeMove(move);
 
                     var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    childBoard.UnMakeMove(previousState);
+                    childBoard.UnMakeMove();
 
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
