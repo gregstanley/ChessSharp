@@ -83,10 +83,10 @@ namespace Chess.Engine.Ai.Searches
                 foreach (var move in moves)
                 {
                     childBoard.MakeMove(move);
- 
+
                     var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    childBoard.UnMakeMove();
+                    childBoard.UnMakeMove(move);
 
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
@@ -109,7 +109,7 @@ namespace Chess.Engine.Ai.Searches
 
                     var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
-                    childBoard.UnMakeMove();
+                    childBoard.UnMakeMove(move);
 
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 

@@ -23,9 +23,11 @@ namespace Chess.Engine
 
         public ICollection<Board> ChildBoards { get; private set; } = new List<Board>();
 
+        public ulong Key { get; private set; } = 0;
+
         private BitBoard _bitBoard { get; set; }
 
-        private BitBoardMoveFinder _bitBoardMoveFinder;
+        private BitBoardMoveFinder _bitBoardMoveFinder { get; set; }
 
         private Move _move { get; set; }
 
@@ -38,6 +40,8 @@ namespace Chess.Engine
         private BoardState _previousState = BoardState.None;
 
         private SquareFlag _previousInvalidFlags { get; set; } = 0;
+
+        private Zobrist _keyGen { get; set; }
 
         public static Board FromFen(Fen fen)
         {
@@ -75,6 +79,11 @@ namespace Chess.Engine
             Turn = turn;
 
             _move = move;
+
+            _keyGen = new Zobrist();
+            _keyGen.Init();
+
+            Key = _keyGen.Hash(_bitBoard);
         }
 
         public Board(Board parentBoard, Colour turn)
@@ -84,6 +93,13 @@ namespace Chess.Engine
             _bitBoardMoveFinder = ParentBoard._bitBoardMoveFinder;
 
             Turn = turn;
+
+            _keyGen = ParentBoard._keyGen;
+
+            Key = ParentBoard.Key;
+
+            //if (_bitBoard != null)
+            //    Key = _keyGen.Hash(_bitBoard);
         }
 
         public Board(Board parentBoard, Move move, BitBoard bitBoard, BitBoardMoveFinder moveFinder)
@@ -96,6 +112,10 @@ namespace Chess.Engine
 
             _bitBoard = bitBoard;
             _bitBoardMoveFinder = moveFinder;
+
+            _keyGen = ParentBoard._keyGen;
+
+            Key = _keyGen.Hash(_bitBoard);
 
             _invalidFlags = CalculateInvalidSquares(move);
         }
@@ -230,6 +250,12 @@ namespace Chess.Engine
             _move = move;
             _bitBoard = ParentBoard._bitBoard.ApplyMove(move);
 
+            //Key = _keyGen.Hash(_bitBoard);
+            if (move is MoveCastle || move.PromotionType != PieceType.None)
+                Key = _keyGen.Hash(_bitBoard);
+            else
+                Key = _keyGen.Update(Key, move);
+
             _state = CheckForCheck(move.PieceColour, _bitBoard, _bitBoardMoveFinder, _state);
 
             _invalidFlags = CalculateInvalidSquares(move);
@@ -253,11 +279,18 @@ namespace Chess.Engine
             //}
         }
 
-        public void UnMakeMove()
+        public void UnMakeMove(Move move)
         {
             _state = _previousState;
-
             _invalidFlags = _previousInvalidFlags;
+
+            if (move is MoveCastle || move.PromotionType != PieceType.None)
+                Key = _keyGen.Hash(ParentBoard._bitBoard);
+            else
+                Key = _keyGen.Update(Key, move);
+
+            if (ParentBoard.Key != Key)
+            { var bp = true; }
         }
 
         public double Evaluate(Colour colour)
