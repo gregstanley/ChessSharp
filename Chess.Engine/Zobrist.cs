@@ -1,9 +1,7 @@
 ﻿using Chess.Engine.Bit;
 using Chess.Engine.Extensions;
 using Chess.Engine.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using Troschuetz.Random.Generators;
 
 namespace Chess.Engine
 {
@@ -27,24 +25,22 @@ namespace Chess.Engine
 
         //private ulong[] BaseValues = new ulong[]{0b00000000_00000000_00000000_00000000_00000000_00000000_00000000_00000000};
         private ulong[,] _squares = new ulong[64,12];
+        private ulong[] _colours = new ulong[2];
 
         public void Init()
         {
-            var gen = new Troschuetz.Random.Generators.StandardGenerator();
+            var gen = new StandardGenerator();
 
-            for(var i = 0; i < 64; ++i)
+            for (var i = 0; i < 64; ++i)
             {
                 for(var j = 0; j < 12; ++j)
                 {
-                    var int1 = (ulong)gen.NextInclusiveMaxValue();
-                    var int2 = (ulong)gen.NextInclusiveMaxValue();
-
-                    ulong result = int1 << 32;
-                    result += int2;
-
-                    _squares[i, j] = result;
+                    _squares[i, j] = Random64(gen);
                 }
             }
+
+            _colours[0] = Random64(gen);
+            _colours[1] = Random64(gen);
         }
 
         public ulong Update(ulong hash, Move move)
@@ -59,18 +55,21 @@ namespace Chess.Engine
             //    to = new SquareState(move.EndPositionSquareFlag);
 
             // Remove the piece on source square
-            hash ^= _squares[move.StartPositionSquareFlag.ToBoardIndex(), (int)Index(move.PieceColour, move.Type)];
+            hash ^= _squares[move.StartPositionSquareFlag.ToBoardIndex(), (int)ToPieceIndex(move.PieceColour, move.Type)];
 
             // Remove the piece on target square
-            hash ^= _squares[move.EndPositionSquareFlag.ToBoardIndex(), (int)Index(move.PieceColour.Opposite(), move.CapturePieceType)];
+            hash ^= _squares[move.EndPositionSquareFlag.ToBoardIndex(), (int)ToPieceIndex(move.PieceColour.Opposite(), move.CapturePieceType)];
 
             // Add the moving piece to target square
-            hash ^= _squares[move.EndPositionSquareFlag.ToBoardIndex(), (int)Index(move.PieceColour, move.Type)];
+            hash ^= _squares[move.EndPositionSquareFlag.ToBoardIndex(), (int)ToPieceIndex(move.PieceColour, move.Type)];
+
+            hash ^= _colours[0];
+            hash ^= _colours[1];
 
             return hash;
         }
 
-        public ulong Hash(BitBoard bitBoard)
+        public ulong Hash(BitBoard bitBoard, Colour colour)
         {
             var squares = (bitBoard.White | bitBoard.Black).ToList();
 
@@ -83,10 +82,26 @@ namespace Chess.Engine
                 hash ^= _squares[square.ToBoardIndex(), (int)Index(squareState)];
             }
 
+            if (colour == Colour.White)
+                hash ^= _colours[0];
+            else
+                hash ^= _colours[1];
+
             return hash;
         }
 
-        private PieceIndex Index(Colour colour, PieceType type)
+        private ulong Random64(StandardGenerator gen)
+        {
+            var int1 = (ulong)gen.NextInclusiveMaxValue();
+            var int2 = (ulong)gen.NextInclusiveMaxValue();
+
+            ulong result = int1 << 32;
+            result += int2;
+
+            return result;
+        }
+
+        private PieceIndex ToPieceIndex(Colour colour, PieceType type)
         {
             switch (type)
             {

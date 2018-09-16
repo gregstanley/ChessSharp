@@ -109,7 +109,7 @@ namespace Chess.Engine.Ai
                 return chosenBoard;
             }
 
-            chosenBoard = _search.DoSearch(board, colour, 3, true);
+            chosenBoard = _search.DoSearch(board, colour, 5, true);
 
             chosenBoard.Evaluate(colour);
 

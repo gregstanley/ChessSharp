@@ -83,7 +83,7 @@ namespace Chess.Engine
             _keyGen = new Zobrist();
             _keyGen.Init();
 
-            Key = _keyGen.Hash(_bitBoard);
+            Key = _keyGen.Hash(_bitBoard, turn);
         }
 
         public Board(Board parentBoard, Colour turn)
@@ -115,7 +115,7 @@ namespace Chess.Engine
 
             _keyGen = ParentBoard._keyGen;
 
-            Key = _keyGen.Hash(_bitBoard);
+            Key = _keyGen.Hash(_bitBoard, Turn);
 
             _invalidFlags = CalculateInvalidSquares(move);
         }
@@ -252,7 +252,7 @@ namespace Chess.Engine
 
             //Key = _keyGen.Hash(_bitBoard);
             if (move is MoveCastle || move.PromotionType != PieceType.None)
-                Key = _keyGen.Hash(_bitBoard);
+                Key = _keyGen.Hash(_bitBoard, move.PieceColour.Opposite());
             else
                 Key = _keyGen.Update(Key, move);
 
@@ -285,7 +285,7 @@ namespace Chess.Engine
             _invalidFlags = _previousInvalidFlags;
 
             if (move is MoveCastle || move.PromotionType != PieceType.None)
-                Key = _keyGen.Hash(ParentBoard._bitBoard);
+                Key = _keyGen.Hash(ParentBoard._bitBoard, move.PieceColour);
             else
                 Key = _keyGen.Update(Key, move);
 
@@ -363,7 +363,7 @@ namespace Chess.Engine
             
             var availableMoves = validUnplayedParentMoves.Concat(newMoves);
 
-            var validateMoves = true;
+            var validateMoves = false;
 
             if (validateMoves)
             {

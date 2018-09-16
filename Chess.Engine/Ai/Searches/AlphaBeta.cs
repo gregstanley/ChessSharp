@@ -15,10 +15,12 @@ namespace Chess.Engine.Ai.Searches
 
         private int _positionCounter = 0;
 
-        private IEnumerable<Board> Prioritise(IEnumerable<Board> primary, IEnumerable<Board> secondary)
-        {
-            return primary.Concat(secondary.Where(x => !primary.Contains(x)));
-        }
+        private TranspositionTable TranspositionTable { get; set; } = new TranspositionTable();
+
+        //private IEnumerable<Board> Prioritise(IEnumerable<Board> primary, IEnumerable<Board> secondary)
+        //{
+        //    return primary.Concat(secondary.Where(x => !primary.Contains(x)));
+        //}
 
         public Board DoSearch(Board board, Colour colour, int depth, bool isMax)
         {
@@ -63,18 +65,55 @@ namespace Chess.Engine.Ai.Searches
             if (depth == 0)
                 return new PotentialBoard(board, board.Evaluate(colour), PotentialBoard.NodeType.PV);
 
-            var moves = board.FindMoves2(colour);
+            var existingTransposition = TranspositionTable.Find(board.Key);
 
-            moves = moves.OrderByDescending(x => x.CapturePieceType == PieceType.Pawn)
+            Move previousBestMove = null;
+
+            if (existingTransposition != null)
+            {
+                if (existingTransposition.Key == board.Key)
+                {
+                    if (existingTransposition.Depth > depth)
+                    {
+                        return existingTransposition.PotentialBoard;
+                    }
+
+                    if (existingTransposition.BestMove != null)
+                    {
+                        previousBestMove = existingTransposition.BestMove;
+                    }
+                }
+            }
+
+            var moves = board.FindMoves2(colour)
+                .OrderByDescending(x => x.CapturePieceType == PieceType.Pawn)
                 .OrderByDescending(x => x.CapturePieceType == PieceType.Knight)
                 .OrderByDescending(x => x.CapturePieceType == PieceType.Bishop)
                 .OrderByDescending(x => x.CapturePieceType == PieceType.Rook)
                 .OrderByDescending(x => x.CapturePieceType == PieceType.Queen)
-                .OrderByDescending(x => x.CapturePieceType == PieceType.King);
+                .OrderByDescending(x => x.CapturePieceType == PieceType.King)
+                .ToList();
+
+            // Move previous best move to top
+            if (previousBestMove != null)
+            {
+                var possibleBestMove = moves.SingleOrDefault(x => x.Notation == previousBestMove.Notation);
+
+                if (possibleBestMove != null)
+                {
+                    moves.Remove(possibleBestMove);
+                    moves.Insert(0, possibleBestMove);
+                }
+                else
+                {
+                    var bp = true;
+                }
+            }
 
             PotentialBoard bestChildBoard;
 
             var childBoard = new Board(board, colour.Opposite());
+            Move bestCurrentMove = null;
 
             if (isMax)
             {
@@ -84,19 +123,46 @@ namespace Chess.Engine.Ai.Searches
                 {
                     childBoard.MakeMove(move);
 
-                    var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+                    //var existingTransposition = TranspositionTable.Find(childBoard.Key);
 
+                    //PotentialBoard currentChildBoard = null;
+
+                    //if (existingTransposition != null)
+                    //{
+                    //    if (existingTransposition.Key == childBoard.Key)
+                    //    {
+                    //        if (existingTransposition.Depth >= depth)
+                    //        {
+                    //            currentChildBoard = existingTransposition.PotentialBoard;
+                    //        }
+                    //    }
+                    //}
+
+                    //if (currentChildBoard == null)
+                    //{
+                    //    currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+                    //    TranspositionTable.Add(new Transposition(childBoard.Key, depth, childBoard.Turn, currentChildBoard.Score, currentChildBoard));
+                    //}
+
+                    var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
                     childBoard.UnMakeMove(move);
 
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore > bestChildBoard.PotentialScore)
+                    {
+                        bestCurrentMove = move;
                         bestChildBoard = currentChildBoard;
+                    }
 
                     alpha = Math.Max(alpha, bestChildBoard.PotentialScore);
 
                     if (beta <= alpha)
-                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                    {
+                        var cbwtm1 = bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                        TranspositionTable.Add(new Transposition(board.Key, depth, board.Turn, bestChildBoard.Score, cbwtm1, bestCurrentMove));
+                        return cbwtm1;
+                    }
                 }
             }
             else
@@ -107,6 +173,27 @@ namespace Chess.Engine.Ai.Searches
                 {
                     childBoard.MakeMove(move);
 
+                    //var existingTransposition = TranspositionTable.Find(childBoard.Key);
+
+                    //PotentialBoard currentChildBoard = null;
+
+                    //if (existingTransposition != null)
+                    //{
+                    //    if (existingTransposition.Key == childBoard.Key)
+                    //    {
+                    //        if (existingTransposition.Depth >= depth)
+                    //        {
+                    //            currentChildBoard = existingTransposition.PotentialBoard;
+                    //        }
+                    //    }
+                    //}
+
+                    //if (currentChildBoard == null)
+                    //{
+                    //    currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
+                    //    TranspositionTable.Add(new Transposition(childBoard.Key, depth, childBoard.Turn, currentChildBoard.Score, currentChildBoard));
+                    //}
+
                     var currentChildBoard = AlphaBetaInternal2(childBoard, colour.Opposite(), depth - 1, alpha, beta, !isMax, sb);
 
                     childBoard.UnMakeMove(move);
@@ -114,16 +201,28 @@ namespace Chess.Engine.Ai.Searches
                     childBoard.ProjectedEvaluation = currentChildBoard.Score;
 
                     if (currentChildBoard.PotentialScore < bestChildBoard.PotentialScore)
+                    {
+                        bestCurrentMove = move;
                         bestChildBoard = currentChildBoard;
+                    }
 
                     beta = Math.Min(beta, bestChildBoard.PotentialScore);
 
                     if (beta <= alpha)
-                        return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                    {
+                        var cbwtm2 = bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                        TranspositionTable.Add(new Transposition(board.Key, depth, board.Turn, bestChildBoard.Score, cbwtm2, bestCurrentMove));
+                        return cbwtm2;
+                        //return bestChildBoard.WithType(PotentialBoard.NodeType.Cut);
+                    }
                 }
             }
 
-            return bestChildBoard.WithType(PotentialBoard.NodeType.All);
+            var cbwt = bestChildBoard.WithType(PotentialBoard.NodeType.All);
+            TranspositionTable.Add(new Transposition(board.Key, depth, board.Turn, bestChildBoard.Score, cbwt, bestCurrentMove));
+
+            return cbwt;
+            //return bestChildBoard.WithType(PotentialBoard.NodeType.All);
         }
 
         private PotentialBoard AlphaBetaInternal(Board board, Colour colour, int depth, double alpha, double beta, bool isMax, StringBuilder sb)
