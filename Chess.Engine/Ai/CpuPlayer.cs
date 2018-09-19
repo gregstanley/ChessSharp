@@ -18,39 +18,55 @@ namespace Chess.Engine.Ai
 
         private BitBoardMoveFinder _bitBoardMoveFinder = new BitBoardMoveFinder();
 
+        private StringBuilder _sb = new StringBuilder();
+
         public CpuPlayer(ISearchMoves search)
         {
             _search = search;
+
+            _search.IterationComplete += OnIterationComplete;
+        }
+
+        private void OnIterationComplete(object sender, System.EventArgs e)
+        {
+            IterationCompleteEventArgs args = (IterationCompleteEventArgs)e;
+
+            var moveString = args.PotentialBoard.Moves
+                .Reverse()
+                .Select(x => x.Notation);
+
+            _sb.AppendLine($"{args.Depth}) {args.Eval} {string.Join(" ", moveString)}");
         }
 
         public Board ChoseMove(Board board, Colour colour, int ply)
         {
-            var sb = new StringBuilder();
+            //var sb = new StringBuilder();
+            _sb.Clear();
 
-            sb.AppendLine($"Playing for {colour}. Generating possible moves...");
+            _sb.AppendLine($"Playing for {colour}. Generating possible moves...");
 
             // Must be 2 for now. Should probably always be even so ends with opponents turn
             board.GenerateChildBoards(colour, 2);
 
             if (!board.ChildBoards.Any())
             {
-                sb.AppendLine($"Err... no boards available. Not much I can do with that.");
+                _sb.AppendLine($"Err... no boards available. Not much I can do with that.");
 
-                _moveLog.Add(sb.ToString());
+                _moveLog.Add(_sb.ToString());
 
                 return null;
             }
 
             if (board.ChildBoards.Count() == 1)
             {
-                sb.AppendLine($"Only one option so may as well play that...");
+                _sb.AppendLine($"Only one option so may as well play that...");
 
-                _moveLog.Add(sb.ToString());
+                _moveLog.Add(_sb.ToString());
 
                 return board.ChildBoards.First();
             }
 
-            sb.AppendLine($"There are {board.ChildBoards.Count()} possible moves.");
+            _sb.AppendLine($"There are {board.ChildBoards.Count()} possible moves.");
 
             var oppositeColour = colour.Opposite();
             var myScore = board.GetScore(colour);
@@ -58,9 +74,9 @@ namespace Chess.Engine.Ai
 
             if (board.IsInCheckmate(colour))
             {
-                sb.AppendLine($"Hmm I seem to be in Checkmate");
+                _sb.AppendLine($"Hmm I seem to be in Checkmate");
 
-                _moveLog.Add(sb.ToString());
+                _moveLog.Add(_sb.ToString());
 
                 return board;
             }
@@ -68,7 +84,7 @@ namespace Chess.Engine.Ai
             var checkmateBoards = board.GetBoardsWithCheckmate(oppositeColour);
 
             if (checkmateBoards.Any())
-                return GetCheckmateBoard(checkmateBoards, colour, sb);
+                return GetCheckmateBoard(checkmateBoards, colour, _sb);
 
             Board chosenBoard;
 
@@ -76,27 +92,27 @@ namespace Chess.Engine.Ai
             
             if (board.IsInCheck(colour))
             {
-                escapeCheckBoards = GetEscapeCheckBoards(board, colour, sb);
+                escapeCheckBoards = GetEscapeCheckBoards(board, colour, _sb);
 
                 if (escapeCheckBoards == null || !escapeCheckBoards.Any())
                 {
-                    sb.AppendLine($"{colour} is in check with no escape");
+                    _sb.AppendLine($"{colour} is in check with no escape");
 
-                    _moveLog.Add(sb.ToString());
+                    _moveLog.Add(_sb.ToString());
 
                     return null;
                 }
 
-                sb.AppendLine($"I'm in check");
+                _sb.AppendLine($"I'm in check");
 
                 var optionsBoardsRanked = colour == Colour.White
                     ? escapeCheckBoards.OrderByDescending(x => x.Evaluation)
                     : escapeCheckBoards.OrderBy(x => x.Evaluation);
 
-                sb.AppendLine($"Final order:");
+                _sb.AppendLine($"Final order:");
 
                 foreach (var optionBoard in optionsBoardsRanked)
-                    sb.AppendLine($"   {optionBoard.GetMetricsString()}");
+                    _sb.AppendLine($"   {optionBoard.GetMetricsString()}");
 
                 var chosenTargetBoard = optionsBoardsRanked.First();
 
@@ -104,31 +120,31 @@ namespace Chess.Engine.Ai
 
                 board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
 
-                _moveLog.Add(sb.ToString());
+                _moveLog.Add(_sb.ToString());
 
                 return chosenBoard;
             }
 
-            chosenBoard = _search.DoSearch(board, colour, 5, true);
+            chosenBoard = _search.DoSearch(board, colour, 3, true);
 
             chosenBoard.Evaluate(colour);
 
-            sb.AppendLine($"Analysed {_search.PositionCounter} moves.");
+            _sb.AppendLine($"Analysed {_search.PositionCounter} moves.");
 
-            sb.AppendLine($"Chosen board: {chosenBoard.GetMetricsString()}");
+            _sb.AppendLine($"Chosen board: {chosenBoard.GetMetricsString()}");
 
-            sb.AppendLine($"All options:");
+            _sb.AppendLine($"All options:");
 
             var orderedBoards = colour == Colour.White
                 ? board.ChildBoards.OrderByDescending(x => x.ProjectedEvaluation)
                 : board.ChildBoards.OrderBy(x => x.ProjectedEvaluation);
 
             foreach (var optionBoard in orderedBoards)
-                sb.AppendLine($"   {optionBoard.GetMetricsString()}");
+                _sb.AppendLine($"   {optionBoard.GetMetricsString()}");
 
             board.OrphanOtherChildBoardSiblingBoards(chosenBoard);
 
-            _moveLog.Add(sb.ToString());
+            _moveLog.Add(_sb.ToString());
 
             return chosenBoard;
         }

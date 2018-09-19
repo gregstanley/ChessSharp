@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Text;
 using Chess.Engine.Models;
 using Troschuetz.Random.Generators;
@@ -10,6 +11,8 @@ namespace Chess.Engine.Ai.Searches
         public int PositionCounter { get; private set; }
 
         private StandardGenerator _random = new StandardGenerator();
+
+        public event EventHandler IterationComplete;
 
         public Board DoSearch(Board board, Colour colour, int depth, bool isMax)
         {

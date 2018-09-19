@@ -11,56 +11,61 @@ namespace Chess.Engine.Bit
         private static SquareFlag WhitePromotionRank = SquareFlagExtensions.r8;
         private static SquareFlag BlackPromotionRank = SquareFlagExtensions.r1;
 
-        private static int[] StridesKnight = new[] { -17, -15, -10, -6, 6, 10, 15, 17 };
-        private static int[] StridesHorizontal = new[] { -8, -1, 1, 8 };
-        private static int[] StridesDiagonal = new[] { -9, -7, 7, 9 };
-        private static int[] StridesQueen = new[] { -9, -8, -7, -1, 1, 7, 8, 9 };
+        private static readonly int[] StridesKnight = new[] { -17, -15, -10, -6, 6, 10, 15, 17 };
+        private static readonly int[] StridesHorizontal = new[] { -8, -1, 1, 8 };
+        private static readonly int[] StridesDiagonal = new[] { -9, -7, 7, 9 };
+        private static readonly int[] StridesQueen = new[] { -9, -8, -7, -1, 1, 7, 8, 9 };
 
         public IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, bool withCastles = true)
         {
             var squares = board.FindPieceSquares(colour).ToList();
 
-            var moves = new List<Move>();
-
+            var moves = new List<Move>(256);
+            
             foreach (var square in squares)
             {
-                var pieceMoves = FindMoves(board, enPassantSquare, colour, square, withCastles);
+                FindMoves(moves, board, enPassantSquare, colour, square, withCastles);
+                //var pieceMoves = FindMoves(moves, board, enPassantSquare, colour, square, withCastles);
 
-                if (pieceMoves.Any())
-                    moves.AddRange(pieceMoves);
+                //if (pieceMoves.Any())
+                //    moves.AddRange(pieceMoves);
             };
 
             return moves;
         }
 
 
-        public IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, IReadOnlyCollection<SquareState> squareStates, bool withCastles = true)
+        public void FindMoves(List<Move> moves, BitBoard board, SquareFlag enPassantSquare, Colour colour, IReadOnlyCollection<SquareState> squareStates, bool withCastles = true)
         {
-            var moves = new List<Move>();
+            //var moves = new List<Move>(200);
 
             foreach (var squareState in squareStates)
             {
-                var pieceMoves = FindMoves(board, enPassantSquare, colour, squareState.Square, withCastles);
+                FindMoves(moves, board, enPassantSquare, colour, squareState.Square, withCastles);
+                //var pieceMoves = FindMoves(moves, board, enPassantSquare, colour, squareState.Square, withCastles);
 
-                if (pieceMoves.Any())
-                    moves.AddRange(pieceMoves);
+                //if (pieceMoves.Any())
+                //    moves.AddRange(pieceMoves);
             };
 
-            return moves;
+            //return moves;
         }
 
-        private IList<Move> FindMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square, bool withCastles = true)
+        private void FindMoves(List<Move> moves, BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square, bool withCastles = true)
         {
             var pieceType = board.GetPieceType(square);
             var possibleSquares = GetStandardCoveredSquares(board, colour, square, pieceType);
-            var moves = new List<Move>();
+
+            //var moves = new List<Move>();
+
             var startRankFile = square.ToRankFile();
 
             if (pieceType == PieceType.Pawn)
             {
-                var pawnMoves = PawnMoves(board, enPassantSquare, colour, square);
+                PawnMoves(moves, board, enPassantSquare, colour, square);
+                //var pawnMoves = PawnMoves(moves, board, enPassantSquare, colour, square);
 
-                moves.AddRange(pawnMoves);
+                //moves.AddRange(pawnMoves);
             }
 
             if (pieceType == PieceType.Rook && withCastles)
@@ -81,12 +86,12 @@ namespace Chess.Engine.Bit
                     moves.Add(new Move(colour, pieceType, RankFile.Get(startRankFile.Rank, startRankFile.File), RankFile.Get(rankFile.Rank, rankFile.File)));
             }
 
-            return moves;
+            //return moves;
         }
 
-        private List<Move> PawnMoves(BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square)
+        private List<Move> PawnMoves(List<Move> moves, BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square)
         {
-            var moves = new List<Move>();
+            //var moves = new List<Move>();
 
             var startRankFile = square.ToRankFile();
             var stride = board.GetPieceColour(square) == Colour.White ? 8 : -8;
@@ -416,6 +421,9 @@ namespace Chess.Engine.Bit
 
         public List<SquareState> FindPiecesAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
         {
+            if (square.ToBoardIndex() == -1)
+            { var bp = true; }
+
             var squares = new List<SquareState>();
 
             Func<SquareState, bool> opponentColour = ss => ss.Colour == colour.Opposite();
@@ -538,7 +546,7 @@ namespace Chess.Engine.Bit
         
         public List<SquareState> FindPawnsAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
         {
-            var outSquares = new List<SquareState>();
+            var outSquares = new List<SquareState>(64);
 
             var stride = colour == Colour.White ? 8 : -8;
             var captureStride1 = stride + 1;

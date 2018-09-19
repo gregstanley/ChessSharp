@@ -91,7 +91,8 @@ namespace Chess.Engine.Extensions
             [SquareFlag.H8] = 63
         };
 
-        public static int ToBoardIndex(this SquareFlag square) => _indices[square];
+        public static int ToBoardIndex(this SquareFlag square) =>
+            _indices.ContainsKey(square) ? _indices[square] : -1;
 
         public static byte GetInstanceNumber(this SquareFlag squares, SquareFlag square)
         {

@@ -259,24 +259,6 @@ namespace Chess.Engine
             _state = CheckForCheck(move.PieceColour, _bitBoard, _bitBoardMoveFinder, _state);
 
             _invalidFlags = CalculateInvalidSquares(move);
-
-            //var colour = move.PieceColour;
-
-            //var whiteKingSquare = _bitBoard.FindKingSquare(Colour.White);
-            //var blackKingSquare = _bitBoard.FindKingSquare(Colour.Black);
-            //var whiteChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.White, whiteKingSquare);
-            //var blackChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(_bitBoard, Colour.Black, blackKingSquare);
-
-            //if (whiteChecks.Any())
-            //{
-            //    if (colour == Colour.Black && !blackChecks.Any())
-            //        _state |= BoardState.WhiteIsInCheck;
-            //}
-            //else if (blackChecks.Any())
-            //{
-            //    if (colour == Colour.White && !whiteChecks.Any())
-            //        _state |= BoardState.BlackIsInCheck;
-            //}
         }
 
         public void UnMakeMove(Move move)
@@ -289,6 +271,7 @@ namespace Chess.Engine
             else
                 Key = _keyGen.Update(Key, move);
 
+            // TODO: Bug - Castle doesn't undo properly
             if (ParentBoard.Key != Key)
             { var bp = true; }
         }
@@ -302,9 +285,30 @@ namespace Chess.Engine
             return Evaluation * who2move;
         }
 
+        public bool ParentMoveWasCastle()
+        {
+            if (ParentBoard == null)
+                return false;
+
+            return ParentBoard.Notation.StartsWith("0-0");
+        }
+
+        public bool IsInCheckOrImmediatePostCastle(Colour colour)
+        {
+            if (ParentBoard == null
+                || IsInCheck(colour)
+                || ParentMoveWasCastle())
+            //|| ParentBoard.Notation.StartsWith("0-0"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
         public IEnumerable<Move> GetUnplayedParentMoves(Colour colour, IEnumerable<SquareFlag> invalidSquares)
         {
-            if (ParentBoard == null || ParentBoard._move == null)
+            if (ParentBoard == null || ParentBoard._move == null || ParentBoard._moves == null)
                 return new List<Move>();
 
             var unplayedMoves = ParentBoard._moves
@@ -321,11 +325,66 @@ namespace Chess.Engine
         public IList<Move> FindMoves(Colour colour) =>
             _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantSquare, colour);
 
+        public IEnumerable<Move> FindPreviousMoves(Colour colour)
+        {
+            var invalidSquares = GetInvalidFlags();
+            var invalidSquaresArray = invalidSquares.ToList();
+
+            return ParentBoard.GetUnplayedParentMoves(colour, invalidSquaresArray);
+        }
+
+        //private bool NeedsReCalc(Colour colour)
+        //{
+        //    if (ParentBoard?.ParentBoard == null
+        //        || IsInCheck(colour)
+        //        || ParentMoveWasCastle())
+        //    //|| ParentBoard.Notation.StartsWith("0-0"))
+        //    {
+        //        return true;
+        //    }
+
+        //    return false;
+        //}
+
+        public IEnumerable<Move> FindNewMoves(Colour colour)
+        {
+            //if (ParentBoard?.ParentBoard == null
+            //    || IsInCheck(colour)
+            //    || PreviousMoveWasCastle())
+            //    //|| ParentBoard.Notation.StartsWith("0-0"))
+            if (IsInCheckOrImmediatePostCastle(colour))
+            {
+                //_moves = FindMoves(colour);
+                //return _moves;
+                return FindMoves(colour);
+            }
+
+            var squareStates = GetInvalidSquares(colour);
+            var newMoves2 = new List<Move>(256);
+            //var newMoves = 
+                _bitBoardMoveFinder.FindMoves(newMoves2, _bitBoard, EnPassantSquare, colour, squareStates);
+
+            return newMoves2;
+        }
+
+        private List<SquareState> GetInvalidSquares(Colour colour)
+        {
+            var invalidSquares = GetInvalidFlags();
+            var invalidSquaresArray = invalidSquares.ToList();
+
+            return invalidSquaresArray
+                .Select(x => _bitBoard.GetSquareState(x))
+                .Where(x => x.Colour == colour)
+                .ToList();
+        }
+
         public IEnumerable<Move> FindMoves2(Colour colour)
         {
-            if (ParentBoard?.ParentBoard == null
-                || IsInCheck(colour)
-                || ParentBoard.Notation.StartsWith("0-0"))
+            //if (ParentBoard?.ParentBoard == null
+            //    || IsInCheck(colour)
+            //    || PreviousMoveWasCastle())
+            //    //|| ParentBoard.Notation.StartsWith("0-0"))
+            if (IsInCheckOrImmediatePostCastle(colour))
             {
                 _moves = FindMoves(colour);
                 return _moves;
@@ -344,9 +403,11 @@ namespace Chess.Engine
             //if (EnPassantSquare == SquareFlag.F6)
             //{ var bp = true; }
 
-            var invalidSquares = GetInvalidFlags();
-            var invalidSquaresArray = invalidSquares.ToList();
-            var validUnplayedParentMoves = ParentBoard.GetUnplayedParentMoves(colour, invalidSquaresArray);
+            //var invalidSquares = GetInvalidFlags();
+            //var invalidSquaresArray = invalidSquares.ToList();
+            //var validUnplayedParentMoves = ParentBoard.GetUnplayedParentMoves(colour, invalidSquaresArray);
+
+            var validUnplayedParentMoves = FindPreviousMoves(colour);
 
             if (!validUnplayedParentMoves.Any())
             {
@@ -354,13 +415,18 @@ namespace Chess.Engine
                 return _moves;
             }
 
-            var squareStates = invalidSquaresArray
-                .Select(x => _bitBoard.GetSquareState(x))
-                .Where(x => x.Colour == colour)
-                .ToList();
+            //var squareStates = invalidSquaresArray
+            //    .Select(x => _bitBoard.GetSquareState(x))
+            //    .Where(x => x.Colour == colour)
+            //    .ToList();
 
-            var newMoves = _bitBoardMoveFinder.FindMoves(_bitBoard, EnPassantSquare, colour, squareStates);
-            
+            //var squareStates = GetInvalidSquares(colour);
+
+            //var newMoves2 = new List<Move>(256);
+            //var newMoves = _bitBoardMoveFinder.FindMoves(newMoves2, _bitBoard, EnPassantSquare, colour, squareStates);
+
+            var newMoves = FindNewMoves(colour);
+
             var availableMoves = validUnplayedParentMoves.Concat(newMoves);
 
             var validateMoves = false;
@@ -563,12 +629,12 @@ namespace Chess.Engine
 
             if (whiteChecks.Any())
             {
-                if (colour == Colour.Black && !blackChecks.Any())
+                //if (colour == Colour.Black && !blackChecks.Any())
                     state |= BoardState.WhiteIsInCheck;
             }
             else if (blackChecks.Any())
             {
-                if (colour == Colour.White && !whiteChecks.Any())
+                //if (colour == Colour.White && !whiteChecks.Any())
                     state |= BoardState.BlackIsInCheck;
             }
 
