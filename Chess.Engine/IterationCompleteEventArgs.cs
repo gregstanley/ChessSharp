@@ -9,6 +9,8 @@ namespace Chess.Engine
     {
         public int Depth { get; set; }
         public double Eval { get; set; }
+        public int NodeCount { get; set; }
+        public long TimeMs { get; set; }
         public PotentialBoard PotentialBoard { get; set; }
     }
 }

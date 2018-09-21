@@ -489,20 +489,31 @@ namespace Chess.Engine
 
                     var whiteKingSquare = childBitBoard.FindKingSquare(Colour.White);
                     var blackKingSquare = childBitBoard.FindKingSquare(Colour.Black);
-                    var whiteChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(childBitBoard, Colour.White, whiteKingSquare);
-                    var blackChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(childBitBoard, Colour.Black, blackKingSquare);
+                    //var whiteChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(childBitBoard, Colour.White, whiteKingSquare);
+                    //var blackChecks = _bitBoardMoveFinder.FindPiecesAttackingThisSquare(childBitBoard, Colour.Black, blackKingSquare);
 
-                    if (whiteChecks.Any())
+                    var isWhiteCheck = _bitBoardMoveFinder.IsCheck(childBitBoard, Colour.White, whiteKingSquare);
+                    var isBlackCheck = _bitBoardMoveFinder.IsCheck(childBitBoard, Colour.Black, blackKingSquare);
+
+                    //if (whiteChecks.Any())
+                    if (isWhiteCheck)
                     {
-                        if (colour == Colour.Black && !blackChecks.Any())
+                        //if (!isWhiteCheck)
+                        //{ var bp = true; }
+                        //if (colour == Colour.Black && !blackChecks.Any())
+                        if (colour == Colour.Black && !isBlackCheck)
                         {
                             childBoard._state |= BoardState.WhiteIsInCheck;
                             ChildBoards.Add(childBoard);
                         }
                     }
-                    else if (blackChecks.Any())
+                    //else if (blackChecks.Any())
+                    else if(isBlackCheck)
                     {
-                        if (colour == Colour.White && !whiteChecks.Any())
+                        //if (!isBlackCheck)
+                        //{ var bp = true; }
+                        //if (colour == Colour.White && !whiteChecks.Any())
+                        if (colour == Colour.White && !isWhiteCheck)
                         {
                             childBoard._state |= BoardState.BlackIsInCheck;
                             ChildBoards.Add(childBoard);
@@ -624,15 +635,21 @@ namespace Chess.Engine
         {
             var whiteKingSquare = bitBoard.FindKingSquare(Colour.White);
             var blackKingSquare = bitBoard.FindKingSquare(Colour.Black);
-            var whiteChecks = bitBoardMoveFinder.FindPiecesAttackingThisSquare(bitBoard, Colour.White, whiteKingSquare);
-            var blackChecks = bitBoardMoveFinder.FindPiecesAttackingThisSquare(bitBoard, Colour.Black, blackKingSquare);
+            //var whiteChecks = bitBoardMoveFinder.FindPiecesAttackingThisSquare(bitBoard, Colour.White, whiteKingSquare);
+            //var blackChecks = bitBoardMoveFinder.FindPiecesAttackingThisSquare(bitBoard, Colour.Black, blackKingSquare);
 
-            if (whiteChecks.Any())
+            var isWhiteCheck = _bitBoardMoveFinder.IsCheck(bitBoard, Colour.White, whiteKingSquare);
+            var isBlackCheck = _bitBoardMoveFinder.IsCheck(bitBoard, Colour.Black, blackKingSquare);
+
+            //if (whiteChecks.Any())
+            if(isWhiteCheck)
             {
                 //if (colour == Colour.Black && !blackChecks.Any())
                     state |= BoardState.WhiteIsInCheck;
             }
-            else if (blackChecks.Any())
+
+            //if (blackChecks.Any())
+            if (isBlackCheck)
             {
                 //if (colour == Colour.White && !whiteChecks.Any())
                     state |= BoardState.BlackIsInCheck;

@@ -35,7 +35,7 @@ namespace Chess.Engine.Ai
                 .Reverse()
                 .Select(x => x.Notation);
 
-            _sb.AppendLine($"{args.Depth}) {args.Eval} {string.Join(" ", moveString)}");
+            _sb.AppendLine($"{args.Depth}) E:{args.Eval} Nodes: {args.NodeCount} Time: {args.TimeMs} {string.Join(" ", moveString)}");
         }
 
         public Board ChoseMove(Board board, Colour colour, int ply)

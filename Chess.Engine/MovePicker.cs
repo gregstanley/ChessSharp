@@ -20,8 +20,6 @@ namespace Chess.Engine
         private readonly Move _transpositionTableMove;
         private readonly State _state = State.TT;
 
-        //List<Move> _moves = new List<Move>(256);
-
         public MovePicker(Colour colour, Board board, Move transpositionTableMove)
         {
             _colour = colour;
@@ -39,7 +37,6 @@ namespace Chess.Engine
                 yield return _transpositionTableMove;
             }
 
-            //if (_board.IsInCheck(_colour) || _board.ParentBoard.Notation.StartsWith("0-0"))
             if (_board.IsInCheckOrImmediatePostCastle(_colour))
             {
                 var newMoves = _board.FindMoves(_colour)
@@ -83,6 +80,9 @@ namespace Chess.Engine
 
                 foreach (var newMove in newMoves)
                 {
+                    if (_transpositionTableMove != null && newMove.Notation == _transpositionTableMove.Notation)
+                        continue;
+
                     yield return newMove;
                 }
             }

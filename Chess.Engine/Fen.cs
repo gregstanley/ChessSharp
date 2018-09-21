@@ -119,7 +119,8 @@ namespace Chess.Engine
             if (fenChars.Length != 64)
                 throw new Exception($"The expanded fen string has {fenChars.Length} chars in it but it should have 64");
 
-            SquareFlag allBitsOn = (SquareFlag)~0;
+            //SquareFlag allBitsOn = (SquareFlag)~0;
+            SquareFlag allBitsOn = (SquareFlag)ulong.MaxValue;
 
             var squareArray = allBitsOn.ToList().ToArray();
 

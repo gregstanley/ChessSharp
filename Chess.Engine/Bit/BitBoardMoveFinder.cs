@@ -419,7 +419,217 @@ namespace Chess.Engine.Bit
             return outSquares;
         }
 
+        public bool IsCheck(BitBoard board, Colour colour, SquareFlag square)
+        {
+            if (square.ToBoardIndex() == -1)
+            { var bp = true; }
+
+            var attackedByPawn = FindPawnsAttackingThisSquare(board, colour, square);
+
+            if (attackedByPawn.Any())
+                return true;
+
+            Func<SquareState, bool> opponentColour = ss => ss.Colour == colour.Opposite();
+            Func<SquareState, bool> anyColour = ss => true;
+            Func<SquareState, bool> whereColour = colour == Colour.None ? anyColour : opponentColour;
+
+            Func<SquareState, bool> whereQueen = ss => whereColour(ss) && ss.Type == PieceType.Queen;
+            Func<SquareState, bool> whereRook = ss => whereColour(ss) && ss.Type == PieceType.Rook;
+            Func<SquareState, bool> whereBishop = ss => whereColour(ss) && ss.Type == PieceType.Bishop;
+            Func<SquareState, bool> wherePawn = ss => whereColour(ss) && ss.Type == PieceType.Pawn;
+            Func<SquareState, bool> whereKnight = ss => whereColour(ss) && ss.Type == PieceType.Knight;
+            Func<SquareState, bool> whereKing = ss => whereColour(ss) && ss.Type == PieceType.King;
+
+            var attackedByKnight = AvailableKnightSquares(board, colour, square)
+                .Where(whereKnight);
+
+            if (attackedByKnight.Any())
+                return true;
+
+            var horizontal = SquareFlagExtensions.HorizontalAttacks(square);
+
+            var rookSquares = board.FindRookSquares(colour.Opposite());
+
+            var opponentHit = horizontal & rookSquares;
+
+            if (opponentHit > 0)
+            {
+                var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
+                  .Where(whereRook);
+
+                if (attackedByRook.Any())
+                    return true;
+            }
+
+            var diagonal = SquareFlagExtensions.DiagonalAttacks(square);
+
+            var bishopSquares = board.FindBishopSquares(colour.Opposite());
+
+            opponentHit = diagonal & bishopSquares;
+
+            if (opponentHit > 0)
+            {
+                var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
+                  .Where(whereBishop);
+
+                if (attackedByBishop.Any())
+                    return true;
+            }
+
+            var queenSquares = board.FindQueenSquares(colour.Opposite());
+            var star = horizontal | diagonal;
+
+            opponentHit = star & queenSquares;
+
+            if (opponentHit > 0)
+            {
+                var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
+                  .Where(whereQueen);
+
+                if (attackedByQueen.Any())
+                    return true;
+            }
+
+            opponentHit = horizontal & board.FindKingSquare(colour.Opposite());
+
+            if (opponentHit > 0)
+            {
+                var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
+                  .Where(whereKing);
+
+                if (attackedByKing.Any())
+                    return true;
+            }
+
+            return false;
+        }
+
         public List<SquareState> FindPiecesAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
+        {
+            if (square.ToBoardIndex() == -1)
+            { var bp = true; }
+
+            var squares = new List<SquareState>();
+
+            if (colour == Colour.None)
+            {
+                var attackedByPawnWhite = FindPawnsAttackingThisSquare(board, Colour.White, square);
+
+                if (attackedByPawnWhite.Any())
+                    squares.AddRange(attackedByPawnWhite);
+
+                var attackedByPawnBlack = FindPawnsAttackingThisSquare(board, Colour.Black, square);
+
+                if (attackedByPawnBlack.Any())
+                    squares.AddRange(attackedByPawnBlack);
+            }
+            else
+            {
+                var attackedByPawn = FindPawnsAttackingThisSquare(board, colour, square);
+
+                if (attackedByPawn.Any())
+                    squares.AddRange(attackedByPawn);
+            }
+
+            Func<SquareState, bool> opponentColour = ss => ss.Colour == colour.Opposite();
+            Func<SquareState, bool> anyColour = ss => true;
+            Func<SquareState, bool> whereColour = colour == Colour.None ? anyColour : opponentColour;
+
+            Func<SquareState, bool> whereQueen = ss => whereColour(ss) && ss.Type == PieceType.Queen;
+            Func<SquareState, bool> whereRook = ss => whereColour(ss) && ss.Type == PieceType.Rook;
+            Func<SquareState, bool> whereBishop = ss => whereColour(ss) && ss.Type == PieceType.Bishop;
+            Func<SquareState, bool> wherePawn = ss => whereColour(ss) && ss.Type == PieceType.Pawn;
+            Func<SquareState, bool> whereKnight = ss => whereColour(ss) && ss.Type == PieceType.Knight;
+            Func<SquareState, bool> whereKing = ss => whereColour(ss) && ss.Type == PieceType.King;
+
+            var attackedByKnight = AvailableKnightSquares(board, colour, square)
+                .Where(whereKnight);
+
+            if (attackedByKnight.Any())
+                squares.AddRange(attackedByKnight);
+
+            var horizontal = SquareFlagExtensions.HorizontalAttacks(square);
+
+            var rookSquares = board.FindRookSquares(colour.Opposite());
+
+            var opponentHit = horizontal & rookSquares;
+
+            if (opponentHit > 0)
+            {
+                var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
+                  .Where(whereRook);
+
+                if (attackedByRook.Any())
+                    squares.AddRange(attackedByRook);
+            }
+
+            var diagonal = SquareFlagExtensions.DiagonalAttacks(square);
+
+            var bishopSquares = board.FindBishopSquares(colour.Opposite());
+
+            opponentHit = diagonal & bishopSquares;
+
+            if (opponentHit > 0)
+            {
+                var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
+                  .Where(whereBishop);
+
+                if (attackedByBishop.Any())
+                    squares.AddRange(attackedByBishop);
+            }
+
+            var queenSquares = board.FindQueenSquares(colour.Opposite());
+            var star = horizontal | diagonal;
+
+            opponentHit = star & queenSquares;
+
+            if (opponentHit > 0)
+            {
+                var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
+                  .Where(whereQueen);
+
+                if (attackedByQueen.Any())
+                    squares.AddRange(attackedByQueen);
+            }
+
+            opponentHit = horizontal & board.FindKingSquare(colour.Opposite());
+
+            if (opponentHit > 0)
+            {
+                var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
+                  .Where(whereKing);
+
+                if (attackedByKing.Any())
+                    squares.AddRange(attackedByKing);
+            }
+            //var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
+            //    .Where(whereRook);
+
+            //if (attackedByRook.Any())
+            //    squares.AddRange(attackedByRook);
+
+            //var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
+            //    .Where(whereBishop);
+
+            //if (attackedByBishop.Any())
+            //    squares.AddRange(attackedByBishop);
+
+            //var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
+            //    .Where(whereQueen);
+
+            //if (attackedByQueen.Any())
+            //    squares.AddRange(attackedByQueen);
+
+            //var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
+            //    .Where(whereKing);
+
+            //if (attackedByKing.Any())
+            //    squares.AddRange(attackedByKing);
+
+            return squares;
+        }
+
+        public List<SquareState> FindPiecesAttackingThisSquare2(BitBoard board, Colour colour, SquareFlag square)
         {
             if (square.ToBoardIndex() == -1)
             { var bp = true; }
