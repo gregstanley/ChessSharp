@@ -1,125 +1,134 @@
 using ChessSharp.Enums;
-using ChessSharp.Models;
+using ChessSharp.Extensions;
 using Xunit;
 
 namespace ChessSharp.Tests
 {
     public class MoveTests
     {
-        [Fact]
-        public void Move_Constructor_Colour()
+        [Theory]
+        [InlineData(Colour.White)]
+        [InlineData(Colour.Black)]
+        public void Move_Constructor_Colour(Colour colour)
         {
-            var moveWhite = new Move(Colour.White, 0, 0, 0, 0, 0, 0, false);
-            var moveBlack = new Move(Colour.Black, 0, 0, 0, 0, 0, 0, false);
+            var move = MoveConstructor.CreateMove(colour, 0, 0, 0, 0, MoveType.Ordinary);
 
-            Assert.Equal(Colour.White, moveWhite.Colour);
-            Assert.Equal(Colour.Black, moveBlack.Colour);
+            Assert.Equal(colour, move.GetColour());
         }
 
-        [Fact]
-        public void Move_Constructor_PieceType()
+        [Theory]
+        [InlineData(PieceType.None)]
+        [InlineData(PieceType.Pawn)]
+        [InlineData(PieceType.Rook)]
+        [InlineData(PieceType.Bishop)]
+        [InlineData(PieceType.Knight)]
+        [InlineData(PieceType.Queen)]
+        [InlineData(PieceType.King)]
+        public void Move_Constructor_PieceType(PieceType pieceType)
         {
-            var movePawn   = new Move(0, PieceType.Pawn, 0, 0, 0, 0, 0, false);
-            var moveRook   = new Move(0, PieceType.Rook, 0, 0, 0, 0, 0, false);
-            var moveKnight = new Move(0, PieceType.Knight, 0, 0, 0, 0, 0, false);
-            var moveBishop = new Move(0, PieceType.Bishop, 0, 0, 0, 0, 0, false);
-            var moveQueen  = new Move(0, PieceType.Queen, 0, 0, 0, 0, 0, false);
-            var moveKing   = new Move(0, PieceType.King, 0, 0, 0, 0, 0, false);
+            var move   = MoveConstructor.CreateMove(0, pieceType, 0, 0, 0, MoveType.Ordinary);
 
-            Assert.Equal(PieceType.Pawn, movePawn.PieceType);
-            Assert.Equal(PieceType.Rook, moveRook.PieceType);
-            Assert.Equal(PieceType.Knight, moveKnight.PieceType);
-            Assert.Equal(PieceType.Bishop, moveBishop.PieceType);
-            Assert.Equal(PieceType.Queen, moveQueen.PieceType);
-            Assert.Equal(PieceType.King, moveKing.PieceType);
+            Assert.Equal(pieceType, move.GetPieceType());
         }
 
-        [Fact]
-        public void Move_Constructor_From()
+        [Theory]
+        [InlineData(SquareFlag.A1)]
+        [InlineData(SquareFlag.B2)]
+        [InlineData(SquareFlag.C3)]
+        [InlineData(SquareFlag.D4)]
+        [InlineData(SquareFlag.E5)]
+        [InlineData(SquareFlag.F6)]
+        [InlineData(SquareFlag.G7)]
+        [InlineData(SquareFlag.H8)]
+        public void Move_Constructor_From(SquareFlag square)
         {
-            var move = new Move(0, 0, SquareFlag.A2, 0, 0, 0, 0, false);
+            var move = MoveConstructor.CreateMove(0, 0, square, 0, 0, MoveType.Ordinary);
 
-            Assert.Equal(SquareFlag.A2, move.From);
+            Assert.Equal(square, move.GetFrom());
         }
 
-        [Fact]
-        public void Move_Constructor_To()
+        [Theory]
+        [InlineData(SquareFlag.A1)]
+        [InlineData(SquareFlag.B2)]
+        [InlineData(SquareFlag.C3)]
+        [InlineData(SquareFlag.D4)]
+        [InlineData(SquareFlag.E5)]
+        [InlineData(SquareFlag.F6)]
+        [InlineData(SquareFlag.G7)]
+        [InlineData(SquareFlag.H8)]
+        public void Move_Constructor_To(SquareFlag square)
         {
-            var move = new Move(0, 0, 0, SquareFlag.H8, 0, 0, 0, false);
+            var move = MoveConstructor.CreateMove(0, 0, 0, square, 0, MoveType.Ordinary);
 
-            Assert.Equal(SquareFlag.H8, move.To);
+            Assert.Equal(square, move.GetTo());
         }
 
-        [Fact]
-        public void Move_Constructor_CapturePieceType()
+        [Theory]
+        [InlineData(PieceType.None)]
+        [InlineData(PieceType.Pawn)]
+        [InlineData(PieceType.Rook)]
+        [InlineData(PieceType.Bishop)]
+        [InlineData(PieceType.Knight)]
+        [InlineData(PieceType.Queen)]
+        [InlineData(PieceType.King)]
+        public void Move_Constructor_CapturePieceType(PieceType pieceType)
         {
-            var move = new Move(0, 0, 0, 0, PieceType.Bishop, 0, 0, false);
+            var move = MoveConstructor.CreateMove(0, 0, 0, 0, pieceType, MoveType.Ordinary);
 
-            Assert.Equal(PieceType.Bishop, move.CapturePieceType);
+            Assert.Equal(pieceType, move.GetCapturePieceType());
         }
 
-        [Fact]
-        public void Move_Constructor_PromotionPieceType()
+        [Theory]
+        [InlineData(MoveType.Ordinary)]
+        [InlineData(MoveType.EnPassant)]
+        [InlineData(MoveType.CastleKing)]
+        [InlineData(MoveType.CastleQueen)]
+        [InlineData(MoveType.PromotionQueen)]
+        [InlineData(MoveType.PromotionRook)]
+        [InlineData(MoveType.PromotionBishop)]
+        [InlineData(MoveType.PromotionKnight)]
+
+        public void Move_Constructor_MoveType(MoveType moveType)
         {
-            var move = new Move(0, 0, 0, 0, 0, PieceType.Queen, 0, false);
+            var move = MoveConstructor.CreateMove(0, 0, 0, 0, 0, moveType);
 
-            Assert.Equal(PieceType.Queen, move.PromotionPieceType);
-        }
-
-        [Fact]
-        public void Move_Constructor_Castle()
-        {
-            var moveCastleKing = new Move(0, 0, 0, 0, 0, 0, CastleType.King, false);
-            var moveCastleQueen = new Move(0, 0, 0, 0, 0, 0, CastleType.Queen, false);
-
-            Assert.Equal(CastleType.King, moveCastleKing.CastleType);
-            Assert.Equal(CastleType.Queen, moveCastleQueen.CastleType);
-        }
-
-        [Fact]
-        public void Move_Constructor_EnPassant()
-        {
-            var move = new Move(0, 0, 0, 0, 0, 0, 0, true);
-
-            Assert.True(move.EnPassant);
+            Assert.Equal(moveType, move.GetMoveType());
         }
 
         [Fact]
         public void Move_Constructor_AccessTwice_NoChange()
         {
-            var move = new Move(Colour.White, PieceType.Knight, SquareFlag.D5, SquareFlag.E7, PieceType.Pawn, PieceType.Rook, CastleType.King, false);
+            var move = MoveConstructor.CreateMove(Colour.White, PieceType.Knight, SquareFlag.D5, SquareFlag.E7, PieceType.Pawn, MoveType.CastleKing);
 
-            Assert.Equal(Colour.White, move.Colour);
-            Assert.Equal(Colour.White, move.Colour);
-            Assert.Equal(PieceType.Knight, move.PieceType);
-            Assert.Equal(PieceType.Knight, move.PieceType);
-            Assert.Equal(SquareFlag.D5, move.From);
-            Assert.Equal(SquareFlag.D5, move.From);
-            Assert.Equal(SquareFlag.E7, move.To);
-            Assert.Equal(SquareFlag.E7, move.To);
-            Assert.Equal(PieceType.Pawn, move.CapturePieceType);
-            Assert.Equal(PieceType.Pawn, move.CapturePieceType);
-            Assert.Equal(PieceType.Rook, move.PromotionPieceType);
-            Assert.Equal(PieceType.Rook, move.PromotionPieceType);
-            Assert.Equal(CastleType.King, move.CastleType);
-            Assert.Equal(CastleType.King, move.CastleType);
-            Assert.False(move.EnPassant);
-            Assert.False(move.EnPassant);
+            Assert.Equal(Colour.White, move.GetColour());
+            Assert.Equal(Colour.White, move.GetColour());
+            Assert.Equal(PieceType.Knight, move.GetPieceType());
+            Assert.Equal(PieceType.Knight, move.GetPieceType());
+            Assert.Equal(SquareFlag.D5, move.GetFrom());
+            Assert.Equal(SquareFlag.D5, move.GetFrom());
+            Assert.Equal(SquareFlag.E7, move.GetTo());
+            Assert.Equal(SquareFlag.E7, move.GetTo());
+            Assert.Equal(PieceType.Pawn, move.GetCapturePieceType());
+            Assert.Equal(PieceType.Pawn, move.GetCapturePieceType());
+            Assert.Equal(MoveType.CastleKing, move.GetMoveType());
+            Assert.Equal(MoveType.CastleKing, move.GetMoveType());
         }
 
         [Fact]
         public void Move_AreEqual()
         {
-            var moveA = new Move(Colour.White, PieceType.Rook, SquareFlag.G5, 0, 0, 0, 0, true);
-            var moveB = new Move(Colour.White, PieceType.Rook, SquareFlag.G5, 0, 0, 0, 0, true);
+            var moveA = MoveConstructor.CreateMove(Colour.White, PieceType.Rook, SquareFlag.G5, 0, 0, MoveType.Ordinary);
+            var moveB = MoveConstructor.CreateMove(Colour.White, PieceType.Rook, SquareFlag.G5, 0, 0, MoveType.Ordinary);
+
             Assert.Equal(moveA, moveB);
         }
 
         [Fact]
         public void Move_AreNotEqual()
         {
-            var moveA = new Move(Colour.White, 0, 0, 0, 0, 0, 0, false);
-            var moveB = new Move(Colour.Black, 0, 0, 0, 0, 0, 0, true);
+            var moveA = MoveConstructor.CreateMove(Colour.White, 0, 0, 0, 0, MoveType.Ordinary);
+            var moveB = MoveConstructor.CreateMove(Colour.Black, 0, 0, 0, 0, MoveType.Ordinary);
+
             Assert.NotEqual(moveA, moveB);
         }
     }

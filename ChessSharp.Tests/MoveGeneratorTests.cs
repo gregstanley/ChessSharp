@@ -1,5 +1,5 @@
 ﻿using ChessSharp.Enums;
-using ChessSharp.Models;
+using ChessSharp.Extensions;
 using System.Collections.Generic;
 using Xunit;
 
@@ -14,11 +14,11 @@ namespace ChessSharp.Tests
 
             var moveGenerator = new MoveGenerator();
 
-            var moves = new List<Move>(10);
+            var moves = new List<uint>(10);
 
             moveGenerator.GeneratePawnMoves(bitBoard, Colour.White, moves);
 
-            Assert.Collection(moves, x => Assert.Equal(SquareFlag.D5, x.To));
+            Assert.Collection(moves, x => Assert.Equal(SquareFlag.D5, x.GetTo()));
         }
 
         private BitBoard Create(string fenString)
