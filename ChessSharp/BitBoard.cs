@@ -160,5 +160,45 @@ namespace ChessSharp
 
         public SquareFlag FindKingSquare(Colour colour) =>
             colour == Colour.White ? WhiteKing : BlackKing;
+
+        public Colour GetPieceColour(SquareFlag square)
+        {
+            if (White.HasFlag(square))
+                return Colour.White;
+
+            if (Black.HasFlag(square))
+                return Colour.Black;
+
+            return Colour.None;
+        }
+
+        public PieceType GetPieceType(SquareFlag square)
+        {
+            var colour = GetPieceColour(square);
+
+            if (colour == Colour.None)
+                return PieceType.None;
+
+            if (colour == Colour.White)
+            {
+                if (WhitePawns.HasFlag(square)) return PieceType.Pawn;
+                if (WhiteRooks.HasFlag(square)) return PieceType.Rook;
+                if (WhiteKnights.HasFlag(square)) return PieceType.Knight;
+                if (WhiteBishops.HasFlag(square)) return PieceType.Bishop;
+                if (WhiteQueens.HasFlag(square)) return PieceType.Queen;
+                if (WhiteKing.HasFlag(square)) return PieceType.King;
+            }
+            else
+            {
+                if (BlackPawns.HasFlag(square)) return PieceType.Pawn;
+                if (BlackRooks.HasFlag(square)) return PieceType.Rook;
+                if (BlackKnights.HasFlag(square)) return PieceType.Knight;
+                if (BlackBishops.HasFlag(square)) return PieceType.Bishop;
+                if (BlackQueens.HasFlag(square)) return PieceType.Queen;
+                if (BlackKing.HasFlag(square)) return PieceType.King;
+            }
+
+            throw new System.Exception($"Failed to find piece for {square}");
+        }
     }
 }
