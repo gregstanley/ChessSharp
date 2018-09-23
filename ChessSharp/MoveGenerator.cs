@@ -239,7 +239,7 @@ namespace ChessSharp
         // https://www.geeksforgeeks.org/print-all-possible-combinations-of-r-elements-in-a-given-array-of-size-n/
         private void CombinationUtil(IReadOnlyList<SquareFlag> squares, int rootSquare, SquareFlag[] combination, int start, int end, int index, int combinationLength, Action<int, SquareFlag> addToList)
         {
-            if (index == r)
+            if (index == combinationLength)
             {
                 SquareFlag currentOccupancy = 0;
 
