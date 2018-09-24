@@ -22,7 +22,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GeneratePawnMoves(bitBoard, Colour.White, moves);
+            _moveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
 
             Assert.Collection(moves, x => Assert.Equal(SquareFlag.D5, x.GetTo()));
         }

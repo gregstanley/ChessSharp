@@ -4,6 +4,55 @@ namespace ChessSharp
 {
     public class MagicAttackGenerator
     {
+        public static SquareFlag GenerateKingAttack(int square)
+        {
+            ulong attackableSquares = 0;
+
+            var bit = 1ul << square;
+
+            ulong rowBits = ((ulong)0xFF) << (8 * (square / 8));
+
+            bit <<= 8;
+            attackableSquares |= bit;
+
+            bit = 1ul << square;
+
+            bit >>= 8;
+            attackableSquares |= bit;
+
+            bit = 1ul << (square + 1);
+
+            if ((bit & rowBits) != 0)
+            {
+                attackableSquares |= bit;
+
+                bit <<= 8;
+                attackableSquares |= bit;
+
+                bit = 1ul << (square + 1);
+
+                bit >>= 8;
+                attackableSquares |= bit;
+            }
+
+            bit = 1ul << (square - 1);
+
+            if ((bit & rowBits) != 0)
+            {
+                attackableSquares |= bit;
+
+                bit <<= 8;
+                attackableSquares |= bit;
+
+                bit = 1ul << (square - 1);
+
+                bit >>= 8;
+                attackableSquares |= bit;
+            }
+
+            return (SquareFlag)attackableSquares;
+        }
+
         public static SquareFlag GenerateRookAttack(int square, SquareFlag occupancy)
         {
             ulong attackableSquares = 0;
