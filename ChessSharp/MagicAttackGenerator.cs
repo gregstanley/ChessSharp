@@ -11,7 +11,7 @@ namespace ChessSharp
             var bit = 1ul << square;
 
             ulong rowBits = ((ulong)0xFF) << (8 * (square / 8));
-
+            
             bit <<= 8;
             attackableSquares |= bit;
 
@@ -49,7 +49,7 @@ namespace ChessSharp
                 bit >>= 8;
                 attackableSquares |= bit;
             }
-
+            
             return (SquareFlag)attackableSquares;
         }
 

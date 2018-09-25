@@ -195,6 +195,48 @@ namespace ChessSharp.Tests
             //Assert.Contains(capture8, captures);
         }
 
+        [Fact]
+        public void King_8Moves_Correct()
+        {
+            var bitBoard = Create("8/8/8/8/4K3/8/8/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+
+            var moveCount = moves.Count;
+
+            Assert.Equal(8, moveCount);
+        }
+
+        [Fact]
+        public void King_6Moves_Correct()
+        {
+            var bitBoard = Create("8/8/8/8/3PKP2/8/8/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+
+            var moveCount = moves.Count;
+
+            Assert.Equal(6, moveCount);
+        }
+
+        [Fact]
+        public void King_RookCoveringRank5_3Moves_Correct()
+        {
+            var bitBoard = Create("8/8/8/r7/3PKP2/8/8/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+
+            var moveCount = moves.Count;
+
+            Assert.Equal(3, moveCount);
+        }
+
         private BitBoard Create(string fenString)
         {
             var fen = Fen.Parse(fenString);
