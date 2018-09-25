@@ -6,13 +6,26 @@ using Xunit;
 
 namespace ChessSharp.Tests
 {
-    public class MoveGeneratorTests
+    public class MoveGeneratorFixture
     {
-        private MoveGenerator _moveGenerator;
-
-        public MoveGeneratorTests()
+        public MoveGeneratorFixture()
         {
-            _moveGenerator = new MoveGenerator();
+            MoveGenerator = new MoveGenerator();
+        }
+
+        public MoveGenerator MoveGenerator { get; private set; }
+    }
+
+    public class MoveGeneratorTests : IClassFixture<MoveGeneratorFixture>
+    {
+        MoveGeneratorFixture _moveGeneratorFixture;
+
+        //private MoveGenerator _moveGenerator;
+
+        public MoveGeneratorTests(MoveGeneratorFixture moveGeneratorFixture)
+        {
+            //_moveGenerator = new MoveGenerator();
+            _moveGeneratorFixture = moveGeneratorFixture;
         }
 
         [Fact]
@@ -22,9 +35,67 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
 
             Assert.Collection(moves, x => Assert.Equal(SquareFlag.D5, x.GetTo()));
+        }
+
+        [Fact]
+        public void EightPawns_Empty_OnePush_Correct()
+        {
+            var bitBoard = Create("8/8/8/8/8/8/PPPPPPPP/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+
+            Assert.Collection(moves,
+                x => { Assert.Equal(SquareFlag.A3, x.GetTo()); },
+                x => { Assert.Equal(SquareFlag.B3, x.GetTo()); },
+                x => { Assert.Equal(SquareFlag.C3, x.GetTo()); },
+                x => { Assert.Equal(SquareFlag.D3, x.GetTo()); },
+                x => { Assert.Equal(SquareFlag.E3, x.GetTo()); },
+                x => { Assert.Equal(SquareFlag.F3, x.GetTo()); },
+                x => { Assert.Equal(SquareFlag.G3, x.GetTo()); },
+                x => { Assert.Equal(SquareFlag.H3, x.GetTo()); });
+        }
+
+        [Fact]
+        public void FourPawns_Blocked_Correct()
+        {
+            var bitBoard = Create("8/8/8/8/8/1p1p1p1p/1P1P1P1P/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+
+            Assert.Empty(moves);
+        }
+
+        [Fact]
+        public void TwoPawns_FourCaptures_OnePush_Correct()
+        {
+            var bitBoard = Create("8/8/8/8/8/p1p2p1p/1P4P1/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+
+            var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
+
+            var capture1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.A3, PieceType.Pawn, MoveType.Ordinary);
+            var capture2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.C3, PieceType.Pawn, MoveType.Ordinary);
+            var capture3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.F3, PieceType.Pawn, MoveType.Ordinary);
+            var capture4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.H3, PieceType.Pawn, MoveType.Ordinary);
+            var move1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.B3, PieceType.None, MoveType.Ordinary);
+            var move2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.G3, PieceType.None, MoveType.Ordinary);
+
+            Assert.Contains(capture1, moves);
+            Assert.Contains(capture2, moves);
+            Assert.Contains(capture3, moves);
+            Assert.Contains(capture4, moves);
+            Assert.Contains(move1, moves);
+            Assert.Contains(move2, moves);
         }
 
         [Fact]
@@ -34,7 +105,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
 
             Assert.Empty(moves);
         }
@@ -46,7 +117,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
 
             Assert.Equal(4, moves.Count());
         }
@@ -58,7 +129,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
 
             var move = MoveConstructor.CreateMove(Colour.White, PieceType.Rook, SquareFlag.A1, SquareFlag.A2, PieceType.Pawn, MoveType.Ordinary);
 
@@ -72,7 +143,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -90,7 +161,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetBishopMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(bitBoard, Colour.White, moves);
 
             Assert.Empty(moves);
         }
@@ -102,7 +173,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetBishopMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(bitBoard, Colour.White, moves);
 
             Assert.Equal(4, moves.Count());
         }
@@ -122,7 +193,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
 
             Assert.Equal(moveCount, moves.Count);
         }
@@ -134,7 +205,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -152,7 +223,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -170,7 +241,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -202,7 +273,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -216,7 +287,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -230,7 +301,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -244,7 +315,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            var checkers = _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
 

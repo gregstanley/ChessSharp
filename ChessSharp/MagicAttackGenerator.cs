@@ -25,7 +25,7 @@ namespace ChessSharp
         private static ulong ShiftRankDown(ulong bits, int numRanks) =>
             bits >> (8 * numRanks);
 
-        private static ulong ShiftAndCheck(ulong bit, int shiftAmount, ulong rankBits)
+        private static ulong ShiftAndMaskRank(ulong bit, int shiftAmount, ulong rankBits)
         {
             if (shiftAmount > 0)
                 bit <<= shiftAmount;
@@ -35,34 +35,55 @@ namespace ChessSharp
             return bit & rankBits;
         }
 
+        public static SquareFlag GeneratePawnCapture(int squareIndex, Colour colour)
+        {
+            ulong attackableSquares = 0;
+
+            var bit = 1ul << squareIndex;
+
+            if (colour == Colour.White)
+            {
+                var rankBits = AllBitsOnForRankAtOffset(squareIndex, 1);
+
+                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthWest, rankBits);
+                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthEast, rankBits);
+            }
+            else if(colour == Colour.Black)
+            {
+                var rankBits = AllBitsOnForRankAtOffset(squareIndex, -1);
+
+                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthWest, rankBits);
+                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthEast, rankBits);
+            }
+
+            return (SquareFlag)attackableSquares;
+        }
+
         public static SquareFlag GenerateKnightAttack(int squareIndex)
         {
             ulong attackableSquares = 0;
 
             var bit = 1ul << squareIndex;
 
-            if (squareIndex == 18)
-            { var bp = true; }
+            var rankBits = AllBitsOnForRankAtOffset(squareIndex, 2);
 
-            ulong rankBits = AllBitsOnForRankAtOffset(squareIndex, 2);
-
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.NorthNorthWest, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.NorthNorthEast, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthNorthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthNorthEast, rankBits);
 
             rankBits = AllBitsOnForRankAtOffset(squareIndex, 1);
 
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.WestNorthWest, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.EastNorthEast, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.WestNorthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.EastNorthEast, rankBits);
 
             rankBits = AllBitsOnForRankAtOffset(squareIndex, -1);
 
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.WestSouthWest, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.EastSouthEast, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.WestSouthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.EastSouthEast, rankBits);
 
             rankBits = AllBitsOnForRankAtOffset(squareIndex, -2);
 
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.SouthSouthWest, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.SouthSouthEast, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthSouthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthSouthEast, rankBits);
 
             return (SquareFlag)attackableSquares;
         }
@@ -73,22 +94,22 @@ namespace ChessSharp
 
             var bit = 1ul << squareIndex;
 
-            ulong rankBits = AllBitsOnForRankAtOffset(squareIndex, 1);
+            var rankBits = AllBitsOnForRankAtOffset(squareIndex, 1);
 
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.NorthWest, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.North, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.NorthEast, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.North, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthEast, rankBits);
 
             rankBits = AllBitsOnForRank(squareIndex);
 
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.West, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.East, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.West, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.East, rankBits);
 
             rankBits = AllBitsOnForRankAtOffset(squareIndex, -1);
 
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.SouthWest, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.South, rankBits);
-            attackableSquares |= ShiftAndCheck(bit, (int)MoveDirection.SouthEast, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.South, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthEast, rankBits);
 
             return (SquareFlag)attackableSquares;
         }
@@ -101,7 +122,8 @@ namespace ChessSharp
 
             var occupancyAsLong = (ulong)occupancy;
 
-            ulong rowBits = ((ulong)0xFF) << (8 * (squareIndex / 8));
+            //ulong rowBits = ((ulong)0xFF) << (8 * (squareIndex / 8));
+            var rankBits = AllBitsOnForRank(squareIndex);
 
             do
             {
@@ -125,7 +147,7 @@ namespace ChessSharp
             {
                 bit <<= 1;
 
-                if ((bit & rowBits) != 0)
+                if ((bit & rankBits) != 0)
                     attackableSquares |= bit;
                 else
                     break;
@@ -138,7 +160,7 @@ namespace ChessSharp
             {
                 bit >>= 1;
 
-                if ((bit & rowBits) != 0)
+                if ((bit & rankBits) != 0)
                     attackableSquares |= bit;
                 else
                     break;
@@ -157,14 +179,15 @@ namespace ChessSharp
 
             var occupancyAsLong = (ulong)occupancy;
 
-            ulong rowBits = (((ulong)0xFF) << (8 * (squareIndex / 8)));
+            //ulong rowBits = (((ulong)0xFF) << (8 * (squareIndex / 8)));
+            var rankBits = AllBitsOnForRank(squareIndex);
 
             do
             {
                 bit <<= 8 - 1;
                 bit2 >>= 1;
 
-                if ((bit2 & rowBits) != 0)
+                if ((bit2 & rankBits) != 0)
                     attackableSquares |= bit;
                 else
                     break;
@@ -179,7 +202,7 @@ namespace ChessSharp
                 bit <<= 8 + 1;
                 bit2 <<= 1;
 
-                if ((bit2 & rowBits) != 0)
+                if ((bit2 & rankBits) != 0)
                     attackableSquares |= bit;
                 else
                     break;
@@ -194,7 +217,7 @@ namespace ChessSharp
                 bit >>= 8 - 1;
                 bit2 <<= 1;
 
-                if ((bit2 & rowBits) != 0)
+                if ((bit2 & rankBits) != 0)
                     attackableSquares |= bit;
                 else
                     break;
@@ -209,7 +232,7 @@ namespace ChessSharp
                 bit >>= 8 + 1;
                 bit2 >>= 1;
 
-                if ((bit2 & rowBits) != 0)
+                if ((bit2 & rankBits) != 0)
                     attackableSquares |= bit;
                 else
                     break;
