@@ -237,6 +237,26 @@ namespace ChessSharp.Tests
             Assert.Equal(3, moveCount);
         }
 
+        [Fact]
+        public void King_Check_6Moves_Correct()
+        {
+            var bitBoard = Create("8/8/8/4r3/3PKP2/8/8/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            var checkers = _moveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+
+            var moveCount = moves.Count;
+
+            var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
+
+            var capture1 = MoveConstructor.CreateMove(Colour.White, PieceType.King, SquareFlag.E4, SquareFlag.E5, PieceType.Rook, MoveType.Ordinary);
+
+            Assert.Equal(4, moveCount);
+
+            Assert.Contains(capture1, captures);
+        }
+
         private BitBoard Create(string fenString)
         {
             var fen = Fen.Parse(fenString);

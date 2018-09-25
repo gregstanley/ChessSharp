@@ -11,12 +11,14 @@ namespace ChessSharp
      */
     public class MoveGenerator
     {
+        private SquareFlag[] KnightAttacks = new SquareFlag[64];
         private SquareFlag[] KingAttacks = new SquareFlag[64];
         private SquareFlag[][] RookAttacks = new SquareFlag[64][];
         private SquareFlag[][] BishopAttacks = new SquareFlag[64][];
 
         public MoveGenerator()
         {
+            InitKnightAttacks();
             InitKingAttacks();
             InitRookAttacks();
             InitBishopAttacks();
@@ -27,7 +29,12 @@ namespace ChessSharp
             
         }
 
-        public void GetKingMoves(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        private void GetCheckers(BitBoard bitBoard, Colour colour)
+        {
+
+        }
+
+        public SquareFlag GetKingMoves(BitBoard bitBoard, Colour colour, IList<uint> moves)
         {
             var mySquares = bitBoard.FindPieceSquares(colour);
             var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
@@ -35,6 +42,11 @@ namespace ChessSharp
             var kingSquare = bitBoard.FindKingSquare(colour).ToList().First();
 
             var kingSquareIndex = kingSquare.ToBoardIndex();
+
+            var checkersRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Rook);
+            var checkersBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Bishop);
+            var checkersQueenAsRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Queen);
+            var checkersQueenAsBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Queen);
 
             var attackableSquaresIncludingSelfCaptures = MagicAttackGenerator.GenerateKingAttack(kingSquareIndex);
 
@@ -46,23 +58,24 @@ namespace ChessSharp
 
             foreach(var attackableSquare in attackableSquaresAsList)
             {
-                var isCheckRook = IsCheck(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Rook);
+                var potentialCheckersRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Rook);
 
-                if (isCheckRook)
+                if (potentialCheckersRook > 0)
                     continue;
 
-                var isCheckBishop = IsCheck(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Bishop);
+                var potentialCheckersBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Bishop);
 
-                if (isCheckBishop)
+                if (potentialCheckersBishop > 0)
                     continue;
 
-                var isCheckQueenAsRook = IsCheck(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Queen);
+                var potentialCheckersQueenAsRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Queen);
 
-                if (isCheckQueenAsRook)
+                if (potentialCheckersQueenAsRook > 0)
                     continue;
-                var isCheckQueenAsBishop = IsCheck(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Queen);
 
-                if (isCheckQueenAsBishop)
+                var potentialCheckersQueenAsBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Queen);
+
+                if (potentialCheckersQueenAsBishop > 0)
                     continue;
 
                 safeSquares |= attackableSquare;
@@ -83,6 +96,8 @@ namespace ChessSharp
                     moves.Add(MoveConstructor.CreateMove(colour, PieceType.King, kingSquare, to, PieceType.None, MoveType.Ordinary));
                 }
             }
+
+            return checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
         }
 
         private SquareFlag GetAttackableSquares(BitBoard bitBoard, Colour colour, SquareFlag square, PieceType rayType)
@@ -107,7 +122,7 @@ namespace ChessSharp
             return attackableSquares;
         }
 
-        public bool IsCheck(BitBoard bitBoard, Colour colour, SquareFlag square, PieceType rayType, PieceType pieceType)
+        public SquareFlag GetCheckers(BitBoard bitBoard, Colour colour, SquareFlag square, PieceType rayType, PieceType pieceType)
         {
             var opponentSquares = pieceType == PieceType.Queen
                 ? bitBoard.FindQueenSquares(colour.Opposite())
@@ -115,11 +130,9 @@ namespace ChessSharp
                     ? bitBoard.FindRookSquares(colour.Opposite())
                     : bitBoard.FindBishopSquares(colour.Opposite());
 
-            //var opponentRookSquares = bitBoard.FindRookSquares(colour.Opposite());
-
             var attackableSquares = GetAttackableSquares(bitBoard, colour, square, rayType);
 
-            return (attackableSquares & opponentSquares) > 0 ? true : false;
+            return attackableSquares & opponentSquares;
         }
 
         public bool IsCheckBishop(BitBoard bitBoard, Colour colour, SquareFlag square)
@@ -233,13 +246,25 @@ namespace ChessSharp
             return (int)index;
         }
 
+        private void InitKnightAttacks()
+        {
+            var knightAttacks = new SquareFlag[64];
+
+            for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
+            {
+                knightAttacks[squareIndex] = MagicAttackGenerator.GenerateKnightAttack(squareIndex);
+            }
+
+            KnightAttacks = knightAttacks;
+        }
+
         private void InitKingAttacks()
         {
             var kingAttacks = new SquareFlag[64];
 
-            for (var square = 0; square < 64; ++square)
+            for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
             {
-                kingAttacks[square] = MagicAttackGenerator.GenerateKingAttack(square);
+                kingAttacks[squareIndex] = MagicAttackGenerator.GenerateKingAttack(squareIndex);
             }
 
             KingAttacks = kingAttacks;
@@ -247,40 +272,40 @@ namespace ChessSharp
 
         private void InitRookAttacks()
         {
-            for (var square = 0; square < 64; ++square)
+            for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
             {
                 var dictionary = new SortedDictionary<int, SquareFlag>();
-                var occupancyMask = MagicNumbers.RookOccupancyMasks[square];
+                var occupancyMask = MagicNumbers.RookOccupancyMasks[squareIndex];
 
                 // Fill a (sorted) dictionary with index and board key value pairs
-                GenerateAllOccupancyCombinations(square, occupancyMask, AddRookAttack, dictionary);
+                GenerateAllOccupancyCombinations(squareIndex, occupancyMask, AddRookAttack, dictionary);
 
                 var highestIndex = dictionary.OrderByDescending(x => x.Key).First();
 
-                RookAttacks[square] = new SquareFlag[highestIndex.Key + 1]; // 65536
+                RookAttacks[squareIndex] = new SquareFlag[highestIndex.Key + 1]; // 65536
 
                 // Copy the sorted dictionary (binary search) to an array (empty space but fast to search)
                 foreach (var magicMove in dictionary)
-                    RookAttacks[square][magicMove.Key] = magicMove.Value;
+                    RookAttacks[squareIndex][magicMove.Key] = magicMove.Value;
             }
         }
 
         private void InitBishopAttacks()
         {
-            for (var square = 0; square < 64; ++square)
+            for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
             {
                 var dictionary = new SortedDictionary<int, SquareFlag>();
-                var occupancyMask = MagicNumbers.BishopOccupancyMasks[square];
+                var occupancyMask = MagicNumbers.BishopOccupancyMasks[squareIndex];
 
-                GenerateAllOccupancyCombinations(square, occupancyMask, AddBishopAttack, dictionary);
+                GenerateAllOccupancyCombinations(squareIndex, occupancyMask, AddBishopAttack, dictionary);
 
                 var highestIndex = dictionary.OrderByDescending(x => x.Key).First();
 
-                BishopAttacks[square] = new SquareFlag[highestIndex.Key + 1]; // 65536
+                BishopAttacks[squareIndex] = new SquareFlag[highestIndex.Key + 1]; // 65536
 
                 // Copy the sorted dictionary (binary search) to an array (empty space but fast to search)
                 foreach (var magicMove in dictionary)
-                    BishopAttacks[square][magicMove.Key] = magicMove.Value;
+                    BishopAttacks[squareIndex][magicMove.Key] = magicMove.Value;
             }
         }
 
@@ -325,35 +350,35 @@ namespace ChessSharp
             }
         }
 
-        private void AddRookAttack(SortedDictionary<int, SquareFlag> dictionary, int square, SquareFlag currentOccupancy)
+        private void AddRookAttack(SortedDictionary<int, SquareFlag> dictionary, int squareIndex, SquareFlag currentOccupancy)
         {
-            var index = GetRookMagicIndex(square, currentOccupancy);
+            var magicIndex = GetRookMagicIndex(squareIndex, currentOccupancy);
 
-            var attack = MagicAttackGenerator.GenerateRookAttack(square, currentOccupancy);
+            var attack = MagicAttackGenerator.GenerateRookAttack(squareIndex, currentOccupancy);
 
-            if (dictionary.ContainsKey(index) && dictionary[index] != attack)
+            if (dictionary.ContainsKey(magicIndex) && dictionary[magicIndex] != attack)
             {
                 var bp = true;
             }
             else
             {
-                dictionary[index] = attack;
+                dictionary[magicIndex] = attack;
             }
         }
 
-        private void AddBishopAttack(SortedDictionary<int, SquareFlag> dictionary, int square, SquareFlag currentOccupancy)
+        private void AddBishopAttack(SortedDictionary<int, SquareFlag> dictionary, int squareIndex, SquareFlag currentOccupancy)
         {
-            var index = GetBishopMagicIndex(square, currentOccupancy);
+            var magicIndex = GetBishopMagicIndex(squareIndex, currentOccupancy);
 
-            var attack = MagicAttackGenerator.GenerateBishopAttack(square, currentOccupancy);
+            var attack = MagicAttackGenerator.GenerateBishopAttack(squareIndex, currentOccupancy);
 
-            if (dictionary.ContainsKey(index) && dictionary[index] != attack)
+            if (dictionary.ContainsKey(magicIndex) && dictionary[magicIndex] != attack)
             {
                 var bp = true;
             }
             else
             {
-                dictionary[index] = attack;
+                dictionary[magicIndex] = attack;
             }
         }
     }
