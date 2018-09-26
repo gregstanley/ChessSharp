@@ -3,63 +3,37 @@ using System;
 
 namespace ChessSharp
 {
-    public class MagicAttackGenerator
+    public class AttackGenerator
     {
-        private static ulong AllBitsOnForRankAtOffset(int squareIndex, int offset)
-        {
-            var rankBits = AllBitsOnForRank(squareIndex);
-
-            return offset == 0
-                ? rankBits
-                : offset > 0
-                    ? ShiftRankUp(rankBits, offset)
-                    : ShiftRankDown(rankBits, Math.Abs(offset));
-        }
-
-        private static ulong AllBitsOnForRank(int squareIndex) =>
-            ((ulong)0xFF) << (8 * (squareIndex / 8));
-
-        private static ulong ShiftRankUp(ulong bits, int numRanks) =>
-            bits << (8 * numRanks);
-
-        private static ulong ShiftRankDown(ulong bits, int numRanks) =>
-            bits >> (8 * numRanks);
-
-        private static ulong ShiftAndMaskRank(ulong bit, int shiftAmount, ulong rankBits)
-        {
-            if (shiftAmount > 0)
-                bit <<= shiftAmount;
-            else if (shiftAmount < 0)
-                bit >>= Math.Abs(shiftAmount);
-
-            return bit & rankBits;
-        }
-
-        public static SquareFlag GeneratePawnCapture(int squareIndex, Colour colour)
+        public static SquareFlag GeneratePotentialWhitePawnCaptures(int squareIndex)
         {
             ulong attackableSquares = 0;
 
             var bit = 1ul << squareIndex;
 
-            if (colour == Colour.White)
-            {
-                var rankBits = AllBitsOnForRankAtOffset(squareIndex, 1);
+            var rankBits = AllBitsOnForRankAtOffset(squareIndex, 1);
 
-                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthWest, rankBits);
-                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthEast, rankBits);
-            }
-            else if(colour == Colour.Black)
-            {
-                var rankBits = AllBitsOnForRankAtOffset(squareIndex, -1);
-
-                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthWest, rankBits);
-                attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthEast, rankBits);
-            }
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.NorthEast, rankBits);
 
             return (SquareFlag)attackableSquares;
         }
 
-        public static SquareFlag GenerateKnightAttack(int squareIndex)
+        public static SquareFlag GeneratePotentialBlackPawnCaptures(int squareIndex)
+        {
+            ulong attackableSquares = 0;
+
+            var bit = 1ul << squareIndex;
+
+            var rankBits = AllBitsOnForRankAtOffset(squareIndex, -1);
+
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthWest, rankBits);
+            attackableSquares |= ShiftAndMaskRank(bit, (int)MoveDirection.SouthEast, rankBits);
+
+            return (SquareFlag)attackableSquares;
+        }
+
+        public static SquareFlag GeneratePotentialKnightAttacks(int squareIndex)
         {
             ulong attackableSquares = 0;
 
@@ -88,7 +62,7 @@ namespace ChessSharp
             return (SquareFlag)attackableSquares;
         }
 
-        public static SquareFlag GenerateKingAttack(int squareIndex)
+        public static SquareFlag GeneratePotentialKingAttacks(int squareIndex)
         {
             ulong attackableSquares = 0;
 
@@ -114,7 +88,7 @@ namespace ChessSharp
             return (SquareFlag)attackableSquares;
         }
 
-        public static SquareFlag GenerateRookAttack(int squareIndex, SquareFlag occupancy)
+        public static SquareFlag GeneratePotentialRookAttacks(int squareIndex, SquareFlag occupancy)
         {
             ulong attackableSquares = 0;
 
@@ -170,7 +144,7 @@ namespace ChessSharp
             return (SquareFlag)attackableSquares;
         }
 
-        public static SquareFlag GenerateBishopAttack(int squareIndex, SquareFlag occupancy)
+        public static SquareFlag GeneratePotentialBishopAttacks(int squareIndex, SquareFlag occupancy)
         {
             ulong attackableSquares = 0;
 
@@ -240,6 +214,36 @@ namespace ChessSharp
             } while (bit != 0 && ((bit & occupancyAsLong) == 0));
 
             return (SquareFlag)attackableSquares;
+        }
+
+        private static ulong AllBitsOnForRankAtOffset(int squareIndex, int offset)
+        {
+            var rankBits = AllBitsOnForRank(squareIndex);
+
+            return offset == 0
+                ? rankBits
+                : offset > 0
+                    ? ShiftRankUp(rankBits, offset)
+                    : ShiftRankDown(rankBits, Math.Abs(offset));
+        }
+
+        private static ulong AllBitsOnForRank(int squareIndex) =>
+            ((ulong)0xFF) << (8 * (squareIndex / 8));
+
+        private static ulong ShiftRankUp(ulong bits, int numRanks) =>
+            bits << (8 * numRanks);
+
+        private static ulong ShiftRankDown(ulong bits, int numRanks) =>
+            bits >> (8 * numRanks);
+
+        private static ulong ShiftAndMaskRank(ulong bit, int shiftAmount, ulong rankBits)
+        {
+            if (shiftAmount > 0)
+                bit <<= shiftAmount;
+            else if (shiftAmount < 0)
+                bit >>= Math.Abs(shiftAmount);
+
+            return bit & rankBits;
         }
     }
 }

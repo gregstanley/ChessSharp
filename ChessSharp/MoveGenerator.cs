@@ -51,7 +51,7 @@ namespace ChessSharp
             var checkersQueenAsRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Queen);
             var checkersQueenAsBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Queen);
 
-            var attackableSquaresIncludingSelfCaptures = MagicAttackGenerator.GenerateKingAttack(kingSquareIndex);
+            var attackableSquaresIncludingSelfCaptures = AttackGenerator.GeneratePotentialKingAttacks(kingSquareIndex);
 
             var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
 
@@ -61,6 +61,16 @@ namespace ChessSharp
 
             foreach(var attackableSquare in attackableSquaresAsList)
             {
+                var potentialCheckersPawn = GetPawnCheckers(bitBoard, colour, attackableSquare);
+
+                if (potentialCheckersPawn > 0)
+                    continue;
+
+                var potentialCheckersKnight = GetKnightCheckers(bitBoard, colour, attackableSquare);
+
+                if (potentialCheckersKnight > 0)
+                    continue;
+
                 var potentialCheckersRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Rook);
 
                 if (potentialCheckersRook > 0)
@@ -125,6 +135,30 @@ namespace ChessSharp
             return attackableSquares;
         }
 
+        public SquareFlag GetPawnCheckers(BitBoard bitBoard, Colour colour, SquareFlag square)
+        {
+            var squareIndex = square.ToBoardIndex();
+
+            var opponentPawnSquares = bitBoard.FindPawnSquares(colour.Opposite());
+
+            var attackableSquares = colour == Colour.White
+                ? PawnCapturesWhite[squareIndex]
+                : PawnCapturesBlack[squareIndex];
+
+            return attackableSquares & opponentPawnSquares;
+        }
+
+        public SquareFlag GetKnightCheckers(BitBoard bitBoard, Colour colour, SquareFlag square)
+        {
+            var squareIndex = square.ToBoardIndex();
+
+            var opponentKnightSquares = bitBoard.FindKnightSquares(colour.Opposite());
+
+            var attackableSquares = KnightAttacks[squareIndex];
+
+            return attackableSquares & opponentKnightSquares;
+        }
+
         public SquareFlag GetCheckers(BitBoard bitBoard, Colour colour, SquareFlag square, PieceType rayType, PieceType pieceType)
         {
             var opponentSquares = pieceType == PieceType.Queen
@@ -157,33 +191,79 @@ namespace ChessSharp
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
-                var toSquare = colour == Colour.White ? (ulong)fromSquare << 8 : (ulong)fromSquare >> 8;
-
-                if (!opponentSquares.HasFlag((SquareFlag)toSquare))
+                if (colour == Colour.White)
                 {
-                    // TODO: Promotion happens here
-                    moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, (SquareFlag)toSquare, PieceType.None, MoveType.Ordinary));
+                    var toSquare = (SquareFlag)((ulong)fromSquare << 8);
+
+                    if (!opponentSquares.HasFlag(toSquare))
+                    {
+                        if (SquareFlagExtensions.r8.HasFlag(toSquare))
+                            GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, PieceType.None);
+                        else
+                            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
+                    }
+                }
+                else if (colour == Colour.Black)
+                {
+                    var toSquare = (SquareFlag)((ulong)fromSquare >> 8);
+
+                    if (!opponentSquares.HasFlag(toSquare))
+                    {
+                        if (SquareFlagExtensions.r1.HasFlag(toSquare))
+                            GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, PieceType.None);
+                        else
+                            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
+                    }
                 }
             }
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
+                var fromSquareIndex = fromSquare.ToBoardIndex();
+
                 if (colour == Colour.White)
                 {
-                    var fromSquareIndex = fromSquare.ToBoardIndex();
-                    var captures = PawnCapturesWhite[fromSquareIndex].ToList();
+                    var captureSquares = PawnCapturesWhite[fromSquareIndex].ToList();
 
-                    foreach (var capture in captures)
+                    foreach (var toSquare in captureSquares)
                     {
-                        if (opponentSquares.HasFlag(capture))
+                        if (opponentSquares.HasFlag(toSquare))
                         {
-                            var capturePieceType = bitBoard.GetPieceType(capture);
+                            var capturePieceType = bitBoard.GetPieceType(toSquare);
 
-                            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, capture, capturePieceType, MoveType.Ordinary));
+                            if (SquareFlagExtensions.r8.HasFlag(toSquare))
+                                GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
+                            else
+                                moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
+                        }
+                    }
+                }
+                else if (colour == Colour.Black)
+                {
+                    var captureSquares = PawnCapturesBlack[fromSquareIndex].ToList();
+
+                    foreach (var toSquare in captureSquares)
+                    {
+                        if (opponentSquares.HasFlag(toSquare))
+                        {
+                            var capturePieceType = bitBoard.GetPieceType(toSquare);
+
+                            if (SquareFlagExtensions.r1.HasFlag(toSquare))
+                                GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
+                            else
+                                moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
                         }
                     }
                 }
             }
+        }
+
+        private void GetPromotions(BitBoard bitBoard, Colour colour, IList<uint> moves, SquareFlag fromSquare, SquareFlag toSquare, PieceType capturePieceType)
+        {
+            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionQueen));
+            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionRook));
+            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionKnight));
+            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionBishop));
         }
 
         public void GetRookMoves(BitBoard bitBoard, Colour colour, IList<uint> moves) =>
@@ -284,8 +364,8 @@ namespace ChessSharp
 
             for (var squareIndex = 8; squareIndex < 56; ++squareIndex)
             {
-                pawnCapturesWhite[squareIndex] = MagicAttackGenerator.GeneratePawnCapture(squareIndex, Colour.White);
-                pawnCapturesBlack[squareIndex] = MagicAttackGenerator.GeneratePawnCapture(squareIndex, Colour.Black);
+                pawnCapturesWhite[squareIndex] = AttackGenerator.GeneratePotentialWhitePawnCaptures(squareIndex);
+                pawnCapturesBlack[squareIndex] = AttackGenerator.GeneratePotentialBlackPawnCaptures(squareIndex);
             }
 
             PawnCapturesWhite = pawnCapturesWhite;
@@ -297,7 +377,7 @@ namespace ChessSharp
             var knightAttacks = new SquareFlag[64];
 
             for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
-                knightAttacks[squareIndex] = MagicAttackGenerator.GenerateKnightAttack(squareIndex);
+                knightAttacks[squareIndex] = AttackGenerator.GeneratePotentialKnightAttacks(squareIndex);
 
             KnightAttacks = knightAttacks;
         }
@@ -307,7 +387,7 @@ namespace ChessSharp
             var kingAttacks = new SquareFlag[64];
 
             for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
-                kingAttacks[squareIndex] = MagicAttackGenerator.GenerateKingAttack(squareIndex);
+                kingAttacks[squareIndex] = AttackGenerator.GeneratePotentialKingAttacks(squareIndex);
 
             KingAttacks = kingAttacks;
         }
@@ -396,7 +476,7 @@ namespace ChessSharp
         {
             var magicIndex = GetRookMagicIndex(squareIndex, currentOccupancy);
 
-            var attack = MagicAttackGenerator.GenerateRookAttack(squareIndex, currentOccupancy);
+            var attack = AttackGenerator.GeneratePotentialRookAttacks(squareIndex, currentOccupancy);
 
             var indexTaken = dictionary.ContainsKey(magicIndex) && dictionary[magicIndex] != attack;
 
@@ -410,7 +490,7 @@ namespace ChessSharp
         {
             var magicIndex = GetBishopMagicIndex(squareIndex, currentOccupancy);
 
-            var attack = MagicAttackGenerator.GenerateBishopAttack(squareIndex, currentOccupancy);
+            var attack = AttackGenerator.GeneratePotentialBishopAttacks(squareIndex, currentOccupancy);
 
             var indexTaken = dictionary.ContainsKey(magicIndex) && dictionary[magicIndex] != attack;
 
