@@ -75,5 +75,13 @@ namespace ChessSharp.Tests
             Assert.Equal(1, fen.HalfTurnCounter);
             Assert.Equal(8, fen.FullMoveNumber);
         }
+
+        [Fact]
+        public void Fen_EnPassant_Correct()
+        {
+            var fen = Fen.Parse("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQ e3 1 8");
+
+            Assert.Equal(SquareFlag.E3, fen.EnPassantSquare);
+        }
     }
 }

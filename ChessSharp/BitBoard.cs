@@ -59,7 +59,8 @@ namespace ChessSharp
             }
 
             return new BitBoard(whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueens, whiteKing,
-                blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.CastlingRights);
+                blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.EnPassantSquare,
+                fen.CastlingRights);
         }
 
         public BitBoard()
@@ -91,6 +92,7 @@ namespace ChessSharp
             SquareFlag blackBishops,
             SquareFlag blackQueens,
             SquareFlag blackKing,
+            SquareFlag enPassant,
             BoardState state)
         {
             WhitePawns = whitePawns;
@@ -105,6 +107,7 @@ namespace ChessSharp
             BlackBishops = blackBishops;
             BlackQueens = blackQueens;
             BlackKing = blackKing;
+            EnPassant = enPassant;
             _state = state;
         }
 
@@ -131,6 +134,8 @@ namespace ChessSharp
         public SquareFlag BlackQueens { get; private set; }
 
         public SquareFlag BlackKing { get; private set; }
+
+        public SquareFlag EnPassant { get; private set; }
 
         public SquareFlag White =>
             WhitePawns | WhiteRooks | WhiteKnights | WhiteBishops | WhiteQueens | WhiteKing;

@@ -24,7 +24,7 @@ namespace ChessSharp
             var colour = parts[1] == "w" ? Colour.White : Colour.Black;
             BoardState castlingRights = ParseCastlingRights(parts[2]);
 
-            SquareFlag enPassantSquare = (SquareFlag)0;
+            SquareFlag enPassantSquare = 0;
 
             if (parts[3] != "-")
                 Enum.TryParse(parts[3].ToUpper(), out enPassantSquare);

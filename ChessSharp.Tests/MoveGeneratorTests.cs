@@ -32,7 +32,8 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
 
             Assert.Collection(moves, x => Assert.Equal(SquareFlag.D5, x.GetTo()));
         }
@@ -44,7 +45,8 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
 
             Assert.Collection(moves,
                 x => { Assert.Equal(SquareFlag.A3, x.GetTo()); },
@@ -64,7 +66,8 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
 
             Assert.Empty(moves);
         }
@@ -76,7 +79,8 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.Black, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
 
             Assert.Empty(moves);
         }
@@ -88,7 +92,8 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
 
             var move1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.B3, PieceType.None, MoveType.Ordinary);
             var move2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.G3, PieceType.None, MoveType.Ordinary);
@@ -116,7 +121,8 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
 
             var promotion1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.D8, PieceType.None, MoveType.PromotionQueen);
             var promotion2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.D8, PieceType.None, MoveType.PromotionRook);
@@ -136,7 +142,8 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetPawnMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
 
             var promotion1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionQueen);
             var promotion2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionRook);
@@ -147,6 +154,21 @@ namespace ChessSharp.Tests
             Assert.Contains(promotion2, moves);
             Assert.Contains(promotion3, moves);
             Assert.Contains(promotion4, moves);
+        }
+
+        [Fact]
+        public void Pawn_EnPassant_Capture_Correct()
+        {
+            var bitBoard = Create("8/8/3Pp3/8/8/8/8/8 w KQkq e7");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+
+            var enPassantCapture = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D6, SquareFlag.E7, PieceType.Pawn, MoveType.EnPassant);
+
+            Assert.Contains(enPassantCapture, moves);
         }
 
         [Fact]

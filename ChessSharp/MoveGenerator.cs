@@ -32,11 +32,6 @@ namespace ChessSharp
             
         }
 
-        private void GetCheckers(BitBoard bitBoard, Colour colour)
-        {
-
-        }
-
         public SquareFlag GetKingMoves(BitBoard bitBoard, Colour colour, IList<uint> moves)
         {
             var mySquares = bitBoard.FindPieceSquares(colour);
@@ -46,55 +41,11 @@ namespace ChessSharp
 
             var kingSquareIndex = kingSquare.ToBoardIndex();
 
-            var checkersRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Rook);
-            var checkersBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Bishop);
-            var checkersQueenAsRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Queen);
-            var checkersQueenAsBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Queen);
-
             var attackableSquaresIncludingSelfCaptures = AttackGenerator.GeneratePotentialKingAttacks(kingSquareIndex);
 
             var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
 
-            var attackableSquaresAsList = attackableSquares.ToList();
-
-            var safeSquares = (SquareFlag)0;
-
-            foreach(var attackableSquare in attackableSquaresAsList)
-            {
-                var potentialCheckersPawn = GetPawnCheckers(bitBoard, colour, attackableSquare);
-
-                if (potentialCheckersPawn > 0)
-                    continue;
-
-                var potentialCheckersKnight = GetKnightCheckers(bitBoard, colour, attackableSquare);
-
-                if (potentialCheckersKnight > 0)
-                    continue;
-
-                var potentialCheckersRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Rook);
-
-                if (potentialCheckersRook > 0)
-                    continue;
-
-                var potentialCheckersBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Bishop);
-
-                if (potentialCheckersBishop > 0)
-                    continue;
-
-                var potentialCheckersQueenAsRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Queen);
-
-                if (potentialCheckersQueenAsRook > 0)
-                    continue;
-
-                var potentialCheckersQueenAsBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Queen);
-
-                if (potentialCheckersQueenAsBishop > 0)
-                    continue;
-
-                safeSquares |= attackableSquare;
-            }
-
-            var safeSquaresAsList = safeSquares.ToList();
+            var safeSquaresAsList = FastFilterOutCoveredSquares(bitBoard, colour, attackableSquares.ToList()).ToList();
 
             foreach (var to in safeSquaresAsList)
             {
@@ -110,7 +61,14 @@ namespace ChessSharp
                 }
             }
 
-            return checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
+            var checkersPawn = GetPawnCheckers(bitBoard, colour, kingSquare);
+            var checkersKnight = GetKnightCheckers(bitBoard, colour, kingSquare);
+            var checkersRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Rook);
+            var checkersBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Bishop);
+            var checkersQueenAsRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Queen);
+            var checkersQueenAsBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Queen);
+
+            return checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
         }
 
         private SquareFlag GetAttackableSquares(BitBoard bitBoard, Colour colour, SquareFlag square, PieceType rayType)
@@ -181,78 +139,119 @@ namespace ChessSharp
             return (attackableSquares & opponentRookSquares) > 0 ? true : false;
         }
 
-        public void GetPawnMoves(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        public void GetWhitePawnPushes(BitBoard bitBoard, Colour colour, IList<uint> moves)
         {
-            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
+            var promotionRank = SquareFlagExtensions.r8;
 
-            var pawnSquares = (ulong)bitBoard.FindPawnSquares(colour);
+            var opponentSquares = bitBoard.Black;
+
+            var pawnSquares = (ulong)bitBoard.WhitePawns;
 
             var pawnSquaresAsList = ((SquareFlag)pawnSquares).ToList();
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
-                if (colour == Colour.White)
-                {
-                    var toSquare = (SquareFlag)((ulong)fromSquare << 8);
+                var toSquare = (SquareFlag)((ulong)fromSquare << 8);
 
-                    if (!opponentSquares.HasFlag(toSquare))
-                    {
-                        if (SquareFlagExtensions.r8.HasFlag(toSquare))
-                            GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, PieceType.None);
-                        else
-                            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
-                    }
-                }
-                else if (colour == Colour.Black)
+                if (!opponentSquares.HasFlag(toSquare))
                 {
-                    var toSquare = (SquareFlag)((ulong)fromSquare >> 8);
-
-                    if (!opponentSquares.HasFlag(toSquare))
-                    {
-                        if (SquareFlagExtensions.r1.HasFlag(toSquare))
-                            GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, PieceType.None);
-                        else
-                            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
-                    }
+                    if (promotionRank.HasFlag(toSquare))
+                        GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, PieceType.None);
+                    else
+                        moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
                 }
             }
+        }
+
+        public void GetBlackPawnPushes(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        {
+            var promotionRank = SquareFlagExtensions.r1;
+
+            var opponentSquares = bitBoard.White;
+
+            var pawnSquares = (ulong)bitBoard.BlackPawns;
+
+            var pawnSquaresAsList = ((SquareFlag)pawnSquares).ToList();
+
+            foreach (var fromSquare in pawnSquaresAsList)
+            {
+                var toSquare = (SquareFlag)((ulong)fromSquare >> 8);
+
+                if (!opponentSquares.HasFlag(toSquare))
+                {
+                    if (promotionRank.HasFlag(toSquare))
+                        GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, PieceType.None);
+                    else
+                        moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
+                }
+            }
+        }
+
+        public void GetWhitePawnCaptures(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        {
+            var promotionRank = SquareFlagExtensions.r8;
+
+            var opponentSquares = bitBoard.Black;
+
+            var pawnSquares = (ulong)bitBoard.WhitePawns;
+
+            var pawnSquaresAsList = ((SquareFlag)pawnSquares).ToList();
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
                 var fromSquareIndex = fromSquare.ToBoardIndex();
 
-                if (colour == Colour.White)
+                var captureSquares = PawnCapturesWhite[fromSquareIndex].ToList();
+
+                foreach (var toSquare in captureSquares)
                 {
-                    var captureSquares = PawnCapturesWhite[fromSquareIndex].ToList();
+                    var moveType = bitBoard.EnPassant.HasFlag(toSquare) ? MoveType.EnPassant : MoveType.Ordinary;
 
-                    foreach (var toSquare in captureSquares)
+                    if (opponentSquares.HasFlag(toSquare) || moveType == MoveType.EnPassant)
                     {
-                        if (opponentSquares.HasFlag(toSquare))
-                        {
-                            var capturePieceType = bitBoard.GetPieceType(toSquare);
+                        var capturePieceType = moveType == MoveType.EnPassant
+                            ? PieceType.Pawn
+                            : bitBoard.GetPieceType(toSquare);
 
-                            if (SquareFlagExtensions.r8.HasFlag(toSquare))
-                                GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
-                            else
-                                moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
-                        }
+                        if (promotionRank.HasFlag(toSquare))
+                            GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
+                        else
+                            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, moveType));
                     }
                 }
-                else if (colour == Colour.Black)
+            }
+        }
+
+        public void GetBlackPawnCaptures(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        {
+            var promotionRank = SquareFlagExtensions.r1;
+
+            var opponentSquares = bitBoard.White;
+
+            var pawnSquares = (ulong)bitBoard.BlackPawns;
+
+            var pawnSquaresAsList = ((SquareFlag)pawnSquares).ToList();
+
+            foreach (var fromSquare in pawnSquaresAsList)
+            {
+                var fromSquareIndex = fromSquare.ToBoardIndex();
+
+                var captureSquares = PawnCapturesBlack[fromSquareIndex].ToList();
+
+                foreach (var toSquare in captureSquares)
                 {
-                    var captureSquares = PawnCapturesBlack[fromSquareIndex].ToList();
+                    var moveType = bitBoard.EnPassant.HasFlag(toSquare) ? MoveType.EnPassant : MoveType.Ordinary;
 
-                    foreach (var toSquare in captureSquares)
+                    if (opponentSquares.HasFlag(toSquare) || moveType == MoveType.EnPassant)
                     {
-                        if (opponentSquares.HasFlag(toSquare))
-                        {
-                            var capturePieceType = bitBoard.GetPieceType(toSquare);
+                        var capturePieceType = moveType == MoveType.EnPassant
+                            ? PieceType.Pawn
+                            : bitBoard.GetPieceType(toSquare);
 
-                            if (SquareFlagExtensions.r1.HasFlag(toSquare))
-                                GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
-                            else
-                                moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
-                        }
+                        if (promotionRank.HasFlag(toSquare))
+                            GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
+                        else
+                            moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, moveType));
                     }
                 }
             }
@@ -321,6 +320,48 @@ namespace ChessSharp
                     }
                 }
             }
+        }
+
+        private SquareFlag FastFilterOutCoveredSquares(BitBoard bitBoard, Colour colour, IReadOnlyList<SquareFlag> attackableSquaresAsList)
+        {
+            var safeSquares = (SquareFlag)0;
+
+            foreach (var attackableSquare in attackableSquaresAsList)
+            {
+                var potentialCheckersPawn = GetPawnCheckers(bitBoard, colour, attackableSquare);
+
+                if (potentialCheckersPawn > 0)
+                    continue;
+
+                var potentialCheckersKnight = GetKnightCheckers(bitBoard, colour, attackableSquare);
+
+                if (potentialCheckersKnight > 0)
+                    continue;
+
+                var potentialCheckersRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Rook);
+
+                if (potentialCheckersRook > 0)
+                    continue;
+
+                var potentialCheckersBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Bishop);
+
+                if (potentialCheckersBishop > 0)
+                    continue;
+
+                var potentialCheckersQueenAsRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Queen);
+
+                if (potentialCheckersQueenAsRook > 0)
+                    continue;
+
+                var potentialCheckersQueenAsBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Queen);
+
+                if (potentialCheckersQueenAsBishop > 0)
+                    continue;
+
+                safeSquares |= attackableSquare;
+            }
+
+            return safeSquares;
         }
 
         private SquareFlag GetOccupancyMask(PieceType pieceType, int squareIndex) =>
