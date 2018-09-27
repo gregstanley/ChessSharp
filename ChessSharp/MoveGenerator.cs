@@ -257,20 +257,19 @@ namespace ChessSharp
 
                     if (opponentSquares.HasFlag(toSquare) || moveType == MoveType.EnPassant)
                     {
-                        var capturePieceType = moveType == MoveType.EnPassant
-                            ? PieceType.Pawn
-                            : bitBoard.GetPieceType(toSquare);
+                        var capturePieceType = bitBoard.GetPieceType(toSquare);
 
                         var discoveredCheck = false;
 
-                        // DISCOVERED CHECK - Not spotted by pinned pieces as there are 2 pawns in the way
                         if (moveType == MoveType.EnPassant)
                         {
+                            capturePieceType = PieceType.Pawn;
+
+                            // Looking for DISCOVERED CHECK (not spotted by pinned pieces as there are 2 pawns in the way)
                             var kingSquare = bitBoard.FindKingSquare(colour);
 
                             var enPassantRank = SquareFlagExtensions.r6;
 
-                            // Look for reasons not to continue
                             if (enPassantRank.HasFlag(kingSquare))
                             {
                                 if ((enPassantRank & bitBoard.BlackRooks) > 0 || (enPassantRank & bitBoard.BlackQueens) > 0)
@@ -295,11 +294,7 @@ namespace ChessSharp
 
                                     var kingRayAttacksOnRank = kingRayAttacks & enPassantRank;
 
-                                    var attackedByRook = kingRayAttacksOnRank & bitBoard.BlackRooks;
-                                    var attackedByQueen = kingRayAttacksOnRank & bitBoard.BlackQueens;
-
-                                    if (attackedByRook > 0 || attackedByQueen > 0)
-                                        discoveredCheck = true;
+                                    discoveredCheck = (kingRayAttacksOnRank & bitBoard.BlackRooks) > 0 || (kingRayAttacksOnRank & bitBoard.BlackQueens) > 0;
                                 }
                             }
                         }
@@ -335,20 +330,19 @@ namespace ChessSharp
 
                     if (opponentSquares.HasFlag(toSquare) || moveType == MoveType.EnPassant)
                     {
-                        var capturePieceType = moveType == MoveType.EnPassant
-                            ? PieceType.Pawn
-                            : bitBoard.GetPieceType(toSquare);
+                        var capturePieceType = bitBoard.GetPieceType(toSquare);
 
                         var discoveredCheck = false;
 
-                        // DISCOVERED CHECK - Not spotted by pinned pieces as there are 2 pawns in the way
                         if (moveType == MoveType.EnPassant)
                         {
+                            capturePieceType = PieceType.Pawn;
+
+                            // Looking for DISCOVERED CHECK (not spotted by pinned pieces as there are 2 pawns in the way)
                             var kingSquare = bitBoard.FindKingSquare(colour);
 
                             var enPassantRank = SquareFlagExtensions.r4;
 
-                            // Look for reasons not to continue
                             if (enPassantRank.HasFlag(kingSquare))
                             {
                                 if ((enPassantRank & bitBoard.WhiteRooks) > 0 || (enPassantRank & bitBoard.WhiteQueens) > 0)
@@ -358,8 +352,8 @@ namespace ChessSharp
                                     // Our King is on the en passant rank with opponent Ray pieces so could be exposed after capture
                                     var rankOccupancy = (enPassantRank & bitBoard.White) | (enPassantRank & bitBoard.Black);
 
-                                    // We're White so the en passant square is SOUTH of the capturable pawn - so look NORTH
-                                    var enPassantPiece = (ulong)bitBoard.EnPassant >> Math.Abs((int)MoveDirection.South);
+                                    // We're Black so the en passant square is SOUTH of the capturable pawn - so look NORTH
+                                    var enPassantPiece = (ulong)bitBoard.EnPassant >> Math.Abs((int)MoveDirection.North);
 
                                     // Remove the two pawns from the board
                                     var rankOccupancyPostCapture = rankOccupancy & ~(SquareFlag)enPassantPiece & ~fromSquare;
@@ -373,11 +367,7 @@ namespace ChessSharp
 
                                     var kingRayAttacksOnRank = kingRayAttacks & enPassantRank;
 
-                                    var attackedByRook = kingRayAttacksOnRank & bitBoard.WhiteRooks;
-                                    var attackedByQueen = kingRayAttacksOnRank & bitBoard.WhiteQueens;
-
-                                    if (attackedByRook > 0 || attackedByQueen > 0)
-                                        discoveredCheck = true;
+                                    discoveredCheck = (kingRayAttacksOnRank & bitBoard.WhiteRooks) > 0 || (kingRayAttacksOnRank & bitBoard.WhiteQueens) > 0;
                                 }
                             }
                         }
