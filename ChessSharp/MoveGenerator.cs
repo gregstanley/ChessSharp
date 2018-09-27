@@ -11,7 +11,7 @@ namespace ChessSharp
      */
     public class MoveGenerator
     {
-        private SquareFlag[][] Intersections = new SquareFlag[64][];
+        private SquareFlag[][] Paths = new SquareFlag[64][];
         private SquareFlag[] PawnCapturesWhite = new SquareFlag[56];
         private SquareFlag[] PawnCapturesBlack = new SquareFlag[56];
         private SquareFlag[] KnightAttacks = new SquareFlag[64];
@@ -21,7 +21,7 @@ namespace ChessSharp
 
         public MoveGenerator()
         {
-            InitIntersections();
+            InitPaths();
             InitPawnCaptures();
             InitKnightAttacks();
             InitKingAttacks();
@@ -54,38 +54,44 @@ namespace ChessSharp
 
             var numCheckers = checkers.Count();
 
+            https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/
+            var captureMask = (SquareFlag)ulong.MaxValue;
+            var pushMask = (SquareFlag)ulong.MaxValue;
+
             if (numCheckers == 1)
             {
-                var captureMask = checkers;
+                captureMask = checkers;
 
                 var rayChecker = checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
 
                 if (rayChecker > 0)
                 {
-                    var pushMask = (SquareFlag)0;
+                    var checkerSquareIndex = rayChecker.ToBoardIndex();
 
-                    var checkerBoardIndex = rayChecker.ToBoardIndex();
+                    var pathFromCheckerToKing = Paths[checkerSquareIndex][kingSquareIndex];
 
-                    if ((checkersRook | checkersQueenAsRook) > 0)
-                    {
-                        var checkerAsRookMagicIndex = GetMagicIndex(PieceType.Rook, checkerBoardIndex, kingSquare);
-                        var kingAsRookMagicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, rayChecker);
+                    pushMask = pathFromCheckerToKing & ~kingSquare & ~rayChecker;
 
-                        var checkerAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, checkerAsRookMagicIndex);
-                        var kingAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, kingAsRookMagicIndex);
+                    //if ((checkersRook | checkersQueenAsRook) > 0)
+                    //{
+                    //    var checkerAsRookMagicIndex = GetMagicIndex(PieceType.Rook, checkerBoardIndex, kingSquare);
+                    //    var kingAsRookMagicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, rayChecker);
 
-                        pushMask = checkerAsRook & kingAsRook;
-                    }
-                    else if((checkersBishop | checkersQueenAsBishop) > 0)
-                    {
-                        var checkerAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, checkerBoardIndex, kingSquare);
-                        var kingAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, kingSquareIndex, rayChecker);
+                    //    var checkerAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, checkerAsRookMagicIndex);
+                    //    var kingAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, kingAsRookMagicIndex);
 
-                        var checkerAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, checkerAsBishopMagicIndex);
-                        var kingAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, kingAsBishopMagicIndex);
+                    //    pushMask = checkerAsRook & kingAsRook;
+                    //}
+                    //else if((checkersBishop | checkersQueenAsBishop) > 0)
+                    //{
+                    //    var checkerAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, checkerBoardIndex, kingSquare);
+                    //    var kingAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, kingSquareIndex, rayChecker);
 
-                        pushMask = checkerAsBishop & kingAsBishop;
-                    }
+                    //    var checkerAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, checkerAsBishopMagicIndex);
+                    //    var kingAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, kingAsBishopMagicIndex);
+
+                    //    pushMask = checkerAsBishop & kingAsBishop;
+                    //}
                 }
             }
 
@@ -255,9 +261,52 @@ namespace ChessSharp
                             ? PieceType.Pawn
                             : bitBoard.GetPieceType(toSquare);
 
+                        var discoveredCheck = false;
+
+                        // DISCOVERED CHECK - Not spotted by pinned pieces as there are 2 pawns in the way
+                        if (moveType == MoveType.EnPassant)
+                        {
+                            var kingSquare = bitBoard.FindKingSquare(colour);
+
+                            var enPassantRank = SquareFlagExtensions.r6;
+
+                            // Look for reasons not to continue
+                            if (enPassantRank.HasFlag(kingSquare))
+                            {
+                                if ((enPassantRank & bitBoard.BlackRooks) > 0 || (enPassantRank & bitBoard.BlackQueens) > 0)
+                                {
+                                    var opponentPiecesOnRank = enPassantRank & opponentSquares;
+
+                                    // Our King is on the en passant rank with opponent Ray pieces so could be exposed after capture
+                                    var rankOccupancy = (enPassantRank & bitBoard.White) | (enPassantRank & bitBoard.Black);
+
+                                    // We're White so the en passant square is NORTH of the capturable pawn - so look SOUTH
+                                    var enPassantPiece = (ulong)bitBoard.EnPassant >> Math.Abs((int)MoveDirection.South);
+
+                                    // Remove the two pawns from the board
+                                    var rankOccupancyPostCapture = rankOccupancy & ~(SquareFlag)enPassantPiece & ~fromSquare;
+
+                                    var kingSquareIndex = kingSquare.ToBoardIndex();
+
+                                    // Search for magic moves using just the occupancy of rank (the rest is not relevant)
+                                    var magicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, rankOccupancyPostCapture);
+
+                                    var kingRayAttacks = RookAttacks[kingSquareIndex][magicIndex];
+
+                                    var kingRayAttacksOnRank = kingRayAttacks & enPassantRank;
+
+                                    var attackedByRook = kingRayAttacksOnRank & bitBoard.BlackRooks;
+                                    var attackedByQueen = kingRayAttacksOnRank & bitBoard.BlackQueens;
+
+                                    if (attackedByRook > 0 || attackedByQueen > 0)
+                                        discoveredCheck = true;
+                                }
+                            }
+                        }
+
                         if (promotionRank.HasFlag(toSquare))
                             GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
-                        else
+                        else if (!discoveredCheck)
                             moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, moveType));
                     }
                 }
@@ -290,9 +339,52 @@ namespace ChessSharp
                             ? PieceType.Pawn
                             : bitBoard.GetPieceType(toSquare);
 
+                        var discoveredCheck = false;
+
+                        // DISCOVERED CHECK - Not spotted by pinned pieces as there are 2 pawns in the way
+                        if (moveType == MoveType.EnPassant)
+                        {
+                            var kingSquare = bitBoard.FindKingSquare(colour);
+
+                            var enPassantRank = SquareFlagExtensions.r4;
+
+                            // Look for reasons not to continue
+                            if (enPassantRank.HasFlag(kingSquare))
+                            {
+                                if ((enPassantRank & bitBoard.WhiteRooks) > 0 || (enPassantRank & bitBoard.WhiteQueens) > 0)
+                                {
+                                    var opponentPiecesOnRank = enPassantRank & opponentSquares;
+
+                                    // Our King is on the en passant rank with opponent Ray pieces so could be exposed after capture
+                                    var rankOccupancy = (enPassantRank & bitBoard.White) | (enPassantRank & bitBoard.Black);
+
+                                    // We're White so the en passant square is SOUTH of the capturable pawn - so look NORTH
+                                    var enPassantPiece = (ulong)bitBoard.EnPassant >> Math.Abs((int)MoveDirection.South);
+
+                                    // Remove the two pawns from the board
+                                    var rankOccupancyPostCapture = rankOccupancy & ~(SquareFlag)enPassantPiece & ~fromSquare;
+
+                                    var kingSquareIndex = kingSquare.ToBoardIndex();
+
+                                    // Search for magic moves using just the occupancy of rank (the rest is not relevant)
+                                    var magicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, rankOccupancyPostCapture);
+
+                                    var kingRayAttacks = RookAttacks[kingSquareIndex][magicIndex];
+
+                                    var kingRayAttacksOnRank = kingRayAttacks & enPassantRank;
+
+                                    var attackedByRook = kingRayAttacksOnRank & bitBoard.WhiteRooks;
+                                    var attackedByQueen = kingRayAttacksOnRank & bitBoard.WhiteQueens;
+
+                                    if (attackedByRook > 0 || attackedByQueen > 0)
+                                        discoveredCheck = true;
+                                }
+                            }
+                        }
+
                         if (promotionRank.HasFlag(toSquare))
                             GetPromotions(bitBoard, colour, moves, fromSquare, toSquare, capturePieceType);
-                        else
+                        else if (!discoveredCheck)
                             moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, moveType));
                     }
                 }
@@ -440,14 +532,14 @@ namespace ChessSharp
             return (int)index;
         }
 
-        private void InitIntersections()
+        private void InitPaths()
         {
-            var intersections = new SquareFlag[64][];
+            var paths = new SquareFlag[64][];
 
             for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
-                intersections[squareIndex] = AttackGenerator.GenerateIntersections(squareIndex);
+                paths[squareIndex] = AttackGenerator.GeneratePaths(squareIndex);
 
-            Intersections = intersections;
+            Paths = paths;
         }
 
         private void InitPawnCaptures()

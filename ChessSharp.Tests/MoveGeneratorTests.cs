@@ -172,6 +172,21 @@ namespace ChessSharp.Tests
         }
 
         [Fact]
+        public void Pawn_EnPassant_Capture_DiscoveredCheck_Correct()
+        {
+            var bitBoard = Create("8/8/q1rPp2K/8/7p/8/8/8 w KQkq e7");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+
+            var enPassantCapture = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D6, SquareFlag.E7, PieceType.Pawn, MoveType.EnPassant);
+
+            Assert.DoesNotContain(enPassantCapture, moves);
+        }
+
+        [Fact]
         public void Rook_Blocked_Correct()
         {
             var bitBoard = Create("8/8/8/8/8/1P6/PRP5/1P6 w KQkq -");
