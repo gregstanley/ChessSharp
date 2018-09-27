@@ -5,6 +5,159 @@ namespace ChessSharp
 {
     public class AttackGenerator
     {
+        public static SquareFlag[] GenerateIntersections(int squareIndex)
+        {
+            var bit = 1ul << squareIndex;
+
+            var rankBits = AllBitsOnForRank(squareIndex);
+
+            var currentLine = bit;
+
+            SquareFlag[] intersections = new SquareFlag[64];
+
+            var toSquareIndex = squareIndex;
+
+            // North
+            do
+            {
+                bit <<= (int)MoveDirection.North;
+
+                if (bit != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.North;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            bit = 1ul << squareIndex;
+            currentLine = bit;
+            toSquareIndex = squareIndex;
+
+            // South
+            do
+            {
+                bit >>= Math.Abs((int)MoveDirection.South);
+
+                if (bit != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.South;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            bit = 1ul << squareIndex;
+            currentLine = bit;
+            toSquareIndex = squareIndex;
+
+            // East
+            do
+            {
+                bit <<= (int)MoveDirection.East;
+
+                if ((bit & rankBits) != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.East;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            bit = 1ul << squareIndex;
+            currentLine = bit;
+            toSquareIndex = squareIndex;
+
+            // West
+            do
+            {
+                bit >>= Math.Abs((int)MoveDirection.West);
+
+                if ((bit & rankBits) != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.West;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            bit = 1ul << squareIndex;
+            currentLine = bit;
+            toSquareIndex = squareIndex;
+            var bit2 = bit;
+
+            // North East
+            do
+            {
+                bit <<= (int)MoveDirection.NorthEast;
+                bit2 <<= (int)MoveDirection.East;
+
+                if ((bit != 0) && (bit2 & rankBits) != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.NorthEast;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            bit = 1ul << squareIndex;
+            currentLine = bit;
+            toSquareIndex = squareIndex;
+            bit2 = bit;
+
+            // South East
+            do
+            {
+                bit >>= Math.Abs((int)MoveDirection.SouthEast);
+                bit2 <<= (int)MoveDirection.East;
+
+                if ((bit != 0) && (bit2 & rankBits) != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.SouthEast;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            // South West
+            do
+            {
+                bit >>= Math.Abs((int)MoveDirection.SouthWest);
+                bit2 >>= Math.Abs((int)MoveDirection.West);
+
+                if ((bit != 0) && (bit2 & rankBits) != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.SouthWest;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            // North West
+            do
+            {
+                bit <<= (int)MoveDirection.NorthWest;
+                bit2 >>= Math.Abs((int)MoveDirection.West);
+
+                if ((bit != 0) && (bit2 & rankBits) != 0)
+                {
+                    currentLine |= bit;
+                    toSquareIndex += (int)MoveDirection.NorthWest;
+                    intersections[toSquareIndex] = (SquareFlag)currentLine;
+                }
+
+            } while (bit != 0);
+
+            return intersections;
+        }
+
         public static SquareFlag GeneratePotentialWhitePawnCaptures(int squareIndex)
         {
             ulong attackableSquares = 0;

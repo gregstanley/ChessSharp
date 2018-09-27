@@ -11,6 +11,7 @@ namespace ChessSharp
      */
     public class MoveGenerator
     {
+        private SquareFlag[][] Intersections = new SquareFlag[64][];
         private SquareFlag[] PawnCapturesWhite = new SquareFlag[56];
         private SquareFlag[] PawnCapturesBlack = new SquareFlag[56];
         private SquareFlag[] KnightAttacks = new SquareFlag[64];
@@ -20,6 +21,7 @@ namespace ChessSharp
 
         public MoveGenerator()
         {
+            InitIntersections();
             InitPawnCaptures();
             InitKnightAttacks();
             InitKingAttacks();
@@ -41,6 +43,52 @@ namespace ChessSharp
 
             var kingSquareIndex = kingSquare.ToBoardIndex();
 
+            var checkersPawn = GetPawnCheckers(bitBoard, colour, kingSquare);
+            var checkersKnight = GetKnightCheckers(bitBoard, colour, kingSquare);
+            var checkersRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Rook);
+            var checkersBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Bishop);
+            var checkersQueenAsRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Queen);
+            var checkersQueenAsBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Queen);
+
+            var checkers = checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
+
+            var numCheckers = checkers.Count();
+
+            if (numCheckers == 1)
+            {
+                var captureMask = checkers;
+
+                var rayChecker = checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
+
+                if (rayChecker > 0)
+                {
+                    var pushMask = (SquareFlag)0;
+
+                    var checkerBoardIndex = rayChecker.ToBoardIndex();
+
+                    if ((checkersRook | checkersQueenAsRook) > 0)
+                    {
+                        var checkerAsRookMagicIndex = GetMagicIndex(PieceType.Rook, checkerBoardIndex, kingSquare);
+                        var kingAsRookMagicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, rayChecker);
+
+                        var checkerAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, checkerAsRookMagicIndex);
+                        var kingAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, kingAsRookMagicIndex);
+
+                        pushMask = checkerAsRook & kingAsRook;
+                    }
+                    else if((checkersBishop | checkersQueenAsBishop) > 0)
+                    {
+                        var checkerAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, checkerBoardIndex, kingSquare);
+                        var kingAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, kingSquareIndex, rayChecker);
+
+                        var checkerAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, checkerAsBishopMagicIndex);
+                        var kingAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, kingAsBishopMagicIndex);
+
+                        pushMask = checkerAsBishop & kingAsBishop;
+                    }
+                }
+            }
+
             var attackableSquaresIncludingSelfCaptures = AttackGenerator.GeneratePotentialKingAttacks(kingSquareIndex);
 
             var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
@@ -61,13 +109,7 @@ namespace ChessSharp
                 }
             }
 
-            var checkersPawn = GetPawnCheckers(bitBoard, colour, kingSquare);
-            var checkersKnight = GetKnightCheckers(bitBoard, colour, kingSquare);
-            var checkersRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Rook);
-            var checkersBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Bishop);
-            var checkersQueenAsRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Queen);
-            var checkersQueenAsBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Queen);
-
+            
             return checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
         }
 
@@ -396,6 +438,16 @@ namespace ChessSharp
             var index = ((ulong)occupancy * MagicNumbers.BishopMagicNumbers[square]) >> 50;
 
             return (int)index;
+        }
+
+        private void InitIntersections()
+        {
+            var intersections = new SquareFlag[64][];
+
+            for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
+                intersections[squareIndex] = AttackGenerator.GenerateIntersections(squareIndex);
+
+            Intersections = intersections;
         }
 
         private void InitPawnCaptures()
