@@ -26,6 +26,18 @@ namespace ChessSharp.Tests
         }
 
         [Fact]
+        public void Pins_Correct()
+        {
+            var bitBoard = Create("8/8/8/8/rRN1KB1q/8/8/8 w KQkq -");
+
+            var moves = new List<uint>(10);
+
+            var pinnedPieces = _moveGeneratorFixture.MoveGenerator.GetPinnedPieces(bitBoard, Colour.White);
+
+            Assert.Equal(SquareFlag.F4, pinnedPieces);
+        }
+
+        [Fact]
         public void Pawn_Empty_OnePush_Correct()
         {
             var bitBoard = Create("8/8/8/8/3P4/8/8/8 w KQkq -");

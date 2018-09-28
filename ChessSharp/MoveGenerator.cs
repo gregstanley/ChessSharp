@@ -34,6 +34,58 @@ namespace ChessSharp
             
         }
 
+        public SquareFlag GetPinnedPieces(BitBoard bitBoard, Colour colour)
+        {
+            var mySquares = bitBoard.FindPieceSquares(colour);
+            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
+
+            var kingSquare = bitBoard.FindKingSquare(colour).ToList().First();
+
+            var kingSquareIndex = kingSquare.ToBoardIndex();
+
+            var occupiedSquares = mySquares | opponentSquares;
+
+            //var attackableSquares = GetAttackableSquares(bitBoard, colour, kingSquare, PieceType.Queen);
+            var attackableSquaresRook = GetAttackableSquares(kingSquare, PieceType.Rook, occupiedSquares);
+            var attackableSquaresBishop = GetAttackableSquares(kingSquare, PieceType.Bishop, occupiedSquares);
+
+            var attackableSquares = attackableSquaresRook | attackableSquaresBishop;
+
+            var potentialPins = attackableSquares & mySquares;
+
+            // TODO: We may have discovered Check at this point in which case we don't need pins - I think
+
+            var occupancyAfterRemovingMyPieces = attackableSquares & ~potentialPins;
+
+            var attackableSquaresBeyondPinsRook = GetAttackableSquares(kingSquare, PieceType.Rook, occupancyAfterRemovingMyPieces);
+            var attackableSquaresBeyondPinsBishop = GetAttackableSquares(kingSquare, PieceType.Bishop, occupancyAfterRemovingMyPieces);
+
+            var attackableSquaresBeyondPins = attackableSquaresBeyondPinsRook | attackableSquaresBeyondPinsBishop;
+
+            var pinningQueens = attackableSquaresBeyondPins & bitBoard.FindQueenSquares(colour.Opposite());
+            var pinningRooks = attackableSquaresBeyondPins & bitBoard.FindRookSquares(colour.Opposite());
+            var pinningBishops = attackableSquaresBeyondPins & bitBoard.FindBishopSquares(colour.Opposite());
+
+            var pinnedPieces = (SquareFlag)0;
+
+            if (pinningQueens > 0)
+            {
+                var pinningQueensAsList = pinningQueens.ToList();
+
+                foreach(var pinningQueen in pinningQueensAsList)
+                {
+                    var path = Paths[kingSquareIndex][pinningQueen.ToBoardIndex()];
+
+                    var piecesPinnedByThisQueen = path & potentialPins;
+
+                    if (piecesPinnedByThisQueen > 0)
+                        pinnedPieces |= piecesPinnedByThisQueen;
+                }
+            }
+
+            return pinnedPieces;
+        }
+
         public SquareFlag GetKingMoves(BitBoard bitBoard, Colour colour, IList<uint> moves)
         {
             var mySquares = bitBoard.FindPieceSquares(colour);
@@ -115,30 +167,7 @@ namespace ChessSharp
                 }
             }
 
-            
             return checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
-        }
-
-        private SquareFlag GetAttackableSquares(BitBoard bitBoard, Colour colour, SquareFlag square, PieceType rayType)
-        {
-            var mySquares = bitBoard.FindPieceSquares(colour);
-            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
-
-            var squareIndex = square.ToBoardIndex();
-
-            var occupiedSquares = mySquares | opponentSquares;
-
-            var occupancyMask = GetOccupancyMask(rayType, squareIndex);
-
-            var occupancyMasked = occupiedSquares & occupancyMask;
-
-            var magicIndex = GetMagicIndex(rayType, squareIndex, occupancyMasked);
-
-            var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, squareIndex, magicIndex);
-
-            var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
-
-            return attackableSquares;
         }
 
         public SquareFlag GetPawnCheckers(BitBoard bitBoard, Colour colour, SquareFlag square)
@@ -412,36 +441,97 @@ namespace ChessSharp
             var mySquares = bitBoard.FindPieceSquares(colour);
             var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
 
+            //var occupiedSquares = mySquares | opponentSquares;
+
+            foreach (var fromSquare in squares)
+            {
+                var attackableSquares = GetAttackableSquares(bitBoard, colour, fromSquare, rayType);//, occupiedSquares);
+                //var squareIndex = fromSquare.ToBoardIndex();
+
+                //var occupancyMask = GetOccupancyMask(rayType, squareIndex);
+
+                //var occupancyMasked = occupiedSquares & occupancyMask;
+
+                //var magicIndex = GetMagicIndex(rayType, squareIndex, occupancyMasked);
+
+                //var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, squareIndex, magicIndex);
+
+                //var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
+
+                ToOrdinaryMoves(bitBoard, colour, moves, pieceType, fromSquare, attackableSquares);
+                //var attackableSquaresAsList = attackableSquares.ToList();
+
+                //foreach (var to in attackableSquaresAsList)
+                //{
+                //    if (opponentSquares.HasFlag(to))
+                //    {
+                //        var capturePieceType = bitBoard.GetPieceType(to);
+
+                //        moves.Add(MoveConstructor.CreateMove(colour, pieceType, square, to, capturePieceType, MoveType.Ordinary));
+                //    }
+                //    else
+                //    {
+                //        moves.Add(MoveConstructor.CreateMove(colour, pieceType, square, to, PieceType.None, MoveType.Ordinary));
+                //    }
+                //}
+            }
+        }
+
+        private SquareFlag GetAttackableSquares(BitBoard bitBoard, Colour colour, SquareFlag fromSquare, PieceType rayType)
+        {
+            var mySquares = bitBoard.FindPieceSquares(colour);
+            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
+
             var occupiedSquares = mySquares | opponentSquares;
 
-            foreach (var square in squares)
+            return GetAttackableSquares(fromSquare, rayType, occupiedSquares);
+            //var fromSquareIndex = fromSquare.ToBoardIndex();
+            
+            //var occupancyMask = GetOccupancyMask(rayType, fromSquareIndex);
+
+            //var occupancyMasked = occupiedSquares & occupancyMask;
+
+            //var magicIndex = GetMagicIndex(rayType, fromSquareIndex, occupancyMasked);
+
+            //var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, fromSquareIndex, magicIndex);
+
+            //var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
+
+            //return attackableSquares;
+        }
+
+        private SquareFlag GetAttackableSquares(SquareFlag fromSquare, PieceType rayType, SquareFlag occupiedSquares)
+        {
+            var squareIndex = fromSquare.ToBoardIndex();
+
+            var occupancyMask = GetOccupancyMask(rayType, squareIndex);
+
+            var occupancyMasked = occupiedSquares & occupancyMask;
+
+            var magicIndex = GetMagicIndex(rayType, squareIndex, occupancyMasked);
+
+            var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, squareIndex, magicIndex);
+
+            return attackableSquaresIncludingSelfCaptures;
+        }
+
+        private void ToOrdinaryMoves(BitBoard bitBoard, Colour colour, IList<uint> moves, PieceType pieceType, SquareFlag fromSquare, SquareFlag attackableSquares)
+        {
+            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
+
+            var attackableSquaresAsList = attackableSquares.ToList();
+
+            foreach (var toSquare in attackableSquaresAsList)
             {
-                var squareIndex = square.ToBoardIndex();
-
-                var occupancyMask = GetOccupancyMask(rayType, squareIndex);
-
-                var occupancyMasked = occupiedSquares & occupancyMask;
-
-                var magicIndex = GetMagicIndex(rayType, squareIndex, occupancyMasked);
-
-                var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, squareIndex, magicIndex);
-
-                var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
-
-                var attackableSquaresAsList = attackableSquares.ToList();
-
-                foreach (var to in attackableSquaresAsList)
+                if (opponentSquares.HasFlag(toSquare))
                 {
-                    if (opponentSquares.HasFlag(to))
-                    {
-                        var capturePieceType = bitBoard.GetPieceType(to);
+                    var capturePieceType = bitBoard.GetPieceType(toSquare);
 
-                        moves.Add(MoveConstructor.CreateMove(colour, pieceType, square, to, capturePieceType, MoveType.Ordinary));
-                    }
-                    else
-                    {
-                        moves.Add(MoveConstructor.CreateMove(colour, pieceType, square, to, PieceType.None, MoveType.Ordinary));
-                    }
+                    moves.Add(MoveConstructor.CreateMove(colour, pieceType, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
+                }
+                else
+                {
+                    moves.Add(MoveConstructor.CreateMove(colour, pieceType, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
                 }
             }
         }
