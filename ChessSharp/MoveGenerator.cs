@@ -34,6 +34,7 @@ namespace ChessSharp
         {
             var relativeBitBoard = bitBoard.ToRelative(colour);
 
+            var pinnedPieces = GetPinnedPieces(relativeBitBoard);
         }
 
         public SquareFlag GetPinnedPieces(RelativeBitBoard relativeBitBoard)
@@ -57,25 +58,37 @@ namespace ChessSharp
 
             var attackableSquaresBeyondPins = attackableSquaresBeyondPinsRook | attackableSquaresBeyondPinsBishop;
 
-            var pinningQueens = attackableSquaresBeyondPins & relativeBitBoard.OpponentQueens;
             var pinningRooks = attackableSquaresBeyondPins & relativeBitBoard.OpponentRooks;
             var pinningBishops = attackableSquaresBeyondPins & relativeBitBoard.OpponentBishops;
+            var pinningQueens = attackableSquaresBeyondPins & relativeBitBoard.OpponentQueens;
 
             var pinnedPieces = (SquareFlag)0;
 
+            if (pinningRooks > 0)
+                pinnedPieces |= AddPinned(kingSquareIndex, potentialPins, pinningRooks);
+
+            if (pinningBishops > 0)
+                pinnedPieces |= AddPinned(kingSquareIndex, potentialPins, pinningBishops);
+
             if (pinningQueens > 0)
+                pinnedPieces |= AddPinned(kingSquareIndex, potentialPins, pinningQueens);
+
+            return pinnedPieces;
+        }
+
+        private SquareFlag AddPinned(int kingSquareIndex, SquareFlag potentialPins, SquareFlag pinners)
+        {
+            var pinnedPieces = (SquareFlag)0;
+            var pinnersAsList = pinners.ToList();
+
+            foreach (var pinner in pinnersAsList)
             {
-                var pinningQueensAsList = pinningQueens.ToList();
+                var path = Paths[kingSquareIndex][pinner.ToBoardIndex()];
 
-                foreach(var pinningQueen in pinningQueensAsList)
-                {
-                    var path = Paths[kingSquareIndex][pinningQueen.ToBoardIndex()];
+                var piecesPinnedByThisPiece = path & potentialPins;
 
-                    var piecesPinnedByThisQueen = path & potentialPins;
-
-                    if (piecesPinnedByThisQueen > 0)
-                        pinnedPieces |= piecesPinnedByThisQueen;
-                }
+                if (piecesPinnedByThisPiece > 0)
+                    pinnedPieces |= piecesPinnedByThisPiece;
             }
 
             return pinnedPieces;
