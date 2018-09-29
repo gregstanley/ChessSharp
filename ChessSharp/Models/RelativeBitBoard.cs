@@ -56,39 +56,39 @@ namespace ChessSharp.Models
 
         public SquareFlag EnPassant { get; }
 
-        public SquareFlag MyPieces =>
-            MyPawns | MyKnights | MyRayPieces | MyKing;
+        public SquareFlag MySquares =>
+            MyPawns | MyKnights | MyRaySquares | MyKing;
 
-        public SquareFlag OpponentPieces =>
-            OpponentPawns | OpponentKnights | OpponentRayPieces | OpponentKing;
+        public SquareFlag OpponentSquares =>
+            OpponentPawns | OpponentKnights | OpponentRaySquares | OpponentKing;
 
-        public SquareFlag MyRayPieces =>
+        public SquareFlag MyRaySquares =>
             MyRooks | MyBishops | MyQueens;
 
-        public SquareFlag MyDiagonalRayPieces =>
+        public SquareFlag MyDiagonalRaySquares =>
             MyBishops | MyQueens;
 
-        public SquareFlag MyNonDiagonalRayPieces =>
+        public SquareFlag MyNonDiagonalRaySquares =>
             MyRooks | MyQueens;
 
-        public SquareFlag OpponentRayPieces =>
+        public SquareFlag OpponentRaySquares =>
             OpponentRooks | OpponentBishops | OpponentQueens;
 
-        public SquareFlag OpponentDiagonalRayPieces =>
+        public SquareFlag OpponentDiagonalRaySquares =>
             OpponentBishops | OpponentQueens;
 
-        public SquareFlag OpponentNonDiagonalRayPieces =>
+        public SquareFlag OpponentNonDiagonalRaySquares =>
             OpponentRooks | OpponentQueens;
 
         public SquareFlag OccupiedSquares =>
-            MyPieces | OpponentPieces;
+            MySquares | OpponentSquares;
 
         public Colour GetPieceColour(SquareFlag square)
         {
-            if (MyPieces.HasFlag(square))
+            if (MySquares.HasFlag(square))
                 return Colour;
 
-            if (OpponentPieces.HasFlag(square))
+            if (OpponentSquares.HasFlag(square))
                 return Colour.Opposite();
 
             return Colour.None;
@@ -122,6 +122,5 @@ namespace ChessSharp.Models
 
             throw new Exception($"Failed to find piece for {square}");
         }
-
     }
 }
