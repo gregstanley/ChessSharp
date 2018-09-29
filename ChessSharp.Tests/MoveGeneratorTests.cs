@@ -28,11 +28,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pins_Correct()
         {
-            var bitBoard = Create("8/8/8/8/rRN1KB1q/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/rRN1KB1q/8/8/8 w KQkq -")
+                .ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            var pinnedPieces = _moveGeneratorFixture.MoveGenerator.GetPinnedPieces(bitBoard, Colour.White);
+            var pinnedPieces = _moveGeneratorFixture.MoveGenerator.GetPinnedPieces(relativeBitBoard);
 
             Assert.Equal(SquareFlag.F4, pinnedPieces);
         }
@@ -201,11 +202,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_Blocked_Correct()
         {
-            var bitBoard = Create("8/8/8/8/8/1P6/PRP5/1P6 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/8/1P6/PRP5/1P6 w KQkq -")
+                .ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
 
             Assert.Empty(moves);
         }
@@ -213,11 +215,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_Blocked2_Correct()
         {
-            var bitBoard = Create("8/8/3Q4/7k/1P1R1B2/7K/3N4/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/3Q4/7k/1P1R1B2/7K/3N4/8 w KQkq -")
+                .ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
 
             Assert.Equal(4, moves.Count());
         }
@@ -225,11 +228,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_Capture_Correct()
         {
-            var bitBoard = Create("8/8/8/8/8/8/p7/RN6 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/8/8/p7/RN6 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
 
             var move = MoveConstructor.CreateMove(Colour.White, PieceType.Rook, SquareFlag.A1, SquareFlag.A2, PieceType.Pawn, MoveType.Ordinary);
 
@@ -239,11 +242,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_AllDirections_1Capture_Correct()
         {
-            var bitBoard = Create("1p6/8/1p6/8/8/8/1R6/8 w KQkq -");
+            var relativeBitBoard = Create("1p6/8/1p6/8/8/8/1R6/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -257,11 +260,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Bishop_Blocked_Correct()
         {
-            var bitBoard = Create("8/8/8/8/8/P1P5/1B6/P1P5 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/8/P1P5/1B6/P1P5 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(relativeBitBoard, moves);
 
             Assert.Empty(moves);
         }
@@ -269,11 +272,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Bishop_4Moves_0Captures_Correct()
         {
-            var bitBoard = Create("8/8/2R3N1/7k/4B3/7K/2Q3P1/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/2R3N1/7k/4B3/7K/2Q3P1/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(relativeBitBoard, moves);
 
             Assert.Equal(4, moves.Count());
         }
@@ -289,11 +292,11 @@ namespace ChessSharp.Tests
         [InlineData("7Q/8/8/8/8/8/8/8 w KQkq -", 21)]
         public void Queen_A1_H8_0Captures_Correct(string fen, int moveCount)
         {
-            var bitBoard = Create(fen);
+            var relativeBitBoard = Create(fen).ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
 
             Assert.Equal(moveCount, moves.Count);
         }
@@ -301,11 +304,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Queen_B2_21Moves_0Captures_Correct()
         {
-            var bitBoard = Create("8/8/8/8/8/8/1Q6/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/8/8/1Q6/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
 
@@ -319,11 +322,11 @@ namespace ChessSharp.Tests
         [InlineData("8/8/8/8/3Q4/8/8/6p1 w KQkq -", SquareFlag.G1)]
         public void Queen_E4_27Moves_1Capture_Correct(string fen, SquareFlag captureSquare)
         {
-            var bitBoard = Create(fen);
+            var relativeBitBoard = Create(fen).ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -337,11 +340,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Queen_E4_16Moves_8Captures_Correct()
         {
-            var bitBoard = Create("8/8/2p1p1p1/7k/2p1Q1p1/7K/2p1p1p1/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/2p1p1p1/7k/2p1Q1p1/7K/2p1p1p1/8 w KQkq -")
+                .ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -369,11 +373,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_8Moves_Correct()
         {
-            var bitBoard = Create("8/8/8/8/4K3/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/4K3/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetKingMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
 
@@ -383,11 +387,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_6Moves_Correct()
         {
-            var bitBoard = Create("8/8/8/8/3PKP2/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetKingMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
 
@@ -397,11 +401,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_RookCoveringRank5_3Moves_Correct()
         {
-            var bitBoard = Create("8/8/8/r7/3PKP2/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/r7/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetKingMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
 
@@ -411,11 +415,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_Check_Rook_4Moves_Correct()
         {
-            var bitBoard = Create("8/8/8/4r3/3PKP2/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/4r3/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
 
@@ -431,11 +435,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_Check_Pawn_6Moves_Correct()
         {
-            var bitBoard = Create("8/8/8/5p2/3PKP2/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/5p2/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
 
@@ -451,11 +455,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_Check_Knight_8Moves_Correct()
         {
-            var bitBoard = Create("8/8/3n4/8/3PKP2/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/3n4/8/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(bitBoard, Colour.White, moves);
+            var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(relativeBitBoard, moves);
 
             var moveCount = moves.Count;
 

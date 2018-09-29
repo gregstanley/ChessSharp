@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
+using ChessSharp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,29 +30,23 @@ namespace ChessSharp
             InitBishopAttacks();
         }
 
-        public void Generate(BitBoard bitBoard)
+        public void Generate(BitBoard bitBoard, Colour colour)
         {
-            
+            var relativeBitBoard = bitBoard.ToRelative(colour);
+
         }
 
-        public SquareFlag GetPinnedPieces(BitBoard bitBoard, Colour colour)
+        public SquareFlag GetPinnedPieces(RelativeBitBoard relativeBitBoard)
         {
-            var mySquares = bitBoard.FindPieceSquares(colour);
-            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
-
-            var kingSquare = bitBoard.FindKingSquare(colour).ToList().First();
-
+            var kingSquare = relativeBitBoard.MyKing;
             var kingSquareIndex = kingSquare.ToBoardIndex();
 
-            var occupiedSquares = mySquares | opponentSquares;
-
-            //var attackableSquares = GetAttackableSquares(bitBoard, colour, kingSquare, PieceType.Queen);
-            var attackableSquaresRook = GetAttackableSquares(kingSquare, PieceType.Rook, occupiedSquares);
-            var attackableSquaresBishop = GetAttackableSquares(kingSquare, PieceType.Bishop, occupiedSquares);
+            var attackableSquaresRook = GetAttackableSquares(kingSquare, PieceType.Rook, relativeBitBoard.OccupiedSquares);
+            var attackableSquaresBishop = GetAttackableSquares(kingSquare, PieceType.Bishop, relativeBitBoard.OccupiedSquares);
 
             var attackableSquares = attackableSquaresRook | attackableSquaresBishop;
 
-            var potentialPins = attackableSquares & mySquares;
+            var potentialPins = attackableSquares & relativeBitBoard.MyPieces;
 
             // TODO: We may have discovered Check at this point in which case we don't need pins - I think
 
@@ -62,9 +57,9 @@ namespace ChessSharp
 
             var attackableSquaresBeyondPins = attackableSquaresBeyondPinsRook | attackableSquaresBeyondPinsBishop;
 
-            var pinningQueens = attackableSquaresBeyondPins & bitBoard.FindQueenSquares(colour.Opposite());
-            var pinningRooks = attackableSquaresBeyondPins & bitBoard.FindRookSquares(colour.Opposite());
-            var pinningBishops = attackableSquaresBeyondPins & bitBoard.FindBishopSquares(colour.Opposite());
+            var pinningQueens = attackableSquaresBeyondPins & relativeBitBoard.OpponentQueens;
+            var pinningRooks = attackableSquaresBeyondPins & relativeBitBoard.OpponentRooks;
+            var pinningBishops = attackableSquaresBeyondPins & relativeBitBoard.OpponentBishops;
 
             var pinnedPieces = (SquareFlag)0;
 
@@ -86,27 +81,23 @@ namespace ChessSharp
             return pinnedPieces;
         }
 
-        public SquareFlag GetKingMoves(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        public SquareFlag GetKingMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves)
         {
-            var mySquares = bitBoard.FindPieceSquares(colour);
-            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
-
-            var kingSquare = bitBoard.FindKingSquare(colour).ToList().First();
-
+            var kingSquare = relativeBitBoard.MyKing;
             var kingSquareIndex = kingSquare.ToBoardIndex();
 
-            var checkersPawn = GetPawnCheckers(bitBoard, colour, kingSquare);
-            var checkersKnight = GetKnightCheckers(bitBoard, colour, kingSquare);
-            var checkersRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Rook);
-            var checkersBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Bishop);
-            var checkersQueenAsRook = GetCheckers(bitBoard, colour, kingSquare, PieceType.Rook, PieceType.Queen);
-            var checkersQueenAsBishop = GetCheckers(bitBoard, colour, kingSquare, PieceType.Bishop, PieceType.Queen);
+            var checkersPawn = GetPawnCheckers(relativeBitBoard, kingSquare);
+            var checkersKnight = GetKnightCheckers(relativeBitBoard, kingSquare);
+            var checkersRook = GetCheckers(relativeBitBoard, kingSquare, PieceType.Rook, PieceType.Rook);
+            var checkersBishop = GetCheckers(relativeBitBoard, kingSquare, PieceType.Bishop, PieceType.Bishop);
+            var checkersQueenAsRook = GetCheckers(relativeBitBoard, kingSquare, PieceType.Rook, PieceType.Queen);
+            var checkersQueenAsBishop = GetCheckers(relativeBitBoard, kingSquare, PieceType.Bishop, PieceType.Queen);
 
             var checkers = checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
 
             var numCheckers = checkers.Count();
 
-            https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/
+            // https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/
             var captureMask = (SquareFlag)ulong.MaxValue;
             var pushMask = (SquareFlag)ulong.MaxValue;
 
@@ -149,71 +140,65 @@ namespace ChessSharp
 
             var attackableSquaresIncludingSelfCaptures = AttackGenerator.GeneratePotentialKingAttacks(kingSquareIndex);
 
-            var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
+            var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MyPieces;//~mySquares;
 
-            var safeSquaresAsList = FastFilterOutCoveredSquares(bitBoard, colour, attackableSquares.ToList()).ToList();
+            var safeSquaresAsList = FastFilterOutCoveredSquares(relativeBitBoard, attackableSquares.ToList()).ToList();
 
             foreach (var to in safeSquaresAsList)
             {
-                if (opponentSquares.HasFlag(to))
+                if (relativeBitBoard.OpponentPieces.HasFlag(to))
                 {
-                    var capturePieceType = bitBoard.GetPieceType(to);
+                    var capturePieceType = relativeBitBoard.GetPieceType(to);
 
-                    moves.Add(MoveConstructor.CreateMove(colour, PieceType.King, kingSquare, to, capturePieceType, MoveType.Ordinary));
+                    moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, PieceType.King, kingSquare, to, capturePieceType, MoveType.Ordinary));
                 }
                 else
                 {
-                    moves.Add(MoveConstructor.CreateMove(colour, PieceType.King, kingSquare, to, PieceType.None, MoveType.Ordinary));
+                    moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, PieceType.King, kingSquare, to, PieceType.None, MoveType.Ordinary));
                 }
             }
 
             return checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
         }
 
-        public SquareFlag GetPawnCheckers(BitBoard bitBoard, Colour colour, SquareFlag square)
+        public SquareFlag GetPawnCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
         {
             var squareIndex = square.ToBoardIndex();
 
-            var opponentPawnSquares = bitBoard.FindPawnSquares(colour.Opposite());
-
-            var attackableSquares = colour == Colour.White
+            var attackableSquares = relativeBitBoard.Colour == Colour.White
                 ? PawnCapturesWhite[squareIndex]
                 : PawnCapturesBlack[squareIndex];
 
-            return attackableSquares & opponentPawnSquares;
+            return attackableSquares & relativeBitBoard.OpponentPawns;
         }
 
-        public SquareFlag GetKnightCheckers(BitBoard bitBoard, Colour colour, SquareFlag square)
+        public SquareFlag GetKnightCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
         {
             var squareIndex = square.ToBoardIndex();
 
-            var opponentKnightSquares = bitBoard.FindKnightSquares(colour.Opposite());
-
             var attackableSquares = KnightAttacks[squareIndex];
 
-            return attackableSquares & opponentKnightSquares;
+            return attackableSquares & relativeBitBoard.OpponentKnights;
         }
 
-        public SquareFlag GetCheckers(BitBoard bitBoard, Colour colour, SquareFlag square, PieceType rayType, PieceType pieceType)
+        public SquareFlag GetCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square, PieceType rayType, PieceType pieceType)
         {
             var opponentSquares = pieceType == PieceType.Queen
-                ? bitBoard.FindQueenSquares(colour.Opposite())
+                ? relativeBitBoard.OpponentQueens
                 : pieceType == PieceType.Rook
-                    ? bitBoard.FindRookSquares(colour.Opposite())
-                    : bitBoard.FindBishopSquares(colour.Opposite());
+                    ? relativeBitBoard.OpponentRooks
+                    : relativeBitBoard.OpponentBishops;
 
-            var attackableSquares = GetAttackableSquares(bitBoard, colour, square, rayType);
+            var attackableSquares = GetAttackableSquares(relativeBitBoard, square, rayType);
 
             return attackableSquares & opponentSquares;
         }
 
-        public bool IsCheckBishop(BitBoard bitBoard, Colour colour, SquareFlag square)
+        public bool IsCheckBishop(RelativeBitBoard relativeBitBoard, Colour colour, SquareFlag square)
         {
-            var opponentRookSquares = bitBoard.FindRookSquares(colour.Opposite());
+            var attackableSquares = GetAttackableSquares(relativeBitBoard, square, PieceType.Rook);
 
-            var attackableSquares = GetAttackableSquares(bitBoard, colour, square, PieceType.Rook);
-
-            return (attackableSquares & opponentRookSquares) > 0 ? true : false;
+            return (attackableSquares & relativeBitBoard.OpponentRooks) > 0 ? true : false;
         }
 
         public void GetWhitePawnPushes(BitBoard bitBoard, Colour colour, IList<uint> moves)
@@ -418,87 +403,37 @@ namespace ChessSharp
             moves.Add(MoveConstructor.CreateMove(colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionBishop));
         }
 
-        public void GetRookMoves(BitBoard bitBoard, Colour colour, IList<uint> moves) =>
-            GetRayMoves(bitBoard, colour, PieceType.Rook, PieceType.Rook, moves);
+        public void GetRookMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves) =>
+            GetRayMoves(relativeBitBoard, PieceType.Rook, PieceType.Rook, moves);
 
-        public void GetBishopMoves(BitBoard bitBoard, Colour colour, IList<uint> moves) =>
-            GetRayMoves(bitBoard, colour, PieceType.Bishop, PieceType.Bishop, moves);
+        public void GetBishopMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves) =>
+            GetRayMoves(relativeBitBoard, PieceType.Bishop, PieceType.Bishop, moves);
 
-        public void GetQueenMoves(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        public void GetQueenMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves)
         {
-            GetRayMoves(bitBoard, colour, PieceType.Rook, PieceType.Queen, moves);
-            GetRayMoves(bitBoard, colour, PieceType.Bishop, PieceType.Queen, moves);
+            GetRayMoves(relativeBitBoard, PieceType.Rook, PieceType.Queen, moves);
+            GetRayMoves(relativeBitBoard, PieceType.Bishop, PieceType.Queen, moves);
         }
 
-        public void GetRayMoves(BitBoard bitBoard, Colour colour, PieceType rayType, PieceType pieceType, IList<uint> moves)
+        public void GetRayMoves(RelativeBitBoard relativeBitBoard, PieceType rayType, PieceType pieceType, IList<uint> moves)
         {
             var squares = pieceType == PieceType.Queen
-                ? bitBoard.FindQueenSquares(colour).ToList()
+                ? relativeBitBoard.MyQueens.ToList()
                 : pieceType == PieceType.Rook
-                    ? bitBoard.FindRookSquares(colour).ToList()
-                    : bitBoard.FindBishopSquares(colour).ToList();
-
-            var mySquares = bitBoard.FindPieceSquares(colour);
-            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
-
-            //var occupiedSquares = mySquares | opponentSquares;
+                    ? relativeBitBoard.MyRooks.ToList()
+                    : relativeBitBoard.MyBishops.ToList();
 
             foreach (var fromSquare in squares)
             {
-                var attackableSquares = GetAttackableSquares(bitBoard, colour, fromSquare, rayType);//, occupiedSquares);
-                //var squareIndex = fromSquare.ToBoardIndex();
+                var attackableSquaresIncludingSelfCaptures = GetAttackableSquares(relativeBitBoard, fromSquare, rayType);
+                var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MyPieces;
 
-                //var occupancyMask = GetOccupancyMask(rayType, squareIndex);
-
-                //var occupancyMasked = occupiedSquares & occupancyMask;
-
-                //var magicIndex = GetMagicIndex(rayType, squareIndex, occupancyMasked);
-
-                //var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, squareIndex, magicIndex);
-
-                //var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
-
-                ToOrdinaryMoves(bitBoard, colour, moves, pieceType, fromSquare, attackableSquares);
-                //var attackableSquaresAsList = attackableSquares.ToList();
-
-                //foreach (var to in attackableSquaresAsList)
-                //{
-                //    if (opponentSquares.HasFlag(to))
-                //    {
-                //        var capturePieceType = bitBoard.GetPieceType(to);
-
-                //        moves.Add(MoveConstructor.CreateMove(colour, pieceType, square, to, capturePieceType, MoveType.Ordinary));
-                //    }
-                //    else
-                //    {
-                //        moves.Add(MoveConstructor.CreateMove(colour, pieceType, square, to, PieceType.None, MoveType.Ordinary));
-                //    }
-                //}
+                ToOrdinaryMoves(relativeBitBoard, moves, pieceType, fromSquare, attackableSquares);
             }
         }
 
-        private SquareFlag GetAttackableSquares(BitBoard bitBoard, Colour colour, SquareFlag fromSquare, PieceType rayType)
-        {
-            var mySquares = bitBoard.FindPieceSquares(colour);
-            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
-
-            var occupiedSquares = mySquares | opponentSquares;
-
-            return GetAttackableSquares(fromSquare, rayType, occupiedSquares);
-            //var fromSquareIndex = fromSquare.ToBoardIndex();
-            
-            //var occupancyMask = GetOccupancyMask(rayType, fromSquareIndex);
-
-            //var occupancyMasked = occupiedSquares & occupancyMask;
-
-            //var magicIndex = GetMagicIndex(rayType, fromSquareIndex, occupancyMasked);
-
-            //var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, fromSquareIndex, magicIndex);
-
-            //var attackableSquares = attackableSquaresIncludingSelfCaptures & ~mySquares;
-
-            //return attackableSquares;
-        }
+        private SquareFlag GetAttackableSquares(RelativeBitBoard relativeBitBoard, SquareFlag fromSquare, PieceType rayType) => 
+            GetAttackableSquares(fromSquare, rayType, relativeBitBoard.OccupiedSquares);
 
         private SquareFlag GetAttackableSquares(SquareFlag fromSquare, PieceType rayType, SquareFlag occupiedSquares)
         {
@@ -515,59 +450,57 @@ namespace ChessSharp
             return attackableSquaresIncludingSelfCaptures;
         }
 
-        private void ToOrdinaryMoves(BitBoard bitBoard, Colour colour, IList<uint> moves, PieceType pieceType, SquareFlag fromSquare, SquareFlag attackableSquares)
+        private void ToOrdinaryMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves, PieceType pieceType, SquareFlag fromSquare, SquareFlag attackableSquares)
         {
-            var opponentSquares = bitBoard.FindPieceSquares(colour.Opposite());
-
             var attackableSquaresAsList = attackableSquares.ToList();
 
             foreach (var toSquare in attackableSquaresAsList)
             {
-                if (opponentSquares.HasFlag(toSquare))
+                if (relativeBitBoard.OpponentPieces.HasFlag(toSquare))
                 {
-                    var capturePieceType = bitBoard.GetPieceType(toSquare);
+                    var capturePieceType = relativeBitBoard.GetPieceType(toSquare);
 
-                    moves.Add(MoveConstructor.CreateMove(colour, pieceType, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
+                    moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, pieceType, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
                 }
                 else
                 {
-                    moves.Add(MoveConstructor.CreateMove(colour, pieceType, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
+                    moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, pieceType, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
                 }
             }
         }
 
-        private SquareFlag FastFilterOutCoveredSquares(BitBoard bitBoard, Colour colour, IReadOnlyList<SquareFlag> attackableSquaresAsList)
+        private SquareFlag FastFilterOutCoveredSquares(RelativeBitBoard relativeBitBoard, IReadOnlyList<SquareFlag> attackableSquaresAsList)
         {
             var safeSquares = (SquareFlag)0;
 
             foreach (var attackableSquare in attackableSquaresAsList)
             {
-                var potentialCheckersPawn = GetPawnCheckers(bitBoard, colour, attackableSquare);
+                var potentialCheckersPawn = GetPawnCheckers(relativeBitBoard, attackableSquare);
 
                 if (potentialCheckersPawn > 0)
                     continue;
 
-                var potentialCheckersKnight = GetKnightCheckers(bitBoard, colour, attackableSquare);
+                var potentialCheckersKnight = GetKnightCheckers(relativeBitBoard, attackableSquare);
 
                 if (potentialCheckersKnight > 0)
                     continue;
 
-                var potentialCheckersRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Rook);
+                var potentialCheckersRook = GetCheckers(relativeBitBoard, attackableSquare, PieceType.Rook, PieceType.Rook);
 
                 if (potentialCheckersRook > 0)
                     continue;
 
-                var potentialCheckersBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Bishop);
+                var potentialCheckersBishop = GetCheckers(relativeBitBoard, attackableSquare, PieceType.Bishop, PieceType.Bishop);
 
                 if (potentialCheckersBishop > 0)
                     continue;
 
-                var potentialCheckersQueenAsRook = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Rook, PieceType.Queen);
+                var potentialCheckersQueenAsRook = GetCheckers(relativeBitBoard, attackableSquare, PieceType.Rook, PieceType.Queen);
 
                 if (potentialCheckersQueenAsRook > 0)
                     continue;
 
-                var potentialCheckersQueenAsBishop = GetCheckers(bitBoard, colour, attackableSquare, PieceType.Bishop, PieceType.Queen);
+                var potentialCheckersQueenAsBishop = GetCheckers(relativeBitBoard, attackableSquare, PieceType.Bishop, PieceType.Queen);
 
                 if (potentialCheckersQueenAsBishop > 0)
                     continue;

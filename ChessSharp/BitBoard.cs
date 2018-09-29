@@ -1,4 +1,7 @@
 ﻿using ChessSharp.Enums;
+using ChessSharp.Extensions;
+using ChessSharp.Models;
+using System;
 
 namespace ChessSharp
 {
@@ -203,7 +206,30 @@ namespace ChessSharp
                 if (BlackKing.HasFlag(square)) return PieceType.King;
             }
 
-            throw new System.Exception($"Failed to find piece for {square}");
+            throw new Exception($"Failed to find piece for {square}");
+        }
+
+        public RelativeBitBoard ToRelative(Colour colour)
+        {
+            var opponentColour = colour.Opposite();
+
+            var relativeBitBoard = new RelativeBitBoard
+                (colour,
+                 FindPawnSquares(colour),
+                 FindRookSquares(colour),
+                 FindKnightSquares(colour),
+                 FindBishopSquares(colour),
+                 FindQueenSquares(colour),
+                 FindKingSquare(colour),
+                 FindPawnSquares(opponentColour),
+                 FindRookSquares(opponentColour),
+                 FindKnightSquares(opponentColour),
+                 FindBishopSquares(opponentColour),
+                 FindQueenSquares(opponentColour),
+                 FindKingSquare(opponentColour),
+                 EnPassant);
+
+            return relativeBitBoard;
         }
     }
 }
