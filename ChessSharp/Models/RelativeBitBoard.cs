@@ -13,6 +13,7 @@ namespace ChessSharp.Models
             SquareFlag enPassant)
         {
             Colour = colour;
+            OpponentColour = colour.Opposite();
             MyPawns = myPawns;
             MyRooks = myRooks;
             MyKnights = myKnights;
@@ -29,6 +30,8 @@ namespace ChessSharp.Models
         }
 
         public Colour Colour { get; }
+
+        public Colour OpponentColour { get; }
 
         public SquareFlag MyPawns { get; }
 
@@ -122,5 +125,14 @@ namespace ChessSharp.Models
 
             throw new Exception($"Failed to find piece for {square}");
         }
+
+        public SquareFlag StartRank =>
+            Colour == Colour.White ? SquareFlagExtensions.r2 : SquareFlagExtensions.r7;
+
+        public SquareFlag EnPassantDiscoveredCheckRank =>
+            Colour == Colour.White ? SquareFlagExtensions.r5 : SquareFlagExtensions.r4;
+
+        public SquareFlag PromotionRank =>
+            Colour == Colour.White ? SquareFlagExtensions.r8 : SquareFlagExtensions.r1;
     }
 }

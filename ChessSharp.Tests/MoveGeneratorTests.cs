@@ -31,12 +31,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_Empty_OnePush_Correct()
         {
-            var bitBoard = Create("8/8/8/8/3P4/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/3P4/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             Assert.Collection(moves, x => Assert.Equal(SquareFlag.D5, x.GetTo()));
         }
@@ -44,33 +44,60 @@ namespace ChessSharp.Tests
         [Fact]
         public void EightPawns_Empty_OnePush_Correct()
         {
-            var bitBoard = Create("8/8/8/8/8/8/PPPPPPPP/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/8/8/PPPPPPPP/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
-            Assert.Collection(moves,
-                x => { Assert.Equal(SquareFlag.A3, x.GetTo()); },
-                x => { Assert.Equal(SquareFlag.B3, x.GetTo()); },
-                x => { Assert.Equal(SquareFlag.C3, x.GetTo()); },
-                x => { Assert.Equal(SquareFlag.D3, x.GetTo()); },
-                x => { Assert.Equal(SquareFlag.E3, x.GetTo()); },
-                x => { Assert.Equal(SquareFlag.F3, x.GetTo()); },
-                x => { Assert.Equal(SquareFlag.G3, x.GetTo()); },
-                x => { Assert.Equal(SquareFlag.H3, x.GetTo()); });
+            // Purely for debugging
+            var wrappedMoves = moves.Select(x => new MoveWrapper(x));
+
+            var moveA3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.A2, SquareFlag.A3, PieceType.None, MoveType.Ordinary);
+            var moveA4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.A2, SquareFlag.A4, PieceType.None, MoveType.Ordinary);
+            var moveB3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.B3, PieceType.None, MoveType.Ordinary);
+            var moveB4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.B4, PieceType.None, MoveType.Ordinary);
+            var moveC3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.C2, SquareFlag.C3, PieceType.None, MoveType.Ordinary);
+            var moveC4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.C2, SquareFlag.C4, PieceType.None, MoveType.Ordinary);
+            var moveD3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D2, SquareFlag.D3, PieceType.None, MoveType.Ordinary);
+            var moveD4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D2, SquareFlag.D4, PieceType.None, MoveType.Ordinary);
+            var moveE3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.E2, SquareFlag.E3, PieceType.None, MoveType.Ordinary);
+            var moveE4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.E2, SquareFlag.E4, PieceType.None, MoveType.Ordinary);
+            var moveF3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.F2, SquareFlag.F3, PieceType.None, MoveType.Ordinary);
+            var moveF4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.F2, SquareFlag.F4, PieceType.None, MoveType.Ordinary);
+            var moveG3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.G3, PieceType.None, MoveType.Ordinary);
+            var moveG4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.G4, PieceType.None, MoveType.Ordinary);
+            var moveH3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.H2, SquareFlag.H3, PieceType.None, MoveType.Ordinary);
+            var moveH4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.H2, SquareFlag.H4, PieceType.None, MoveType.Ordinary);
+
+            Assert.Contains(moveA3, moves);
+            Assert.Contains(moveA4, moves);
+            Assert.Contains(moveB3, moves);
+            Assert.Contains(moveB4, moves);
+            Assert.Contains(moveC3, moves);
+            Assert.Contains(moveC4, moves);
+            Assert.Contains(moveD3, moves);
+            Assert.Contains(moveD4, moves);
+            Assert.Contains(moveE3, moves);
+            Assert.Contains(moveE4, moves);
+            Assert.Contains(moveF3, moves);
+            Assert.Contains(moveF4, moves);
+            Assert.Contains(moveG3, moves);
+            Assert.Contains(moveG4, moves);
+            Assert.Contains(moveH3, moves);
+            Assert.Contains(moveH4, moves);
         }
 
         [Fact]
         public void Pawns_White_FourBlocked_NoMoves_Correct()
         {
-            var bitBoard = Create("8/8/8/8/8/1p1p1p1p/1P1P1P1P/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/8/1p1p1p1p/1P1P1P1P/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             Assert.Empty(moves);
         }
@@ -78,12 +105,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawns_Black_FourBlocked_NoMoves_Correct()
         {
-            var bitBoard = Create("8/1p1p1p1p/1P1P1P1P/8/8/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/1p1p1p1p/1P1P1P1P/8/8/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             Assert.Empty(moves);
         }
@@ -91,12 +118,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawns_White_FourCaptures_OnePush_Correct()
         {
-            var bitBoard = Create("8/8/8/8/8/p1p2p1p/1P4P1/8 w KQkq -");
+            var relativeBitBoard = Create("8/8/8/8/8/p1p2p1p/1P4P1/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             var move1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.B3, PieceType.None, MoveType.Ordinary);
             var move2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.G3, PieceType.None, MoveType.Ordinary);
@@ -120,12 +147,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_Empty_OnePush_Promotion_Correct()
         {
-            var bitBoard = Create("8/3P4/8/8/8/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("8/3P4/8/8/8/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             var promotion1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.D8, PieceType.None, MoveType.PromotionQueen);
             var promotion2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.D8, PieceType.None, MoveType.PromotionRook);
@@ -141,12 +168,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_Capture_OneCapture_Promotion_Correct()
         {
-            var bitBoard = Create("3nn3/3P4/8/8/8/8/8/8 w KQkq -");
+            var relativeBitBoard = Create("3nn3/3P4/8/8/8/8/8/8 w KQkq -").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             var promotion1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionQueen);
             var promotion2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionRook);
@@ -162,12 +189,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_EnPassant_Capture_Correct()
         {
-            var bitBoard = Create("8/8/3Pp3/8/8/8/8/8 w KQkq e7");
+            var relativeBitBoard = Create("8/8/3Pp3/8/8/8/8/8 w KQkq e7").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             var enPassantCapture = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D6, SquareFlag.E7, PieceType.Pawn, MoveType.EnPassant);
 
@@ -177,12 +204,12 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_EnPassant_Capture_DiscoveredCheck_Correct()
         {
-            var bitBoard = Create("8/8/q1rPp2K/8/7p/8/8/8 w KQkq e7");
+            var relativeBitBoard = Create("8/8/8/q1rPp2K/8/7p/8/8 w KQkq e6").ToRelative(Colour.White);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnPushes(bitBoard, Colour.White, moves);
-            _moveGeneratorFixture.MoveGenerator.GetWhitePawnCaptures(bitBoard, Colour.White, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnPushes(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetPawnCaptures(relativeBitBoard, moves);
 
             var enPassantCapture = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D6, SquareFlag.E7, PieceType.Pawn, MoveType.EnPassant);
 
