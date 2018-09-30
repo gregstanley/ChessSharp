@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
+using ChessSharp.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -18,8 +19,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pins_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/rRN1KB1q/8/8/8 w KQkq -")
-                .ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/rRN1KB1q/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -31,7 +31,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_Empty_OnePush_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/3P4/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/3P4/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -44,7 +44,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void EightPawns_Empty_OnePush_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/8/8/PPPPPPPP/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/8/8/PPPPPPPP/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -92,7 +92,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawns_White_FourBlocked_NoMoves_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/8/1p1p1p1p/1P1P1P1P/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/8/1p1p1p1p/1P1P1P1P/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -105,7 +105,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawns_Black_FourBlocked_NoMoves_Correct()
         {
-            var relativeBitBoard = Create("8/1p1p1p1p/1P1P1P1P/8/8/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/1p1p1p1p/1P1P1P1P/8/8/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -118,7 +118,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawns_White_FourCaptures_OnePush_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/8/p1p2p1p/1P4P1/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/8/p1p2p1p/1P4P1/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -147,7 +147,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_Empty_OnePush_Promotion_Correct()
         {
-            var relativeBitBoard = Create("8/3P4/8/8/8/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/3P4/8/8/8/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -168,7 +168,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_Capture_OneCapture_Promotion_Correct()
         {
-            var relativeBitBoard = Create("3nn3/3P4/8/8/8/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("3nn3/3P4/8/8/8/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -189,7 +189,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_EnPassant_Capture_Correct()
         {
-            var relativeBitBoard = Create("8/8/3Pp3/8/8/8/8/8 w KQkq e7").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/3Pp3/8/8/8/8/8 w KQkq e7");
 
             var moves = new List<uint>(10);
 
@@ -204,7 +204,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Pawn_EnPassant_Capture_DiscoveredCheck_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/q1rPp2K/8/7p/8/8 w KQkq e6").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/q1rPp2K/8/7p/8/8 w KQkq e6");
 
             var moves = new List<uint>(10);
 
@@ -219,12 +219,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_Blocked_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/8/1P6/PRP5/1P6 w KQkq -")
-                .ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/8/1P6/PRP5/1P6 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             Assert.Empty(moves);
         }
@@ -232,12 +231,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_Blocked2_Correct()
         {
-            var relativeBitBoard = Create("8/8/3Q4/7k/1P1R1B2/7K/3N4/8 w KQkq -")
-                .ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/3Q4/7k/1P1R1B2/7K/3N4/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             Assert.Equal(4, moves.Count());
         }
@@ -245,11 +243,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_Capture_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/8/8/p7/RN6 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/8/8/p7/RN6 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             var move = MoveConstructor.CreateMove(Colour.White, PieceType.Rook, SquareFlag.A1, SquareFlag.A2, PieceType.Pawn, MoveType.Ordinary);
 
@@ -259,11 +257,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Rook_AllDirections_1Capture_Correct()
         {
-            var relativeBitBoard = Create("1p6/8/1p6/8/8/8/1R6/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("1p6/8/1p6/8/8/8/1R6/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetRookMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -277,11 +275,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Bishop_Blocked_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/8/P1P5/1B6/P1P5 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/8/P1P5/1B6/P1P5 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             Assert.Empty(moves);
         }
@@ -289,11 +287,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Bishop_4Moves_0Captures_Correct()
         {
-            var relativeBitBoard = Create("8/8/2R3N1/7k/4B3/7K/2Q3P1/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/2R3N1/7k/4B3/7K/2Q3P1/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetBishopMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             Assert.Equal(4, moves.Count());
         }
@@ -309,11 +307,11 @@ namespace ChessSharp.Tests
         [InlineData("7Q/8/8/8/8/8/8/8 w KQkq -", 21)]
         public void Queen_A1_H8_0Captures_Correct(string fen, int moveCount)
         {
-            var relativeBitBoard = Create(fen).ToRelative(Colour.White);
+            var relativeBitBoard = Create(fen);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             Assert.Equal(moveCount, moves.Count);
         }
@@ -321,11 +319,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Queen_B2_21Moves_0Captures_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/8/8/1Q6/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/8/8/1Q6/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             var moveCount = moves.Count;
 
@@ -339,11 +337,11 @@ namespace ChessSharp.Tests
         [InlineData("8/8/8/8/3Q4/8/8/6p1 w KQkq -", SquareFlag.G1)]
         public void Queen_E4_27Moves_1Capture_Correct(string fen, SquareFlag captureSquare)
         {
-            var relativeBitBoard = Create(fen).ToRelative(Colour.White);
+            var relativeBitBoard = Create(fen);
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -357,12 +355,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Queen_E4_16Moves_8Captures_Correct()
         {
-            var relativeBitBoard = Create("8/8/2p1p1p1/7k/2p1Q1p1/7K/2p1p1p1/8 w KQkq -")
-                .ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/2p1p1p1/7k/2p1Q1p1/7K/2p1p1p1/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
-            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, moves);
+            _moveGeneratorFixture.MoveGenerator.GetQueenMoves(relativeBitBoard, (SquareFlag)ulong.MaxValue, moves);
 
             var moveCount = moves.Count;
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
@@ -390,7 +387,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_8Moves_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/4K3/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/4K3/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -404,7 +401,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_6Moves_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/8/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/8/3PKP2/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -418,7 +415,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_RookCoveringRank5_3Moves_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/r7/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/r7/3PKP2/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -432,7 +429,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_Check_Rook_4Moves_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/4r3/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/4r3/3PKP2/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -444,7 +441,7 @@ namespace ChessSharp.Tests
 
             var capture1 = MoveConstructor.CreateMove(Colour.White, PieceType.King, SquareFlag.E4, SquareFlag.E5, PieceType.Rook, MoveType.Ordinary);
 
-            Assert.Equal(4, moveCount);
+            Assert.Equal(3, moveCount);
 
             Assert.Contains(capture1, captures);
         }
@@ -452,7 +449,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_Check_Pawn_6Moves_Correct()
         {
-            var relativeBitBoard = Create("8/8/8/5p2/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/8/5p2/3PKP2/8/8/8 w KQkq -");
 
             var moves = new List<uint>(10);
 
@@ -472,9 +469,9 @@ namespace ChessSharp.Tests
         [Fact]
         public void King_Check_Knight_8Moves_Correct()
         {
-            var relativeBitBoard = Create("8/8/3n4/8/3PKP2/8/8/8 w KQkq -").ToRelative(Colour.White);
+            var relativeBitBoard = Create("8/8/3n4/8/3PKP2/8/8/8 w KQkq -");
 
-            var moves = new List<uint>(10);
+            var moves = new List<uint>(20);
 
             var checkers = _moveGeneratorFixture.MoveGenerator.GetKingMoves(relativeBitBoard, moves);
 
@@ -483,10 +480,53 @@ namespace ChessSharp.Tests
             Assert.Equal(5, moveCount);
         }
 
-        private BitBoard Create(string fenString)
+        [Fact]
+        public void King_Check_Evade_Correct()
+        {
+            var bitBoard = CreateBitBoard("k7/2Q5/8/4p3/3K1P2/8/8/8 w - - 0 1");
+
+            var moves = new List<uint>(20);
+
+            _moveGeneratorFixture.MoveGenerator.Generate(bitBoard, Colour.White, moves);
+
+            // Purely for debugging
+            var wrappedMoves = moves.Select(x => new MoveWrapper(x));
+
+            var moveCount = moves.Count;
+
+            Assert.Equal(10, moveCount);
+        }
+
+        [Fact]
+        public void King_DoubleCheck_Evade_Correct()
+        {
+            var bitBoard = CreateBitBoard("k7/2Q5/8/4p3/3K1P2/2q5/8/8 w - - 0 1");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.Generate(bitBoard, Colour.White, moves);
+
+            // Purely for debugging
+            var wrappedMoves = moves.Select(x => new MoveWrapper(x));
+
+            var moveCount = moves.Count;
+
+            Assert.Equal(3, moveCount);
+        }
+
+        private BitBoard CreateBitBoard(string fenString)
         {
             var fen = Fen.Parse(fenString);
+
             return BitBoard.FromFen(fen);
+        }
+
+        private RelativeBitBoard Create(string fenString)
+        {
+            var fen = Fen.Parse(fenString);
+
+            return BitBoard.FromFen(fen)
+                .ToRelative(fen.ToPlay);
         }
     }
 }

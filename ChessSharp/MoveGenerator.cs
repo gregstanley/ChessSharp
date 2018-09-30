@@ -95,17 +95,23 @@ namespace ChessSharp
 
                     pushMask = pathFromCheckerToKing & ~kingSquare & ~rayChecker;
                 }
+                else
+                {
+                    pushMask = 0;
+                }
             }
 
             // The pinned pieces will only be allowed to move along pin ray i.e. can't move to expose King
             var pinnedPieces = GetPinnedPieces2(relativeBitBoard, kingSquareIndex, kingRayAttackSquares);
 
+            var legalMask = pushMask | captureMask;
+
             GetPawnPushes(relativeBitBoard, pushMask, moves);
             GetPawnCaptures(relativeBitBoard, captureMask, moves);
-            GetKnightMoves(relativeBitBoard, moves);
-            GetRookMoves(relativeBitBoard, moves);
-            GetBishopMoves(relativeBitBoard, moves);
-            GetQueenMoves(relativeBitBoard, moves);
+            GetKnightMoves(relativeBitBoard, legalMask, moves);
+            GetRookMoves(relativeBitBoard, legalMask, moves);
+            GetBishopMoves(relativeBitBoard, legalMask, moves);
+            GetQueenMoves(relativeBitBoard, legalMask, moves);
         }
 
         public SquareFlag GetPinnedPieces2(RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag kingRayAttackSquares)
@@ -285,7 +291,10 @@ namespace ChessSharp
                     ? relativeBitBoard.OpponentRooks
                     : relativeBitBoard.OpponentBishops;
 
-            var attackableSquares = GetAttackableSquares(relativeBitBoard, square, rayType);
+            //var attackableSquares = GetAttackableSquares(relativeBitBoard, square, rayType);
+            var attackableSquaresWithoutKing = relativeBitBoard.OccupiedSquares & ~relativeBitBoard.MyKing;
+
+            var attackableSquares = GetAttackableSquares(square, rayType, attackableSquaresWithoutKing);
 
             return attackableSquares & opponentSquares;
         }
@@ -422,7 +431,7 @@ namespace ChessSharp
             moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionBishop));
         }
 
-        public void GetKnightMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves)
+        public void GetKnightMoves(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, IList<uint> moves)
         {
             var knightSquares = relativeBitBoard.MyKnights.ToList();
 
@@ -432,24 +441,25 @@ namespace ChessSharp
 
                 var attackableSquaresIncludingSelfCaptures = KnightAttacks[squareIndex];
                 var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MySquares;
+                var legalAttackableSquares = attackableSquares & legalMask;
 
-                ToOrdinaryMoves(relativeBitBoard, moves, PieceType.Knight, fromSquare, attackableSquares);
+                ToOrdinaryMoves(relativeBitBoard, moves, PieceType.Knight, fromSquare, legalAttackableSquares);
             }
         }
 
-        public void GetRookMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves) =>
-            GetRayMoves(relativeBitBoard, PieceType.Rook, PieceType.Rook, moves);
+        public void GetRookMoves(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, IList<uint> moves) =>
+            GetRayMoves(relativeBitBoard, PieceType.Rook, PieceType.Rook, legalMask, moves);
 
-        public void GetBishopMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves) =>
-            GetRayMoves(relativeBitBoard, PieceType.Bishop, PieceType.Bishop, moves);
+        public void GetBishopMoves(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, IList<uint> moves) =>
+            GetRayMoves(relativeBitBoard, PieceType.Bishop, PieceType.Bishop, legalMask, moves);
 
-        public void GetQueenMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves)
+        public void GetQueenMoves(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, IList<uint> moves)
         {
-            GetRayMoves(relativeBitBoard, PieceType.Rook, PieceType.Queen, moves);
-            GetRayMoves(relativeBitBoard, PieceType.Bishop, PieceType.Queen, moves);
+            GetRayMoves(relativeBitBoard, PieceType.Rook, PieceType.Queen, legalMask, moves);
+            GetRayMoves(relativeBitBoard, PieceType.Bishop, PieceType.Queen, legalMask, moves);
         }
 
-        public void GetRayMoves(RelativeBitBoard relativeBitBoard, PieceType rayType, PieceType pieceType, IList<uint> moves)
+        public void GetRayMoves(RelativeBitBoard relativeBitBoard, PieceType rayType, PieceType pieceType, SquareFlag legalMask, IList<uint> moves)
         {
             var squares = pieceType == PieceType.Queen
                 ? relativeBitBoard.MyQueens.ToList()
@@ -461,8 +471,9 @@ namespace ChessSharp
             {
                 var attackableSquaresIncludingSelfCaptures = GetAttackableSquares(relativeBitBoard, fromSquare, rayType);
                 var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MySquares;
+                var legalAttackableSquares = attackableSquares & legalMask;
 
-                ToOrdinaryMoves(relativeBitBoard, moves, pieceType, fromSquare, attackableSquares);
+                ToOrdinaryMoves(relativeBitBoard, moves, pieceType, fromSquare, legalAttackableSquares);
             }
         }
 
@@ -478,15 +489,15 @@ namespace ChessSharp
         private SquareFlag GetAttackableSquares(SquareFlag fromSquare, PieceType rayType, SquareFlag occupiedSquares) =>
             GetAttackableSquares(fromSquare.ToBoardIndex(), rayType, occupiedSquares);
 
-        private SquareFlag GetAttackableSquares(int fromSqaureIndex, PieceType rayType, SquareFlag occupiedSquares)
+        private SquareFlag GetAttackableSquares(int fromSquareIndex, PieceType rayType, SquareFlag occupiedSquares)
         {
-            var occupancyMask = GetOccupancyMask(rayType, fromSqaureIndex);
+            var occupancyMask = GetOccupancyMask(rayType, fromSquareIndex);
 
             var occupancyMasked = occupiedSquares & occupancyMask;
 
-            var magicIndex = GetMagicIndex(rayType, fromSqaureIndex, occupancyMasked);
+            var magicIndex = GetMagicIndex(rayType, fromSquareIndex, occupancyMasked);
 
-            var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, fromSqaureIndex, magicIndex);
+            var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, fromSquareIndex, magicIndex);
 
             return attackableSquaresIncludingSelfCaptures;
         }
