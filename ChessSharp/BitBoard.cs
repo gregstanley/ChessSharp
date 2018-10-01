@@ -231,5 +231,421 @@ namespace ChessSharp
 
             return relativeBitBoard;
         }
+
+        public void UnMakeMove(uint move)
+        {
+            var colour = move.GetColour();
+            var fromSquare = move.GetFrom();
+            var toSquare = move.GetTo();
+            var moveType = move.GetMoveType();
+
+            if (moveType == MoveType.CastleKing)
+            {
+
+            }
+            else if (move.GetPieceType() == PieceType.Pawn)
+            {
+                if (moveType == MoveType.EnPassant)
+                {
+                    // Capturing behind the opponent pawn so shift as if we are opponent
+                    var captureSquare = move.GetTo()
+                        .PawnForward(colour.Opposite(), 1);
+
+                    MovePiece(colour.Opposite(), PieceType.Pawn, captureSquare, captureSquare);
+                }
+                else if (moveType == MoveType.PromotionQueen)
+                {
+                    DemotePiece(colour, PieceType.Queen, toSquare);
+                }
+                else if (moveType == MoveType.PromotionRook)
+                {
+                    DemotePiece(colour, PieceType.Rook, toSquare);
+                }
+                else if (moveType == MoveType.PromotionBishop)
+                {
+                    DemotePiece(colour, PieceType.Bishop, toSquare);
+                }
+                else if (moveType == MoveType.PromotionKnight)
+                {
+                    DemotePiece(colour, PieceType.Knight, toSquare);
+                }
+            }
+            else
+            {
+                MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
+
+                if (move.GetCapturePieceType() != PieceType.None)
+                    MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
+            }
+        }
+
+        public void MakeMove(uint move)
+        {
+            var colour = move.GetColour();
+            var fromSquare = move.GetFrom();
+            var toSquare = move.GetTo();
+            var moveType = move.GetMoveType();
+            
+            if (moveType == MoveType.CastleKing)
+            {
+
+            }
+            else if (move.GetPieceType() == PieceType.Pawn)
+            {
+                if (moveType == MoveType.EnPassant)
+                {
+                    // Capturing behind the opponent pawn so shift as if we are opponent
+                    var captureSquare = move.GetTo()
+                        .PawnForward(colour.Opposite(), 1);
+
+                    RemovePiece(colour.Opposite(), captureSquare);
+                }
+                else if (moveType == MoveType.PromotionQueen)
+                {
+                    PromotePiece(colour, PieceType.Queen, toSquare);
+                }
+                else if (moveType == MoveType.PromotionRook)
+                {
+                    PromotePiece(colour, PieceType.Rook, toSquare);
+                }
+                else if (moveType == MoveType.PromotionBishop)
+                {
+                    PromotePiece(colour, PieceType.Bishop, toSquare);
+                }
+                else if (moveType == MoveType.PromotionKnight)
+                {
+                    PromotePiece(colour, PieceType.Knight, toSquare);
+                }
+                else
+                {
+                    // We can only move forward two from start square
+                    var toSquareTemp = move.GetFrom()
+                        .PawnForward(colour, 2);
+
+                    // So if the 'to' square is the same it might set en passant flag
+                    if (toSquareTemp == move.GetTo())
+                    {
+                        var targetSquare = (SquareFlag)((ulong)toSquare >> Math.Abs((int)MoveDirection.West));
+                        
+                        var pieceColour = GetPieceColour(targetSquare);
+                        var pieceType = GetPieceType(targetSquare);
+
+                        if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
+                        {
+                            EnPassant = move.GetFrom().PawnForward(colour, 1);
+                        }
+                        else
+                        {
+                            targetSquare = (SquareFlag)((ulong)toSquare << (int)MoveDirection.East);
+
+                            pieceColour = GetPieceColour(targetSquare);
+                            pieceType = GetPieceType(targetSquare);
+
+                            if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
+                            {
+                                EnPassant = move.GetFrom().PawnForward(colour, 1);
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+
+                if (move.GetCapturePieceType() != PieceType.None)
+                    RemovePiece(colour.Opposite(), toSquare);
+            }
+            
+            //if (move is MoveCastle castle)
+            //{
+            //    var kingStartSquareFlag = castle.KingStartPosition.ToSquareFlag();
+            //    var kingEndSquareFlag = castle.KingEndPosition.ToSquareFlag();
+
+            //    childBoard.MovePiece(colour, PieceType.King, kingStartSquareFlag, kingEndSquareFlag);
+
+            //    childBoard.RemoveCastleAvailability(move.PieceColour);
+            //}
+            //else if (CanCastle(move.PieceColour))
+            //{
+            //    if (move.Type == PieceType.King)
+            //        childBoard.RemoveCastleAvailability(colour);
+
+            //    if (move.Type == PieceType.Rook)
+            //    {
+            //        var kingSquare = childBoard.FindKingSquare(colour).ToRankFile();
+
+            //        var relativePostion = kingSquare.To(move.StartPosition);
+
+            //        var side = relativePostion.File == 3 ? PieceType.King : PieceType.Queen;
+
+            //        childBoard.RemoveCastleAvailability(colour, side);
+            //    }
+            //}
+
+            //return childBoard;
+        }
+
+        private void RemoveCastleAvailability(Colour colour, PieceType side)
+        {
+            if (colour == Colour.White)
+            {
+                if (side == PieceType.King) _state &= ~BoardState.WhiteCanCastleKingSide;
+                if (side == PieceType.Queen) _state &= ~BoardState.WhiteCanCastleQueenSide;
+            }
+            else
+            {
+                if (side == PieceType.King) _state &= ~BoardState.BlackCanCastleKingSide;
+                if (side == PieceType.Queen) _state &= ~BoardState.BlackCanCastleQueenSide;
+            }
+        }
+
+        private void RemoveCastleAvailability(Colour colour)
+        {
+            RemoveCastleAvailability(colour, PieceType.King);
+            RemoveCastleAvailability(colour, PieceType.Queen);
+        }
+
+        private void RemovePiece(Colour colour, SquareFlag square)
+        {
+            if (colour == Colour.White)
+            {
+                WhitePawns &= ~square;
+                WhiteRooks &= ~square;
+                WhiteKnights &= ~square;
+                WhiteBishops &= ~square;
+                WhiteQueens &= ~square;
+                WhiteKing &= ~square;
+            }
+            else
+            {
+                BlackPawns &= ~square;
+                BlackRooks &= ~square;
+                BlackKnights &= ~square;
+                BlackBishops &= ~square;
+                BlackQueens &= ~square;
+                BlackKing &= ~square;
+            }
+        }
+
+        private void MovePiece(Colour colour, PieceType type, SquareFlag start, SquareFlag end)
+        {
+            if (colour == Colour.White)
+            {
+                if (type == PieceType.Pawn)
+                {
+                    WhitePawns &= ~start;
+                    WhitePawns |= end;
+                    return;
+                }
+
+                if (type == PieceType.Rook)
+                {
+                    WhiteRooks &= ~start;
+                    WhiteRooks |= end;
+                    return;
+                }
+
+                if (type == PieceType.Knight)
+                {
+                    WhiteKnights &= ~start;
+                    WhiteKnights |= end;
+                    return;
+                }
+
+                if (type == PieceType.Bishop)
+                {
+                    WhiteBishops &= ~start;
+                    WhiteBishops |= end;
+                    return;
+                }
+
+                if (type == PieceType.Queen)
+                {
+                    WhiteQueens &= ~start;
+                    WhiteQueens |= end;
+                    return;
+                }
+
+                if (type == PieceType.King)
+                {
+                    WhiteKing &= ~start;
+                    WhiteKing |= end;
+                    return;
+                }
+            }
+            else
+            {
+                if (type == PieceType.Pawn)
+                {
+                    BlackPawns &= ~start;
+                    BlackPawns |= end;
+                    return;
+                }
+
+                if (type == PieceType.Rook)
+                {
+                    BlackRooks &= ~start;
+                    BlackRooks |= end;
+                    return;
+                }
+
+                if (type == PieceType.Knight)
+                {
+                    BlackKnights &= ~start;
+                    BlackKnights |= end;
+                    return;
+                }
+
+                if (type == PieceType.Bishop)
+                {
+                    BlackBishops &= ~start;
+                    BlackBishops |= end;
+                    return;
+                }
+
+                if (type == PieceType.Queen)
+                {
+                    BlackQueens &= ~start;
+                    BlackQueens |= end;
+                    return;
+                }
+
+                if (type == PieceType.King)
+                {
+                    BlackKing &= ~start;
+                    BlackKing |= end;
+                    return;
+                }
+            }
+        }
+
+        private void PromotePiece(Colour colour, PieceType promoteTo, SquareFlag square)
+        {
+            if (colour == Colour.White)
+            {
+                if (promoteTo == PieceType.Rook)
+                {
+                    WhitePawns &= ~square;
+                    WhiteRooks |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Knight)
+                {
+                    WhitePawns &= ~square;
+                    WhiteKnights |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Bishop)
+                {
+                    WhitePawns &= ~square;
+                    WhiteBishops |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Queen)
+                {
+                    WhitePawns &= ~square;
+                    WhiteQueens |= square;
+                    return;
+                }
+            }
+            else
+            {
+                if (promoteTo == PieceType.Rook)
+                {
+                    BlackPawns &= ~square;
+                    BlackRooks |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Knight)
+                {
+                    BlackPawns &= ~square;
+                    BlackKnights |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Bishop)
+                {
+                    BlackPawns &= ~square;
+                    BlackBishops |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Queen)
+                {
+                    BlackPawns &= ~square;
+                    BlackQueens |= square;
+                    return;
+                }
+            }
+        }
+
+        private void DemotePiece(Colour colour, PieceType promoteTo, SquareFlag square)
+        {
+            if (colour == Colour.White)
+            {
+                if (promoteTo == PieceType.Rook)
+                {
+                    WhiteRooks &= ~square;
+                    WhitePawns |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Knight)
+                {
+                    WhiteKnights &= ~square;
+                    WhitePawns |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Bishop)
+                {
+                    WhiteBishops &= ~square;
+                    WhitePawns |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Queen)
+                {
+                    WhiteQueens &= ~square;
+                    WhitePawns |= square;
+                    return;
+                }
+            }
+            else
+            {
+                if (promoteTo == PieceType.Rook)
+                {
+                    BlackRooks &= ~square;
+                    BlackPawns |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Knight)
+                {
+                    BlackKnights &= ~square;
+                    BlackPawns |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Bishop)
+                {
+                    BlackBishops &= ~square;
+                    BlackPawns |= square;
+                    return;
+                }
+
+                if (promoteTo == PieceType.Queen)
+                {
+                    BlackQueens &= ~square;
+                    BlackPawns |= square;
+                    return;
+                }
+            }
+        }
     }
 }

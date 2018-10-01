@@ -54,5 +54,22 @@ namespace ChessSharp.Tests
             //Assert.Equal(469, metrics4.Checks);
             //Assert.Equal(8, metrics4.Checkmates);
         }
+
+        [Fact]
+        public void DefaultPosition2()
+        {
+            var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
+
+            // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+            var fen = Fen.Parse(Fen.Default);
+
+            var bitBoard = BitBoard.FromFen(fen);
+
+            var moves = new List<uint>(20);
+
+            var count = perftRunner.Go(bitBoard, fen.ToPlay, 2);
+
+            Assert.Equal(400, count);
+        }
     }
 }

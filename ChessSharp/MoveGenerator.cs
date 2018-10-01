@@ -14,7 +14,7 @@ namespace ChessSharp
     {
         private SquareFlag[][] Paths = new SquareFlag[64][];
         private SquareFlag[] PawnCapturesWhite = new SquareFlag[56];
-        private SquareFlag[] PawnCapturesBlack = new SquareFlag[56];
+        private SquareFlag[] PawnCapturesBlack = new SquareFlag[64];
         private SquareFlag[] KnightAttacks = new SquareFlag[64];
         private SquareFlag[] KingAttacks = new SquareFlag[64];
         private SquareFlag[][] RookAttacks = new SquareFlag[64][];
@@ -216,27 +216,6 @@ namespace ChessSharp
                     var pathFromCheckerToKing = Paths[checkerSquareIndex][kingSquareIndex];
 
                     pushMask = pathFromCheckerToKing & ~kingSquare & ~rayChecker;
-
-                    //if ((checkersRook | checkersQueenAsRook) > 0)
-                    //{
-                    //    var checkerAsRookMagicIndex = GetMagicIndex(PieceType.Rook, checkerBoardIndex, kingSquare);
-                    //    var kingAsRookMagicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, rayChecker);
-
-                    //    var checkerAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, checkerAsRookMagicIndex);
-                    //    var kingAsRook = GetAttacks(PieceType.Rook, checkerBoardIndex, kingAsRookMagicIndex);
-
-                    //    pushMask = checkerAsRook & kingAsRook;
-                    //}
-                    //else if((checkersBishop | checkersQueenAsBishop) > 0)
-                    //{
-                    //    var checkerAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, checkerBoardIndex, kingSquare);
-                    //    var kingAsBishopMagicIndex = GetMagicIndex(PieceType.Bishop, kingSquareIndex, rayChecker);
-
-                    //    var checkerAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, checkerAsBishopMagicIndex);
-                    //    var kingAsBishop = GetAttacks(PieceType.Bishop, checkerBoardIndex, kingAsBishopMagicIndex);
-
-                    //    pushMask = checkerAsBishop & kingAsBishop;
-                    //}
                 }
             }
 
@@ -315,7 +294,8 @@ namespace ChessSharp
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
-                var toSquare = PushPawnOneSquare(relativeBitBoard, fromSquare);
+                //var toSquare = PushPawnOneSquare(relativeBitBoard, fromSquare);
+                var toSquare = fromSquare.PawnForward(relativeBitBoard.Colour, 1);
 
                 if (relativeBitBoard.OpponentSquares.HasFlag(toSquare))
                     continue;
@@ -330,7 +310,8 @@ namespace ChessSharp
 
                 if (relativeBitBoard.StartRank.HasFlag(fromSquare))
                 {
-                    toSquare = PushPawnOneSquare(relativeBitBoard, toSquare);
+                    //toSquare = PushPawnOneSquare(relativeBitBoard, toSquare);
+                    toSquare = fromSquare.PawnForward(relativeBitBoard.Colour, 2);
 
                     if (!relativeBitBoard.OpponentSquares.HasFlag(toSquare))
                     {
@@ -628,12 +609,15 @@ namespace ChessSharp
         private void InitPawnCaptures()
         {
             var pawnCapturesWhite = new SquareFlag[56];
-            var pawnCapturesBlack = new SquareFlag[56];
+            var pawnCapturesBlack = new SquareFlag[64];
 
-            for (var squareIndex = 8; squareIndex < 56; ++squareIndex)
+            for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
             {
-                pawnCapturesWhite[squareIndex] = AttackGenerator.GeneratePotentialWhitePawnCaptures(squareIndex);
-                pawnCapturesBlack[squareIndex] = AttackGenerator.GeneratePotentialBlackPawnCaptures(squareIndex);
+                if (squareIndex < 56)
+                    pawnCapturesWhite[squareIndex] = AttackGenerator.GeneratePotentialWhitePawnCaptures(squareIndex);
+
+                if (squareIndex > 7)
+                    pawnCapturesBlack[squareIndex] = AttackGenerator.GeneratePotentialBlackPawnCaptures(squareIndex);
             }
 
             PawnCapturesWhite = pawnCapturesWhite;
