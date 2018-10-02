@@ -73,12 +73,14 @@ namespace ChessSharp
 
             var numCheckers = checkers.Count();
 
-            // If in Check by move than one piece then only options are King moves
+            // If in Check by more than one piece then only options are King moves - which we already have
             if (numCheckers > 1)
                 return;
 
             // https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/
+            // By default - whole board. If in Check it becomes limited to the Checker (no other captures count)
             var captureMask = (SquareFlag)ulong.MaxValue;
+            // By default - whole board. If in Check by ray piece it becomes limited to popsitions between King and Checker
             var pushMask = (SquareFlag)ulong.MaxValue;
 
             if (numCheckers == 1)
@@ -93,12 +95,19 @@ namespace ChessSharp
 
                     var pathFromCheckerToKing = Paths[checkerSquareIndex][kingSquareIndex];
 
+                    // In Check by ray piece so only non capture moves must end on this line
                     pushMask = pathFromCheckerToKing & ~kingSquare & ~rayChecker;
                 }
                 else
                 {
+                    // Not a ray piece so force captures only
                     pushMask = 0;
                 }
+            }
+            else
+            {
+                // Only run castle logic if we are not in check
+                GetCastles(relativeBitBoard, moves);
             }
 
             // The pinned pieces will only be allowed to move along pin ray i.e. can't move to expose King
@@ -112,8 +121,6 @@ namespace ChessSharp
             GetRookMoves(relativeBitBoard, legalMask, moves);
             GetBishopMoves(relativeBitBoard, legalMask, moves);
             GetQueenMoves(relativeBitBoard, legalMask, moves);
-
-            GetCastles(relativeBitBoard, legalMask, moves);
         }
 
         public SquareFlag GetPinnedPieces2(RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag kingRayAttackSquares)
@@ -295,7 +302,6 @@ namespace ChessSharp
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
-                //var toSquare = PushPawnOneSquare(relativeBitBoard, fromSquare);
                 var toSquare = fromSquare.PawnForward(relativeBitBoard.Colour, 1);
 
                 if (relativeBitBoard.OpponentSquares.HasFlag(toSquare))
@@ -311,7 +317,6 @@ namespace ChessSharp
 
                 if (relativeBitBoard.StartRank.HasFlag(fromSquare))
                 {
-                    //toSquare = PushPawnOneSquare(relativeBitBoard, toSquare);
                     toSquare = fromSquare.PawnForward(relativeBitBoard.Colour, 2);
 
                     if (!relativeBitBoard.OpponentSquares.HasFlag(toSquare))
@@ -459,7 +464,7 @@ namespace ChessSharp
             }
         }
 
-        public void GetCastles(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, IList<uint> moves)
+        public void GetCastles(RelativeBitBoard relativeBitBoard, IList<uint> moves)
         {
             if (!relativeBitBoard.CanCastleKingSide && !relativeBitBoard.CanCastleQueenSide)
                 return;
@@ -487,7 +492,7 @@ namespace ChessSharp
 
                     if (squaresBetween == safeSquares)
                     {
-                        moves.Add(MoveConstructor.CreateCastle(relativeBitBoard.Colour, relativeBitBoard.KingStartSquare, relativeBitBoard.KingSideCastleStep2, MoveType.CastleKing));
+                        moves.Add(MoveConstructor.CreateCastle(relativeBitBoard.Colour, MoveType.CastleKing));
                     }
                 }
             }
@@ -515,7 +520,7 @@ namespace ChessSharp
 
                     if(squaresBetweenMinusFirstRookStep == safeSquares)
                     {
-                        moves.Add(MoveConstructor.CreateCastle(relativeBitBoard.Colour, relativeBitBoard.KingStartSquare, relativeBitBoard.QueenSideCastleStep2, MoveType.CastleQueen));
+                        moves.Add(MoveConstructor.CreateCastle(relativeBitBoard.Colour, MoveType.CastleQueen));
                     }
                 }
             }

@@ -538,6 +538,38 @@ namespace ChessSharp.Tests
             Assert.Equal(1, castleQueenCount);
         }
 
+        [Theory]
+        [InlineData("p7", 1, 1)]
+        [InlineData("1p6", 1, 0)]
+        [InlineData("2p5", 1, 0)]
+        [InlineData("3p4", 0, 0)]
+        [InlineData("4p3", 0, 0)]
+        [InlineData("5p2", 0, 0)]
+        [InlineData("6p1", 0, 1)]
+        [InlineData("7p", 0, 1)]
+        public void Castle_BlockedByPassingThroughCheck_Correct(string partialFen, int castleKingExpectedCount, int castleQueenExpectedCount)
+        {
+            var bitBoard = CreateBitBoard($"r3k2r/8/8/8/8/8/{partialFen}/R3K2R w KQkq - 0 1");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.Generate(bitBoard, Colour.White, moves);
+
+            // Purely for debugging
+            var wrappedMoves = moves.Select(x => new MoveWrapper(x));
+
+            var moveCount = moves.Count;
+
+            var castleKing = moves.Where(x => x.GetMoveType() == MoveType.CastleKing);
+            var castleQueen = moves.Where(x => x.GetMoveType() == MoveType.CastleQueen);
+
+            var castleKingCount = castleKing.Count();
+            var castleQueenCount = castleQueen.Count();
+
+            Assert.Equal(castleKingExpectedCount, castleKingCount);
+            Assert.Equal(castleQueenExpectedCount, castleQueenCount);
+        }
+
         private BitBoard CreateBitBoard(string fenString)
         {
             var fen = Fen.Parse(fenString);

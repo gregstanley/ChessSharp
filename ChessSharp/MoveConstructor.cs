@@ -19,15 +19,13 @@ namespace ChessSharp
                 | capturePieceTypeShift | moveTypeShift;
         }
 
-        public static uint CreateCastle(Colour colour, SquareFlag from, SquareFlag to, MoveType moveType)
+        public static uint CreateCastle(Colour colour, MoveType moveType)
         {
             var colourShift = colour == Colour.White ? (uint)0 : 1;
-            var pieceTypeShift = (uint)PieceType.King << 1;
-            var fromShift = from != 0 ? (uint)from.ToBoardIndex() << 4 : 0;
-            var toShift = to != 0 ? (uint)to.ToBoardIndex() << 10 : 0;
+
             var moveTypeShift = (uint)moveType << 19;
 
-            return colourShift | pieceTypeShift | fromShift | toShift | moveTypeShift;
+            return colourShift | moveTypeShift;
         }
     }
 }
