@@ -2,16 +2,17 @@
 using ChessSharp.Extensions;
 using ChessSharp.Models;
 using System;
+using System.Collections.Generic;
 
 namespace ChessSharp
 {
     public class BitBoard
     {
         private const BoardState DefaultState =
-            BoardState.WhiteCanCastleKingSide
-            | BoardState.WhiteCanCastleQueenSide
-            | BoardState.BlackCanCastleKingSide
-            | BoardState.BlackCanCastleQueenSide;
+            Enums.BoardState.WhiteCanCastleKingSide
+            | Enums.BoardState.WhiteCanCastleQueenSide
+            | Enums.BoardState.BlackCanCastleKingSide
+            | Enums.BoardState.BlackCanCastleQueenSide;
 
         public static BitBoard FromFen(Fen fen)
         {
@@ -61,9 +62,10 @@ namespace ChessSharp
                 }
             }
 
+            var state = fen.BoardState;
+
             return new BitBoard(whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueens, whiteKing,
-                blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.EnPassantSquare,
-                fen.CastlingRights);
+                blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.BoardState);
         }
 
         public BitBoard()
@@ -80,7 +82,11 @@ namespace ChessSharp
             BlackBishops = SquareFlag.C8 | SquareFlag.F8;
             BlackQueens = SquareFlag.D8;
             BlackKing = SquareFlag.E8;
-            _state = DefaultState;
+
+            var state = Enums.BoardState.WhiteCanCastleKingSide | Enums.BoardState.WhiteCanCastleQueenSide
+                | Enums.BoardState.BlackCanCastleKingSide | Enums.BoardState.BlackCanCastleQueenSide;
+
+            BoardState.Push(state);
         }
 
         public BitBoard(SquareFlag whitePawns,
@@ -95,7 +101,6 @@ namespace ChessSharp
             SquareFlag blackBishops,
             SquareFlag blackQueens,
             SquareFlag blackKing,
-            SquareFlag enPassant,
             BoardState state)
         {
             WhitePawns = whitePawns;
@@ -110,8 +115,8 @@ namespace ChessSharp
             BlackBishops = blackBishops;
             BlackQueens = blackQueens;
             BlackKing = blackKing;
-            EnPassant = enPassant;
-            _state = state;
+
+            BoardState.Push(state);
         }
 
         public SquareFlag WhitePawns { get; private set; }
@@ -138,15 +143,15 @@ namespace ChessSharp
 
         public SquareFlag BlackKing { get; private set; }
 
-        public SquareFlag EnPassant { get; private set; }
+        public SquareFlag EnPassant => BoardState.Peek().GetEnPassantSquare();
+
+        public Stack<BoardState> BoardState { get; } = new Stack<BoardState>(256);
 
         public SquareFlag White =>
             WhitePawns | WhiteRooks | WhiteKnights | WhiteBishops | WhiteQueens | WhiteKing;
 
         public SquareFlag Black =>
             BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
-
-        private BoardState _state = BoardState.None;
 
         public SquareFlag FindPieceSquares(Colour colour) =>
             colour == Colour.White ? White : Black;
@@ -243,6 +248,10 @@ namespace ChessSharp
             {
 
             }
+            else if (moveType == MoveType.CastleQueen)
+            {
+
+            }
             else if (move.GetPieceType() == PieceType.Pawn)
             {
                 if (moveType == MoveType.EnPassant)
@@ -277,6 +286,8 @@ namespace ChessSharp
                 if (move.GetCapturePieceType() != PieceType.None)
                     MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
             }
+
+            BoardState.Pop();
         }
 
         public void MakeMove(uint move)
@@ -285,8 +296,15 @@ namespace ChessSharp
             var fromSquare = move.GetFrom();
             var toSquare = move.GetTo();
             var moveType = move.GetMoveType();
-            
+
+            // Copy current state
+            var state = BoardState.Peek();
+
             if (moveType == MoveType.CastleKing)
+            {
+
+            }
+            else if (moveType == MoveType.CastleQueen)
             {
 
             }
@@ -332,7 +350,9 @@ namespace ChessSharp
 
                         if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
                         {
-                            EnPassant = move.GetFrom().PawnForward(colour, 1);
+                            //EnPassant = move.GetFrom().PawnForward(colour, 1);
+                            var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
+                            state = state.AddEnPassantSquare(enPassantSquare);
                         }
                         else
                         {
@@ -343,7 +363,9 @@ namespace ChessSharp
 
                             if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
                             {
-                                EnPassant = move.GetFrom().PawnForward(colour, 1);
+                                //EnPassant = move.GetFrom().PawnForward(colour, 1);
+                                var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
+                                state = state.AddEnPassantSquare(enPassantSquare);
                             }
                         }
                     }
@@ -356,7 +378,9 @@ namespace ChessSharp
                 if (move.GetCapturePieceType() != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
             }
-            
+
+            BoardState.Push(state);
+
             //if (move is MoveCastle castle)
             //{
             //    var kingStartSquareFlag = castle.KingStartPosition.ToSquareFlag();
@@ -388,16 +412,16 @@ namespace ChessSharp
 
         private void RemoveCastleAvailability(Colour colour, PieceType side)
         {
-            if (colour == Colour.White)
-            {
-                if (side == PieceType.King) _state &= ~BoardState.WhiteCanCastleKingSide;
-                if (side == PieceType.Queen) _state &= ~BoardState.WhiteCanCastleQueenSide;
-            }
-            else
-            {
-                if (side == PieceType.King) _state &= ~BoardState.BlackCanCastleKingSide;
-                if (side == PieceType.Queen) _state &= ~BoardState.BlackCanCastleQueenSide;
-            }
+            //if (colour == Colour.White)
+            //{
+            //    if (side == PieceType.King) stat &= ~BoardState.WhiteCanCastleKingSide;
+            //    if (side == PieceType.Queen) _state &= ~BoardState.WhiteCanCastleQueenSide;
+            //}
+            //else
+            //{
+            //    if (side == PieceType.King) _state &= ~BoardState.BlackCanCastleKingSide;
+            //    if (side == PieceType.Queen) _state &= ~BoardState.BlackCanCastleQueenSide;
+            //}
         }
 
         private void RemoveCastleAvailability(Colour colour)

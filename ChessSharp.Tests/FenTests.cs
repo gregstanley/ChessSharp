@@ -21,10 +21,10 @@ namespace ChessSharp.Tests
             Assert.Equal("pppppppp", fen.Rank7);
             Assert.Equal("rnbqkbnr", fen.Rank8);
             Assert.Equal(Colour.White, fen.ToPlay);
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.WhiteCanCastleKingSide));
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.WhiteCanCastleQueenSide));
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.BlackCanCastleKingSide));
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.BlackCanCastleQueenSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.WhiteCanCastleKingSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.WhiteCanCastleQueenSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.BlackCanCastleKingSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.BlackCanCastleQueenSide));
             Assert.Equal((SquareFlag)0, fen.EnPassantSquare);
             Assert.Equal(0, fen.HalfTurnCounter);
             Assert.Equal(1, fen.FullMoveNumber);
@@ -52,10 +52,10 @@ namespace ChessSharp.Tests
 
             Assert.Equal("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R", fen.Board);
             Assert.Equal(Colour.White, fen.ToPlay);
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.WhiteCanCastleKingSide));
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.WhiteCanCastleQueenSide));
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.BlackCanCastleKingSide));
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.BlackCanCastleQueenSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.WhiteCanCastleKingSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.WhiteCanCastleQueenSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.BlackCanCastleKingSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.BlackCanCastleQueenSide));
             Assert.Equal((SquareFlag)0, fen.EnPassantSquare);
         }
 
@@ -67,21 +67,25 @@ namespace ChessSharp.Tests
 
             Assert.Equal("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R", fen.Board);
             Assert.Equal(Colour.White, fen.ToPlay);
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.WhiteCanCastleKingSide));
-            Assert.True(fen.CastlingRights.HasFlag(BoardState.WhiteCanCastleQueenSide));
-            Assert.False(fen.CastlingRights.HasFlag(BoardState.BlackCanCastleKingSide));
-            Assert.False(fen.CastlingRights.HasFlag(BoardState.BlackCanCastleQueenSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.WhiteCanCastleKingSide));
+            Assert.True(fen.BoardState.HasFlag(BoardState.WhiteCanCastleQueenSide));
+            Assert.False(fen.BoardState.HasFlag(BoardState.BlackCanCastleKingSide));
+            Assert.False(fen.BoardState.HasFlag(BoardState.BlackCanCastleQueenSide));
             Assert.Equal((SquareFlag)0, fen.EnPassantSquare);
             Assert.Equal(1, fen.HalfTurnCounter);
             Assert.Equal(8, fen.FullMoveNumber);
         }
 
-        [Fact]
-        public void Fen_EnPassant_Correct()
+        [Theory]
+        [InlineData("-", (SquareFlag)0)]
+        [InlineData("a1", SquareFlag.A1)]
+        [InlineData("e3", SquareFlag.E3)]
+        [InlineData("h8", SquareFlag.H8)]
+        public void Fen_EnPassant_Correct(string enPassantSquareFen, SquareFlag enPassantSquare)
         {
-            var fen = Fen.Parse("rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQ e3 1 8");
+            var fen = Fen.Parse($"rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR w KQ {enPassantSquareFen} 1 8");
 
-            Assert.Equal(SquareFlag.E3, fen.EnPassantSquare);
+            Assert.Equal(enPassantSquare, fen.EnPassantSquare);
         }
     }
 }

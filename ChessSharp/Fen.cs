@@ -60,8 +60,11 @@ namespace ChessSharp
         {
             Board = board;
             ToPlay = toPlay;
-            CastlingRights = castlingRights;
-            EnPassantSquare = enPassantSquare;
+            BoardState = castlingRights;
+
+            if (enPassantSquare != 0)
+                BoardState = BoardState.AddEnPassantSquare(enPassantSquare);
+
             HalfTurnCounter = halfTurnCounter;
             FullMoveNumber = fullMoveNumber;
 
@@ -92,9 +95,9 @@ namespace ChessSharp
 
         public Colour ToPlay { get; }
 
-        public BoardState CastlingRights { get; }
+        public BoardState BoardState { get; }
 
-        public SquareFlag EnPassantSquare { get; }
+        public SquareFlag EnPassantSquare => BoardState.GetEnPassantSquare();
 
         public int HalfTurnCounter { get; }
 

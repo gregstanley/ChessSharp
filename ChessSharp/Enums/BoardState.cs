@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace ChessSharp.Enums
 {
@@ -8,15 +6,13 @@ namespace ChessSharp.Enums
     public enum BoardState
     {
         None = 0,
-        IsCapture = 1,
-        IsPawnPromotion = 2,
-        WhiteIsInCheck = 4,
-        BlackIsInCheck = 8,
-        WhiteIsInCheckmate = 16,
-        BlackIsInCheckmate = 32,
-        WhiteCanCastleKingSide = 64,
-        WhiteCanCastleQueenSide = 128,
-        BlackCanCastleKingSide = 256,
-        BlackCanCastleQueenSide = 512
+        WhiteCanCastleKingSide = 1 << 1,
+        WhiteCanCastleQueenSide = 1 << 2,
+        BlackCanCastleKingSide = 1 << 3,
+        BlackCanCastleQueenSide = 1 << 4,
+        WhiteIsInCheck = 1 << 5,
+        BlackIsInCheck = 1 << 6,
+        WhiteIsInCheckmate = 1 << 7,
+        BlackIsInCheckmate = 1 << 8
     }
 }

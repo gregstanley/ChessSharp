@@ -458,6 +458,87 @@ namespace ChessSharp
             }
         }
 
+
+        /*
+        private uint CanCastle(BitBoard board, Colour colour, SquareFlag square)
+        {
+            if (!board.CanCastle(colour))
+                return null;
+
+            if (board.GetPieceColour(square) != colour)
+                return null;
+
+            var type = board.GetPieceType(square);
+
+            if (type != PieceType.Rook)
+                return null;
+
+            var kingSquare = board.FindKingSquare(colour);
+
+            var kingRankFile = kingSquare.ToRankFile();
+            var rookRankFile = square.ToRankFile();
+
+            if (rookRankFile.File != File.a && rookRankFile.File != File.h)
+                return null;
+
+            var side = Math.Abs(kingRankFile.File - rookRankFile.File) == 3 ? PieceType.King : PieceType.Queen;
+
+            if (side == PieceType.King && !board.CanCastleKingSide(colour))
+                return null;
+
+            if (side == PieceType.Queen && !board.CanCastleQueenSide(colour))
+                return null;
+
+            var attackingThisSquare = FindPiecesAttackingThisSquare(board, colour, kingSquare);
+
+            if (attackingThisSquare.Any())
+                return null;
+
+            var stride = rookRankFile.File < kingRankFile.File ? 1 : -1;
+
+            var stillCan = true;
+
+            var currentSquare = square;
+
+            while (Next(currentSquare, stride) != kingSquare && stillCan)
+            {
+                currentSquare = Next(currentSquare, stride);
+
+                if (board.GetPieceType(currentSquare) != PieceType.None)
+                {
+                    stillCan = false;
+                }
+                else
+                {
+                    attackingThisSquare = FindPiecesAttackingThisSquare(board, colour, currentSquare);
+
+                    var queenSideSafeSpace = side == PieceType.Queen && currentSquare == Next(square, stride);
+
+                    // This is the square next to the Rook and CAN be under attack as the King does not pass through
+                    if (attackingThisSquare.Any() && !queenSideSafeSpace)
+                        stillCan = false;
+                }
+            }
+
+            if (!stillCan)
+                return null;
+
+            var targetKingSquare = RankFile.Get(kingRankFile.Rank, kingRankFile.File + (stride * -2));
+
+            if (targetKingSquare == null)
+                throw new Exception($"{colour} King is not in correct square");
+
+            var targetRookSquare = RankFile.Get(rookRankFile.Rank, targetKingSquare.File + stride);
+
+            return new MoveCastle(colour,
+                type,
+                RankFile.Get(rookRankFile.Rank, rookRankFile.File),
+                targetRookSquare,
+                RankFile.Get(kingRankFile.Rank, kingRankFile.File),
+                targetKingSquare,
+                side);
+        }
+        */
         private SquareFlag PushPawnOneSquare(Colour colour, SquareFlag fromSquare) =>
            colour == Colour.White ? (SquareFlag)((ulong)fromSquare << 8) : (SquareFlag)((ulong)fromSquare >> 8);
 

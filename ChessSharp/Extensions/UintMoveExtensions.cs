@@ -2,7 +2,7 @@
 
 namespace ChessSharp.Extensions
 {
-    public static class UintExtensions
+    public static class UintMoveExtensions
     {
         public static SquareFlag ToSquareFlag(this uint value) => _indices[value];
 
