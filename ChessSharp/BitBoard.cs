@@ -62,8 +62,6 @@ namespace ChessSharp
                 }
             }
 
-            var state = fen.BoardState;
-
             return new BitBoard(whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueens, whiteKing,
                 blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.BoardState);
         }
@@ -232,7 +230,7 @@ namespace ChessSharp
                  FindBishopSquares(opponentColour),
                  FindQueenSquares(opponentColour),
                  FindKingSquare(opponentColour),
-                 EnPassant);
+                 BoardState.Peek());
 
             return relativeBitBoard;
         }

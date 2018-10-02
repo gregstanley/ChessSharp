@@ -112,13 +112,14 @@ namespace ChessSharp
             GetRookMoves(relativeBitBoard, legalMask, moves);
             GetBishopMoves(relativeBitBoard, legalMask, moves);
             GetQueenMoves(relativeBitBoard, legalMask, moves);
+
+            GetCastles(relativeBitBoard, legalMask, moves);
         }
 
         public SquareFlag GetPinnedPieces2(RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag kingRayAttackSquares)
         {
             var potentialPins = kingRayAttackSquares & relativeBitBoard.MySquares;
 
-            //var occupancyAfterRemovingMyPieces = kingRayAttackSquares & ~potentialPins;
             var opponentOccupancy = kingRayAttackSquares & relativeBitBoard.OpponentSquares;
 
             var attackableSquaresBeyondPinsRook = GetAttackableSquares(kingSquareIndex, PieceType.Rook, opponentOccupancy);
@@ -213,9 +214,9 @@ namespace ChessSharp
                 {
                     var checkerSquareIndex = rayChecker.ToBoardIndex();
 
-                    var pathFromCheckerToKing = Paths[checkerSquareIndex][kingSquareIndex];
+                    var pathFromKingToChecker = Paths[kingSquareIndex][checkerSquareIndex];
 
-                    pushMask = pathFromCheckerToKing & ~kingSquare & ~rayChecker;
+                    pushMask = pathFromKingToChecker & ~kingSquare & ~rayChecker;
                 }
             }
 
@@ -458,87 +459,68 @@ namespace ChessSharp
             }
         }
 
-
-        /*
-        private uint CanCastle(BitBoard board, Colour colour, SquareFlag square)
+        public void GetCastles(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, IList<uint> moves)
         {
-            if (!board.CanCastle(colour))
-                return null;
+            if (!relativeBitBoard.CanCastleKingSide && !relativeBitBoard.CanCastleQueenSide)
+                return;
 
-            if (board.GetPieceColour(square) != colour)
-                return null;
+            var kingSquareIndex = relativeBitBoard.KingStartSquare.ToBoardIndex();
 
-            var type = board.GetPieceType(square);
-
-            if (type != PieceType.Rook)
-                return null;
-
-            var kingSquare = board.FindKingSquare(colour);
-
-            var kingRankFile = kingSquare.ToRankFile();
-            var rookRankFile = square.ToRankFile();
-
-            if (rookRankFile.File != File.a && rookRankFile.File != File.h)
-                return null;
-
-            var side = Math.Abs(kingRankFile.File - rookRankFile.File) == 3 ? PieceType.King : PieceType.Queen;
-
-            if (side == PieceType.King && !board.CanCastleKingSide(colour))
-                return null;
-
-            if (side == PieceType.Queen && !board.CanCastleQueenSide(colour))
-                return null;
-
-            var attackingThisSquare = FindPiecesAttackingThisSquare(board, colour, kingSquare);
-
-            if (attackingThisSquare.Any())
-                return null;
-
-            var stride = rookRankFile.File < kingRankFile.File ? 1 : -1;
-
-            var stillCan = true;
-
-            var currentSquare = square;
-
-            while (Next(currentSquare, stride) != kingSquare && stillCan)
+            // We lose castle rights if any piece moves so they MUST be in correct locations
+            if (relativeBitBoard.CanCastleKingSide)
             {
-                currentSquare = Next(currentSquare, stride);
+                var kingSideRookIndex = relativeBitBoard.KingSideRookStartSquare.ToBoardIndex();
 
-                if (board.GetPieceType(currentSquare) != PieceType.None)
+                var kingToRook = Paths[kingSquareIndex][kingSideRookIndex];
+
+                var squaresBetween = kingToRook & ~relativeBitBoard.KingStartSquare & ~relativeBitBoard.KingSideRookStartSquare;
+
+                if ((squaresBetween & relativeBitBoard.OccupiedSquares) == 0)
                 {
-                    stillCan = false;
-                }
-                else
-                {
-                    attackingThisSquare = FindPiecesAttackingThisSquare(board, colour, currentSquare);
+                    var stepsSquares = new List<SquareFlag>
+                    {
+                        relativeBitBoard.KingSideCastleStep1,
+                        relativeBitBoard.KingSideCastleStep2
+                    };
 
-                    var queenSideSafeSpace = side == PieceType.Queen && currentSquare == Next(square, stride);
+                    var safeSquares = FastFilterOutCoveredSquares(relativeBitBoard, stepsSquares);
 
-                    // This is the square next to the Rook and CAN be under attack as the King does not pass through
-                    if (attackingThisSquare.Any() && !queenSideSafeSpace)
-                        stillCan = false;
+                    if (squaresBetween == safeSquares)
+                    {
+                        moves.Add(MoveConstructor.CreateCastle(relativeBitBoard.Colour, relativeBitBoard.KingStartSquare, relativeBitBoard.KingSideCastleStep2, MoveType.CastleKing));
+                    }
                 }
             }
 
-            if (!stillCan)
-                return null;
+            if (relativeBitBoard.CanCastleQueenSide)
+            {
+                var queenSideRookIndex = relativeBitBoard.QueenSideRookStartSquare.ToBoardIndex();
 
-            var targetKingSquare = RankFile.Get(kingRankFile.Rank, kingRankFile.File + (stride * -2));
+                var kingToRook = Paths[kingSquareIndex][queenSideRookIndex];
 
-            if (targetKingSquare == null)
-                throw new Exception($"{colour} King is not in correct square");
+                var squaresBetween = kingToRook & ~relativeBitBoard.KingStartSquare & ~relativeBitBoard.QueenSideRookStartSquare;
 
-            var targetRookSquare = RankFile.Get(rookRankFile.Rank, targetKingSquare.File + stride);
+                if ((squaresBetween & relativeBitBoard.OccupiedSquares) == 0)
+                {
+                    var stepsSquares = new List<SquareFlag>
+                    {
+                        relativeBitBoard.QueenSideCastleStep1,
+                        relativeBitBoard.QueenSideCastleStep2
+                    };
 
-            return new MoveCastle(colour,
-                type,
-                RankFile.Get(rookRankFile.Rank, rookRankFile.File),
-                targetRookSquare,
-                RankFile.Get(kingRankFile.Rank, kingRankFile.File),
-                targetKingSquare,
-                side);
+                    var safeSquares = FastFilterOutCoveredSquares(relativeBitBoard, stepsSquares);
+
+                    // On Queen side the King doesn't pass through B file so we don't look for Check there
+                    var squaresBetweenMinusFirstRookStep = squaresBetween & ~relativeBitBoard.QueenSideRookStep1Square;
+
+                    if(squaresBetweenMinusFirstRookStep == safeSquares)
+                    {
+                        moves.Add(MoveConstructor.CreateCastle(relativeBitBoard.Colour, relativeBitBoard.KingStartSquare, relativeBitBoard.QueenSideCastleStep2, MoveType.CastleQueen));
+                    }
+                }
+            }
         }
-        */
+
         private SquareFlag PushPawnOneSquare(Colour colour, SquareFlag fromSquare) =>
            colour == Colour.White ? (SquareFlag)((ulong)fromSquare << 8) : (SquareFlag)((ulong)fromSquare >> 8);
 

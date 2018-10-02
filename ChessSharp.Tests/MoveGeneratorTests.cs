@@ -514,6 +514,30 @@ namespace ChessSharp.Tests
             Assert.Equal(3, moveCount);
         }
 
+        [Fact]
+        public void Castle_Both_Correct()
+        {
+            var bitBoard = CreateBitBoard("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+
+            var moves = new List<uint>(10);
+
+            _moveGeneratorFixture.MoveGenerator.Generate(bitBoard, Colour.White, moves);
+
+            // Purely for debugging
+            var wrappedMoves = moves.Select(x => new MoveWrapper(x));
+
+            var moveCount = moves.Count;
+
+            var castleKing = moves.Where(x => x.GetMoveType() == MoveType.CastleKing);
+            var castleQueen = moves.Where(x => x.GetMoveType() == MoveType.CastleQueen);
+
+            var castleKingCount = castleKing.Count();
+            var castleQueenCount = castleQueen.Count();
+
+            Assert.Equal(1, castleKingCount);
+            Assert.Equal(1, castleQueenCount);
+        }
+
         private BitBoard CreateBitBoard(string fenString)
         {
             var fen = Fen.Parse(fenString);
