@@ -138,28 +138,44 @@ namespace ChessSharp.Models
             Colour == Colour.White ? SquareFlagExtensions.r8 : SquareFlagExtensions.r1;
 
         public SquareFlag KingStartSquare =>
-            Colour == Colour.White ? SquareFlag.E1 : SquareFlag.E8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingStartSquare
+            : SquareFlagConstants.BlackKingStartSquare;
 
         public SquareFlag KingSideRookStartSquare =>
-            Colour == Colour.White ? SquareFlag.H1 : SquareFlag.H8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingSideRookStartSquare
+            : SquareFlagConstants.BlackKingSideRookStartSquare;
 
         public SquareFlag QueenSideRookStartSquare =>
-            Colour == Colour.White ? SquareFlag.A1 : SquareFlag.A8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideRookStartSquare
+            : SquareFlagConstants.BlackQueenSideRookStartSquare;
 
         public SquareFlag QueenSideRookStep1Square =>
-            Colour == Colour.White ? SquareFlag.B1 : SquareFlag.B8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideRookStep1Square
+            : SquareFlagConstants.BlackQueenSideRookStep1Square;
 
         public SquareFlag KingSideCastleStep1 =>
-            Colour == Colour.White ? SquareFlag.F1 : SquareFlag.F8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingSideCastleStep1
+            : SquareFlagConstants.BlackKingSideCastleStep1;
 
         public SquareFlag KingSideCastleStep2 =>
-            Colour == Colour.White ? SquareFlag.G1 : SquareFlag.G8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingSideCastleStep2
+            : SquareFlagConstants.BlackKingSideCastleStep2;
 
         public SquareFlag QueenSideCastleStep1 =>
-            Colour == Colour.White ? SquareFlag.D1 : SquareFlag.D8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideCastleStep1
+            : SquareFlagConstants.BlackQueenSideCastleStep1;
 
         public SquareFlag QueenSideCastleStep2 =>
-            Colour == Colour.White ? SquareFlag.C1 : SquareFlag.C8;
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideCastleStep2
+            : SquareFlagConstants.BlackQueenSideCastleStep2;
 
         public bool CanCastleKingSide =>
             Colour == Colour.White
