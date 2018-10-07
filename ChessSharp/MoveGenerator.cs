@@ -693,7 +693,7 @@ namespace ChessSharp
             var numSquares = squares.Count();
 
             // Generate each 'length' combination
-            for (var combinationLength = 0; combinationLength < numSquares; ++combinationLength)
+            for (var combinationLength = 0; combinationLength <= numSquares; ++combinationLength)
                 CombinationUtil(squares, square, new SquareFlag[numSquares], 0, numSquares - 1, 0, combinationLength, addToList, dictionary);
         }
 

@@ -34,5 +34,21 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             Assert.Equal(4, moves.Count);
         }
+
+        [Fact]
+        public void Bishop_LargeOccupancy()
+        {
+            var fen = Fen.Parse("8/2p5/3p4/4p3/5p2/6p1/7B/k4K2 w - -");
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(10);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var bishopMoves = GetBishopMoveViews(moves);
+
+            Assert.Equal(2, bishopMoves.Count);
+        }
     }
 }

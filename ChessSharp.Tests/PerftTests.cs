@@ -28,7 +28,8 @@ namespace ChessSharp.Tests
             var moveView = moves.Select(x => new MoveViewer(x));
             var moveCount = moves.Count;
 
-            Assert.Equal(20, moveCount);
+            
+            //Assert.Equal(20, moveCount);
             //Assert.Equal(20, metrics1.Legal);
             //Assert.Equal(0, metrics1.Captures);
             //Assert.Equal(0, metrics1.EnPassantCaptures);
@@ -58,7 +59,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void DefaultPosition2()
         {
-            var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
             // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
             var fen = Fen.Parse(Fen.Default);
@@ -67,9 +68,27 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(20);
 
-            var count = perftRunner.Go(bitBoard, fen.ToPlay, 2);
+            var metrics = new Dictionary<int, PerftMetrics>();
+            
+            perftRunner.Go(bitBoard, fen.ToPlay, 3, metrics);
 
-            Assert.Equal(400, count);
+            Assert.Equal(20, metrics[3].Legal);
+            Assert.Equal(0, metrics[3].Captures);
+            Assert.Equal(0, metrics[3].EnPassantCaptures);
+            Assert.Equal(0, metrics[3].Castles);
+            Assert.Equal(0, metrics[3].Checks);
+
+            Assert.Equal(400, metrics[2].Legal);
+            Assert.Equal(0, metrics[2].Captures);
+            Assert.Equal(0, metrics[2].EnPassantCaptures);
+            Assert.Equal(0, metrics[2].Castles);
+            Assert.Equal(0, metrics[2].Checks);
+
+            Assert.Equal(8902, metrics[1].Legal);
+            Assert.Equal(0, metrics[1].Captures);
+            Assert.Equal(0, metrics[1].EnPassantCaptures);
+            Assert.Equal(0, metrics[1].Castles);
+            Assert.Equal(0, metrics[1].Checks);
         }
 
         [Fact]
@@ -104,11 +123,34 @@ namespace ChessSharp.Tests
             //var count1 = perftRunner.Go(bitBoard, fen.ToPlay, 1);
             //var count2 = perftRunner.Go(bitBoard, fen.ToPlay, 2);
             //var count3 = perftRunner.Go(bitBoard, fen.ToPlay, 3);
-            perftRunner.Go(bitBoard, fen.ToPlay, 3, metrics);
+            perftRunner.Go(bitBoard, fen.ToPlay, 5, metrics);
 
-            Assert.Equal(14, metrics[3].Legal);
-            Assert.Equal(191, metrics[2].Legal);
-            Assert.Equal(2812, metrics[1].Legal);
+            Assert.Equal(14, metrics[5].Legal);
+            Assert.Equal(1, metrics[5].Captures);
+            Assert.Equal(0, metrics[5].EnPassantCaptures);
+            Assert.Equal(0, metrics[5].Castles);
+            //Assert.Equal(2, metrics[5].Checks);
+            Assert.Equal(191, metrics[4].Legal);
+            Assert.Equal(14, metrics[4].Captures);
+            Assert.Equal(0, metrics[4].EnPassantCaptures);
+            Assert.Equal(0, metrics[4].Castles);
+            //Assert.Equal(10, metrics[4].Checks);
+            Assert.Equal(2812, metrics[3].Legal);
+            Assert.Equal(209, metrics[3].Captures);
+            Assert.Equal(2, metrics[3].EnPassantCaptures);
+            Assert.Equal(0, metrics[3].Castles);
+            //Assert.Equal(267, metrics[3].Checks);
+            Assert.Equal(43238, metrics[2].Legal);
+            Assert.Equal(3348, metrics[2].Captures);
+            Assert.Equal(123, metrics[2].EnPassantCaptures);
+            Assert.Equal(0, metrics[2].Castles);
+            //Assert.Equal(1680, metrics[2].Checks);
+            Assert.Equal(674624, metrics[1].Legal);
+            Assert.Equal(52051, metrics[1].Captures);
+            Assert.Equal(1165, metrics[1].EnPassantCaptures);
+            Assert.Equal(0, metrics[1].Castles);
+            //Assert.Equal(52950, metrics[1].Checks);
+
             //Assert.Equal(14, metrics1.Legal);
             //Assert.Equal(1, metrics1.Captures);
             //Assert.Equal(0, metrics1.EnPassantCaptures);
