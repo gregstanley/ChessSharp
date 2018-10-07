@@ -11,57 +11,63 @@ namespace ChessSharp.Tests.MoveGeneratorTests
     {
         protected MoveGenerator MoveGenerator => _moveGeneratorFixture.MoveGenerator;
         
-        protected MoveGeneratorFixture _moveGeneratorFixture;
+        private MoveGeneratorFixture _moveGeneratorFixture;
 
         public MoveGeneratorTestsBase(MoveGeneratorFixture moveGeneratorFixture)
         {
             _moveGeneratorFixture = moveGeneratorFixture;
         }
 
-        protected IEnumerable<MoveViewer> GetKingMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetKingMoveViews(IList<uint> moves) =>
             GetMoveViews(moves, PieceType.King);
 
-        protected IEnumerable<MoveViewer> GetQueenMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetQueenMoveViews(IList<uint> moves) =>
             GetMoveViews(moves, PieceType.Queen);
 
-        protected IEnumerable<MoveViewer> GetRookMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetRookMoveViews(IList<uint> moves) =>
             GetMoveViews(moves, PieceType.Rook);
 
-        protected IEnumerable<MoveViewer> GetBishopMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetBishopMoveViews(IList<uint> moves) =>
             GetMoveViews(moves, PieceType.Bishop);
 
-        protected IEnumerable<MoveViewer> GetKnightMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetKnightMoveViews(IList<uint> moves) =>
             GetMoveViews(moves, PieceType.Knight);
 
-        protected IEnumerable<MoveViewer> GetPawnMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetPawnMoveViews(IList<uint> moves) =>
             GetMoveViews(moves, PieceType.Pawn);
 
-        protected IEnumerable<MoveViewer> GetMoveViews(IList<uint> moves, PieceType pieceType) =>
-            moves.Where(x => x.GetPieceType() == pieceType).Select(x => new MoveViewer(x));
+        protected IList<MoveViewer> GetMoveViews(IList<uint> moves, PieceType pieceType) =>
+            moves.Where(x => x.GetPieceType() == pieceType)
+            .Select(x => new MoveViewer(x))
+            .ToList();
 
-        protected IEnumerable<MoveViewer> GetKingCaptureMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetKingCaptureMoveViews(IList<uint> moves) =>
             GetCaptureMoveViews(moves, PieceType.King);
 
-        protected IEnumerable<MoveViewer> GetQueenCaptureMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetQueenCaptureMoveViews(IList<uint> moves) =>
             GetCaptureMoveViews(moves, PieceType.Queen);
 
-        protected IEnumerable<MoveViewer> GetRookCaptureMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetRookCaptureMoveViews(IList<uint> moves) =>
             GetCaptureMoveViews(moves, PieceType.Rook);
 
-        protected IEnumerable<MoveViewer> GetBishopCaptureMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetBishopCaptureMoveViews(IList<uint> moves) =>
             GetCaptureMoveViews(moves, PieceType.Bishop);
 
-        protected IEnumerable<MoveViewer> GetKnightCaptureMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetKnightCaptureMoveViews(IList<uint> moves) =>
             GetCaptureMoveViews(moves, PieceType.Knight);
 
-        protected IEnumerable<MoveViewer> GetPawnCaptureMoveViews(IList<uint> moves) =>
+        protected IList<MoveViewer> GetPawnCaptureMoveViews(IList<uint> moves) =>
             GetCaptureMoveViews(moves, PieceType.Pawn);
 
-        protected IEnumerable<MoveViewer> GetCaptureMoveViews(IList<uint> moves, PieceType pieceType) =>
-            moves.Where(x => x.GetCapturePieceType() == pieceType).Select(x => new MoveViewer(x));
+        protected IList<MoveViewer> GetCaptureMoveViews(IList<uint> moves, PieceType pieceType) =>
+            moves.Where(x => x.GetCapturePieceType() == pieceType)
+            .Select(x => new MoveViewer(x))
+            .ToList();
 
-        protected IEnumerable<MoveViewer> GetCaptureMoveViews(IList<uint> moves) =>
-            moves.Where(x => x.GetCapturePieceType() != PieceType.None).Select(x => new MoveViewer(x));
+        protected IList<MoveViewer> GetCaptureMoveViews(IList<uint> moves) =>
+            moves.Where(x => x.GetCapturePieceType() != PieceType.None)
+            .Select(x => new MoveViewer(x))
+            .ToList();
 
         protected BitBoard CreateBitBoard(string fenString) =>
             BitBoard.FromFen(Fen.Parse(fenString));

@@ -14,6 +14,25 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Theory]
+        [InlineData("K7/8/8/8/8/8/8/7k w - -", 3)]
+        [InlineData("k7/8/8/8/8/8/8/7K b - -", 3)]
+        public void FromCorners(string fenString, int expectedMovesCount)
+        {
+            // This is mainly checking the pawn check magic bitboards as it uses them
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(20);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveCount = moves.Count;
+
+            Assert.Equal(expectedMovesCount, moveCount);
+        }
+
+        [Theory]
         [InlineData("8/8/8/8/4K3/8/8/8 w - -", 8)]
         [InlineData("8/8/8/8/4k3/8/8/8 b - -", 8)]
         [InlineData("8/8/8/8/3PK3/8/8/8 w - -", 7)]

@@ -1,5 +1,4 @@
 ﻿using ChessSharp.Models;
-using System;
 using System.Collections.Generic;
 using Xunit;
 
