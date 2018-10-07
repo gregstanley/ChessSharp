@@ -3,6 +3,7 @@ using ChessSharp.Extensions;
 using ChessSharp.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChessSharp
 {
@@ -67,6 +68,7 @@ namespace ChessSharp
         }
 
         private Stack<BoardState> _boardStates { get; } = new Stack<BoardState>(256);
+        private Stack<uint> _moves { get; } = new Stack<uint>(256);
 
         public BitBoard()
         {
@@ -86,6 +88,7 @@ namespace ChessSharp
             BlackKing = SquareFlag.E8;
 
             _boardStates.Push(DefaultState);
+            //_moves.Push(0);
         }
 
         public BitBoard(SquareFlag whitePawns,
@@ -116,6 +119,7 @@ namespace ChessSharp
             BlackKing = blackKing;
 
             _boardStates.Push(state);
+            //_moves.Push(0);
         }
 
         public SquareFlag WhitePawns { get; private set; }
@@ -294,6 +298,13 @@ namespace ChessSharp
                 {
                     DemotePiece(colour, PieceType.Knight, toSquare);
                 }
+                else
+                {
+                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
+
+                    if (move.GetCapturePieceType() != PieceType.None)
+                        MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
+                }
             }
             else
             {
@@ -304,6 +315,15 @@ namespace ChessSharp
             }
 
             _boardStates.Pop();
+            _moves.Pop();
+        }
+
+        public IReadOnlyCollection<MoveViewer> MoveHistory
+        {
+            get
+            {
+                return _moves.Select(x => new MoveViewer(x)).ToList();
+            }
         }
 
         public void MakeMove(uint move)
@@ -378,6 +398,7 @@ namespace ChessSharp
                         {
                             //EnPassant = move.GetFrom().PawnForward(colour, 1);
                             var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
+
                             state = state.AddEnPassantSquare(enPassantSquare);
                         }
                         else
@@ -391,10 +412,16 @@ namespace ChessSharp
                             {
                                 //EnPassant = move.GetFrom().PawnForward(colour, 1);
                                 var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
+
                                 state = state.AddEnPassantSquare(enPassantSquare);
                             }
                         }
                     }
+
+                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+
+                    if (move.GetCapturePieceType() != PieceType.None)
+                        RemovePiece(colour.Opposite(), toSquare);
                 }
             }
             else
@@ -466,6 +493,7 @@ namespace ChessSharp
             }
 
             _boardStates.Push(state);
+            _moves.Push(move);
         }
 
         private void MakeWhiteKingSideCastle()

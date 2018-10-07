@@ -13,7 +13,7 @@ namespace ChessSharp.Extensions
         }
 
         public static BoardState AddEnPassantSquare(this BoardState value, SquareFlag enPassantSquare) =>
-            value.AddEnPassantIndex(enPassantSquare.ToBoardIndex());
+            value.AddEnPassantIndex(enPassantSquare.ToSquareIndex());
 
         private static int GetEnPassantIndex(this BoardState value) =>
             (int)(((uint)value & _enPassantIndexMask) >> 8) - 1;

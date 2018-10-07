@@ -10,8 +10,8 @@ namespace ChessSharp
         {
             var colourShift = colour == Colour.White ? (uint)0 : 1;
             var pieceTypeShift = (uint)pieceType << 1;
-            var fromShift = from != 0 ? (uint)from.ToBoardIndex() << 4 : 0;
-            var toShift = to != 0 ? (uint)to.ToBoardIndex() << 10 : 0;
+            var fromShift = from != 0 ? (uint)from.ToSquareIndex() << 4 : 0;
+            var toShift = to != 0 ? (uint)to.ToSquareIndex() << 10 : 0;
             var capturePieceTypeShift = (uint)capturePieceType << 16;
             var moveTypeShift = (uint)moveType << 19;
 

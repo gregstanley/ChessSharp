@@ -106,7 +106,7 @@ namespace ChessSharp.Models
             if (colour == Colour.None)
                 return PieceType.None;
 
-            if (colour == Colour.White)
+            if (Colour == colour)
             {
                 if (MyPawns.HasFlag(square)) return PieceType.Pawn;
                 if (MyRooks.HasFlag(square)) return PieceType.Rook;
@@ -129,13 +129,13 @@ namespace ChessSharp.Models
         }
 
         public SquareFlag StartRank =>
-            Colour == Colour.White ? SquareFlagExtensions.r2 : SquareFlagExtensions.r7;
+            Colour == Colour.White ? SquareFlagConstants.r2 : SquareFlagConstants.r7;
 
         public SquareFlag EnPassantDiscoveredCheckRank =>
-            Colour == Colour.White ? SquareFlagExtensions.r5 : SquareFlagExtensions.r4;
+            Colour == Colour.White ? SquareFlagConstants.r5 : SquareFlagConstants.r4;
 
         public SquareFlag PromotionRank =>
-            Colour == Colour.White ? SquareFlagExtensions.r8 : SquareFlagExtensions.r1;
+            Colour == Colour.White ? SquareFlagConstants.r8 : SquareFlagConstants.r1;
 
         public SquareFlag KingStartSquare =>
             Colour == Colour.White

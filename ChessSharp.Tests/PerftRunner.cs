@@ -1,8 +1,7 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace ChessSharp.Tests
 {
@@ -23,10 +22,10 @@ namespace ChessSharp.Tests
 
             var count = 0;
 
-            foreach(var move in moves)
-            {
-                var moves2 = new List<uint>(256);
+            var movesView = moves.Select(x => new MoveViewer(x));
 
+            foreach (var move in moves)
+            {
                 bitBoard.MakeMove(move);
 
                 count += InnerPerft(bitBoard, colour.Opposite(), depth - 1);
@@ -42,16 +41,22 @@ namespace ChessSharp.Tests
             if (depth == 0)
                 return 1;
 
+            if (depth == 1)
+            { var bp = true; }
             var moves = new List<uint>(256);
 
             MoveGenerator.Generate(bitBoard, colour, moves);
 
             var count = 0;
 
+            var movesView = moves.Select(x => new MoveViewer(x));
+            var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
+
+            if (captures.Any())
+            { var bp = true; }
+
             foreach (var move in moves)
             {
-                var moves2 = new List<uint>(256);
-
                 bitBoard.MakeMove(move);
 
                 count += InnerPerft(bitBoard, colour.Opposite(), depth - 1);

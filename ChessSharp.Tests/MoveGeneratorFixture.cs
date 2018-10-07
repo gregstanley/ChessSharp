@@ -1,4 +1,8 @@
-﻿namespace ChessSharp.Tests
+﻿using ChessSharp.Enums;
+using ChessSharp.Extensions;
+using ChessSharp.Models;
+
+namespace ChessSharp.Tests
 {
     public class MoveGeneratorFixture
     {
