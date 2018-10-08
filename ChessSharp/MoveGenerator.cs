@@ -68,11 +68,14 @@ namespace ChessSharp
                 }
             }
 
-            var rayCheckers = kingRayAttackSquares & relativeBitBoard.OpponentRaySquares;
             var checkersPawn = GetPawnCheckers(relativeBitBoard, kingSquare);
             var checkersKnight = GetKnightCheckers(relativeBitBoard, kingSquare);
 
-            var checkers = checkersPawn | checkersKnight | rayCheckers;
+            var checkerBishop = kingRayAttackSquaresBishop & relativeBitBoard.OpponentBishops;
+            var checkersRook = kingRayAttackSquaresRook & relativeBitBoard.OpponentRooks;
+            var checkersQueen = kingRayAttackSquares & relativeBitBoard.OpponentQueens;
+
+            var checkers = checkersPawn | checkersKnight | checkerBishop | checkersRook | checkersQueen;
 
             var numCheckers = checkers.Count();
 
@@ -177,10 +180,8 @@ namespace ChessSharp
         {
             var potentialPins = kingRayAttackSquares & relativeBitBoard.MySquares;
 
-            var opponentOccupancy = kingRayAttackSquares & relativeBitBoard.OpponentSquares;
-
-            var attackableSquaresBeyondPinsRook = GetAttackableSquares(kingSquareIndex, PieceType.Rook, opponentOccupancy);
-            var attackableSquaresBeyondPinsBishop = GetAttackableSquares(kingSquareIndex, PieceType.Bishop, opponentOccupancy);
+            var attackableSquaresBeyondPinsRook = GetAttackableSquares(kingSquareIndex, PieceType.Rook, relativeBitBoard.OpponentSquares);
+            var attackableSquaresBeyondPinsBishop = GetAttackableSquares(kingSquareIndex, PieceType.Bishop, relativeBitBoard.OpponentSquares);
 
             var attackableSquaresBeyondPins = attackableSquaresBeyondPinsRook | attackableSquaresBeyondPinsBishop;
 
@@ -191,19 +192,13 @@ namespace ChessSharp
             var pinnedPieces = (SquareFlag)0;
 
             if (pinningRooks > 0)
-            {
                 pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningRooks, moves);
-            }
 
             if (pinningBishops > 0)
-            {
                 pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningBishops, moves);
-            }
 
             if (pinningQueens > 0)
-            {
                 pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningQueens, moves);
-            }
 
             return pinnedPieces;
         }
@@ -251,6 +246,9 @@ namespace ChessSharp
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
+                //if (fromSquare == SquareFlag.F4)
+                //{ var bp = true; }
+
                 var toSquare = fromSquare.PawnForward(relativeBitBoard.Colour, 1);
 
                 if (pinnedSquares.HasFlag(fromSquare))

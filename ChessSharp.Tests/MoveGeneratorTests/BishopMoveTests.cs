@@ -1,5 +1,4 @@
-﻿using ChessSharp.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Xunit;
 
 namespace ChessSharp.Tests.MoveGeneratorTests
@@ -11,34 +10,16 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
         }
 
-        [Fact]
-        public void Bishop_Blocked_Correct()
+        [Theory]
+        [InlineData("8/8/8/3R1N1k/4B3/3Q1P1K/8/8 w - -", 0)]
+        [InlineData("8/8/8/3r1n1K/4b3/3q1p1k/8/8 b - -", 0)]
+        [InlineData("8/8/2R3N1/7k/4B3/7K/2Q3P1/8 w - -", 4)]
+        [InlineData("8/8/2r3n1/7K/4b3/7k/2q3p1/8 b - -", 4)]
+        [InlineData("8/1R5P/8/7k/4B3/7K/8/1Q5R w - -", 8)]
+        [InlineData("8/1r5p/8/7K/4b3/7k/8/1q5r b - -", 8)]
+        public void AllDirectionsBlocked(string fenString, int expectedMoveCount)
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/8/8/8/P1P5/1B6/P1P5 w KQkq -");
-
-            var moves = new List<uint>(10);
-
-            MoveGenerator.AddBishopMoves(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-
-            Assert.Empty(moves);
-        }
-
-        [Fact]
-        public void Bishop_4Moves_0Captures_Correct()
-        {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/2R3N1/7k/4B3/7K/2Q3P1/8 w KQkq -");
-
-            var moves = new List<uint>(10);
-
-            MoveGenerator.AddBishopMoves(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-
-            Assert.Equal(4, moves.Count);
-        }
-
-        [Fact]
-        public void Bishop_LargeOccupancy()
-        {
-            var fen = Fen.Parse("8/2p5/3p4/4p3/5p2/6p1/7B/k4K2 w - -");
+            var fen = Fen.Parse(fenString);
 
             var bitBoard = CreateBitBoard(fen);
 
@@ -46,9 +27,36 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
-            var bishopMoves = GetBishopMoveViews(moves);
+            var moveViews = GetBishopMoveViews(moves);
 
-            Assert.Equal(2, bishopMoves.Count);
+            Assert.Equal(expectedMoveCount, moveViews.Count);
+        }
+
+        [Theory]
+        [InlineData("b7/1r6/2p5/3p4/4p3/5p2/6p1/k3K2B w - -")]
+        [InlineData("B7/1R6/2P5/3P4/4P3/5P2/6P1/K3k2b b - -")]
+        [InlineData("7b/6r1/5p2/4p3/3p4/2p5/1p6/B2K1k2 w - -")]
+        [InlineData("7B/6R1/5P2/4P3/3P4/2P5/1P6/b2k1K2 b - -")]
+        [InlineData("B7/1p6/2p5/3p4/4p3/5p2/6r1/2K2k1b w - -")]
+        [InlineData("b7/1P6/2P5/3P4/4P3/5P2/6R1/2k2K1B b - -")]
+        [InlineData("7B/6p1/5p2/4p3/3p4/2p5/1r6/b2K1k2 w - -")]
+        [InlineData("7b/6P1/5P2/4P3/3P4/2P5/1R6/B2k1K2 b - -")]
+        public void LargeOccupancyOneCapture(string fenString)
+        {
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(10);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveViews = GetBishopMoveViews(moves);
+
+            var captureViews = GetCaptureMoveViews(moves);
+
+            Assert.Equal(1, moveViews.Count);
+            Assert.Equal(1, captureViews.Count);
         }
     }
 }

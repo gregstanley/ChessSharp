@@ -14,7 +14,7 @@ namespace ChessSharp.Tests
         }
 
         [Fact]
-        public void DefaultPosition()
+        public void Default_Depth1Only()
         {
             // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
             var fen = Fen.Parse(Fen.Default);
@@ -28,7 +28,7 @@ namespace ChessSharp.Tests
             var moveView = moves.Select(x => new MoveViewer(x));
             var moveCount = moves.Count;
 
-            
+
             //Assert.Equal(20, moveCount);
             //Assert.Equal(20, metrics1.Legal);
             //Assert.Equal(0, metrics1.Captures);
@@ -57,7 +57,7 @@ namespace ChessSharp.Tests
         }
 
         [Fact]
-        public void DefaultPosition2()
+        public void Default_Metrics_ToDepth3()
         {
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
@@ -69,7 +69,7 @@ namespace ChessSharp.Tests
             var moves = new List<uint>(20);
 
             var metrics = new Dictionary<int, PerftMetrics>();
-            
+
             perftRunner.Go(bitBoard, fen.ToPlay, 3, metrics);
 
             Assert.Equal(20, metrics[3].Legal);
@@ -92,7 +92,7 @@ namespace ChessSharp.Tests
         }
 
         [Fact]
-        public void DefaultPosition3()
+        public void Default_Scalar_ToDepth3()
         {
             var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
 
@@ -178,5 +178,22 @@ namespace ChessSharp.Tests
             //Assert.Equal(52950, metrics5.Checks);
         }
 
+        [Fact]
+        public void DefaultPosition_2MovesIn()
+        {
+            // "rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1"
+            var fen = Fen.Parse("rnbqkbnr/pppp1ppp/8/4p3/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 1");
+
+            var bitBoard = BitBoard.FromFen(fen);
+
+            var moves = new List<uint>(20);
+
+            _moveGeneratorFixture.MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveView = moves.Select(x => new MoveViewer(x));
+            var moveCount = moves.Count;
+
+            Assert.Equal(29, moveCount);
+        }
     }
 }

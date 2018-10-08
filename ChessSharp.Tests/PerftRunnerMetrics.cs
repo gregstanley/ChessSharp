@@ -35,6 +35,11 @@ namespace ChessSharp.Tests
 
             foreach (var move in moves)
             {
+                var moveView = new MoveViewer(move);
+
+                //if (moveView.From == SquareFlag.G2)
+                //{ var bp = true; }
+
                 bitBoard.MakeMove(move);
 
                 InnerPerft(bitBoard, colour.Opposite(), depth - 1, metrics);

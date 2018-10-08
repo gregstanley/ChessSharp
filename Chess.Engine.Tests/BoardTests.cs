@@ -160,7 +160,7 @@ namespace Chess.Engine.Tests
 
             var board = Board.FromFen(fen);
 
-            board.GenerateChildBoards(Colour.White, 5);
+            board.GenerateChildBoards(Colour.White, 2);
 
             var d1 = board.GetLegalMoves();
             var d2 = d1.SelectMany(x => x.GetLegalMoves());
