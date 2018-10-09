@@ -52,7 +52,7 @@ namespace ChessSharp
             var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MySquares;
 
             // TODO: Investigate performance here (should we just generate the attacked squares from opponent perspective?)
-            var safeSquaresAsList = FastFilterOutCoveredSquares(relativeBitBoard, attackableSquares.ToList()).ToList();
+            var safeSquaresAsList = FastFilterOutCoveredSquares(relativeBitBoard, attackableSquares).ToList();
 
             foreach (var to in safeSquaresAsList)
             {
@@ -180,8 +180,10 @@ namespace ChessSharp
         {
             var potentialPins = kingRayAttackSquares & relativeBitBoard.MySquares;
 
-            var attackableSquaresBeyondPinsRook = GetAttackableSquares(kingSquareIndex, PieceType.Rook, relativeBitBoard.OpponentSquares);
-            var attackableSquaresBeyondPinsBishop = GetAttackableSquares(kingSquareIndex, PieceType.Bishop, relativeBitBoard.OpponentSquares);
+            var occupancyWithoutPotentialPins = relativeBitBoard.OccupiedSquares & ~potentialPins;
+
+            var attackableSquaresBeyondPinsRook = GetAttackableSquares(kingSquareIndex, PieceType.Rook, occupancyWithoutPotentialPins);
+            var attackableSquaresBeyondPinsBishop = GetAttackableSquares(kingSquareIndex, PieceType.Bishop, occupancyWithoutPotentialPins);
 
             var attackableSquaresBeyondPins = attackableSquaresBeyondPinsRook | attackableSquaresBeyondPinsBishop;
 
@@ -257,7 +259,7 @@ namespace ChessSharp
                         continue;
                 }
 
-                if (relativeBitBoard.OpponentSquares.HasFlag(toSquare))
+                if (relativeBitBoard.OccupiedSquares.HasFlag(toSquare))
                     continue;
 
                 if (!pushMask.HasFlag(toSquare))
@@ -272,11 +274,11 @@ namespace ChessSharp
                 {
                     toSquare = fromSquare.PawnForward(relativeBitBoard.Colour, 2);
 
-                    if (!relativeBitBoard.OpponentSquares.HasFlag(toSquare))
-                    {
-                        if (!pushMask.HasFlag(toSquare))
+                    if (!pushMask.HasFlag(toSquare))
                             continue;
 
+                    if (!relativeBitBoard.OccupiedSquares.HasFlag(toSquare))
+                    {
                         // Promotions not possible from start rank
                         moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
                     }
@@ -306,9 +308,6 @@ namespace ChessSharp
                             continue;
                     }
 
-                    if (!captureMask.HasFlag(toSquare))
-                        continue;
-
                     var moveType = relativeBitBoard.EnPassant.HasFlag(toSquare) ? MoveType.EnPassant : MoveType.Ordinary;
 
                     if (relativeBitBoard.OpponentSquares.HasFlag(toSquare) || moveType == MoveType.EnPassant)
@@ -317,8 +316,19 @@ namespace ChessSharp
 
                         var discoveredCheck = false;
 
-                        if (moveType == MoveType.EnPassant)
+                        if (moveType != MoveType.EnPassant)
                         {
+                            if (!captureMask.HasFlag(toSquare))
+                                continue;
+                        }
+                        else
+                        {
+                            // Abuse the push system - push an imaginary pawn from the en passant square as opponent to find piece
+                            var enPassantCaptureSquare = relativeBitBoard.EnPassant.PawnForward(relativeBitBoard.OpponentColour, 1);
+
+                            if (!captureMask.HasFlag(enPassantCaptureSquare))
+                                continue;
+
                             capturePieceType = PieceType.Pawn;
 
                             // Looking for DISCOVERED CHECK (not spotted by pinned pieces as there are 2 pawns in the way)
@@ -337,9 +347,6 @@ namespace ChessSharp
                                     // Our King is on the en passant rank with opponent Ray pieces so could be exposed after capture
                                     var rankOccupancy = (enPassantDiscoveredCheckRank & relativeBitBoard.MySquares)
                                         | (enPassantDiscoveredCheckRank & relativeBitBoard.OpponentSquares);
-
-                                    // Abuse the push system - push an imaginary pawn from the en passant square as opponent to find piece
-                                    var enPassantCaptureSquare = relativeBitBoard.EnPassant.PawnForward(relativeBitBoard.OpponentColour, 1);
 
                                     // Remove the two pawns from the board
                                     var rankOccupancyPostCapture = rankOccupancy & ~enPassantCaptureSquare & ~fromSquare;
@@ -434,13 +441,7 @@ namespace ChessSharp
 
                 if ((squaresBetween & relativeBitBoard.OccupiedSquares) == 0)
                 {
-                    var stepsSquares = new List<SquareFlag>
-                    {
-                        relativeBitBoard.KingSideCastleStep1,
-                        relativeBitBoard.KingSideCastleStep2
-                    };
-
-                    var safeSquares = FastFilterOutCoveredSquares(relativeBitBoard, stepsSquares);
+                    var safeSquares = FastFilterOutCoveredSquares(relativeBitBoard, relativeBitBoard.KingSideCastleStep1 | relativeBitBoard.KingSideCastleStep2);
 
                     if (squaresBetween == safeSquares)
                     {
@@ -459,13 +460,7 @@ namespace ChessSharp
 
                 if ((squaresBetween & relativeBitBoard.OccupiedSquares) == 0)
                 {
-                    var stepsSquares = new List<SquareFlag>
-                    {
-                        relativeBitBoard.QueenSideCastleStep1,
-                        relativeBitBoard.QueenSideCastleStep2
-                    };
-
-                    var safeSquares = FastFilterOutCoveredSquares(relativeBitBoard, stepsSquares);
+                    var safeSquares = FastFilterOutCoveredSquares(relativeBitBoard, relativeBitBoard.QueenSideCastleStep1 | relativeBitBoard.QueenSideCastleStep2);
 
                     // On Queen side the King doesn't pass through B file so we don't look for Check there
                     var squaresBetweenMinusFirstRookStep = squaresBetween & ~relativeBitBoard.QueenSideRookStep1Square;
@@ -524,11 +519,12 @@ namespace ChessSharp
             }
         }
 
-        private SquareFlag FastFilterOutCoveredSquares(RelativeBitBoard relativeBitBoard, IReadOnlyList<SquareFlag> attackableSquaresAsList)
+        //private SquareFlag FastFilterOutCoveredSquares(RelativeBitBoard relativeBitBoard, IReadOnlyList<SquareFlag> attackableSquaresAsList)
+        private SquareFlag FastFilterOutCoveredSquares(RelativeBitBoard relativeBitBoard, SquareFlag attackableSquares)
         {
             var safeSquares = (SquareFlag)0;
 
-            foreach (var attackableSquare in attackableSquaresAsList)
+            foreach (var attackableSquare in attackableSquares.ToList())
             {
                 var potentialCheckersPawn = GetPawnCheckers(relativeBitBoard, attackableSquare);
 
@@ -687,7 +683,12 @@ namespace ChessSharp
 
         private void GenerateAllOccupancyCombinations(int square, SquareFlag occupancyMask, Action<SortedDictionary<int, SquareFlag>, int, SquareFlag> addToList, SortedDictionary<int, SquareFlag> dictionary)
         {
-            var squares = occupancyMask.ToList();
+            var squares = new List<SquareFlag>();
+
+            //var squares = occupancyMask.ToList();
+            foreach (var occupancyMaskSquare in occupancyMask.ToList())
+                squares.Add(occupancyMaskSquare);
+            
             var numSquares = squares.Count();
 
             // Generate each 'length' combination

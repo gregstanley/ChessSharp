@@ -57,7 +57,7 @@ namespace ChessSharp.Tests
         }
 
         [Fact]
-        public void Default_Metrics_ToDepth3()
+        public void Default_Metrics_ToDepth4()
         {
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
@@ -70,25 +70,39 @@ namespace ChessSharp.Tests
 
             var metrics = new Dictionary<int, PerftMetrics>();
 
-            perftRunner.Go(bitBoard, fen.ToPlay, 3, metrics);
+            var depth = 5;
 
-            Assert.Equal(20, metrics[3].Legal);
-            Assert.Equal(0, metrics[3].Captures);
-            Assert.Equal(0, metrics[3].EnPassantCaptures);
-            Assert.Equal(0, metrics[3].Castles);
-            Assert.Equal(0, metrics[3].Checks);
+            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
 
-            Assert.Equal(400, metrics[2].Legal);
-            Assert.Equal(0, metrics[2].Captures);
-            Assert.Equal(0, metrics[2].EnPassantCaptures);
-            Assert.Equal(0, metrics[2].Castles);
-            Assert.Equal(0, metrics[2].Checks);
+            Assert.Equal(20, metrics[depth].Legal);
+            Assert.Equal(0, metrics[depth].Captures);
+            Assert.Equal(0, metrics[depth].EnPassantCaptures);
+            Assert.Equal(0, metrics[depth].Castles);
+            //Assert.Equal(0, metrics[depth].Checks);
 
-            Assert.Equal(8902, metrics[1].Legal);
-            Assert.Equal(0, metrics[1].Captures);
-            Assert.Equal(0, metrics[1].EnPassantCaptures);
-            Assert.Equal(0, metrics[1].Castles);
-            Assert.Equal(0, metrics[1].Checks);
+            Assert.Equal(400, metrics[depth - 1].Legal);
+            Assert.Equal(0, metrics[depth - 1].Captures);
+            Assert.Equal(0, metrics[depth - 1].EnPassantCaptures);
+            Assert.Equal(0, metrics[depth - 1].Castles);
+            //Assert.Equal(0, metrics[depth - 1].Checks);
+
+            Assert.Equal(8902, metrics[depth - 2].Legal);
+            Assert.Equal(34, metrics[depth - 2].Captures);
+            Assert.Equal(0, metrics[depth - 2].EnPassantCaptures);
+            Assert.Equal(0, metrics[depth - 2].Castles);
+            //Assert.Equal(12, metrics[depth - 2].Checks);
+
+            Assert.Equal(197281, metrics[depth - 3].Legal);
+            Assert.Equal(1576, metrics[depth - 3].Captures);
+            Assert.Equal(0, metrics[depth - 3].EnPassantCaptures);
+            Assert.Equal(0, metrics[depth - 3].Castles);
+            //Assert.Equal(12, metrics[depth - 3].Checks);
+
+            Assert.Equal(8902, metrics[depth - 4].Legal);
+            Assert.Equal(34, metrics[depth - 4].Captures);
+            Assert.Equal(0, metrics[depth - 4].EnPassantCaptures);
+            Assert.Equal(0, metrics[depth - 4].Castles);
+            //Assert.Equal(12, metrics[depth - 4].Checks);
         }
 
         [Fact]
@@ -109,7 +123,7 @@ namespace ChessSharp.Tests
         }
 
         [Fact]
-        public void GenerateChildBoards_Position3()
+        public void Position3()
         {
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
@@ -194,6 +208,58 @@ namespace ChessSharp.Tests
             var moveCount = moves.Count;
 
             Assert.Equal(29, moveCount);
+        }
+
+        // http://cinnamonchess.altervista.org/perft.html
+        [Fact]
+        public void PromotionsPosition_Metrics_ToDepth2()
+        {
+            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+
+            // "8/PPP4k/8/8/8/8/4Kppp/8 w - - 0 1"
+            var fen = Fen.Parse("8/PPP4k/8/8/8/8/4Kppp/8 w - - 0 1");
+
+            var bitBoard = BitBoard.FromFen(fen);
+
+            var moves = new List<uint>(20);
+
+            var metrics = new Dictionary<int, PerftMetrics>();
+
+            var depth = 3;
+
+            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+
+            Assert.Equal(18, metrics[depth].Legal);
+            Assert.Equal(290, metrics[depth - 1].Legal);
+            Assert.Equal(5044, metrics[depth - 2].Legal);
+            //Assert.Equal(89363, metrics[2].Legal);
+            //Assert.Equal(1745545, metrics[1].Legal);
+        }
+
+        // http://cinnamonchess.altervista.org/perft.html
+        [Fact]
+        public void EnPassantPosition_Metrics_ToDepth2()
+        {
+            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+
+            // "8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28"
+            var fen = Fen.Parse("8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28");
+
+            var bitBoard = BitBoard.FromFen(fen);
+
+            var moves = new List<uint>(20);
+
+            var metrics = new Dictionary<int, PerftMetrics>();
+
+            var depth = 3;
+
+            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+
+            Assert.Equal(5, metrics[depth].Legal);
+            Assert.Equal(117, metrics[depth - 1].Legal);
+            Assert.Equal(3293, metrics[depth - 2].Legal);
+            //Assert.Equal(67197, metrics[2].Legal);
+            //Assert.Equal(1881089, metrics[1].Legal);
         }
     }
 }

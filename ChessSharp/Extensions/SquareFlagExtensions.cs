@@ -113,7 +113,16 @@ namespace ChessSharp.Extensions
             return count;
         }
 
-        public static IReadOnlyList<SquareFlag> ToList(this SquareFlag squares)
+        public static IEnumerable<SquareFlag> ToList(this SquareFlag squares)
+        {
+            var ulsquares = (ulong)squares;
+
+            for (var i = 1ul; i > 0; i = i << 1)
+                if ((ulsquares & i) > 0)
+                    yield return (SquareFlag)i;
+        }
+
+        public static IReadOnlyList<SquareFlag> ToListOrig(this SquareFlag squares)
         {
             IList<SquareFlag> squaresAsList = new List<SquareFlag>();
 

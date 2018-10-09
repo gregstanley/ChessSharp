@@ -16,14 +16,17 @@ namespace ChessSharp.Tests
 
         public void Go(BitBoard bitBoard, Colour colour, int depth, IDictionary<int, PerftMetrics> metrics)
         {
+            //if (!metrics.ContainsKey(depth))
+            //    metrics[depth] = new PerftMetrics();
+
+            for (var i = 1; i <= depth; i++)
+                metrics[i] = new PerftMetrics();
+
             var moves = new List<uint>(256);
 
             MoveGenerator.Generate(bitBoard, colour, moves);
 
             var movesView = moves.Select(x => new MoveViewer(x));
-
-            if (!metrics.ContainsKey(depth))
-                metrics[depth] = new PerftMetrics();
 
             var depthMetrics = metrics[depth];
 
@@ -53,18 +56,18 @@ namespace ChessSharp.Tests
             if (depth == 0)
                 return;
 
-            if (depth == 1)
-            { var bp = true; }
             var moves = new List<uint>(256);
 
             MoveGenerator.Generate(bitBoard, colour, moves);
 
             var movesView = moves.Select(x => new MoveViewer(x));
 
-            if (!metrics.ContainsKey(depth))
-                metrics[depth] = new PerftMetrics();
+            //if (!metrics.ContainsKey(depth))
+            //    metrics[depth] = new PerftMetrics();
 
             var depthMetrics = metrics[depth];
+
+            var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
 
             depthMetrics.Legal += moves.Count();
             depthMetrics.Captures += moves.Where(x => x.GetCapturePieceType() != PieceType.None).Count();
@@ -72,10 +75,8 @@ namespace ChessSharp.Tests
             depthMetrics.Castles += moves.Where(x => x.GetMoveType() == MoveType.CastleKing).Count();
             depthMetrics.Castles += moves.Where(x => x.GetMoveType() == MoveType.CastleQueen).Count();
 
-            var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
-
-            if (captures.Any())
-            { var bp = true; }
+            //if (captures.Any())
+            //{ var bp = true; }
 
             foreach (var move in moves)
             {
@@ -84,6 +85,9 @@ namespace ChessSharp.Tests
                 InnerPerft(bitBoard, colour.Opposite(), depth - 1, metrics);
 
                 bitBoard.UnMakeMove(move);
+
+                //if (bitBoard.BlackPawns.Count() > 8)
+                //{ var bp = true; }
             }
         }
     }

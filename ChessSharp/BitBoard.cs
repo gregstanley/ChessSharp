@@ -281,22 +281,27 @@ namespace ChessSharp
                         .PawnForward(colour.Opposite(), 1);
 
                     MovePiece(colour.Opposite(), PieceType.Pawn, captureSquare, captureSquare);
+                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
                 }
                 else if (moveType == MoveType.PromotionQueen)
                 {
                     DemotePiece(colour, PieceType.Queen, toSquare);
+                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
                 }
                 else if (moveType == MoveType.PromotionRook)
                 {
                     DemotePiece(colour, PieceType.Rook, toSquare);
+                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
                 }
                 else if (moveType == MoveType.PromotionBishop)
                 {
                     DemotePiece(colour, PieceType.Bishop, toSquare);
+                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
                 }
                 else if (moveType == MoveType.PromotionKnight)
                 {
                     DemotePiece(colour, PieceType.Knight, toSquare);
+                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
                 }
                 else
                 {
@@ -333,8 +338,11 @@ namespace ChessSharp
             var toSquare = move.GetTo();
             var moveType = move.GetMoveType();
 
+            if (_boardStates.Peek().GetEnPassantSquare() != 0)
+            { var bp = true; }
+
             // Copy current state
-            var state = _boardStates.Peek();
+            var state = _boardStates.Peek().Next();
 
             if (moveType == MoveType.CastleKing)
             {
@@ -358,6 +366,8 @@ namespace ChessSharp
             {
                 if (moveType == MoveType.EnPassant)
                 {
+                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
+                    
                     // Capturing behind the opponent pawn so shift as if we are opponent
                     var captureSquare = move.GetTo()
                         .PawnForward(colour.Opposite(), 1);
@@ -366,18 +376,22 @@ namespace ChessSharp
                 }
                 else if (moveType == MoveType.PromotionQueen)
                 {
+                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Queen, toSquare);
                 }
                 else if (moveType == MoveType.PromotionRook)
                 {
+                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Rook, toSquare);
                 }
                 else if (moveType == MoveType.PromotionBishop)
                 {
+                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Bishop, toSquare);
                 }
                 else if (moveType == MoveType.PromotionKnight)
                 {
+                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Knight, toSquare);
                 }
                 else
@@ -396,7 +410,6 @@ namespace ChessSharp
 
                         if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
                         {
-                            //EnPassant = move.GetFrom().PawnForward(colour, 1);
                             var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
 
                             state = state.AddEnPassantSquare(enPassantSquare);
@@ -410,7 +423,6 @@ namespace ChessSharp
 
                             if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
                             {
-                                //EnPassant = move.GetFrom().PawnForward(colour, 1);
                                 var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
 
                                 state = state.AddEnPassantSquare(enPassantSquare);
