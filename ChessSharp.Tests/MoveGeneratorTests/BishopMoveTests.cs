@@ -11,6 +11,27 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Theory]
+        [InlineData("7b/1k6/8/8/8/8/6K1/B7 w - - 0 1", 7)]
+        [InlineData("7b/1k6/8/8/8/8/6K1/B7 b - - 0 1", 7)]
+        public void CanCaptureCorners(string fenString, int expectedMoveCount)
+        {
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(10);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveViews = GetBishopMoveViews(moves);
+
+            var captureViews = GetCaptureMoveViews(moves);
+
+            Assert.Equal(expectedMoveCount, moveViews.Count);
+            Assert.Equal(1, captureViews.Count);
+        }
+
+        [Theory]
         [InlineData("8/8/8/3R1N1k/4B3/3Q1P1K/8/8 w - -", 0)]
         [InlineData("8/8/8/3r1n1K/4b3/3q1p1k/8/8 b - -", 0)]
         [InlineData("8/8/2R3N1/7k/4B3/7K/2Q3P1/8 w - -", 4)]

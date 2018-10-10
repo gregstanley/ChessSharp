@@ -27,5 +27,23 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             Assert.Equal(expectedMoveCount, moveViews.Count);
         }
+
+        [Theory]
+        [InlineData("8/4r3/3p4/k3P3/4K3/8/4R3/8 w - - 0 1", 1)]
+        [InlineData("8/4r3/4k3/K3p3/3P4/8/4R3/8 b - - 0 1", 1)]
+        public void PawnPinnedAndCannotCapture(string fenString, int expectedMoveCount)
+        {
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(10);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveViews = GetPawnMoveViews(moves);
+
+            Assert.Equal(expectedMoveCount, moveViews.Count);
+        }
     }
 }

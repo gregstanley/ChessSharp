@@ -38,21 +38,23 @@ namespace ChessSharp.Tests
         [Fact]
         public void Make_UnMake_EnPassant_Correct()
         {
-            var bitBoard = Create("4k3/8/8/8/5Pp1/8/8/4K3 w f3 - 0 1");
+            var bitBoard = Create("4k3/8/8/8/5Pp1/8/8/4K3 w - f3 0 1");
 
-            var bitboard2 = Create("4k3/8/8/8/5Pp1/8/8/4K3 w f3 - 0 1");
+            var bitBoard2 = Create("4k3/8/8/8/5Pp1/8/8/4K3 w - f3 0 1");
 
             var move = MoveConstructor.CreateMove(Colour.Black, PieceType.Pawn, SquareFlag.G4, SquareFlag.F3, PieceType.Pawn, MoveType.EnPassant);
 
             bitBoard.MakeMove(move);
 
-            //Assert.Equal(SquareFlag.D3, bitBoard.EnPassant);
+            Assert.NotEqual(bitBoard.White, bitBoard2.White);
+            Assert.NotEqual(bitBoard.Black, bitBoard2.Black);
+            Assert.NotEqual(bitBoard.EnPassant, bitBoard2.EnPassant);
 
             bitBoard.UnMakeMove(move);
 
-            Assert.Equal(bitBoard.White, bitBoard.White);
-            Assert.Equal(bitBoard.Black, bitBoard.Black);
-            Assert.Equal(bitBoard.EnPassant, bitBoard.EnPassant);
+            Assert.Equal(bitBoard.White, bitBoard2.White);
+            Assert.Equal(bitBoard.Black, bitBoard2.Black);
+            Assert.Equal(bitBoard.EnPassant, bitBoard2.EnPassant);
         }
 
         [Fact]

@@ -88,7 +88,6 @@ namespace ChessSharp
             BlackKing = SquareFlag.E8;
 
             _boardStates.Push(DefaultState);
-            //_moves.Push(0);
         }
 
         public BitBoard(SquareFlag whitePawns,
@@ -119,7 +118,6 @@ namespace ChessSharp
             BlackKing = blackKing;
 
             _boardStates.Push(state);
-            //_moves.Push(0);
         }
 
         public SquareFlag WhitePawns { get; private set; }
@@ -338,9 +336,6 @@ namespace ChessSharp
             var toSquare = move.GetTo();
             var moveType = move.GetMoveType();
 
-            if (_boardStates.Peek().GetEnPassantSquare() != 0)
-            { var bp = true; }
-
             // Copy current state
             var state = _boardStates.Peek().Next();
 
@@ -366,7 +361,7 @@ namespace ChessSharp
             {
                 if (moveType == MoveType.EnPassant)
                 {
-                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
+                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
                     
                     // Capturing behind the opponent pawn so shift as if we are opponent
                     var captureSquare = move.GetTo()
@@ -452,7 +447,7 @@ namespace ChessSharp
                     {
                         if (pieceType == PieceType.Rook)
                         {
-                            if (fromSquare == SquareFlag.H1)
+                            if (fromSquare == SquareFlagConstants.WhiteKingSideRookStartSquare)
                                 state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
                         }
                         else if (pieceType == PieceType.King)
@@ -465,7 +460,7 @@ namespace ChessSharp
                     {
                         if (pieceType == PieceType.Rook)
                         {
-                            if (fromSquare == SquareFlag.A1)
+                            if (fromSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare)
                                 state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
                         }
                         else if (pieceType == PieceType.King)
@@ -480,7 +475,7 @@ namespace ChessSharp
                     {
                         if (pieceType == PieceType.Rook)
                         {
-                            if (fromSquare == SquareFlag.H8)
+                            if (fromSquare == SquareFlagConstants.BlackKingSideRookStartSquare)
                                 state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
                         }
                         else if (pieceType == PieceType.King)
@@ -493,7 +488,7 @@ namespace ChessSharp
                     {
                         if (pieceType == PieceType.Rook)
                         {
-                            if (fromSquare == SquareFlag.A8)
+                            if (fromSquare == SquareFlagConstants.BlackQueenSideRookStartSquare)
                                 state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
                         }
                         else if (pieceType == PieceType.King)
@@ -624,49 +619,49 @@ namespace ChessSharp
             }
         }
 
-        private void MovePiece(Colour colour, PieceType type, SquareFlag start, SquareFlag end)
+        private void MovePiece(Colour colour, PieceType type, SquareFlag fromSquare, SquareFlag toSquare)
         {
             if (colour == Colour.White)
             {
                 if (type == PieceType.Pawn)
                 {
-                    WhitePawns &= ~start;
-                    WhitePawns |= end;
+                    WhitePawns &= ~fromSquare;
+                    WhitePawns |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Rook)
                 {
-                    WhiteRooks &= ~start;
-                    WhiteRooks |= end;
+                    WhiteRooks &= ~fromSquare;
+                    WhiteRooks |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Knight)
                 {
-                    WhiteKnights &= ~start;
-                    WhiteKnights |= end;
+                    WhiteKnights &= ~fromSquare;
+                    WhiteKnights |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Bishop)
                 {
-                    WhiteBishops &= ~start;
-                    WhiteBishops |= end;
+                    WhiteBishops &= ~fromSquare;
+                    WhiteBishops |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Queen)
                 {
-                    WhiteQueens &= ~start;
-                    WhiteQueens |= end;
+                    WhiteQueens &= ~fromSquare;
+                    WhiteQueens |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.King)
                 {
-                    WhiteKing &= ~start;
-                    WhiteKing |= end;
+                    WhiteKing &= ~fromSquare;
+                    WhiteKing |= toSquare;
                     return;
                 }
             }
@@ -674,43 +669,43 @@ namespace ChessSharp
             {
                 if (type == PieceType.Pawn)
                 {
-                    BlackPawns &= ~start;
-                    BlackPawns |= end;
+                    BlackPawns &= ~fromSquare;
+                    BlackPawns |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Rook)
                 {
-                    BlackRooks &= ~start;
-                    BlackRooks |= end;
+                    BlackRooks &= ~fromSquare;
+                    BlackRooks |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Knight)
                 {
-                    BlackKnights &= ~start;
-                    BlackKnights |= end;
+                    BlackKnights &= ~fromSquare;
+                    BlackKnights |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Bishop)
                 {
-                    BlackBishops &= ~start;
-                    BlackBishops |= end;
+                    BlackBishops &= ~fromSquare;
+                    BlackBishops |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.Queen)
                 {
-                    BlackQueens &= ~start;
-                    BlackQueens |= end;
+                    BlackQueens &= ~fromSquare;
+                    BlackQueens |= toSquare;
                     return;
                 }
 
                 if (type == PieceType.King)
                 {
-                    BlackKing &= ~start;
-                    BlackKing |= end;
+                    BlackKing &= ~fromSquare;
+                    BlackKing |= toSquare;
                     return;
                 }
             }
@@ -782,65 +777,47 @@ namespace ChessSharp
 
         private void DemotePiece(Colour colour, PieceType promoteTo, SquareFlag square)
         {
-            if (colour == Colour.White)
+            switch (colour)
             {
-                if (promoteTo == PieceType.Rook)
-                {
+                case Colour.White when promoteTo == PieceType.Rook:
                     WhiteRooks &= ~square;
                     WhitePawns |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Knight)
-                {
+                case Colour.White when promoteTo == PieceType.Knight:
                     WhiteKnights &= ~square;
                     WhitePawns |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Bishop)
-                {
+                case Colour.White when promoteTo == PieceType.Bishop:
                     WhiteBishops &= ~square;
                     WhitePawns |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Queen)
-                {
+                case Colour.White when promoteTo == PieceType.Queen:
                     WhiteQueens &= ~square;
                     WhitePawns |= square;
                     return;
-                }
-            }
-            else
-            {
-                if (promoteTo == PieceType.Rook)
-                {
+
+                case Colour.Black when promoteTo == PieceType.Rook:
                     BlackRooks &= ~square;
                     BlackPawns |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Knight)
-                {
+                case Colour.Black when promoteTo == PieceType.Knight:
                     BlackKnights &= ~square;
                     BlackPawns |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Bishop)
-                {
+                case Colour.Black when promoteTo == PieceType.Bishop:
                     BlackBishops &= ~square;
                     BlackPawns |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Queen)
-                {
+                case Colour.Black when promoteTo == PieceType.Queen:
                     BlackQueens &= ~square;
                     BlackPawns |= square;
                     return;
-                }
             }
         }
     }

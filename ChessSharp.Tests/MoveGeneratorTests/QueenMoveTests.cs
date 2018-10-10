@@ -1,6 +1,4 @@
 ﻿using ChessSharp.Enums;
-using ChessSharp.Extensions;
-using ChessSharp.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -52,47 +50,63 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Theory]
-        [InlineData("8/8/8/8/8/8/8/Q7 w - -", 21)]
-        [InlineData("8/8/8/8/8/8/1Q6/8 w - -", 23)]
-        [InlineData("8/8/8/8/8/2Q5/8/8 w - -", 25)]
-        [InlineData("8/8/8/8/3Q4/8/8/8 w - -", 27)]
-        [InlineData("8/8/8/4Q3/8/8/8/8 w - -", 27)]
-        [InlineData("8/8/5Q2/8/8/8/8/8 w - -", 25)]
-        [InlineData("8/6Q1/8/8/8/8/8/8 w - -", 23)]
-        [InlineData("7Q/8/8/8/8/8/8/8 w - -", 21)]
-        public void A1_H8_0Captures_Correct(string fen, int moveCount)
+        [InlineData("8/8/8/8/8/8/5K1k/Q7 w - -", 21)]
+        [InlineData("8/8/8/8/8/8/5K1k/q7 b - -", 21)]
+        [InlineData("8/8/8/8/8/8/1Q6/5K1k w - -", 23)]
+        [InlineData("8/8/8/8/8/8/1q6/5K1k b - -", 23)]
+        [InlineData("8/8/8/8/8/2Q5/8/5K1k w - -", 25)]
+        [InlineData("8/8/8/8/8/2q5/8/5K1k b - -", 25)]
+        [InlineData("8/8/8/8/3Q4/8/8/5K1k w - -", 27)]
+        [InlineData("8/8/8/8/3q4/8/8/5K1k b - -", 27)]
+        [InlineData("8/8/8/4Q3/8/8/8/5K1k w - -", 27)]
+        [InlineData("8/8/8/4q3/8/8/8/5K1k b - -", 27)]
+        [InlineData("8/8/5Q2/8/8/8/8/4K2k w - -", 25)]
+        [InlineData("8/8/5q2/8/8/8/8/4K2k b - -", 25)]
+        [InlineData("8/6Q1/8/8/8/8/8/5K1k w - -", 23)]
+        [InlineData("8/6q1/8/8/8/8/8/5K1k b - -", 23)]
+        [InlineData("7Q/8/8/8/8/8/8/4K1k1 w - -", 21)]
+        [InlineData("7q/8/8/8/8/8/8/4K1k1 b - -", 21)]
+        public void A1_H8_0Capture(string fenString, int moveCount)
         {
-            var relativeBitBoard = CreateRelativeBitBoard(fen);
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddQueenMoves(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
-            Assert.Equal(moveCount, moves.Count);
+            var movesViews = GetQueenMoveViews(moves);
+
+            Assert.Equal(moveCount, movesViews.Count);
         }
 
         [Fact]
         public void B2_21Moves_0Captures_Correct()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/8/8/8/8/1Q6/8 w KQkq -");
+            var fen = Fen.Parse("8/8/8/k7/8/8/1Q6/4K3 w - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddQueenMoves(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
-            var moveCount = moves.Count;
+            var movesViews = GetQueenMoveViews(moves);
 
-            Assert.Equal(23, moveCount);
+            Assert.Equal(23, movesViews.Count);
         }
 
         [Fact]
         public void E4_16Moves_8Captures_Correct()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/2p1p1p1/7k/2p1Q1p1/7K/2p1p1p1/8 w KQkq -");
+            var fen = Fen.Parse("K7/8/2p1p1p1/8/2p1Q1p1/8/2p1p1p1/k7 w - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddQueenMoves(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var moveCount = moves.Count;
             var captureViews = GetCaptureMoveViews(moves);

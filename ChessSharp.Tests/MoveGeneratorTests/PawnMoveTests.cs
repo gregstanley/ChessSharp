@@ -1,6 +1,5 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
-using ChessSharp.Models;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -23,7 +22,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("k6K/8/8/3p4/8/8/8/8 b - -", SquareFlag.D4)]
         [InlineData("k6K/8/3P4/8/8/8/8/8 w - -", SquareFlag.D7)]
         [InlineData("k6K/8/3p4/8/8/8/8/8 b - -", SquareFlag.D5)]
-        public void Pawn_MidBoardOnlyOnePush(string fenString, SquareFlag toSquare)
+        public void MidBoardOnlyOnePush(string fenString, SquareFlag toSquare)
         {
             var fen = Fen.Parse(fenString);
 
@@ -158,40 +157,47 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Fact]
-        public void Pawns_White_FourBlocked_NoMoves_Correct()
+        public void White_FourBlocked_NoMoves_Correct()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/8/8/8/1p1p1p1p/1P1P1P1P/8 w KQkq -");
+            var fen = Fen.Parse("K6k/8/8/8/8/1p1p1p1p/1P1P1P1P/8 b - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
-            Assert.Empty(moves);
+            var moveViews = GetPawnMoveViews(moves);
+
+            Assert.Empty(moveViews);
         }
 
         [Fact]
-        public void Pawns_Black_FourBlocked_NoMoves_Correct()
+        public void Black_FourBlocked_NoMoves_Correct()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/1p1p1p1p/1P1P1P1P/8/8/8/8/8 w KQkq -");
+            var fen = Fen.Parse("K6k/1p1p1p1p/1P1P1P1P/8/8/8/8/8 b - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
-            Assert.Empty(moves);
+            var moveViews = GetPawnMoveViews(moves);
+
+            Assert.Empty(moveViews);
         }
 
         [Fact]
-        public void Pawns_White_FourCaptures_OnePush_Correct()
+        public void White_FourCaptures_OnePush_Correct()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/8/8/8/p1p2p1p/1P4P1/8 w KQkq -");
+            var fen = Fen.Parse("K6k/8/8/8/8/p1p2p1p/1P4P1/8 w - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var move1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.B2, SquareFlag.B3, PieceType.None, MoveType.Ordinary);
             var move2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.G2, SquareFlag.G3, PieceType.None, MoveType.Ordinary);
@@ -213,14 +219,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Fact]
-        public void Pawn_Empty_OnePush_Promotion_Correct()
+        public void White_Empty_OnePush_Promotion()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/3P4/8/8/8/8/8/8 w KQkq -");
+            var fen = Fen.Parse("K6k/3P4/8/8/8/8/8/8 w - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var promotion1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.D8, PieceType.None, MoveType.PromotionQueen);
             var promotion2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.D8, PieceType.None, MoveType.PromotionRook);
@@ -234,14 +241,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Fact]
-        public void Pawn_Capture_OneCapture_Promotion_Correct()
+        public void White_Capture_OneCapture_Promotion_Correct()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("3nn3/3P4/8/8/8/8/8/8 w KQkq -");
+            var fen = Fen.Parse("3nn3/3P4/8/8/8/8/8/K6k w - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var promotion1 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionQueen);
             var promotion2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionRook);
@@ -255,14 +263,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Fact]
-        public void Pawn_Capture_Correct()
+        public void White_Capture()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/8/8/8/3p4/4P3/8 w KQkq -");
+            var fen = Fen.Parse("K6k/8/8/8/8/3p4/4P3/8 w - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var capture = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.E2, SquareFlag.D3, PieceType.Pawn, MoveType.Ordinary);
 
@@ -272,14 +281,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Fact]
-        public void Pawn_EnPassant_Capture_Correct()
+        public void White_EnPassant_Capture()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/3Pp3/8/8/8/8/8 w KQkq e7");
+            var fen = Fen.Parse("K6k/8/3Pp3/8/8/8/8/8 w - e7");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var enPassantCapture = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D6, SquareFlag.E7, PieceType.Pawn, MoveType.EnPassant);
 
@@ -289,14 +299,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Fact]
-        public void Pawn_EnPassant_Capture_DiscoveredCheck_Correct()
+        public void White_EnPassant_Capture_DiscoveredCheck()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/8/8/q1rPp2K/8/7p/8/8 w KQkq e6");
+            var fen = Fen.Parse("8/8/8/q1rPp2K/8/7p/8/8 w - e6");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlagConstants.All, 0, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var enPassantCapture = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D6, SquareFlag.E7, PieceType.Pawn, MoveType.EnPassant);
 
@@ -306,14 +317,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Fact]
-        public void Pawn_DiscoveredCheck_Correct()
+        public void White_DiscoveredCheck()
         {
-            var relativeBitBoard = CreateRelativeBitBoard("8/2b5/3P4/4K3/8/8/8/7k w KQkq -");
+            var fen = Fen.Parse("8/2b5/3P4/4K3/8/8/8/7k w - -");
+
+            var bitBoard = CreateBitBoard(fen);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.AddPawnPushes(relativeBitBoard, SquareFlagConstants.All, 0, SquareFlag.D6, moves);
-            MoveGenerator.AddPawnCaptures(relativeBitBoard, SquareFlagConstants.All, SquareFlag.D7, SquareFlag.D6, moves);
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
 
             var illegalMove = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D6, SquareFlag.D7, PieceType.None, MoveType.Ordinary);
 
