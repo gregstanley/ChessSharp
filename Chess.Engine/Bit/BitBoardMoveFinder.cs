@@ -144,7 +144,7 @@ namespace Chess.Engine.Bit
                 if ((isCapture || isEnpassantCapture) && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
                 {
                     var enPassantCaptureSquare = Next(availableCaptureSquare1, -stride);
-                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare1, PieceType.Pawn, promotionRank, isEnpassantCapture ? enPassantCaptureSquare : 0));
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare1, board.GetPieceType(availableCaptureSquare1), promotionRank, isEnpassantCapture ? enPassantCaptureSquare : 0));
                 }
             }
 
@@ -157,7 +157,7 @@ namespace Chess.Engine.Bit
                 if ((isCapture || isEnpassantCapture) && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
                 {
                     var enPassantCaptureSquare = Next(availableCaptureSquare2, -stride);
-                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare2, PieceType.Pawn, promotionRank, isEnpassantCapture ? enPassantCaptureSquare : 0));
+                    moves.AddRange(CreatePawnMove(board, colour, startRankFile, availableCaptureSquare2, board.GetPieceType(availableCaptureSquare2), promotionRank, isEnpassantCapture ? enPassantCaptureSquare : 0));
                 }
             }
 

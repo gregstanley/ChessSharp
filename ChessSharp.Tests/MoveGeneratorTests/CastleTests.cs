@@ -62,5 +62,36 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             Assert.Equal(castleKingExpectedCount, castleKingCount);
             Assert.Equal(castleQueenExpectedCount, castleQueenCount);
         }
+
+        // Peter Ellis and Perfect Perft //--Castle Rights
+        [Theory]
+        [InlineData("r3k2r/1b4bq/8/8/8/8/7B/R3K2R w KQkq -", 1, 1)]
+        [InlineData("r3k2r/1b4bq/8/8/8/8/7B/2KR3R b kq -", 1, 0)]
+        [InlineData("r3k2r/1b4bq/8/8/8/8/7B/R4RK1 b kq -", 0, 1)]
+        [InlineData("r3k2r/1b4b1/8/8/4q3/8/7B/R3K2R w KQkq -", 0, 0)]
+        [InlineData("r3k2r/1b4bq/3B4/8/8/8/8/R3K2R b KQkq -", 0, 1)]
+        [InlineData("r3k2r/1b4b1/3B4/8/8/8/8/Rq2K2R w KQkq -", 0, 0)]
+        [InlineData("R3k2r/1b4bq/8/8/8/8/7B/4K2R b Kk -", 0, 0)]
+        public void PeterEllis_Variations(string fenString, int castleKingExpectedCount, int castleQueenExpectedCount)
+        {
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(10);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveCount = moves.Count;
+
+            var castleKing = moves.Where(x => x.GetMoveType() == MoveType.CastleKing);
+            var castleQueen = moves.Where(x => x.GetMoveType() == MoveType.CastleQueen);
+
+            var castleKingCount = castleKing.Count();
+            var castleQueenCount = castleQueen.Count();
+
+            Assert.Equal(castleKingExpectedCount, castleKingCount);
+            Assert.Equal(castleQueenExpectedCount, castleQueenCount);
+        }
     }
 }

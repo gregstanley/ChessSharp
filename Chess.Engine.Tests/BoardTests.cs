@@ -168,7 +168,9 @@ namespace Chess.Engine.Tests
             var d4 = d3.SelectMany(x => x.GetLegalMoves());
             var d5 = d4.SelectMany(x => x.GetLegalMoves());
 
-            LogBoards(board);
+            //LogBoards(board);
+            LogMoves(board);
+
             var d2x = d2.Where(x => x.IsCapture);
             var d2checks = d2.Where(x => x.WhiteIsInCheck || x.BlackIsInCheck);
 
@@ -222,6 +224,9 @@ namespace Chess.Engine.Tests
             var metrics1 = GetDepthMetrics(d1);
             var metrics2 = GetDepthMetrics(d2);
             var metrics3 = GetDepthMetrics(d3);
+
+            //LogBoards(board);
+            LogMoves(board);
 
             Assert.Equal(6, metrics1.Legal);
             Assert.Equal(0, metrics1.Captures);
@@ -284,6 +289,49 @@ namespace Chess.Engine.Tests
             Assert.Equal(46, metrics1.Legal);
             Assert.Equal(2079, metrics2.Legal);
             Assert.Equal(89890, metrics3.Legal);
+        }
+
+        private void LogMoves(Board board)
+        {
+            var moves = new List<Move>();
+
+            foreach (var childBoard1 in board.ChildBoards)
+            {
+                foreach (var childBoard2 in childBoard1.ChildBoards)
+                {
+                    //foreach (var childBoard3 in childBoard2.ChildBoards)
+                    //{
+                    //    var move = childBoard3.Move;
+                    //    var exists = moves.Where(x => x.Notation == move.Notation
+                    //    && x.CapturePieceType == move.CapturePieceType
+                    //    && x.EnPassantSquare == move.EnPassantSquare).Any();
+
+                    //    if (!exists)
+                    //        moves.Add(move);
+                    //}
+
+                    foreach (var childBoard3 in childBoard2.ChildBoards)
+                    {
+                        foreach (var childBoard4 in childBoard3.ChildBoards)
+                        {
+                            var move = childBoard4.Move;
+                            var exists = moves.Where(x => x.Notation == move.Notation
+                            && x.CapturePieceType == move.CapturePieceType
+                            && x.EnPassantSquare == move.EnPassantSquare).Any();
+
+                            if (!exists)
+                                moves.Add(move);
+                        }
+                    }
+                }
+            }
+
+            var orderedMoves = moves.OrderBy(x => x.Type)
+                .OrderBy(x => x.StartPosition.Rank)
+                .ThenBy(x => x.StartPosition.File);
+
+            foreach(var move in orderedMoves)
+                _log.Information($"{move.Type} {move.Notation} {move.CapturePieceType} {move.EnPassantSquare}");
         }
 
         private void LogBoards(Board board)

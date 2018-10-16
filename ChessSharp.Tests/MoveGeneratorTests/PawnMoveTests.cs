@@ -59,6 +59,51 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             Assert.DoesNotContain(illegalMove, moves);
         }
 
+        [Theory]
+        [InlineData("8/8/8/1rP1K3/8/8/8/7k w - - 0 1", SquareFlag.D6, SquareFlag.D7)]
+        [InlineData("8/8/2p5/1r1P1K2/8/8/8/7k w - - 0 1", SquareFlag.D6, SquareFlag.D7)]
+        public void DiscoverCheckRook(string fenString, SquareFlag fromSquare, SquareFlag toSquare)
+        {
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(20);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveViews = GetPawnMoveViews(moves);
+
+            //var moveCount = moves.Count;
+
+            //var illegalMove = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary);
+
+            //Assert.DoesNotContain(illegalMove, moves);
+            Assert.Equal(0, moveViews.Count);
+        }
+
+        [Theory]
+        [InlineData("8/2p5/8/1P1p3r/KR2Pp1k/8/6P1/8 b - e3 0 1")]
+        public void DiscoverCheckRook2(string fenString)
+        {
+            var fen = Fen.Parse(fenString);
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(20);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var moveViews = GetPawnMoveViews(moves);
+
+            //var moveCount = moves.Count;
+
+            //var illegalMove = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary);
+
+            //Assert.DoesNotContain(illegalMove, moves);
+            Assert.Equal(5, moveViews.Count);
+        }
+
         [Fact]
         public void White_EightPawns_OneAndTwoPushes()
         {
@@ -255,6 +300,30 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var promotion2 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionRook);
             var promotion3 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionBishop);
             var promotion4 = MoveConstructor.CreateMove(Colour.White, PieceType.Pawn, SquareFlag.D7, SquareFlag.E8, PieceType.Knight, MoveType.PromotionKnight);
+
+            Assert.Contains(promotion1, moves);
+            Assert.Contains(promotion2, moves);
+            Assert.Contains(promotion3, moves);
+            Assert.Contains(promotion4, moves);
+        }
+
+        [Fact]
+        public void Black_OneCapture_Promotion_Correct()
+        {
+            var fen = Fen.Parse("4k3/8/8/8/8/8/1p6/R2QK3 b - -");
+
+            var bitBoard = CreateBitBoard(fen);
+
+            var moves = new List<uint>(10);
+
+            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+
+            var promotion1 = MoveConstructor.CreateMove(Colour.Black, PieceType.Pawn, SquareFlag.B2, SquareFlag.A1, PieceType.Rook, MoveType.PromotionQueen);
+            var promotion2 = MoveConstructor.CreateMove(Colour.Black, PieceType.Pawn, SquareFlag.B2, SquareFlag.A1, PieceType.Rook, MoveType.PromotionRook);
+            var promotion3 = MoveConstructor.CreateMove(Colour.Black, PieceType.Pawn, SquareFlag.B2, SquareFlag.A1, PieceType.Rook, MoveType.PromotionBishop);
+            var promotion4 = MoveConstructor.CreateMove(Colour.Black, PieceType.Pawn, SquareFlag.B2, SquareFlag.A1, PieceType.Rook, MoveType.PromotionKnight);
+
+            var pawnMoves = GetPawnMoveViews(moves);
 
             Assert.Contains(promotion1, moves);
             Assert.Contains(promotion2, moves);

@@ -40,11 +40,16 @@ namespace ChessSharp.Tests
             {
                 var moveView = new MoveViewer(move);
 
+                if (!depthMetrics.Moves.Where(x => x.Value == move).Any())
+                    depthMetrics.Moves.Add(moveView);
+
                 //if (moveView.From == SquareFlag.G2)
                 //{ var bp = true; }
 
                 bitBoard.MakeMove(move);
 
+                var checkers = GetCheckers(bitBoard, colour);
+                
                 InnerPerft(bitBoard, colour.Opposite(), depth - 1, metrics);
 
                 bitBoard.UnMakeMove(move);
@@ -80,7 +85,35 @@ namespace ChessSharp.Tests
 
             foreach (var move in moves)
             {
+                var moveView = new MoveViewer(move);
+
+                if (moveView.From == SquareFlag.B2)
+                {
+                    var pt = bitBoard.GetPieceColour(SquareFlag.A1);
+
+                    if (moveView.To == SquareFlag.A1)
+                    { var bp = true; }
+                }
+
+                if (moveView.From == SquareFlag.D1)
+                {
+                    var pt = bitBoard.GetPieceColour(SquareFlag.A1);
+
+                    if (moveView.To == SquareFlag.A1)
+                    { var bp = true; }
+                }
+
+                if (!depthMetrics.Moves.Where(x => x.Value == move).Any())
+                    depthMetrics.Moves.Add(moveView);
+
                 bitBoard.MakeMove(move);
+
+                var blackPawnCount = bitBoard.BlackPawns.Count();
+
+                if (blackPawnCount > 3)
+                { var bp = true; }
+
+                var checkers = GetCheckers(bitBoard, colour);
 
                 InnerPerft(bitBoard, colour.Opposite(), depth - 1, metrics);
 
@@ -89,6 +122,34 @@ namespace ChessSharp.Tests
                 //if (bitBoard.BlackPawns.Count() > 8)
                 //{ var bp = true; }
             }
+
+            if (depth == 1)
+            { var bp = true; }
+
+            if (depth == 2)
+            { var bp = true; }
+
+            if (depth == 3)
+            { var bp = true; }
+        }
+
+        private SquareFlag GetCheckers(BitBoard bitBoard, Colour colour)
+        {
+            var relativeBitBoard = bitBoard.ToRelative(colour);
+
+            var checkersPawn = MoveGenerator.GetPawnCheckers(relativeBitBoard, relativeBitBoard.MyKing);
+            var checkersKnight = MoveGenerator.GetKnightCheckers(relativeBitBoard, relativeBitBoard.MyKing);
+            var checkersRook = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Rook, PieceType.Rook);
+            var checkersBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Bishop);
+            var checkersQueenAsRook = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Rook, PieceType.Queen);
+            var checkersQueenAsBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Queen);
+
+            var checkers = checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
+
+            if (checkers > 0)
+            { var bp = true; }
+
+            return checkers;
         }
     }
 }

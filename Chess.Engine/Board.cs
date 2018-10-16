@@ -29,6 +29,8 @@ namespace Chess.Engine
 
         private BitBoardMoveFinder _bitBoardMoveFinder { get; set; }
 
+        public Move Move => _move;
+
         private Move _move { get; set; }
 
         private IList<Move> _moves { get; set; }

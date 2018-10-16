@@ -117,8 +117,10 @@ namespace ChessSharp
                 AddCastles(relativeBitBoard, moves);
             }
 
+            var kingRayAttackSquaresWithoutKing = kingRayAttackSquares & ~kingSquare;
+
             // The pinned pieces will only be allowed to move along pin ray i.e. can't move to expose King
-            var pinnedSquares = AddPinnedMoves(relativeBitBoard, kingSquareIndex, kingRayAttackSquares, moves);
+            var pinnedSquares = AddPinnedMoves(relativeBitBoard, kingSquareIndex, kingRayAttackSquaresWithoutKing, pushMask, captureMask, moves);
 
             if (pinnedSquares > 0)
             {
@@ -128,15 +130,18 @@ namespace ChessSharp
             // Reset the legal mask
             var legalMask = pushMask | captureMask;
 
+            // Knights are special case as they can't move at all if pinned so no moves exist yet
+            AddKnightMoves(relativeBitBoard, legalMask, pinnedSquares, moves);
+
             AddPawnPushes(relativeBitBoard, ~pinnedSquares, pushMask, pinnedSquares, moves);
-            AddPawnCaptures(relativeBitBoard, ~pinnedSquares, captureMask, pinnedSquares, moves);
-            AddKnightMoves(relativeBitBoard, legalMask, moves);
+            AddPawnCaptures(relativeBitBoard, ~pinnedSquares, pushMask, captureMask, pinnedSquares, moves);
             AddRookMoves(relativeBitBoard, ~pinnedSquares, legalMask, pinnedSquares, moves);
             AddBishopMoves(relativeBitBoard, ~pinnedSquares, legalMask, pinnedSquares, moves);
             AddQueenMoves(relativeBitBoard, ~pinnedSquares, legalMask, pinnedSquares, moves);
         }
 
-        private SquareFlag GetPinned(RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag potentialPins, SquareFlag pinners, IList<uint> moves)
+        private SquareFlag GetPinned(RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag potentialPins,
+            SquareFlag pinners, SquareFlag pushMask, SquareFlag captureMask, IList<uint> moves)
         {
             var pinnedSquares = (SquareFlag)0;
             var pinnersAsList = pinners.ToList();
@@ -144,6 +149,10 @@ namespace ChessSharp
             foreach (var pinner in pinnersAsList)
             {
                 var path = Paths[kingSquareIndex][pinner.ToSquareIndex()];
+
+                var pushPath = path & pushMask;
+                var capturePath = path & captureMask;
+                var legalPath = pushPath | capturePath;
 
                 var squarePinnedByThisPiece = path & potentialPins;
 
@@ -157,17 +166,17 @@ namespace ChessSharp
                     {
                         case PieceType.Pawn:
                             // TODO: Can be more efficient here if we know if ray is diagonal or not
-                            AddPawnPushes(relativeBitBoard, pinnedSquares, path, pinnedSquares, moves);
-                            AddPawnCaptures(relativeBitBoard, pinnedSquares, path, pinnedSquares, moves);
+                            AddPawnPushes(relativeBitBoard, pinnedSquares, pushPath, pinnedSquares, moves);
+                            AddPawnCaptures(relativeBitBoard, pinnedSquares, pushPath, capturePath, pinnedSquares, moves);
                             break;
                         case PieceType.Rook:
-                            AddRookMoves(relativeBitBoard, pinnedSquares, path, pinnedSquares, moves);
+                            AddRookMoves(relativeBitBoard, pinnedSquares, legalPath, pinnedSquares, moves);
                             break;
                         case PieceType.Bishop:
-                            AddBishopMoves(relativeBitBoard, pinnedSquares, path, pinnedSquares, moves);
+                            AddBishopMoves(relativeBitBoard, pinnedSquares, legalPath, pinnedSquares, moves);
                             break;
                         case PieceType.Queen:
-                            AddQueenMoves(relativeBitBoard, pinnedSquares, path, pinnedSquares, moves);
+                            AddQueenMoves(relativeBitBoard, pinnedSquares, legalPath, pinnedSquares, moves);
                             break;
                     }
                 }
@@ -176,7 +185,8 @@ namespace ChessSharp
             return pinnedSquares;
         }
 
-        private SquareFlag AddPinnedMoves(RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag kingRayAttackSquares, IList<uint> moves)
+        private SquareFlag AddPinnedMoves(RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag kingRayAttackSquares,
+            SquareFlag pushMask, SquareFlag captureMask, IList<uint> moves)
         {
             var potentialPins = kingRayAttackSquares & relativeBitBoard.MySquares;
 
@@ -194,18 +204,18 @@ namespace ChessSharp
             var pinnedPieces = (SquareFlag)0;
 
             if (pinningRooks > 0)
-                pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningRooks, moves);
+                pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningRooks, pushMask, captureMask, moves);
 
             if (pinningBishops > 0)
-                pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningBishops, moves);
+                pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningBishops, pushMask, captureMask, moves);
 
             if (pinningQueens > 0)
-                pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningQueens, moves);
+                pinnedPieces |= GetPinned(relativeBitBoard, kingSquareIndex, potentialPins, pinningQueens, pushMask, captureMask, moves);
 
             return pinnedPieces;
         }
 
-        private SquareFlag GetPawnCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
+        public SquareFlag GetPawnCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
         {
             var squareIndex = square.ToSquareIndex();
 
@@ -216,7 +226,7 @@ namespace ChessSharp
             return attackableSquares & relativeBitBoard.OpponentPawns;
         }
 
-        private SquareFlag GetKnightCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
+        public SquareFlag GetKnightCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
         {
             var squareIndex = square.ToSquareIndex();
 
@@ -225,7 +235,16 @@ namespace ChessSharp
             return attackableSquares & relativeBitBoard.OpponentKnights;
         }
 
-        private SquareFlag GetCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square, PieceType rayType, PieceType pieceType)
+        public SquareFlag GetKingCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
+        {
+            var squareIndex = square.ToSquareIndex();
+
+            var attackableSquares = KingAttacks[squareIndex];
+
+            return attackableSquares & relativeBitBoard.OpponentKing;
+        }
+
+        public SquareFlag GetCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square, PieceType rayType, PieceType pieceType)
         {
             var opponentSquares = pieceType == PieceType.Queen
                 ? relativeBitBoard.OpponentQueens
@@ -287,7 +306,7 @@ namespace ChessSharp
             }
         }
 
-        private void AddPawnCaptures(RelativeBitBoard relativeBitBoard, SquareFlag squareFilter, SquareFlag captureMask, SquareFlag pinnedSquares, IList<uint> moves)
+        private void AddPawnCaptures(RelativeBitBoard relativeBitBoard, SquareFlag squareFilter, SquareFlag pushMask, SquareFlag captureMask, SquareFlag pinnedSquares, IList<uint> moves)
         {
             var squares = relativeBitBoard.MyPawns & squareFilter;
 
@@ -327,7 +346,12 @@ namespace ChessSharp
                             // Abuse the push system - push an imaginary pawn from the en passant square as opponent to find piece
                             var enPassantCaptureSquare = relativeBitBoard.EnPassant.PawnForward(relativeBitBoard.OpponentColour, 1);
 
-                            if (!captureMask.HasFlag(enPassantCaptureSquare))
+                            //if (!captureMask.HasFlag(enPassantCaptureSquare))
+                            //    continue;
+                            var blockWithPush = pushMask.HasFlag(relativeBitBoard.EnPassant);
+                            var evadeWithCapture = captureMask.HasFlag(enPassantCaptureSquare);
+
+                            if (!blockWithPush && !evadeWithCapture)
                                 continue;
 
                             capturePieceType = PieceType.Pawn;
@@ -343,19 +367,29 @@ namespace ChessSharp
                                 if ((enPassantDiscoveredCheckRank & relativeBitBoard.OpponentRooks) > 0
                                     || (enPassantDiscoveredCheckRank & relativeBitBoard.OpponentQueens) > 0)
                                 {
-                                    var opponentPiecesOnRank = enPassantDiscoveredCheckRank & relativeBitBoard.OpponentSquares;
+                                    //var opponentPiecesOnRank = enPassantDiscoveredCheckRank & relativeBitBoard.OpponentSquares;
 
                                     // Our King is on the en passant rank with opponent Ray pieces so could be exposed after capture
-                                    var rankOccupancy = (enPassantDiscoveredCheckRank & relativeBitBoard.MySquares)
-                                        | (enPassantDiscoveredCheckRank & relativeBitBoard.OpponentSquares);
+                                    //var rankOccupancy = (enPassantDiscoveredCheckRank & relativeBitBoard.MySquares)
+                                    //    | (enPassantDiscoveredCheckRank & relativeBitBoard.OpponentSquares);
 
-                                    // Remove the two pawns from the board
-                                    var rankOccupancyPostCapture = rankOccupancy & ~enPassantCaptureSquare & ~fromSquare;
+                                    // Remove the King and both pawns from the occupancy code
+                                    //var rankOccupancyPostCapture = rankOccupancy
+                                    //    & ~kingSquare
+                                    //    & ~enPassantCaptureSquare
+                                    //    & ~fromSquare;
 
                                     var kingSquareIndex = kingSquare.ToSquareIndex();
 
+                                    var occupancyMask = GetOccupancyMask(PieceType.Rook, kingSquareIndex);
+
+                                    var occupancyBeforeCapture = relativeBitBoard.OccupiedSquares & occupancyMask;
+                                    var occupancyAfterCapture = occupancyBeforeCapture
+                                        & ~enPassantCaptureSquare
+                                        & ~fromSquare;
+
                                     // Search for magic moves using just the occupancy of rank (the rest is not relevant)
-                                    var magicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, rankOccupancyPostCapture);
+                                    var magicIndex = GetMagicIndex(PieceType.Rook, kingSquareIndex, occupancyAfterCapture);
 
                                     var kingRayAttacks = RookAttacks[kingSquareIndex][magicIndex];
 
@@ -376,12 +410,16 @@ namespace ChessSharp
             }
         }
         
-        private void AddKnightMoves(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, IList<uint> moves)
+        private void AddKnightMoves(RelativeBitBoard relativeBitBoard, SquareFlag legalMask, SquareFlag pinnedSquares, IList<uint> moves)
         {
             var knightSquares = relativeBitBoard.MyKnights.ToList();
 
             foreach(var fromSquare in knightSquares)
             {
+                // Knights can't move at all if pinned
+                if (pinnedSquares.HasFlag(fromSquare))
+                    continue;
+
                 var squareIndex = fromSquare.ToSquareIndex();
 
                 var attackableSquaresIncludingSelfCaptures = KnightAttacks[squareIndex];
@@ -526,6 +564,11 @@ namespace ChessSharp
 
             foreach (var attackableSquare in attackableSquares.ToList())
             {
+                var potentialCheckersKing = GetKingCheckers(relativeBitBoard, attackableSquare);
+
+                if (potentialCheckersKing > 0)
+                    continue;
+
                 var potentialCheckersPawn = GetPawnCheckers(relativeBitBoard, attackableSquare);
 
                 if (potentialCheckersPawn > 0)
@@ -555,7 +598,7 @@ namespace ChessSharp
 
                 if (potentialCheckersQueenAsBishop > 0)
                     continue;
-
+                
                 safeSquares |= attackableSquare;
             }
 
