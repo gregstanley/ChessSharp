@@ -30,9 +30,6 @@ namespace ChessSharp.Tests
             {
                 var moveView = new MoveViewer(move);
 
-                if (moveView.From == SquareFlag.A1)
-                { var bp = true; }
-
                 bitBoard.MakeMove(move);
 
                 var checkers = GetCheckers(bitBoard, colour);
@@ -54,8 +51,6 @@ namespace ChessSharp.Tests
             if (depth == 0)
                 return 1;
 
-            if (depth == 1)
-            { var bp = true; }
             var moves = new List<uint>(256);
 
             MoveGenerator.Generate(bitBoard, colour, moves);
@@ -64,9 +59,6 @@ namespace ChessSharp.Tests
 
             var movesView = moves.Select(x => new MoveViewer(x));
             var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
-
-            if (captures.Any())
-            { var bp = true; }
 
             var movePerfts = new List<MovePerft>();
 
@@ -87,14 +79,6 @@ namespace ChessSharp.Tests
                 bitBoard.UnMakeMove(move);
             }
 
-            if (depth == 1)
-            { var bp = true; }
-
-            if (depth == 2)
-            { var bp = true; }
-
-            if (depth == 3)
-            { var bp = true; }
             return count;
         }
 
@@ -110,9 +94,6 @@ namespace ChessSharp.Tests
             var checkersQueenAsBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Queen);
 
             var checkers = checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
-
-            if (checkers > 0)
-            { var bp = true; }
 
             return checkers;
         }

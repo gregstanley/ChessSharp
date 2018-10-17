@@ -16,121 +16,84 @@ namespace ChessSharp.Tests
 
         public void Go(BitBoard bitBoard, Colour colour, int depth, IDictionary<int, PerftMetrics> metrics)
         {
-            //if (!metrics.ContainsKey(depth))
-            //    metrics[depth] = new PerftMetrics();
+            //var moves = new List<uint>(256);
+            var moves = new List<uint>[256];
 
-            for (var i = 1; i <= depth; i++)
+            for (var i = 0; i <= depth; i++)
+            {
+                moves[i] = new List<uint>(256);
                 metrics[i] = new PerftMetrics();
+            }
 
-            var moves = new List<uint>(256);
-
-            MoveGenerator.Generate(bitBoard, colour, moves);
-
-            var movesView = moves.Select(x => new MoveViewer(x));
-
+            var nodeMoves = moves[depth];
             var depthMetrics = metrics[depth];
 
-            depthMetrics.Legal += moves.Count();
-            depthMetrics.Captures += moves.Where(x => x.GetCapturePieceType() != PieceType.None).Count();
-            depthMetrics.EnPassantCaptures += moves.Where(x => x.GetMoveType() == MoveType.EnPassant).Count();
-            depthMetrics.Castles += moves.Where(x => x.GetMoveType() == MoveType.CastleKing).Count();
-            depthMetrics.Castles += moves.Where(x => x.GetMoveType() == MoveType.CastleQueen).Count();
+            MoveGenerator.Generate(bitBoard, colour, moves[depth]);
 
-            foreach (var move in moves)
+            var movesView = nodeMoves.Select(x => new MoveViewer(x));
+
+            depthMetrics.Legal += nodeMoves.Count();
+            depthMetrics.Captures += nodeMoves.Where(x => x.GetCapturePieceType() != PieceType.None).Count();
+            depthMetrics.EnPassantCaptures += nodeMoves.Where(x => x.GetMoveType() == MoveType.EnPassant).Count();
+            depthMetrics.Castles += nodeMoves.Where(x => x.GetMoveType() == MoveType.CastleKing).Count();
+            depthMetrics.Castles += nodeMoves.Where(x => x.GetMoveType() == MoveType.CastleQueen).Count();
+
+            foreach (var move in nodeMoves)
             {
                 var moveView = new MoveViewer(move);
 
                 if (!depthMetrics.Moves.Where(x => x.Value == move).Any())
                     depthMetrics.Moves.Add(moveView);
-
-                //if (moveView.From == SquareFlag.G2)
-                //{ var bp = true; }
 
                 bitBoard.MakeMove(move);
 
                 var checkers = GetCheckers(bitBoard, colour);
                 
-                InnerPerft(bitBoard, colour.Opposite(), depth - 1, metrics);
+                InnerPerft(bitBoard, colour.Opposite(), depth - 1, moves, metrics);
 
                 bitBoard.UnMakeMove(move);
             }
         }
 
-        private void InnerPerft(BitBoard bitBoard, Colour colour, int depth, IDictionary<int, PerftMetrics> metrics)
+        private void InnerPerft(BitBoard bitBoard, Colour colour, int depth, List<uint>[] moves, IDictionary<int, PerftMetrics> metrics)
         {
             if (depth == 0)
                 return;
 
-            var moves = new List<uint>(256);
-
-            MoveGenerator.Generate(bitBoard, colour, moves);
-
-            var movesView = moves.Select(x => new MoveViewer(x));
-
-            //if (!metrics.ContainsKey(depth))
-            //    metrics[depth] = new PerftMetrics();
-
+            //var moves = new List<uint>(256);
+            var nodeMoves = moves[depth];
             var depthMetrics = metrics[depth];
 
-            var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
+            // Must wipe any existing moves each time we enter a depth
+            nodeMoves.Clear();
 
-            depthMetrics.Legal += moves.Count();
-            depthMetrics.Captures += moves.Where(x => x.GetCapturePieceType() != PieceType.None).Count();
-            depthMetrics.EnPassantCaptures += moves.Where(x => x.GetMoveType() == MoveType.EnPassant).Count();
-            depthMetrics.Castles += moves.Where(x => x.GetMoveType() == MoveType.CastleKing).Count();
-            depthMetrics.Castles += moves.Where(x => x.GetMoveType() == MoveType.CastleQueen).Count();
+            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
 
-            //if (captures.Any())
-            //{ var bp = true; }
+            var movesView = nodeMoves.Select(x => new MoveViewer(x));
 
-            foreach (var move in moves)
+            var captures = nodeMoves.Where(x => x.GetCapturePieceType() != PieceType.None);
+
+            depthMetrics.Legal += nodeMoves.Count();
+            depthMetrics.Captures += nodeMoves.Where(x => x.GetCapturePieceType() != PieceType.None).Count();
+            depthMetrics.EnPassantCaptures += nodeMoves.Where(x => x.GetMoveType() == MoveType.EnPassant).Count();
+            depthMetrics.Castles += nodeMoves.Where(x => x.GetMoveType() == MoveType.CastleKing).Count();
+            depthMetrics.Castles += nodeMoves.Where(x => x.GetMoveType() == MoveType.CastleQueen).Count();
+
+            foreach (var move in nodeMoves)
             {
                 var moveView = new MoveViewer(move);
-
-                if (moveView.From == SquareFlag.B2)
-                {
-                    var pt = bitBoard.GetPieceColour(SquareFlag.A1);
-
-                    if (moveView.To == SquareFlag.A1)
-                    { var bp = true; }
-                }
-
-                if (moveView.From == SquareFlag.D1)
-                {
-                    var pt = bitBoard.GetPieceColour(SquareFlag.A1);
-
-                    if (moveView.To == SquareFlag.A1)
-                    { var bp = true; }
-                }
 
                 if (!depthMetrics.Moves.Where(x => x.Value == move).Any())
                     depthMetrics.Moves.Add(moveView);
 
                 bitBoard.MakeMove(move);
 
-                var blackPawnCount = bitBoard.BlackPawns.Count();
-
-                if (blackPawnCount > 3)
-                { var bp = true; }
-
                 var checkers = GetCheckers(bitBoard, colour);
 
-                InnerPerft(bitBoard, colour.Opposite(), depth - 1, metrics);
+                InnerPerft(bitBoard, colour.Opposite(), depth - 1, moves, metrics);
 
                 bitBoard.UnMakeMove(move);
-
-                //if (bitBoard.BlackPawns.Count() > 8)
-                //{ var bp = true; }
             }
-
-            if (depth == 1)
-            { var bp = true; }
-
-            if (depth == 2)
-            { var bp = true; }
-
-            if (depth == 3)
-            { var bp = true; }
         }
 
         private SquareFlag GetCheckers(BitBoard bitBoard, Colour colour)
@@ -145,9 +108,6 @@ namespace ChessSharp.Tests
             var checkersQueenAsBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Queen);
 
             var checkers = checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
-
-            if (checkers > 0)
-            { var bp = true; }
 
             return checkers;
         }

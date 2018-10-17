@@ -34,9 +34,6 @@ namespace ChessSharp
         {
             var relativeBitBoard = bitBoard.ToRelative(colour);
 
-            if (relativeBitBoard.MyKing == 0)
-                return;
-
             var kingSquare = relativeBitBoard.MyKing;
             var kingSquareIndex = kingSquare.ToSquareIndex();
 
@@ -68,12 +65,20 @@ namespace ChessSharp
                 }
             }
 
-            var checkersPawn = GetPawnCheckers(relativeBitBoard, kingSquare);
-            var checkersKnight = GetKnightCheckers(relativeBitBoard, kingSquare);
+            var checkersPawn = relativeBitBoard.OpponentPawns == 0 ? 0
+                : GetPawnCheckers(relativeBitBoard, kingSquare);
 
-            var checkerBishop = kingRayAttackSquaresBishop & relativeBitBoard.OpponentBishops;
-            var checkersRook = kingRayAttackSquaresRook & relativeBitBoard.OpponentRooks;
-            var checkersQueen = kingRayAttackSquares & relativeBitBoard.OpponentQueens;
+            var checkersKnight = relativeBitBoard.OpponentKnights == 0 ? 0
+                : GetKnightCheckers(relativeBitBoard, kingSquare);
+
+            var checkerBishop = relativeBitBoard.OpponentBishops == 0 ? 0
+                : kingRayAttackSquaresBishop & relativeBitBoard.OpponentBishops;
+
+            var checkersRook = relativeBitBoard.OpponentRooks == 0 ? 0
+                : kingRayAttackSquaresRook & relativeBitBoard.OpponentRooks;
+
+            var checkersQueen = relativeBitBoard.OpponentQueens == 0 ? 0
+                : kingRayAttackSquares & relativeBitBoard.OpponentQueens;
 
             var checkers = checkersPawn | checkersKnight | checkerBishop | checkersRook | checkersQueen;
 
@@ -230,18 +235,14 @@ namespace ChessSharp
         {
             var squareIndex = square.ToSquareIndex();
 
-            var attackableSquares = KnightAttacks[squareIndex];
-
-            return attackableSquares & relativeBitBoard.OpponentKnights;
+            return KnightAttacks[squareIndex] & relativeBitBoard.OpponentKnights;
         }
 
         public SquareFlag GetKingCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square)
         {
             var squareIndex = square.ToSquareIndex();
 
-            var attackableSquares = KingAttacks[squareIndex];
-
-            return attackableSquares & relativeBitBoard.OpponentKing;
+            return KingAttacks[squareIndex] & relativeBitBoard.OpponentKing;
         }
 
         public SquareFlag GetCheckers(RelativeBitBoard relativeBitBoard, SquareFlag square, PieceType rayType, PieceType pieceType)
@@ -267,9 +268,6 @@ namespace ChessSharp
 
             foreach (var fromSquare in pawnSquaresAsList)
             {
-                //if (fromSquare == SquareFlag.F4)
-                //{ var bp = true; }
-
                 var toSquare = fromSquare.PawnForward(relativeBitBoard.Colour, 1);
 
                 if (pinnedSquares.HasFlag(fromSquare))
@@ -346,8 +344,6 @@ namespace ChessSharp
                             // Abuse the push system - push an imaginary pawn from the en passant square as opponent to find piece
                             var enPassantCaptureSquare = relativeBitBoard.EnPassant.PawnForward(relativeBitBoard.OpponentColour, 1);
 
-                            //if (!captureMask.HasFlag(enPassantCaptureSquare))
-                            //    continue;
                             var blockWithPush = pushMask.HasFlag(relativeBitBoard.EnPassant);
                             var evadeWithCapture = captureMask.HasFlag(enPassantCaptureSquare);
 
@@ -367,23 +363,12 @@ namespace ChessSharp
                                 if ((enPassantDiscoveredCheckRank & relativeBitBoard.OpponentRooks) > 0
                                     || (enPassantDiscoveredCheckRank & relativeBitBoard.OpponentQueens) > 0)
                                 {
-                                    //var opponentPiecesOnRank = enPassantDiscoveredCheckRank & relativeBitBoard.OpponentSquares;
-
-                                    // Our King is on the en passant rank with opponent Ray pieces so could be exposed after capture
-                                    //var rankOccupancy = (enPassantDiscoveredCheckRank & relativeBitBoard.MySquares)
-                                    //    | (enPassantDiscoveredCheckRank & relativeBitBoard.OpponentSquares);
-
-                                    // Remove the King and both pawns from the occupancy code
-                                    //var rankOccupancyPostCapture = rankOccupancy
-                                    //    & ~kingSquare
-                                    //    & ~enPassantCaptureSquare
-                                    //    & ~fromSquare;
-
                                     var kingSquareIndex = kingSquare.ToSquareIndex();
 
                                     var occupancyMask = GetOccupancyMask(PieceType.Rook, kingSquareIndex);
 
                                     var occupancyBeforeCapture = relativeBitBoard.OccupiedSquares & occupancyMask;
+
                                     var occupancyAfterCapture = occupancyBeforeCapture
                                         & ~enPassantCaptureSquare
                                         & ~fromSquare;
