@@ -1,6 +1,7 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using ChessSharp.Models;
+using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -79,6 +80,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             CreateRelativeBitBoard(Fen.Parse(fenString));
 
         protected RelativeBitBoard CreateRelativeBitBoard(Fen fen) =>
-            BitBoard.FromFen(fen).ToRelative(fen.ToPlay);
+            BitBoard.FromFen(fen).RelativeTo(fen.ToPlay);
     }
 }

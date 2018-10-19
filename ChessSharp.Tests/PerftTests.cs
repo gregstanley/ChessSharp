@@ -1,4 +1,5 @@
-﻿using Serilog;
+﻿using ChessSharp.MoveGeneration;
+using Serilog;
 using Serilog.Core;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,23 +88,7 @@ namespace ChessSharp.Tests
             Assert.Equal(0, metrics[depth - 3].Castles);
             //Assert.Equal(12, metrics[depth - 3].Checks);
 
-            Assert.Equal(8902, metrics[depth - 4].Legal);
-            Assert.Equal(34, metrics[depth - 4].Captures);
-            Assert.Equal(0, metrics[depth - 4].EnPassantCaptures);
-            Assert.Equal(0, metrics[depth - 4].Castles);
-            //Assert.Equal(12, metrics[depth - 4].Checks);
-
-            Assert.Equal(43238, metrics[depth - 4].Legal);
-            Assert.Equal(3348, metrics[depth - 4].Captures);
-            Assert.Equal(123, metrics[depth - 4].EnPassantCaptures);
-            Assert.Equal(0, metrics[depth - 4].Castles);
-            //Assert.Equal(1680, metrics[depth - 4].Checks);
-
-            //Assert.Equal(674624, metrics[depth - 5].Legal);
-            //Assert.Equal(52051, metrics[depth - 5].Captures);
-            //Assert.Equal(1165, metrics[depth - 5].EnPassantCaptures);
-            //Assert.Equal(0, metrics[depth - 5].Castles);
-            //Assert.Equal(52950, metrics[depth - 5].Checks);
+            Assert.Equal(4865609, metrics[depth - 4].Legal);
         }
 
         [Fact]

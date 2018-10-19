@@ -88,6 +88,9 @@ namespace ChessSharp
             BlackKing = SquareFlag.E8;
 
             _boardStates.Push(DefaultState);
+
+            RelativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
+                WhiteKing, BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing, _boardStates.Peek());
         }
 
         public BitBoard(SquareFlag whitePawns,
@@ -118,6 +121,9 @@ namespace ChessSharp
             BlackKing = blackKing;
 
             _boardStates.Push(state);
+
+            RelativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
+                WhiteKing, BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing, _boardStates.Peek());
         }
 
         public SquareFlag WhitePawns { get; private set; }
@@ -143,6 +149,8 @@ namespace ChessSharp
         public SquareFlag BlackQueens { get; private set; }
 
         public SquareFlag BlackKing { get; private set; }
+
+        public RelativeBitBoard RelativeBitBoard { get; private set; }
 
         public SquareFlag EnPassant =>
             _boardStates.Peek().GetEnPassantSquare();
@@ -226,12 +234,11 @@ namespace ChessSharp
             throw new Exception($"Failed to find piece for {square}");
         }
 
-        public RelativeBitBoard ToRelative(Colour colour)
+        public RelativeBitBoard RelativeTo(Colour colour)
         {
             var opponentColour = colour.Opposite();
 
-            var relativeBitBoard = new RelativeBitBoard
-                (colour,
+            RelativeBitBoard.Set(colour,
                  GetPawnSquares(colour),
                  GetRookSquares(colour),
                  GetKnightSquares(colour),
@@ -246,7 +253,7 @@ namespace ChessSharp
                  GetKingSquare(opponentColour),
                  _boardStates.Peek());
 
-            return relativeBitBoard;
+            return RelativeBitBoard;
         }
 
         public void UnMakeMove(uint move)

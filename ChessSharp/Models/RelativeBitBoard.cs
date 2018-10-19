@@ -6,7 +6,7 @@ namespace ChessSharp.Models
 {
     public class RelativeBitBoard
     {
-        private BoardState _boardState { get; }
+        private BoardState _boardState { get; set; }
 
         public RelativeBitBoard(Colour colour, SquareFlag myPawns, SquareFlag myRooks, 
             SquareFlag myKnights, SquareFlag myBishops, SquareFlag myQueens, SquareFlag myKing, 
@@ -31,33 +31,33 @@ namespace ChessSharp.Models
             _boardState = boardState;
         }
 
-        public Colour Colour { get; }
+        public Colour Colour { get; private set; }
 
-        public Colour OpponentColour { get; }
+        public Colour OpponentColour { get; private set; }
 
-        public SquareFlag MyPawns { get; }
+        public SquareFlag MyPawns { get; private set; }
 
-        public SquareFlag MyRooks { get; }
+        public SquareFlag MyRooks { get; private set; }
 
-        public SquareFlag MyKnights { get; }
+        public SquareFlag MyKnights { get; private set; }
 
-        public SquareFlag MyBishops { get; }
+        public SquareFlag MyBishops { get; private set; }
 
-        public SquareFlag MyQueens { get; }
+        public SquareFlag MyQueens { get; private set; }
 
-        public SquareFlag MyKing { get; }
+        public SquareFlag MyKing { get; private set; }
 
-        public SquareFlag OpponentPawns { get; }
+        public SquareFlag OpponentPawns { get; private set; }
 
-        public SquareFlag OpponentRooks { get; }
+        public SquareFlag OpponentRooks { get; private set; }
 
-        public SquareFlag OpponentKnights { get; }
+        public SquareFlag OpponentKnights { get; private set; }
 
-        public SquareFlag OpponentBishops { get; }
+        public SquareFlag OpponentBishops { get; private set; }
 
-        public SquareFlag OpponentQueens { get; }
+        public SquareFlag OpponentQueens { get; private set; }
 
-        public SquareFlag OpponentKing { get; }
+        public SquareFlag OpponentKing { get; private set; }
 
         public SquareFlag EnPassant => _boardState.GetEnPassantSquare();
 
@@ -87,6 +87,29 @@ namespace ChessSharp.Models
 
         public SquareFlag OccupiedSquares =>
             MySquares | OpponentSquares;
+
+        public void Set(Colour colour, SquareFlag myPawns, SquareFlag myRooks,
+            SquareFlag myKnights, SquareFlag myBishops, SquareFlag myQueens, SquareFlag myKing,
+            SquareFlag opponentPawns, SquareFlag opponentRooks, SquareFlag opponentKnights,
+            SquareFlag opponentBishops, SquareFlag opponentQueens, SquareFlag opponentKing,
+            BoardState boardState)
+        {
+            Colour = colour;
+            OpponentColour = colour.Opposite();
+            MyPawns = myPawns;
+            MyRooks = myRooks;
+            MyKnights = myKnights;
+            MyBishops = myBishops;
+            MyQueens = myQueens;
+            MyKing = myKing;
+            OpponentPawns = opponentPawns;
+            OpponentRooks = opponentRooks;
+            OpponentKnights = opponentKnights;
+            OpponentBishops = opponentBishops;
+            OpponentQueens = opponentQueens;
+            OpponentKing = opponentKing;
+            _boardState = boardState;
+        }
 
         public Colour GetPieceColour(SquareFlag square)
         {

@@ -4,4 +4,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="AttackGenerator.cs" />
+    <Compile Remove="MagicNumbers.cs" />
+    <Compile Remove="MoveGenerator.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="AttackGenerator.cs" />
+    <None Include="MagicNumbers.cs" />
+    <None Include="MoveGenerator.cs" />
+  </ItemGroup>
+
 </Project>

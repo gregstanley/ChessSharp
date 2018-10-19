@@ -7,6 +7,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="MovePerft.cs" />
+    <Compile Remove="PerftMetrics.cs" />
+    <Compile Remove="PerftRunner.cs" />
+    <Compile Remove="PerftRunnerMetrics.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="MovePerft.cs" />
+    <None Include="PerftMetrics.cs" />
+    <None Include="PerftRunner.cs" />
+    <None Include="PerftRunnerMetrics.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
     <PackageReference Include="Serilog" Version="2.7.1" />
     <PackageReference Include="Serilog.Sinks.File" Version="4.0.0" />
@@ -18,6 +32,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ChessSharp.Perft\ChessSharp.MoveGeneration.csproj" />
     <ProjectReference Include="..\ChessSharp\ChessSharp.csproj" />
   </ItemGroup>
 
