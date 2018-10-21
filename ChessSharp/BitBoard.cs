@@ -69,6 +69,7 @@ namespace ChessSharp
 
         private Stack<BoardState> _boardStates { get; } = new Stack<BoardState>(256);
         private Stack<uint> _moves { get; } = new Stack<uint>(256);
+        private RelativeBitBoard _relativeBitBoard { get; }
 
         public BitBoard()
         {
@@ -89,7 +90,7 @@ namespace ChessSharp
 
             _boardStates.Push(DefaultState);
 
-            RelativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
+            _relativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
                 WhiteKing, BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing, _boardStates.Peek());
         }
 
@@ -122,7 +123,7 @@ namespace ChessSharp
 
             _boardStates.Push(state);
 
-            RelativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
+            _relativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
                 WhiteKing, BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing, _boardStates.Peek());
         }
 
@@ -149,8 +150,6 @@ namespace ChessSharp
         public SquareFlag BlackQueens { get; private set; }
 
         public SquareFlag BlackKing { get; private set; }
-
-        public RelativeBitBoard RelativeBitBoard { get; private set; }
 
         public SquareFlag EnPassant =>
             _boardStates.Peek().GetEnPassantSquare();
@@ -238,7 +237,7 @@ namespace ChessSharp
         {
             var opponentColour = colour.Opposite();
 
-            RelativeBitBoard.Set(colour,
+            _relativeBitBoard.Set(colour,
                  GetPawnSquares(colour),
                  GetRookSquares(colour),
                  GetKnightSquares(colour),
@@ -253,7 +252,7 @@ namespace ChessSharp
                  GetKingSquare(opponentColour),
                  _boardStates.Peek());
 
-            return RelativeBitBoard;
+            return _relativeBitBoard;
         }
 
         public void UnMakeMove(uint move)
