@@ -107,13 +107,50 @@ namespace ChessSharp.Extensions
         {
             byte count = 0;
 
-            for (var i = 1ul; i > 0; i = i << 1)
-                if (squares.HasFlag((SquareFlag)i)) ++count;
+            var a = (ulong)squares;
+
+            while (a > 0)
+            {
+                if ((a & 1) > 0)
+                    ++count;
+
+                a >>= 1;
+            }
 
             return count;
         }
 
         public static IEnumerable<SquareFlag> ToList(this SquareFlag squares)
+        {
+            var ulsquares = (ulong)squares;
+
+            var a = (uint)(ulsquares & 0b00000000_00000000_00000000_00000000_11111111_11111111_11111111_11111111);
+            var b = (uint)((ulsquares & 0b11111111_11111111_11111111_11111111_00000000_00000000_00000000_00000000) >> 32);
+
+            var x = 0;
+
+            while (a > 0)
+            {
+                if ((a & 1) > 0)
+                    yield return (SquareFlag)((ulong)1 << x);
+
+                a >>= 1;
+                ++x;
+            }
+
+            x = 0;
+
+            while (b > 0)
+            {
+                if ((b & 1) > 0)
+                    yield return (SquareFlag)((ulong)1 << (32 + x));
+
+                b >>= 1;
+                ++x;
+            }
+        }
+
+        public static IEnumerable<SquareFlag> ToListFaster(this SquareFlag squares)
         {
             var ulsquares = (ulong)squares;
 
