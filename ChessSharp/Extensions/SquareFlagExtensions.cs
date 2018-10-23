@@ -1,4 +1,5 @@
 ﻿using ChessSharp.Enums;
+using System;
 using System.Collections.Generic;
 
 namespace ChessSharp.Extensions
@@ -84,9 +85,6 @@ namespace ChessSharp.Extensions
         public static SquareFlag ShiftRankDown(this SquareFlag square, int numRanks) =>
             (SquareFlag)((ulong)square >> (8 * numRanks));
 
-        public static int ToSquareIndex(this SquareFlag square) =>
-            _indices.ContainsKey(square) ? _indices[square] : -1;
-
         public static byte GetInstanceNumber(this SquareFlag squares, SquareFlag square)
         {
             byte instanceNumber = 1;
@@ -118,6 +116,45 @@ namespace ChessSharp.Extensions
             }
 
             return count;
+        }
+
+        // Checking the Dictionary first is mightly expensive. Better to not look for something that doesn't exist.
+        //public static int ToSquareIndex(this SquareFlag square) =>
+        //    _indices.ContainsKey(square) ? _indices[square] : -1;
+        // Even looking up in the dictionary is slow. Better to count!
+        //public static int ToSquareIndex(this SquareFlag square) =>
+        //    _indices[square];
+
+        public static int ToSquareIndex(this SquareFlag square)
+        {
+            if (square == 0)
+                throw new IndexOutOfRangeException("Empty SquareFlag (zero) can not be converted to an index on the board. Ensure it is set to a valid square value.");
+
+            var ulsquares = (ulong)square;
+
+            var a = (uint)(ulsquares & 0b00000000_00000000_00000000_00000000_11111111_11111111_11111111_11111111);
+            var b = (uint)((ulsquares & 0b11111111_11111111_11111111_11111111_00000000_00000000_00000000_00000000) >> 32);
+
+            var x = 0;
+
+            while (a > 0)
+            {
+                a >>= 1;
+                ++x;
+            }
+
+            if (x > 0)
+                return x - 1;
+
+            x = 0;
+
+            while (b > 0)
+            {
+                b >>= 1;
+                ++x;
+            }
+
+            return 32 + x - 1;
         }
 
         public static IEnumerable<SquareFlag> ToList(this SquareFlag squares)

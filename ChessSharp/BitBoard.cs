@@ -255,90 +255,6 @@ namespace ChessSharp
             return _relativeBitBoard;
         }
 
-        public void UnMakeMove(uint move)
-        {
-            var colour = move.GetColour();
-            var fromSquare = move.GetFrom();
-            var toSquare = move.GetTo();
-            var moveType = move.GetMoveType();
-
-            if (moveType == MoveType.CastleKing)
-            {
-                if (colour == Colour.White)
-                    UnMakeWhiteKingSideCastle();
-                else
-                    UnMakeBlackKingSideCastle();
-            }
-            else if (moveType == MoveType.CastleQueen)
-            {
-                if (colour == Colour.White)
-                    UnMakeWhiteQueenSideCastle();
-                else
-                    UnMakeBlackQueenSideCastle();
-            }
-            else if (move.GetPieceType() == PieceType.Pawn)
-            {
-                if (moveType == MoveType.EnPassant)
-                {
-                    // Capturing behind the opponent pawn so shift as if we are opponent
-                    var captureSquare = move.GetTo()
-                        .PawnForward(colour.Opposite(), 1);
-
-                    MovePiece(colour.Opposite(), PieceType.Pawn, captureSquare, captureSquare);
-                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
-                }
-                else if (moveType == MoveType.PromotionQueen)
-                {
-                    DemotePiece(colour, PieceType.Queen, toSquare);
-                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
-
-                    if (move.GetCapturePieceType() != PieceType.None)
-                        MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
-                }
-                else if (moveType == MoveType.PromotionRook)
-                {
-                    DemotePiece(colour, PieceType.Rook, toSquare);
-                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
-
-                    if (move.GetCapturePieceType() != PieceType.None)
-                        MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
-                }
-                else if (moveType == MoveType.PromotionBishop)
-                {
-                    DemotePiece(colour, PieceType.Bishop, toSquare);
-                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
-
-                    if (move.GetCapturePieceType() != PieceType.None)
-                        MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
-                }
-                else if (moveType == MoveType.PromotionKnight)
-                {
-                    DemotePiece(colour, PieceType.Knight, toSquare);
-                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
-
-                    if (move.GetCapturePieceType() != PieceType.None)
-                        MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
-                }
-                else
-                {
-                    MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
-
-                    if (move.GetCapturePieceType() != PieceType.None)
-                        MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
-                }
-            }
-            else
-            {
-                MovePiece(colour, move.GetPieceType(), toSquare, fromSquare);
-
-                if (move.GetCapturePieceType() != PieceType.None)
-                    MovePiece(colour.Opposite(), move.GetCapturePieceType(), toSquare, toSquare);
-            }
-
-            _boardStates.Pop();
-            _moves.Pop();
-        }
-
         public IReadOnlyCollection<MoveViewer> MoveHistory
         {
             get
@@ -353,6 +269,8 @@ namespace ChessSharp
             var fromSquare = move.GetFrom();
             var toSquare = move.GetTo();
             var moveType = move.GetMoveType();
+            var pieceType = move.GetPieceType();
+            var capturePieceType = move.GetCapturePieceType();
 
             // Copy current state
             var state = _boardStates.Peek().Next();
@@ -375,67 +293,65 @@ namespace ChessSharp
 
                 state = RemoveCastleAvailability(colour, state);
             }
-            else if (move.GetPieceType() == PieceType.Pawn)
+            else if (pieceType == PieceType.Pawn)
             {
                 if (moveType == MoveType.EnPassant)
                 {
-                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+                    MovePiece(colour, pieceType, fromSquare, toSquare);
                     
                     // Capturing behind the opponent pawn so shift as if we are opponent
-                    var captureSquare = move.GetTo()
-                        .PawnForward(colour.Opposite(), 1);
+                    var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
 
                     RemovePiece(colour.Opposite(), captureSquare);
                 }
                 else if (moveType == MoveType.PromotionQueen)
                 {
-                    if (move.GetCapturePieceType() != PieceType.None)
+                    if (capturePieceType != PieceType.None)
                         RemovePiece(colour.Opposite(), toSquare);
 
-                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+                    MovePiece(colour, pieceType, fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Queen, toSquare);
                 }
                 else if (moveType == MoveType.PromotionRook)
                 {
-                    if (move.GetCapturePieceType() != PieceType.None)
+                    if (capturePieceType != PieceType.None)
                         RemovePiece(colour.Opposite(), toSquare);
 
-                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+                    MovePiece(colour, pieceType, fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Rook, toSquare);
                 }
                 else if (moveType == MoveType.PromotionBishop)
                 {
-                    if (move.GetCapturePieceType() != PieceType.None)
+                    if (capturePieceType != PieceType.None)
                         RemovePiece(colour.Opposite(), toSquare);
 
-                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+                    MovePiece(colour, pieceType, fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Bishop, toSquare);
                 }
                 else if (moveType == MoveType.PromotionKnight)
                 {
-                    if (move.GetCapturePieceType() != PieceType.None)
+                    if (capturePieceType != PieceType.None)
                         RemovePiece(colour.Opposite(), toSquare);
 
-                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+                    MovePiece(colour, pieceType, fromSquare, toSquare);
                     PromotePiece(colour, PieceType.Knight, toSquare);
                 }
                 else
                 {
                     // We can only move forward two from start square
-                    var toSquareTemp = move.GetFrom()
-                        .PawnForward(colour, 2);
+                    var toSquareTemp = fromSquare.PawnForward(colour, 2);
 
                     // So if the 'to' square is the same it might set en passant flag
-                    if (toSquareTemp == move.GetTo())
+                    if (toSquareTemp == toSquare)
                     {
                         var targetSquare = (SquareFlag)((ulong)toSquare >> Math.Abs((int)MoveDirection.West));
                         
-                        var pieceColour = GetPieceColour(targetSquare);
-                        var pieceType = GetPieceType(targetSquare);
+                        var targetPieceColour = GetPieceColour(targetSquare);
+                        var targetPieceType = GetPieceType(targetSquare);
 
-                        if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
+                        if (targetPieceColour == colour.Opposite() && targetPieceType == PieceType.Pawn)
                         {
-                            var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
+                            var enPassantSquare = fromSquare.PawnForward(colour, 1);
 
                             state = state.AddEnPassantSquare(enPassantSquare);
                         }
@@ -443,33 +359,33 @@ namespace ChessSharp
                         {
                             targetSquare = (SquareFlag)((ulong)toSquare << (int)MoveDirection.East);
 
-                            pieceColour = GetPieceColour(targetSquare);
-                            pieceType = GetPieceType(targetSquare);
+                            targetPieceColour = GetPieceColour(targetSquare);
+                            targetPieceType = GetPieceType(targetSquare);
 
-                            if (pieceColour == colour.Opposite() && pieceType == PieceType.Pawn)
+                            if (targetPieceColour == colour.Opposite() && targetPieceType == PieceType.Pawn)
                             {
-                                var enPassantSquare = move.GetFrom().PawnForward(colour, 1);
+                                var enPassantSquare = fromSquare.PawnForward(colour, 1);
 
                                 state = state.AddEnPassantSquare(enPassantSquare);
                             }
                         }
                     }
 
-                    MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+                    MovePiece(colour, pieceType, fromSquare, toSquare);
 
-                    if (move.GetCapturePieceType() != PieceType.None)
+                    if (capturePieceType != PieceType.None)
                         RemovePiece(colour.Opposite(), toSquare);
                 }
             }
             else
             {
-                MovePiece(colour, move.GetPieceType(), fromSquare, toSquare);
+                MovePiece(colour, pieceType, fromSquare, toSquare);
 
-                if (move.GetCapturePieceType() != PieceType.None)
+                if (capturePieceType != PieceType.None)
                 {
                     RemovePiece(colour.Opposite(), toSquare);
 
-                    if (move.GetCapturePieceType() == PieceType.Rook)
+                    if (capturePieceType == PieceType.Rook)
                     {
                         if (colour == Colour.White)
                         {
@@ -499,8 +415,6 @@ namespace ChessSharp
                         }
                     }
                 }
-
-                var pieceType = move.GetPieceType();
 
                 // Castling rights management
                 if (colour == Colour.White)
@@ -563,6 +477,91 @@ namespace ChessSharp
 
             _boardStates.Push(state);
             _moves.Push(move);
+        }
+
+        public void UnMakeMove(uint move)
+        {
+            var colour = move.GetColour();
+            var fromSquare = move.GetFrom();
+            var toSquare = move.GetTo();
+            var moveType = move.GetMoveType();
+            var pieceType = move.GetPieceType();
+            var capturePieceType = move.GetCapturePieceType();
+
+            if (moveType == MoveType.CastleKing)
+            {
+                if (colour == Colour.White)
+                    UnMakeWhiteKingSideCastle();
+                else
+                    UnMakeBlackKingSideCastle();
+            }
+            else if (moveType == MoveType.CastleQueen)
+            {
+                if (colour == Colour.White)
+                    UnMakeWhiteQueenSideCastle();
+                else
+                    UnMakeBlackQueenSideCastle();
+            }
+            else if (pieceType == PieceType.Pawn)
+            {
+                if (moveType == MoveType.EnPassant)
+                {
+                    // Capturing behind the opponent pawn so shift as if we are opponent
+                    var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
+
+                    MovePiece(colour.Opposite(), PieceType.Pawn, captureSquare, captureSquare);
+                    MovePiece(colour, pieceType, toSquare, fromSquare);
+                }
+                else if (moveType == MoveType.PromotionQueen)
+                {
+                    DemotePiece(colour, PieceType.Queen, toSquare);
+                    MovePiece(colour, pieceType, toSquare, fromSquare);
+
+                    if (capturePieceType != PieceType.None)
+                        MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                }
+                else if (moveType == MoveType.PromotionRook)
+                {
+                    DemotePiece(colour, PieceType.Rook, toSquare);
+                    MovePiece(colour, pieceType, toSquare, fromSquare);
+
+                    if (capturePieceType != PieceType.None)
+                        MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                }
+                else if (moveType == MoveType.PromotionBishop)
+                {
+                    DemotePiece(colour, PieceType.Bishop, toSquare);
+                    MovePiece(colour, pieceType, toSquare, fromSquare);
+
+                    if (capturePieceType != PieceType.None)
+                        MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                }
+                else if (moveType == MoveType.PromotionKnight)
+                {
+                    DemotePiece(colour, PieceType.Knight, toSquare);
+                    MovePiece(colour, pieceType, toSquare, fromSquare);
+
+                    if (capturePieceType != PieceType.None)
+                        MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                }
+                else
+                {
+                    MovePiece(colour, pieceType, toSquare, fromSquare);
+
+                    if (capturePieceType != PieceType.None)
+                        MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                }
+            }
+            else
+            {
+                MovePiece(colour, pieceType, toSquare, fromSquare);
+
+                if (capturePieceType != PieceType.None)
+                    MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+            }
+
+            _boardStates.Pop();
+            _moves.Pop();
         }
 
         private void MakeWhiteKingSideCastle()

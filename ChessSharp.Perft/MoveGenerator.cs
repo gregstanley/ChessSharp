@@ -4,6 +4,7 @@ using ChessSharp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace ChessSharp.MoveGeneration
 {
@@ -41,20 +42,43 @@ namespace ChessSharp.MoveGeneration
                 ? PawnCapturesWhite[kingSquareIndex] & relativeBitBoard.OpponentPawns
                 : PawnCapturesBlack[kingSquareIndex] & relativeBitBoard.OpponentPawns;
 
-            var checkersKnight = KnightAttacks[kingSquareIndex] & relativeBitBoard.OpponentKnights;
-
             var kingRayAttackSquaresRook = GetAttackableSquares(kingSquareIndex, PieceType.Rook, relativeBitBoard.OccupiedSquares);
             var kingRayAttackSquaresBishop = GetAttackableSquares(kingSquareIndex, PieceType.Bishop, relativeBitBoard.OccupiedSquares);
             var kingRayAttackSquares = kingRayAttackSquaresRook | kingRayAttackSquaresBishop;
 
-            var checkersRook = relativeBitBoard.OpponentRooks == 0 ? 0
-                : kingRayAttackSquaresRook & relativeBitBoard.OpponentRooks;
+            var checkersKnight = (SquareFlag)0;
+            var checkersRook = (SquareFlag)0;
+            var checkersBishop = (SquareFlag)0;
+            var checkersQueen = (SquareFlag)0;
 
-            var checkersBishop = relativeBitBoard.OpponentBishops == 0 ? 0
-                : kingRayAttackSquaresBishop & relativeBitBoard.OpponentBishops;
+            if (Vector<ulong>.Count == 4)
+            {
+                var buf1 = new ulong[] { (ulong)KnightAttacks[kingSquareIndex], (ulong)kingRayAttackSquaresRook, (ulong)kingRayAttackSquaresBishop, (ulong)kingRayAttackSquares };
+                var buf2 = new ulong[] { (ulong)relativeBitBoard.OpponentKnights, (ulong)relativeBitBoard.OpponentRooks, (ulong)relativeBitBoard.OpponentBishops, (ulong)relativeBitBoard.OpponentQueens };
 
-            var checkersQueen = relativeBitBoard.OpponentQueens == 0 ? 0
-                : kingRayAttackSquares & relativeBitBoard.OpponentQueens;
+                var vec1 = new Vector<ulong>(buf1);
+                var vec2 = new Vector<ulong>(buf2);
+
+                var vecOut = Vector.BitwiseAnd(vec1, vec2);
+
+                checkersKnight = (SquareFlag)vecOut[0];
+                checkersRook = (SquareFlag)vecOut[1];
+                checkersBishop = (SquareFlag)vecOut[2];
+                checkersQueen = (SquareFlag)vecOut[3];
+            }
+            else
+            {
+                checkersKnight = KnightAttacks[kingSquareIndex] & relativeBitBoard.OpponentKnights;
+
+                checkersRook = relativeBitBoard.OpponentRooks == 0 ? 0
+                    : kingRayAttackSquaresRook & relativeBitBoard.OpponentRooks;
+
+                checkersBishop = relativeBitBoard.OpponentBishops == 0 ? 0
+                    : kingRayAttackSquaresBishop & relativeBitBoard.OpponentBishops;
+
+                checkersQueen = relativeBitBoard.OpponentQueens == 0 ? 0
+                    : kingRayAttackSquares & relativeBitBoard.OpponentQueens;
+            }
 
             // Start on King moves - if we're in Check then that might be all we need
             var attackableSquaresIncludingSelfCaptures = KingAttacks[kingSquareIndex];
@@ -263,7 +287,6 @@ namespace ChessSharp.MoveGeneration
 
             var attackableSquaresBeyondPinsRook = GetAttackableSquares(kingSquareIndex, PieceType.Rook, occupancyWithoutPotentialPins);
             var attackableSquaresBeyondPinsBishop = GetAttackableSquares(kingSquareIndex, PieceType.Bishop, occupancyWithoutPotentialPins);
-
             var attackableSquaresBeyondPins = attackableSquaresBeyondPinsRook | attackableSquaresBeyondPinsBishop;
 
             var pinningRooks = attackableSquaresBeyondPinsRook & relativeBitBoard.OpponentRooks;
@@ -312,11 +335,11 @@ namespace ChessSharp.MoveGeneration
 
                 switch (pieceType)
                 {
-                    case PieceType.Pawn:
-                        if (!diagonal)
-                            AddPawnPushes(relativeBitBoard, pinnedSquares, pushPath, pinnedSquares, moves);
-                        else
-                            AddPawnCaptures(relativeBitBoard, pinnedSquares, pushPath, capturePath, pinnedSquares, moves);
+                    case PieceType.Pawn when !diagonal:
+                        AddPawnPushes(relativeBitBoard, pinnedSquares, pushPath, pinnedSquares, moves);
+                        break;
+                    case PieceType.Pawn when diagonal:
+                        AddPawnCaptures(relativeBitBoard, pinnedSquares, pushPath, capturePath, pinnedSquares, moves);
                         break;
                     case PieceType.Rook:
                         AddRookMoves(relativeBitBoard, pinnedSquares, pushPath | capturePath, pinnedSquares, moves);
@@ -580,28 +603,11 @@ namespace ChessSharp.MoveGeneration
 
             var magicIndex = GetMagicIndex(rayType, fromSquareIndex, occupancyMasked);
 
-            var attackableSquaresIncludingSelfCaptures = GetAttacks(rayType, fromSquareIndex, magicIndex);
+            var attackableSquaresIncludingSelfCaptures = rayType == PieceType.Rook
+                ? RookAttacks[fromSquareIndex][magicIndex]
+                : BishopAttacks[fromSquareIndex][magicIndex];
 
             return attackableSquaresIncludingSelfCaptures;
-        }
-
-        private void ToOrdinaryMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves, PieceType pieceType, SquareFlag fromSquare, SquareFlag attackableSquares)
-        {
-            var attackableSquaresAsList = attackableSquares.ToList();
-
-            foreach (var toSquare in attackableSquaresAsList)
-            {
-                if (relativeBitBoard.OpponentSquares.HasFlag(toSquare))
-                {
-                    var capturePieceType = relativeBitBoard.GetPieceType(toSquare);
-
-                    moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, pieceType, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
-                }
-                else
-                {
-                    moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, pieceType, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
-                }
-            }
         }
 
         private SquareFlag GetOccupancyMask(PieceType pieceType, int squareIndex) =>
@@ -619,11 +625,6 @@ namespace ChessSharp.MoveGeneration
                     : GetBishopMagicIndex(squareIndex, occupancy);
         }
 
-        private SquareFlag GetAttacks(PieceType pieceType, int squareIndex, int magicIndex) =>
-            pieceType == PieceType.Rook 
-                ? RookAttacks[squareIndex][magicIndex]
-                : BishopAttacks[squareIndex][magicIndex];
-
         private int GetRookMagicIndex(int square, SquareFlag occupancy)
         {
             var index = ((ulong)occupancy * MagicNumbers.RookMagicNumbers[square]) >> 50;
@@ -636,6 +637,21 @@ namespace ChessSharp.MoveGeneration
             var index = ((ulong)occupancy * MagicNumbers.BishopMagicNumbers[square]) >> 50;
 
             return (int)index;
+        }
+
+        private void ToOrdinaryMoves(RelativeBitBoard relativeBitBoard, IList<uint> moves, PieceType pieceType, SquareFlag fromSquare, SquareFlag attackableSquares)
+        {
+            var attackableSquaresAsList = attackableSquares.ToList();
+
+            foreach (var toSquare in attackableSquaresAsList)
+            {
+                var capturePieceType = PieceType.None;
+
+                if (relativeBitBoard.OpponentSquares.HasFlag(toSquare))
+                    capturePieceType = relativeBitBoard.GetPieceType(toSquare);
+
+                moves.Add(MoveConstructor.CreateMove(relativeBitBoard.Colour, pieceType, fromSquare, toSquare, capturePieceType, MoveType.Ordinary));
+            }
         }
 
         private void InitPaths()
@@ -653,7 +669,7 @@ namespace ChessSharp.MoveGeneration
             var pawnCapturesWhite = new SquareFlag[64];
             var pawnCapturesBlack = new SquareFlag[64];
 
-            // You could potentially use a smaller range EXCEPT that Kings use this from where Pawns can't reach
+            // You could potentially use a smaller range EXCEPT that Kings use this from ranks 1 and 8
             for (var squareIndex = 0; squareIndex < 64; ++squareIndex)
             {
                 pawnCapturesWhite[squareIndex] = AttackGenerator.GeneratePotentialWhitePawnCaptures(squareIndex);

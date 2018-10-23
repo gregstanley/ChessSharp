@@ -75,11 +75,17 @@ namespace ChessSharp_Perft
 
             Console.WriteLine($"Total: {totalNodes}");
 
-            var nps = (totalNodes / stopWatch.ElapsedMilliseconds) * 1000;
+            //var nps = ((double)totalNodes / stopWatch.ElapsedTicks) * TimeSpan.TicksPerSecond;
+            var elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
+
+            if (elapsedMilliseconds == 0)
+                elapsedMilliseconds = 1;
+
+            var nps = ((double)totalNodes / elapsedMilliseconds) * 1000;
 
             Console.WriteLine($"Time: {stopWatch.ElapsedMilliseconds}ms");
 
-            Console.WriteLine($"Nodes per second: {nps}");
+            Console.WriteLine($"Nodes per second: {Math.Floor(nps)}");
         }
     }
 }
