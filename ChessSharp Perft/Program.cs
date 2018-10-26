@@ -42,16 +42,33 @@ namespace ChessSharp_Perft
 
             PerftDepth(perftRunner, bitBoard, fen, 4);
 
-            Console.WriteLine($"Starting perft for {fenString} depth 5");
+            var results = new List<double>();
 
-            PerftDepth(perftRunner, bitBoard, fen, 5);
+            var iterations = 3;
+
+#if DEBUG
+            iterations = 1;
+#endif
+
+            for (var i = 0; i < iterations; i++)
+            {
+                Console.WriteLine($"Starting perft for {fenString} depth 5 - iteration {i + 1}");
+
+                var result = PerftDepth(perftRunner, bitBoard, fen, 5);
+
+                results.Add(result);
+            }
+
+            var averageNps = results.Average();
+
+            Console.WriteLine($"Average nps: {Math.Floor(averageNps)}");
 
             Console.WriteLine("Press any key to quit");
 
             Console.ReadKey();
         }
 
-        private static void PerftDepth(PerftRunner perftRunner, BitBoard bitBoard, Fen fen, int depth)
+        private static double PerftDepth(PerftRunner perftRunner, BitBoard bitBoard, Fen fen, int depth)
         {
             var moves = new List<uint>(20);
 
@@ -86,6 +103,8 @@ namespace ChessSharp_Perft
             Console.WriteLine($"Time: {stopWatch.ElapsedMilliseconds}ms");
 
             Console.WriteLine($"Nodes per second: {Math.Floor(nps)}");
+
+            return Math.Floor(nps);
         }
     }
 }

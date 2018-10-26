@@ -12,7 +12,11 @@ namespace ChessSharp.Extensions
 
         public static SquareFlag GetFrom(this uint value) => ((value & _fromMask) >> 4).ToSquareFlag();
 
+        public static int GetFromIndex(this uint value) => (int)(value & _fromMask) >> 4;
+
         public static SquareFlag GetTo(this uint value) => ((value & _toMask) >> 10).ToSquareFlag();
+
+        public static int GetToIndex(this uint value) => (int)(value & _toMask) >> 10;
 
         public static PieceType GetCapturePieceType(this uint value) => (PieceType)((value & _capturePieceTypeMask) >> 16);
 

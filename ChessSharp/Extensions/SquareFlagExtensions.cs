@@ -128,7 +128,7 @@ namespace ChessSharp.Extensions
         public static int ToSquareIndex(this SquareFlag square)
         {
             if (square == 0)
-                throw new IndexOutOfRangeException("Empty SquareFlag (zero) can not be converted to an index on the board. Ensure it is set to a valid square value.");
+                 throw new IndexOutOfRangeException("Empty SquareFlag (zero) can not be converted to an index on the board. Ensure it is set to a valid square value.");
 
             var ulsquares = (ulong)square;
 
@@ -137,10 +137,41 @@ namespace ChessSharp.Extensions
 
             var x = 0;
 
-            while (a > 0)
+            if (a > 0)
             {
-                a >>= 1;
-                ++x;
+                var aa = a & 0b11111111_11111111_00000000_00000000;
+
+                if (aa > 0)
+                {
+                    var ab = aa & 0b11111111_0000000_00000000_00000000;
+
+                    if (ab > 0)
+                    {
+                        a >>= 24;
+                        x = 24;
+                    }
+                    else
+                    {
+                        a >>= 16;
+                        x = 16;
+                    }
+                }
+                else
+                {
+                    var ac = aa & 0b00000000_00000000_11111111_0000000;
+
+                    if (ac > 0)
+                    {
+                        a >>= 8;
+                        x = 8;
+                    }
+                }
+
+                while (a > 0)
+                {
+                    a >>= 1;
+                    ++x;
+                }
             }
 
             if (x > 0)
@@ -148,10 +179,41 @@ namespace ChessSharp.Extensions
 
             x = 0;
 
-            while (b > 0)
+            if (b > 0)
             {
-                b >>= 1;
-                ++x;
+                var ba = b & 0b11111111_11111111_00000000_00000000;
+
+                if (ba > 0)
+                {
+                    var bb = ba & 0b11111111_0000000_00000000_00000000;
+
+                    if (bb > 0)
+                    {
+                        b >>= 24;
+                        x = 24;
+                    }
+                    else
+                    {
+                        b >>= 16;
+                        x = 16;
+                    }
+                }
+                else
+                {
+                    var bc = ba & 0b00000000_00000000_11111111_0000000;
+
+                    if (bc > 0)
+                    {
+                        b >>= 8;
+                        x = 8;
+                    }
+                }
+
+                while (b > 0)
+                {
+                    b >>= 1;
+                    ++x;
+                }
             }
 
             return 32 + x - 1;

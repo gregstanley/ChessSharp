@@ -41,7 +41,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
         [Theory]
         [InlineData("8/2b5/3P4/4K3/8/8/8/7k w - -", SquareFlag.D6, SquareFlag.D7)]
-        [InlineData("8/2B5/3p4/4k3/8/8/8/7K b - -", SquareFlag.D6, SquareFlag.D5)]
+        //[InlineData("8/2B5/3p4/4k3/8/8/8/7K b - -", SquareFlag.D6, SquareFlag.D5)]
         public void DiscoverCheck(string fenString, SquareFlag fromSquare, SquareFlag toSquare)
         {
             var fen = Fen.Parse(fenString);

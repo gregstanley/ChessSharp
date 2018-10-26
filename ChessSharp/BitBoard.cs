@@ -71,6 +71,27 @@ namespace ChessSharp
         private Stack<uint> _moves { get; } = new Stack<uint>(256);
         private RelativeBitBoard _relativeBitBoard { get; }
 
+        private enum PieceStateOffset
+        {
+            Pawn = 0,
+            Rook = 8,
+            Knight = 10,
+            Bishop = 12,
+            Queen = 14,
+            King = 15
+        }
+
+        private int[] _pieceStateOffsets = new[]
+        {
+            0,
+            (int)PieceStateOffset.Pawn,
+            (int)PieceStateOffset.Rook,
+            (int)PieceStateOffset.Knight,
+            (int)PieceStateOffset.Bishop,
+            (int)PieceStateOffset.Queen,
+            (int)PieceStateOffset.King
+        };
+
         public BitBoard()
         {
             WhitePawns = SquareFlag.A2 | SquareFlag.B2 | SquareFlag.C2 | SquareFlag.D2
@@ -255,23 +276,22 @@ namespace ChessSharp
             return _relativeBitBoard;
         }
 
-        public IReadOnlyCollection<MoveViewer> MoveHistory
-        {
-            get
-            {
-                return _moves.Select(x => new MoveViewer(x)).ToList();
-            }
-        }
+        public IReadOnlyCollection<MoveViewer> MoveHistory =>
+            _moves.Select(x => new MoveViewer(x)).ToList();
 
         public void MakeMove(uint move)
         {
             var colour = move.GetColour();
             var fromSquare = move.GetFrom();
+            var fromSquareIndex = move.GetFromIndex();
             var toSquare = move.GetTo();
+            var toSquareIndex = move.GetToIndex();
             var moveType = move.GetMoveType();
             var pieceType = move.GetPieceType();
             var capturePieceType = move.GetCapturePieceType();
 
+            if (capturePieceType != PieceType.None)
+            { var bp = true; }
             // Copy current state
             var state = _boardStates.Peek().Next();
 
@@ -298,43 +318,69 @@ namespace ChessSharp
                 if (moveType == MoveType.EnPassant)
                 {
                     MovePiece(colour, pieceType, fromSquare, toSquare);
-                    
+                    //UpdatePieceStateSquare(colour, pieceType, fromSquareIndex, toSquareIndex);
+
                     // Capturing behind the opponent pawn so shift as if we are opponent
                     var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
 
                     RemovePiece(colour.Opposite(), captureSquare);
+                    //UpdatePieceStateType(colour.Opposite(), captureSquare.ToSquareIndex(), PieceType.None);
                 }
                 else if (moveType == MoveType.PromotionQueen)
                 {
                     if (capturePieceType != PieceType.None)
+                    {
                         RemovePiece(colour.Opposite(), toSquare);
+                        //UpdatePieceStateType(colour.Opposite(), toSquareIndex, PieceType.None);
+                    }
 
                     MovePiece(colour, pieceType, fromSquare, toSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, fromSquareIndex, toSquareIndex);
+
                     PromotePiece(colour, PieceType.Queen, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Queen);
                 }
                 else if (moveType == MoveType.PromotionRook)
                 {
                     if (capturePieceType != PieceType.None)
+                    {
                         RemovePiece(colour.Opposite(), toSquare);
+                        //UpdatePieceStateType(colour.Opposite(), toSquareIndex, PieceType.None);
+                    }
 
                     MovePiece(colour, pieceType, fromSquare, toSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, fromSquareIndex, toSquareIndex);
+
                     PromotePiece(colour, PieceType.Rook, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Rook);
                 }
                 else if (moveType == MoveType.PromotionBishop)
                 {
                     if (capturePieceType != PieceType.None)
+                    {
                         RemovePiece(colour.Opposite(), toSquare);
+                        //UpdatePieceStateType(colour.Opposite(), toSquareIndex, PieceType.None);
+                    }
 
                     MovePiece(colour, pieceType, fromSquare, toSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, fromSquareIndex, toSquareIndex);
+
                     PromotePiece(colour, PieceType.Bishop, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Bishop);
                 }
                 else if (moveType == MoveType.PromotionKnight)
                 {
                     if (capturePieceType != PieceType.None)
+                    {
                         RemovePiece(colour.Opposite(), toSquare);
+                        //UpdatePieceStateType(colour.Opposite(), toSquareIndex, PieceType.None);
+                    }
 
                     MovePiece(colour, pieceType, fromSquare, toSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, fromSquareIndex, toSquareIndex);
+
                     PromotePiece(colour, PieceType.Knight, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Knight);
                 }
                 else
                 {
@@ -372,18 +418,24 @@ namespace ChessSharp
                     }
 
                     MovePiece(colour, pieceType, fromSquare, toSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, fromSquareIndex, toSquareIndex);
 
                     if (capturePieceType != PieceType.None)
+                    {
                         RemovePiece(colour.Opposite(), toSquare);
+                        //UpdatePieceStateType(colour.Opposite(), toSquareIndex, PieceType.None);
+                    }
                 }
             }
             else
             {
                 MovePiece(colour, pieceType, fromSquare, toSquare);
+                //UpdatePieceStateSquare(colour, pieceType, fromSquareIndex, toSquareIndex);
 
                 if (capturePieceType != PieceType.None)
                 {
                     RemovePiece(colour.Opposite(), toSquare);
+                    //UpdatePieceStateType(colour.Opposite(), toSquareIndex, PieceType.None);
 
                     if (capturePieceType == PieceType.Rook)
                     {
@@ -483,7 +535,9 @@ namespace ChessSharp
         {
             var colour = move.GetColour();
             var fromSquare = move.GetFrom();
+            var fromSquareIndex = move.GetFromIndex();
             var toSquare = move.GetTo();
+            var toSquareIndex = move.GetToIndex();
             var moveType = move.GetMoveType();
             var pieceType = move.GetPieceType();
             var capturePieceType = move.GetCapturePieceType();
@@ -510,59 +564,95 @@ namespace ChessSharp
                     var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
 
                     MovePiece(colour.Opposite(), PieceType.Pawn, captureSquare, captureSquare);
+                    //RestorePieceStateType(colour.Opposite(), captureSquare.ToSquareIndex(), PieceType.Pawn);
+
                     MovePiece(colour, pieceType, toSquare, fromSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, toSquareIndex, fromSquareIndex);
                 }
                 else if (moveType == MoveType.PromotionQueen)
                 {
                     DemotePiece(colour, PieceType.Queen, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Pawn);
+
                     MovePiece(colour, pieceType, toSquare, fromSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, toSquareIndex, fromSquareIndex);
 
                     if (capturePieceType != PieceType.None)
+                    {
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                        //RestorePieceStateType(colour.Opposite(), toSquareIndex, capturePieceType);
+                    }
                 }
                 else if (moveType == MoveType.PromotionRook)
                 {
                     DemotePiece(colour, PieceType.Rook, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Pawn);
+
                     MovePiece(colour, pieceType, toSquare, fromSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, toSquareIndex, fromSquareIndex);
 
                     if (capturePieceType != PieceType.None)
+                    {
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                        //RestorePieceStateType(colour.Opposite(), toSquareIndex, capturePieceType);
+                    }
                 }
                 else if (moveType == MoveType.PromotionBishop)
                 {
                     DemotePiece(colour, PieceType.Bishop, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Pawn);
+
                     MovePiece(colour, pieceType, toSquare, fromSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, toSquareIndex, fromSquareIndex);
 
                     if (capturePieceType != PieceType.None)
+                    {
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                        //RestorePieceStateType(colour.Opposite(), toSquareIndex, capturePieceType);
+                    }
                 }
                 else if (moveType == MoveType.PromotionKnight)
                 {
                     DemotePiece(colour, PieceType.Knight, toSquare);
+                    //UpdatePieceStateType(colour, toSquareIndex, PieceType.Pawn);
+
                     MovePiece(colour, pieceType, toSquare, fromSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, toSquareIndex, fromSquareIndex);
 
                     if (capturePieceType != PieceType.None)
+                    {
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                        //RestorePieceStateType(colour.Opposite(), toSquareIndex, capturePieceType);
+                    }
                 }
                 else
                 {
                     MovePiece(colour, pieceType, toSquare, fromSquare);
+                    //UpdatePieceStateSquare(colour, pieceType, toSquareIndex, fromSquareIndex);
 
                     if (capturePieceType != PieceType.None)
+                    {
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                        //RestorePieceStateType(colour.Opposite(), toSquareIndex, capturePieceType);
+                    }
                 }
             }
             else
             {
                 MovePiece(colour, pieceType, toSquare, fromSquare);
+                //UpdatePieceStateSquare(colour, pieceType, toSquareIndex, fromSquareIndex);
 
                 if (capturePieceType != PieceType.None)
+                {
                     MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
+                    //RestorePieceStateType(colour.Opposite(), toSquareIndex, capturePieceType);
+                }
             }
 
             _boardStates.Pop();
             _moves.Pop();
         }
+
 
         private void MakeWhiteKingSideCastle()
         {
@@ -571,6 +661,12 @@ namespace ChessSharp
 
             MovePiece(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteKingSideRookStartSquare,
                 SquareFlagConstants.WhiteKingSideCastleStep1);
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.King, SquareFlagConstants.WhiteKingStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteKingSideCastleStep2.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteKingSideRookStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteKingSideCastleStep1.ToSquareIndex());
         }
 
         private void MakeWhiteQueenSideCastle()
@@ -580,6 +676,12 @@ namespace ChessSharp
 
             MovePiece(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteQueenSideRookStartSquare,
                 SquareFlagConstants.WhiteQueenSideCastleStep1);
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.King, SquareFlagConstants.WhiteKingStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteQueenSideCastleStep2.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteQueenSideRookStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteQueenSideCastleStep1.ToSquareIndex());
         }
 
         private void MakeBlackKingSideCastle()
@@ -589,6 +691,12 @@ namespace ChessSharp
 
             MovePiece(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackKingSideRookStartSquare,
                 SquareFlagConstants.BlackKingSideCastleStep1);
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.King, SquareFlagConstants.BlackKingStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.BlackKingSideCastleStep2.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackKingSideRookStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.BlackKingSideCastleStep1.ToSquareIndex());
         }
 
         private void MakeBlackQueenSideCastle()
@@ -598,6 +706,12 @@ namespace ChessSharp
 
             MovePiece(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackQueenSideRookStartSquare,
                 SquareFlagConstants.BlackQueenSideCastleStep1);
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.King, SquareFlagConstants.BlackKingStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.BlackQueenSideCastleStep2.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackQueenSideRookStartSquare.ToSquareIndex(),
+            //    SquareFlagConstants.BlackQueenSideCastleStep1.ToSquareIndex());
         }
 
         private void UnMakeWhiteKingSideCastle()
@@ -607,6 +721,12 @@ namespace ChessSharp
 
             MovePiece(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteKingSideCastleStep1,
                 SquareFlagConstants.WhiteKingSideRookStartSquare);
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.King, SquareFlagConstants.WhiteKingSideCastleStep2.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteKingStartSquare.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteKingSideCastleStep1.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteKingSideRookStartSquare.ToSquareIndex());
         }
 
         private void UnMakeWhiteQueenSideCastle()
@@ -616,6 +736,12 @@ namespace ChessSharp
 
             MovePiece(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteQueenSideCastleStep1,
                 SquareFlagConstants.WhiteQueenSideRookStartSquare);
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.King, SquareFlagConstants.WhiteQueenSideCastleStep2.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteKingStartSquare.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.White, PieceType.Rook, SquareFlagConstants.WhiteQueenSideCastleStep1.ToSquareIndex(),
+            //    SquareFlagConstants.WhiteQueenSideRookStartSquare.ToSquareIndex());
         }
 
         private void UnMakeBlackKingSideCastle()
@@ -625,6 +751,12 @@ namespace ChessSharp
 
             MovePiece(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackKingSideCastleStep1,
                 SquareFlagConstants.BlackKingSideRookStartSquare);
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.King, SquareFlagConstants.BlackKingSideCastleStep2.ToSquareIndex(),
+            //    SquareFlagConstants.BlackKingStartSquare.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackKingSideCastleStep1.ToSquareIndex(),
+            //    SquareFlagConstants.BlackKingSideRookStartSquare.ToSquareIndex());
         }
 
         private void UnMakeBlackQueenSideCastle()
@@ -634,6 +766,12 @@ namespace ChessSharp
 
             MovePiece(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackQueenSideCastleStep1,
                 SquareFlagConstants.BlackQueenSideRookStartSquare);
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.King, SquareFlagConstants.BlackQueenSideCastleStep2.ToSquareIndex(),
+            //    SquareFlagConstants.BlackKingStartSquare.ToSquareIndex());
+
+            //UpdatePieceStateSquare(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackQueenSideCastleStep1.ToSquareIndex(),
+            //    SquareFlagConstants.BlackQueenSideRookStartSquare.ToSquareIndex());
         }
 
         private BoardState RemoveCastleAvailability(Colour colour, MoveType moveType, BoardState boardState)
