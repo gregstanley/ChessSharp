@@ -51,23 +51,30 @@ namespace ChessSharp.MoveGeneration
             var checkersBishop = (SquareFlag)0;
             var checkersQueen = (SquareFlag)0;
 
+            var buffer1 = new ulong[4];
+            var buffer2 = new ulong[4];
+
             if (Vector<ulong>.Count == 4)
             {
-                var buf1 = new ulong[] { (ulong)KnightAttacks[kingSquareIndex], (ulong)kingRayAttackSquaresRook,
-                    (ulong)kingRayAttackSquaresBishop, (ulong)kingRayAttackSquares };
+                buffer1[0] = (ulong)KnightAttacks[kingSquareIndex];
+                buffer1[1] = (ulong)kingRayAttackSquaresRook;
+                buffer1[2] = (ulong)kingRayAttackSquaresBishop;
+                buffer1[3] = (ulong)kingRayAttackSquares;
 
-                var buf2 = new ulong[] { (ulong)relativeBitBoard.OpponentKnights, (ulong)relativeBitBoard.OpponentRooks,
-                    (ulong)relativeBitBoard.OpponentBishops, (ulong)relativeBitBoard.OpponentQueens };
+                buffer2[0] = (ulong)relativeBitBoard.OpponentKnights;
+                buffer2[1] = (ulong)relativeBitBoard.OpponentRooks;
+                buffer2[2] = (ulong)relativeBitBoard.OpponentBishops;
+                buffer2[3] = (ulong)relativeBitBoard.OpponentQueens;
 
-                var vec1 = new Vector<ulong>(buf1);
-                var vec2 = new Vector<ulong>(buf2);
+                var vector1 = new Vector<ulong>(buffer1);
+                var vector2 = new Vector<ulong>(buffer2);
 
-                var vecOut = Vector.BitwiseAnd(vec1, vec2);
+                var vectorOut = Vector.BitwiseAnd(vector1, vector2);
 
-                checkersKnight = (SquareFlag)vecOut[0];
-                checkersRook = (SquareFlag)vecOut[1];
-                checkersBishop = (SquareFlag)vecOut[2];
-                checkersQueen = (SquareFlag)vecOut[3];
+                checkersKnight = (SquareFlag)vectorOut[0];
+                checkersRook = (SquareFlag)vectorOut[1];
+                checkersBishop = (SquareFlag)vectorOut[2];
+                checkersQueen = (SquareFlag)vectorOut[3];
             }
             else
             {
@@ -169,24 +176,53 @@ namespace ChessSharp.MoveGeneration
 
             var legalMask = pushMask | captureMask;
 
+            var remainingSquares = ~pinnedSquares;
+
+            var remainingKnights = (SquareFlag)0;
+            var remainingPawns = (SquareFlag)0;
+            var remainingBishops = (SquareFlag)0;
+            var remainingQueens = (SquareFlag)0;
+
+            if (Vector<ulong>.Count == 4)
+            {
+                buffer1[0] = (ulong)relativeBitBoard.MyKnights;
+                buffer1[1] = (ulong)relativeBitBoard.MyPawns;
+                buffer1[2] = (ulong)relativeBitBoard.MyBishops;
+                buffer1[3] = (ulong)relativeBitBoard.MyQueens;
+
+                buffer2[0] = (ulong)remainingSquares;
+                buffer2[1] = (ulong)remainingSquares;
+                buffer2[2] = (ulong)remainingSquares;
+                buffer2[3] = (ulong)remainingSquares;
+
+                var vector1 = new Vector<ulong>(buffer1);
+                var vector2 = new Vector<ulong>(buffer2);
+
+                var vectorOut = Vector.BitwiseAnd(vector1, vector2);
+
+                remainingKnights = (SquareFlag)vectorOut[0];
+                remainingPawns = (SquareFlag)vectorOut[1];
+                remainingBishops = (SquareFlag)vectorOut[2];
+                remainingQueens = (SquareFlag)vectorOut[3];
+            }
+            else
+            {
+                remainingKnights = relativeBitBoard.MyKnights & remainingSquares;
+                remainingPawns = relativeBitBoard.MyPawns & remainingSquares;
+                remainingBishops = relativeBitBoard.MyBishops & remainingSquares;
+                remainingQueens = relativeBitBoard.MyQueens & remainingSquares;
+            }
+
             if (relativeBitBoard.MyKnights > 0)
             {
-                foreach (var pieceSquare in relativeBitBoard.MyKnights.ToList())
-                {
-                    if (pinnedSquares.HasFlag(pieceSquare))
-                        continue;
-
+                foreach (var pieceSquare in remainingKnights.ToList())
                     AddSingleKnightMoves(relativeBitBoard, pieceSquare, legalMask, moves);
-                }
             }
 
             if (relativeBitBoard.MyPawns > 0)
             {
-                foreach (var pieceSquare in relativeBitBoard.MyPawns.ToList())
+                foreach (var pieceSquare in remainingPawns.ToList())
                 {
-                    if (pinnedSquares.HasFlag(pieceSquare))
-                        continue;
-
                     AddSinglePawnPushes(relativeBitBoard, pieceSquare, pushMask, moves);
                     AddSinglePawnCaptures(relativeBitBoard, pieceSquare, pushMask, captureMask, moves);
                 }
@@ -194,35 +230,22 @@ namespace ChessSharp.MoveGeneration
 
             if (relativeBitBoard.MyRooks > 0)
             {
-                foreach (var pieceSquare in relativeBitBoard.MyRooks.ToList())
-                {
-                    if (pinnedSquares.HasFlag(pieceSquare))
-                        continue;
+                var remainingRooks = relativeBitBoard.MyRooks & remainingSquares;
 
+                foreach (var pieceSquare in remainingRooks.ToList())
                     AddSingleRookMoves(relativeBitBoard, pieceSquare, legalMask, moves);
-                }
             }
 
             if (relativeBitBoard.MyBishops > 0)
             {
-                foreach (var pieceSquare in relativeBitBoard.MyBishops.ToList())
-                {
-                    if (pinnedSquares.HasFlag(pieceSquare))
-                        continue;
-                    
+                foreach (var pieceSquare in remainingBishops.ToList())
                     AddSingleBishopMoves(relativeBitBoard, pieceSquare, legalMask, moves);
-                }
             }
 
             if (relativeBitBoard.MyQueens > 0)
             {
-                foreach (var pieceSquare in relativeBitBoard.MyQueens.ToList())
-                {
-                    if (pinnedSquares.HasFlag(pieceSquare))
-                        continue;
-                    
+                foreach (var pieceSquare in remainingQueens.ToList())
                     AddSingleQueenMoves(relativeBitBoard, pieceSquare, legalMask, moves);
-                }
             }
         }
 
