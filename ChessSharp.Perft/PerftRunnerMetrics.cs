@@ -28,7 +28,10 @@ namespace ChessSharp.MoveGeneration
             var nodeMoves = moves[depth];
             var depthMetrics = metrics[depth];
 
-            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, colour);
+
+            MoveGenerator.Generate(workspace, nodeMoves);
 
             var movesView = nodeMoves.Select(x => new MoveViewer(x));
 
@@ -67,7 +70,10 @@ namespace ChessSharp.MoveGeneration
             // Must wipe any existing moves each time we enter a depth
             nodeMoves.Clear();
 
-            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, colour);
+
+            MoveGenerator.Generate(workspace, nodeMoves);
 
             var movesView = nodeMoves.Select(x => new MoveViewer(x));
 

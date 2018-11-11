@@ -24,35 +24,38 @@ namespace ChessSharp.MoveGeneration
 
             var nodeMoves = depthMoves[depth];
 
-            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, colour);
+
+            MoveGenerator.Generate(workspace, nodeMoves);
 
             var count = 0;
 
             //var movesView = moves.Select(x => new MoveViewer(x));
 
-            var movePerfts = new List<MovePerft>();
+            var movePerfts = new List<MovePerft>(64);
 
             foreach (var move in nodeMoves)
             {
                 var moveView = new MoveViewer(move);
 
-                bitBoard.MakeMove(move);
+                workspace.MakeMove(move);
 
                 //var checkers = GetCheckers(bitBoard, colour);
 
-                var nodes = InnerPerft(bitBoard, colour.Opposite(), depth - 1, depthMoves);
+                var nodes = InnerPerft(workspace, depth - 1, depthMoves);
 
                 count += nodes;
 
                 movePerfts.Add(new MovePerft(moveView, nodes));
 
-                bitBoard.UnMakeMove(move);
+                workspace.UnMakeMove(move);
             }
 
             return movePerfts;
         }
 
-        private int InnerPerft(BitBoard bitBoard, Colour colour, int depth, List<uint>[] depthMoves)
+        private int InnerPerft(MoveGenerationWorkspace workspace, int depth, List<uint>[] depthMoves)
         {
             if (depth == 0)
                 return 1;
@@ -63,7 +66,9 @@ namespace ChessSharp.MoveGeneration
             // Must wipe any existing moves each time we enter a depth
             nodeMoves.Clear();
 
-            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+
+            MoveGenerator.Generate(workspace, nodeMoves);
 
             var count = 0;
 
@@ -76,17 +81,17 @@ namespace ChessSharp.MoveGeneration
             {
                 //var moveView = new MoveViewer(move);
 
-                bitBoard.MakeMove(move);
+                workspace.MakeMove(move);
 
                 //var checkers = GetCheckers(bitBoard, colour);
 
-                var nodes = InnerPerft(bitBoard, colour.Opposite(), depth - 1, depthMoves);
+                var nodes = InnerPerft(workspace, depth - 1, depthMoves);
 
                 count += nodes;
 
                 //movePerfts.Add(new MovePerft(moveView, nodes));
 
-                bitBoard.UnMakeMove(move);
+                workspace.UnMakeMove(move);
             }
 
             return count;

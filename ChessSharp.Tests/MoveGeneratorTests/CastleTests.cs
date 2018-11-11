@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
+using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
@@ -20,7 +21,10 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, Colour.White, moves);
+            //MoveGenerator.Generate(bitBoard, Colour.White, moves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, Colour.White);
+
+            MoveGenerator.Generate(workspace, moves);
 
             var moveCount = moves.Count;
 
@@ -49,7 +53,10 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, Colour.White, moves);
+            //MoveGenerator.Generate(bitBoard, Colour.White, moves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, Colour.White);
+
+            MoveGenerator.Generate(workspace, moves);
 
             var moveCount = moves.Count;
 
@@ -80,7 +87,10 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+
+            MoveGenerator.Generate(workspace, moves);
 
             var moveCount = moves.Count;
 

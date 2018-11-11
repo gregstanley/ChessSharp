@@ -33,7 +33,10 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(20);
 
-            _moveGeneratorFixture.MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+
+            _moveGeneratorFixture.MoveGenerator.Generate(workspace, moves);
 
             var moveView = moves.Select(x => new MoveViewer(x));
             var moveCount = moves.Count;

@@ -14,9 +14,11 @@ namespace ChessSharp.MoveGeneration
     {
         private static readonly AttackBitmaps AttackBitmaps = new AttackBitmaps();
 
-        public void Generate(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        //public void Generate(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        public void Generate(MoveGenerationWorkspace workspace, IList<uint> moves)
         {
-            var relativeBitBoard = bitBoard.RelativeTo(colour);
+            //var relativeBitBoard = bitBoard.RelativeTo(colour);
+            var relativeBitBoard = workspace.RelativeBitBoard;
 
             var kingSquare = relativeBitBoard.MyKing;
             var kingSquareIndex = kingSquare.ToSquareIndex();
@@ -34,8 +36,8 @@ namespace ChessSharp.MoveGeneration
             var checkersBishop = (SquareFlag)0;
             var checkersQueen = (SquareFlag)0;
 
-            var buffer1 = new ulong[4];
-            var buffer2 = new ulong[4];
+            var buffer1 = workspace.Buffer1;// new ulong[4];
+            var buffer2 = workspace.Buffer2;// new ulong[4];
 
             if (Vector<ulong>.Count == 4)
             {
@@ -96,7 +98,7 @@ namespace ChessSharp.MoveGeneration
 
             var semiSafeAttackableSquaresAsList = semiSafeAttackableSquares.ToList();
 
-            var safeSquaresAsList = FindSafeSquares(relativeBitBoard, semiSafeAttackableSquaresAsList);
+            var safeSquaresAsList = FindSafeSquares(relativeBitBoard, semiSafeAttackableSquaresAsList, workspace.SafeSquares);
 
             foreach (var toSquare in safeSquaresAsList)
             {
@@ -149,12 +151,12 @@ namespace ChessSharp.MoveGeneration
             else
             {
                 // Only run castle logic if we are not in check
-                AddCastles(relativeBitBoard, kingSquareIndex, moves);
+                AddCastles(relativeBitBoard, workspace.SafeSquares, kingSquareIndex, moves);
             }
 
             var kingRayAttackSquaresWithoutKing = kingRayAttackSquares & ~kingSquare;
 
-            var pinnedSquares = AddPinnedMoves(bitBoard, relativeBitBoard, kingSquareIndex, kingRayAttackSquaresWithoutKing, pushMask, captureMask, moves);
+            var pinnedSquares = AddPinnedMoves(workspace.BitBoard, relativeBitBoard, kingSquareIndex, kingRayAttackSquaresWithoutKing, pushMask, captureMask, moves);
 
             var legalMask = pushMask | captureMask;
 
@@ -231,10 +233,13 @@ namespace ChessSharp.MoveGeneration
             }
         }
 
-        private IList<SquareFlag> FindSafeSquares(RelativeBitBoard relativeBitBoard, IEnumerable<SquareFlag> attackableSquares)
+        private IList<SquareFlag> FindSafeSquares(RelativeBitBoard relativeBitBoard, IEnumerable<SquareFlag> attackableSquares, IList<SquareFlag> safeSquares)
         {
             //var safeSquares = (SquareFlag)0;
-            var safeSquares = new List<SquareFlag>(32);
+            //var safeSquares = new List<SquareFlag>(32);
+
+            safeSquares.Clear();
+
             var unsafeSquares = (SquareFlag)0;
  
             foreach (var attackableSquare in attackableSquares)
@@ -541,7 +546,7 @@ namespace ChessSharp.MoveGeneration
             ToOrdinaryMoves(relativeBitBoard, pieceType, fromSquare, legalAttackableSquares, moves);
         }
 
-        private void AddCastles(RelativeBitBoard relativeBitBoard, int kingSquareIndex, IList<uint> moves)
+        private void AddCastles(RelativeBitBoard relativeBitBoard, IList<SquareFlag> safeSquaresWorkspace, int kingSquareIndex, IList<uint> moves)
         {
             if (!relativeBitBoard.CanCastleKingSide && !relativeBitBoard.CanCastleQueenSide)
                 return;
@@ -558,7 +563,7 @@ namespace ChessSharp.MoveGeneration
                 if ((squaresBetween & relativeBitBoard.OccupiedSquares) == 0)
                 {
                     var stepSquares = relativeBitBoard.KingSideCastleStep1 | relativeBitBoard.KingSideCastleStep2;
-                    var safeSquaresAsList = FindSafeSquares(relativeBitBoard, stepSquares.ToList());
+                    var safeSquaresAsList = FindSafeSquares(relativeBitBoard, stepSquares.ToList(), safeSquaresWorkspace);
 
                     var safeSquares = (SquareFlag)0;
 
@@ -583,7 +588,7 @@ namespace ChessSharp.MoveGeneration
                 if ((squaresBetween & relativeBitBoard.OccupiedSquares) == 0)
                 {
                     var stepSquares = relativeBitBoard.QueenSideCastleStep1 | relativeBitBoard.QueenSideCastleStep2;
-                    var safeSquaresAsList = FindSafeSquares(relativeBitBoard, stepSquares.ToList());
+                    var safeSquaresAsList = FindSafeSquares(relativeBitBoard, stepSquares.ToList(), safeSquaresWorkspace);
 
                     var safeSquares = (SquareFlag)0;
 

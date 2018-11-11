@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ChessSharp.MoveGeneration;
+using System.Collections.Generic;
 using Xunit;
 
 namespace ChessSharp.Tests.MoveGeneratorTests
@@ -21,7 +22,10 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+
+            MoveGenerator.Generate(workspace, moves);
 
             var moveViews = GetBishopMoveViews(moves);
 
@@ -46,7 +50,10 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+
+            MoveGenerator.Generate(workspace, moves);
 
             var moveViews = GetBishopMoveViews(moves);
 
@@ -70,7 +77,10 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
+            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+
+            MoveGenerator.Generate(workspace, moves);
 
             var moveViews = GetBishopMoveViews(moves);
 
