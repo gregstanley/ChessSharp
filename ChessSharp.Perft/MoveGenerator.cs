@@ -14,10 +14,8 @@ namespace ChessSharp.MoveGeneration
     {
         private static readonly AttackBitmaps AttackBitmaps = new AttackBitmaps();
 
-        //public void Generate(BitBoard bitBoard, Colour colour, IList<uint> moves)
         public void Generate(MoveGenerationWorkspace workspace, IList<uint> moves)
         {
-            //var relativeBitBoard = bitBoard.RelativeTo(colour);
             var relativeBitBoard = workspace.RelativeBitBoard;
 
             var kingSquare = relativeBitBoard.MyKing;
@@ -36,8 +34,8 @@ namespace ChessSharp.MoveGeneration
             var checkersBishop = (SquareFlag)0;
             var checkersQueen = (SquareFlag)0;
 
-            var buffer1 = workspace.Buffer1;// new ulong[4];
-            var buffer2 = workspace.Buffer2;// new ulong[4];
+            var buffer1 = workspace.Buffer1;
+            var buffer2 = workspace.Buffer2;
 
             if (Vector<ulong>.Count == 4)
             {
@@ -156,7 +154,8 @@ namespace ChessSharp.MoveGeneration
 
             var kingRayAttackSquaresWithoutKing = kingRayAttackSquares & ~kingSquare;
 
-            var pinnedSquares = AddPinnedMoves(workspace.BitBoard, relativeBitBoard, kingSquareIndex, kingRayAttackSquaresWithoutKing, pushMask, captureMask, moves);
+            // Pass the relative bitboard in separately to avoid it being re-generated
+            var pinnedSquares = AddPinnedMoves(workspace, relativeBitBoard, kingSquareIndex, kingRayAttackSquaresWithoutKing, pushMask, captureMask, moves);
 
             var legalMask = pushMask | captureMask;
 
@@ -236,8 +235,6 @@ namespace ChessSharp.MoveGeneration
         private IList<SquareFlag> FindSafeSquares(RelativeBitBoard relativeBitBoard, IEnumerable<SquareFlag> attackableSquares, IList<SquareFlag> safeSquares)
         {
             //var safeSquares = (SquareFlag)0;
-            //var safeSquares = new List<SquareFlag>(32);
-
             safeSquares.Clear();
 
             var unsafeSquares = (SquareFlag)0;
@@ -328,7 +325,7 @@ namespace ChessSharp.MoveGeneration
             return attackableSquares & opponentSquares;
         }
 
-        private SquareFlag AddPinnedMoves(BitBoard bitBoard, RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag kingRayAttackSquares,
+        private SquareFlag AddPinnedMoves(MoveGenerationWorkspace workspace, RelativeBitBoard relativeBitBoard, int kingSquareIndex, SquareFlag kingRayAttackSquares,
             SquareFlag pushMask, SquareFlag captureMask, IList<uint> moves)
         {
             var potentialPins = kingRayAttackSquares & relativeBitBoard.MySquares;
@@ -339,24 +336,62 @@ namespace ChessSharp.MoveGeneration
             var attackableSquaresBeyondPinsBishop = GetAttackableSquares(kingSquareIndex, PieceType.Bishop, occupancyWithoutPotentialPins);
             var attackableSquaresBeyondPins = attackableSquaresBeyondPinsRook | attackableSquaresBeyondPinsBishop;
 
-            var pinningRooks = attackableSquaresBeyondPinsRook & relativeBitBoard.OpponentRooks;
-            var pinningBishops = attackableSquaresBeyondPinsBishop & relativeBitBoard.OpponentBishops;
-            var pinningQueensNonDiagonal = attackableSquaresBeyondPinsRook & relativeBitBoard.OpponentQueens;
-            var pinningQueensDiagonal = attackableSquaresBeyondPinsBishop & relativeBitBoard.OpponentQueens;
+            var pinningRooks = (SquareFlag)0;
+            var pinningBishops = (SquareFlag)0;
+            var pinningQueensNonDiagonal = (SquareFlag)0;
+            var pinningQueensDiagonal = (SquareFlag)0;
+
+            var buffer1 = workspace.Buffer1;
+            var buffer2 = workspace.Buffer2;
+
+            if (Vector<ulong>.Count == 4)
+            {
+                buffer1[0] = (ulong)attackableSquaresBeyondPinsRook;
+                buffer1[1] = (ulong)attackableSquaresBeyondPinsBishop;
+                buffer1[2] = (ulong)attackableSquaresBeyondPinsRook;
+                buffer1[3] = (ulong)attackableSquaresBeyondPinsBishop;
+
+                buffer2[0] = (ulong)relativeBitBoard.OpponentRooks;
+                buffer2[1] = (ulong)relativeBitBoard.OpponentBishops;
+                buffer2[2] = (ulong)relativeBitBoard.OpponentQueens;
+                buffer2[3] = (ulong)relativeBitBoard.OpponentQueens;
+
+                var vector1 = new Vector<ulong>(buffer1);
+                var vector2 = new Vector<ulong>(buffer2);
+
+                var vectorOut = Vector.BitwiseAnd(vector1, vector2);
+
+                var anyGreaterThanZero = Vector.GreaterThanAny(vectorOut, new Vector<ulong>(0));
+
+                if (!anyGreaterThanZero)
+                    return 0;
+
+                pinningRooks = (SquareFlag)vectorOut[0];
+                pinningBishops = (SquareFlag)vectorOut[1];
+                pinningQueensNonDiagonal = (SquareFlag)vectorOut[2];
+                pinningQueensDiagonal = (SquareFlag)vectorOut[3];
+            }
+            else
+            {
+                pinningRooks = attackableSquaresBeyondPinsRook & relativeBitBoard.OpponentRooks;
+                pinningBishops = attackableSquaresBeyondPinsBishop & relativeBitBoard.OpponentBishops;
+                pinningQueensNonDiagonal = attackableSquaresBeyondPinsRook & relativeBitBoard.OpponentQueens;
+                pinningQueensDiagonal = attackableSquaresBeyondPinsBishop & relativeBitBoard.OpponentQueens;
+            }
 
             var pinnedPieces = (SquareFlag)0;
 
             if (pinningRooks > 0)
-                pinnedPieces |= AddPinnedMovesInternal(bitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningRooks, false, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningRooks, false, pushMask, captureMask, moves);
 
             if (pinningBishops > 0)
-                pinnedPieces |= AddPinnedMovesInternal(bitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningBishops, true, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningBishops, true, pushMask, captureMask, moves);
 
             if (pinningQueensNonDiagonal > 0)
-                pinnedPieces |= AddPinnedMovesInternal(bitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningQueensNonDiagonal, false, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningQueensNonDiagonal, false, pushMask, captureMask, moves);
 
             if (pinningQueensDiagonal > 0)
-                pinnedPieces |= AddPinnedMovesInternal(bitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningQueensDiagonal, true, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquareIndex, potentialPins, pinningQueensDiagonal, true, pushMask, captureMask, moves);
 
             return pinnedPieces;
         }

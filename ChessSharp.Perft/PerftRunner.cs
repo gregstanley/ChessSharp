@@ -16,7 +16,6 @@ namespace ChessSharp.MoveGeneration
 
         public List<MovePerft> Go(BitBoard bitBoard, Colour colour, int depth)
         {
-            //var nodeMoves = new List<uint>(256);
             var depthMoves = new List<uint>[64];
 
             for (var i = 0; i <= depth; i++)
@@ -24,7 +23,6 @@ namespace ChessSharp.MoveGeneration
 
             var nodeMoves = depthMoves[depth];
 
-            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
             var workspace = new MoveGenerationWorkspace(bitBoard, colour);
 
             MoveGenerator.Generate(workspace, nodeMoves);
@@ -60,13 +58,10 @@ namespace ChessSharp.MoveGeneration
             if (depth == 0)
                 return 1;
 
-            //var nodeMoves = new List<uint>(256);
             var nodeMoves = depthMoves[depth];
 
             // Must wipe any existing moves each time we enter a depth
             nodeMoves.Clear();
-
-            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
 
             MoveGenerator.Generate(workspace, nodeMoves);
 
