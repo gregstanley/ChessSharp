@@ -11,7 +11,7 @@ namespace ChessSharp.Tests
         [InlineData(Colour.Black)]
         public void Move_Constructor_Colour(Colour colour)
         {
-            var move = MoveBuilder.Create(colour, 0, 0, 0, 0, MoveType.Ordinary);
+            var move = MoveBuilder.Create(colour, 0, new Models.Square(), new Models.Square(), 0, MoveType.Ordinary);
 
             Assert.Equal(colour, move.GetColour());
         }
@@ -26,7 +26,7 @@ namespace ChessSharp.Tests
         [InlineData(PieceType.King)]
         public void Move_Constructor_PieceType(PieceType pieceType)
         {
-            var move   = MoveBuilder.Create(0, pieceType, 0, 0, 0, MoveType.Ordinary);
+            var move   = MoveBuilder.Create(0, pieceType, new Models.Square(), new Models.Square(), 0, MoveType.Ordinary);
 
             Assert.Equal(pieceType, move.GetPieceType());
         }
@@ -42,7 +42,7 @@ namespace ChessSharp.Tests
         [InlineData(SquareFlag.H8)]
         public void Move_Constructor_From(SquareFlag square)
         {
-            var move = MoveBuilder.Create(0, 0, square, 0, 0, MoveType.Ordinary);
+            var move = MoveBuilder.Create(0, 0, square.ToSquare(), new Models.Square(), 0, MoveType.Ordinary);
 
             Assert.Equal(square, move.GetFrom());
         }
@@ -58,7 +58,7 @@ namespace ChessSharp.Tests
         [InlineData(SquareFlag.H8)]
         public void Move_Constructor_To(SquareFlag square)
         {
-            var move = MoveBuilder.Create(0, 0, 0, square, 0, MoveType.Ordinary);
+            var move = MoveBuilder.Create(0, 0, new Models.Square(), square.ToSquare(), 0, MoveType.Ordinary);
 
             Assert.Equal(square, move.GetTo());
         }
@@ -73,7 +73,7 @@ namespace ChessSharp.Tests
         [InlineData(PieceType.King)]
         public void Move_Constructor_CapturePieceType(PieceType pieceType)
         {
-            var move = MoveBuilder.Create(0, 0, 0, 0, pieceType, MoveType.Ordinary);
+            var move = MoveBuilder.Create(0, 0, new Models.Square(), new Models.Square(), pieceType, MoveType.Ordinary);
 
             Assert.Equal(pieceType, move.GetCapturePieceType());
         }
@@ -90,7 +90,7 @@ namespace ChessSharp.Tests
 
         public void Move_Constructor_MoveType(MoveType moveType)
         {
-            var move = MoveBuilder.Create(0, 0, 0, 0, 0, moveType);
+            var move = MoveBuilder.Create(0, 0, new Models.Square(), new Models.Square(), 0, moveType);
 
             Assert.Equal(moveType, move.GetMoveType());
         }
@@ -98,7 +98,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Move_Constructor_AccessTwice_NoChange()
         {
-            var move = MoveBuilder.Create(Colour.White, PieceType.Knight, SquareFlag.D5, SquareFlag.E7, PieceType.Pawn, MoveType.CastleKing);
+            var move = MoveBuilder.Create(Colour.White, PieceType.Knight, SquareFlag.D5.ToSquare(), SquareFlag.E7.ToSquare(), PieceType.Pawn, MoveType.CastleKing);
 
             Assert.Equal(Colour.White, move.GetColour());
             Assert.Equal(Colour.White, move.GetColour());
@@ -117,8 +117,8 @@ namespace ChessSharp.Tests
         [Fact]
         public void Move_AreEqual()
         {
-            var moveA = MoveBuilder.Create(Colour.White, PieceType.Rook, SquareFlag.G5, 0, 0, MoveType.Ordinary);
-            var moveB = MoveBuilder.Create(Colour.White, PieceType.Rook, SquareFlag.G5, 0, 0, MoveType.Ordinary);
+            var moveA = MoveBuilder.Create(Colour.White, PieceType.Rook, SquareFlag.G5.ToSquare(), new Models.Square(), 0, MoveType.Ordinary);
+            var moveB = MoveBuilder.Create(Colour.White, PieceType.Rook, SquareFlag.G5.ToSquare(), new Models.Square(), 0, MoveType.Ordinary);
 
             Assert.Equal(moveA, moveB);
         }
@@ -126,8 +126,8 @@ namespace ChessSharp.Tests
         [Fact]
         public void Move_AreNotEqual()
         {
-            var moveA = MoveBuilder.Create(Colour.White, 0, 0, 0, 0, MoveType.Ordinary);
-            var moveB = MoveBuilder.Create(Colour.Black, 0, 0, 0, 0, MoveType.Ordinary);
+            var moveA = MoveBuilder.Create(Colour.White, 0, new Models.Square(), new Models.Square(), 0, MoveType.Ordinary);
+            var moveB = MoveBuilder.Create(Colour.Black, 0, new Models.Square(), new Models.Square(), 0, MoveType.Ordinary);
 
             Assert.NotEqual(moveA, moveB);
         }

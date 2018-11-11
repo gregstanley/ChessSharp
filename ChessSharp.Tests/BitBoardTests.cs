@@ -1,4 +1,5 @@
 ﻿using ChessSharp.Enums;
+using ChessSharp.Extensions;
 using Xunit;
 
 namespace ChessSharp.Tests
@@ -12,7 +13,10 @@ namespace ChessSharp.Tests
         {
             var bitBoard = Create($"rnbqkbnr/pppp1ppp/8/{partialFen}/1P6/2PPPPPP/RNBQKBNR b KQkq -");
 
-            var move = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D2, SquareFlag.D4, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.D2;
+            var toSquare = SquareFlag.D4;
+
+            var move = MoveBuilder.Create(Colour.White, PieceType.Pawn, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -24,7 +28,10 @@ namespace ChessSharp.Tests
         {
             var bitBoard = Create("rnbqkbnr/pppp1ppp/8/8/P3p3/1P6/2PPPPPP/RNBQKBNR b KQkq -");
 
-            var move = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D2, SquareFlag.D4, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.D2;
+            var toSquare = SquareFlag.D4;
+
+            var move = MoveBuilder.Create(Colour.White, PieceType.Pawn, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -42,7 +49,10 @@ namespace ChessSharp.Tests
             var bitBoardReference = Create("7k/8/3p4/8/4N3/8/8/K7 w - - 0 1");
             var bitBoardAfterMake= Create("7k/8/3N4/8/8/8/8/K7 w - - 0 1");
 
-            var move = MoveBuilder.Create(Colour.White, PieceType.Knight, SquareFlag.E4, SquareFlag.D6, PieceType.Pawn, MoveType.Ordinary);
+            var fromSquare = SquareFlag.E4;
+            var toSquare = SquareFlag.D6;
+
+            var move = MoveBuilder.Create(Colour.White, PieceType.Knight, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -60,7 +70,10 @@ namespace ChessSharp.Tests
 
             var bitBoardReference = Create("4k3/8/8/8/5Pp1/8/8/4K3 w - f3 0 1");
 
-            var move = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.G4, SquareFlag.F3, PieceType.Pawn, MoveType.EnPassant);
+            var fromSquare = SquareFlag.G4;
+            var toSquare = SquareFlag.F3;
+
+            var move = MoveBuilder.Create(Colour.Black, PieceType.Pawn, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.Pawn, MoveType.EnPassant);
 
             bitBoard.MakeMove(move);
 
@@ -79,7 +92,10 @@ namespace ChessSharp.Tests
             var bitBoard = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
             var bitBoardReference = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
 
-            var move = MoveBuilder.Create(Colour.White, PieceType.Rook, SquareFlag.A1, SquareFlag.A8, PieceType.Rook, MoveType.Ordinary);
+            var fromSquare = SquareFlag.A1;
+            var toSquare = SquareFlag.A8;
+
+            var move = MoveBuilder.Create(Colour.White, PieceType.Rook, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.Rook, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -139,7 +155,10 @@ namespace ChessSharp.Tests
             var bitBoard = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
             var bitBoardReference = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
 
-            var move = MoveBuilder.Create(Colour.White, PieceType.King, SquareFlag.E1, SquareFlag.E2, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.E1;
+            var toSquare = SquareFlag.E2;
+
+            var move = MoveBuilder.Create(Colour.White, PieceType.King, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -159,7 +178,10 @@ namespace ChessSharp.Tests
             var bitBoard = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
             var bitBoardReference = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
 
-            var move = MoveBuilder.Create(Colour.Black, PieceType.King, SquareFlag.E8, SquareFlag.E7, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.E8;
+            var toSquare = SquareFlag.E7;
+
+            var move = MoveBuilder.Create(Colour.Black, PieceType.King, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -179,7 +201,10 @@ namespace ChessSharp.Tests
             var bitBoard = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
             var bitBoardReference = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
 
-            var move = MoveBuilder.Create(Colour.White, PieceType.Rook, SquareFlag.A1, SquareFlag.A2, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.A1;
+            var toSquare = SquareFlag.A2;
+
+            var move = MoveBuilder.Create(Colour.White, PieceType.Rook, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -199,7 +224,10 @@ namespace ChessSharp.Tests
             var bitBoard = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
             var bitBoardReference = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
 
-            var move = MoveBuilder.Create(Colour.White, PieceType.Rook, SquareFlag.H1, SquareFlag.H2, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.H1;
+            var toSquare = SquareFlag.H2;
+
+            var move = MoveBuilder.Create(Colour.White, PieceType.Rook, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -219,7 +247,10 @@ namespace ChessSharp.Tests
             var bitBoard = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
             var bitBoardReference = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
 
-            var move = MoveBuilder.Create(Colour.Black, PieceType.Rook, SquareFlag.A8, SquareFlag.A7, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.A8;
+            var toSquare = SquareFlag.A7;
+
+            var move = MoveBuilder.Create(Colour.Black, PieceType.Rook, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 
@@ -239,7 +270,10 @@ namespace ChessSharp.Tests
             var bitBoard = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
             var bitBoardReference = Create("r3k2r/8/8/8/8/8/8/R3K2R w KQkq -");
 
-            var move = MoveBuilder.Create(Colour.Black, PieceType.Rook, SquareFlag.H8, SquareFlag.H7, PieceType.None, MoveType.Ordinary);
+            var fromSquare = SquareFlag.H8;
+            var toSquare = SquareFlag.H7;
+
+            var move = MoveBuilder.Create(Colour.Black, PieceType.Rook, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             bitBoard.MakeMove(move);
 

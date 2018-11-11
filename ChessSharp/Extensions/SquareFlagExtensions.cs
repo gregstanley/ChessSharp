@@ -1,4 +1,5 @@
 ﻿using ChessSharp.Enums;
+using ChessSharp.Models;
 using System;
 using System.Collections.Generic;
 
@@ -116,6 +117,14 @@ namespace ChessSharp.Extensions
             }
 
             return count;
+        }
+
+        public static Square ToSquare(this SquareFlag squareFlag)
+        {
+            Square square;
+            square.Flag = squareFlag;
+            square.Index = squareFlag.ToSquareIndex();
+            return square;
         }
 
         // Checking the Dictionary first is mightly expensive. Better to not look for something that doesn't exist.

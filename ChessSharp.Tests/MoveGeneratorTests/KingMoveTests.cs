@@ -122,7 +122,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var captureViews = GetCaptureMoveViews(moves);
 
-            var capture1 = MoveBuilder.Create(fen.ToPlay, PieceType.King, SquareFlag.E4, toSquare, PieceType.Rook, MoveType.Ordinary);
+            var capture1 = MoveBuilder.Create(fen.ToPlay, PieceType.King, SquareFlag.E4.ToSquare(), toSquare.ToSquare(), PieceType.Rook, MoveType.Ordinary);
 
             Assert.Equal(expectedMovesCount, kingMoves.Count());
 
@@ -151,7 +151,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var captureViews = GetCaptureMoveViews(moves);
 
-            var capture1 = MoveBuilder.Create(fen.ToPlay, PieceType.King, fromSquare, toSquare, PieceType.Pawn, MoveType.Ordinary);
+            var capture1 = MoveBuilder.Create(fen.ToPlay, PieceType.King, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
 
             Assert.Equal(expectedMovesCount, moveCount);
 
