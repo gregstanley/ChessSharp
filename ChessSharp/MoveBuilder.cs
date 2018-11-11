@@ -3,9 +3,9 @@ using ChessSharp.Extensions;
 
 namespace ChessSharp
 {
-    public static class MoveConstructor
+    public static class MoveBuilder
     {
-        public static uint CreateMove(Colour colour, PieceType pieceType,
+        public static uint Create(Colour colour, PieceType pieceType,
             SquareFlag from, SquareFlag to, PieceType capturePieceType, MoveType moveType)
         {
             var colourShift = colour == Colour.White ? (uint)0 : 1;

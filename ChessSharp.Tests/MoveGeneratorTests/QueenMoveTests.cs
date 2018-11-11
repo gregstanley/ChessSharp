@@ -43,7 +43,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var captures = GetCaptureMoveViews(moves);
 
-            var capture1 = MoveConstructor.CreateMove(fen.ToPlay, PieceType.Queen, SquareFlag.E4, captureSquare, PieceType.Pawn, MoveType.Ordinary);
+            var capture1 = MoveBuilder.Create(fen.ToPlay, PieceType.Queen, SquareFlag.E4, captureSquare, PieceType.Pawn, MoveType.Ordinary);
 
             Assert.Equal(expectedQueenMoveCount, queenMoves.Count);
             Assert.Contains(capture1, captures.Select(x => x.Value));
@@ -111,14 +111,14 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var moveCount = moves.Count;
             var captureViews = GetCaptureMoveViews(moves);
 
-            var capture1 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.C6, PieceType.Pawn, MoveType.Ordinary);
-            var capture2 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.E6, PieceType.Pawn, MoveType.Ordinary);
-            var capture3 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.G6, PieceType.Pawn, MoveType.Ordinary);
-            var capture4 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.C4, PieceType.Pawn, MoveType.Ordinary);
-            var capture5 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.G4, PieceType.Pawn, MoveType.Ordinary);
-            var capture6 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.C2, PieceType.Pawn, MoveType.Ordinary);
-            var capture7 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.E2, PieceType.Pawn, MoveType.Ordinary);
-            var capture8 = MoveConstructor.CreateMove(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.G2, PieceType.Pawn, MoveType.Ordinary);
+            var capture1 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.C6, PieceType.Pawn, MoveType.Ordinary);
+            var capture2 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.E6, PieceType.Pawn, MoveType.Ordinary);
+            var capture3 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.G6, PieceType.Pawn, MoveType.Ordinary);
+            var capture4 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.C4, PieceType.Pawn, MoveType.Ordinary);
+            var capture5 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.G4, PieceType.Pawn, MoveType.Ordinary);
+            var capture6 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.C2, PieceType.Pawn, MoveType.Ordinary);
+            var capture7 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.E2, PieceType.Pawn, MoveType.Ordinary);
+            var capture8 = MoveBuilder.Create(Colour.White, PieceType.Queen, SquareFlag.E4, SquareFlag.G2, PieceType.Pawn, MoveType.Ordinary);
 
             var captures = captureViews.Select(x => x.Value);
 
