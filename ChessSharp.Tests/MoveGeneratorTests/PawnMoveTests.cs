@@ -392,7 +392,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [Fact]
         public void White_EnPassant_Capture()
         {
-            var fen = Fen.Parse("K6k/8/3Pp3/8/8/8/8/8 w - e7");
+            var fen = Fen.Parse("K6k/8/8/3Pp3/8/8/8/8 w - e6");
 
             var bitBoard = CreateBitBoard(fen);
 
@@ -403,7 +403,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             MoveGenerator.Generate(workspace, moves);
 
-            var enPassantCapture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D6.ToSquare(), SquareFlag.E7.ToSquare(), PieceType.Pawn, MoveType.EnPassant);
+            var enPassantCapture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D5.ToSquare(), SquareFlag.E6.ToSquare(), PieceType.Pawn, MoveType.EnPassant);
 
             var movesView = moves.Select(x => new MoveViewer(x));
 

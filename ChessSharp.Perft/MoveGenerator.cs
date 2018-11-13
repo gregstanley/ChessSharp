@@ -13,6 +13,7 @@ namespace ChessSharp.MoveGeneration
     public class MoveGenerator
     {
         private static readonly AttackBitmaps AttackBitmaps = new AttackBitmaps();
+        private static readonly Vector<ulong> VectorZero = new Vector<ulong>(0);
 
         public void Generate(MoveGenerationWorkspace workspace, IList<uint> moves)
         {
@@ -55,7 +56,7 @@ namespace ChessSharp.MoveGeneration
 
                 var vectorOut = Vector.BitwiseAnd(vector1, vector2);
 
-                anyNonPawnCheckers = Vector.GreaterThanAny(vectorOut, new Vector<ulong>(0));
+                anyNonPawnCheckers = Vector.GreaterThanAny(vectorOut, VectorZero);
 
                 checkersKnight = (SquareFlag)vectorOut[0];
                 checkersRook = (SquareFlag)vectorOut[1];
@@ -74,6 +75,9 @@ namespace ChessSharp.MoveGeneration
 
                 checkersQueen = relativeBitBoard.OpponentQueens == 0 ? 0
                     : kingRayAttackSquares & relativeBitBoard.OpponentQueens;
+
+                if (checkersKnight > 0 || checkersRook > 0 || checkersBishop > 0 || checkersQueen > 0)
+                    anyNonPawnCheckers = true;
             }
 
             // Start on King moves - if we're in Check then that might be all we need
@@ -206,12 +210,74 @@ namespace ChessSharp.MoveGeneration
 
             if (relativeBitBoard.MyPawns > 0)
             {
-                foreach (var pieceSquare in remainingPawns.ToList())
-                {
-                    var toSquare = pieceSquare.ToSquare();
+                var singlePushes = remainingPawns.PawnForward(relativeBitBoard.Colour, 1);
 
-                    AddSinglePawnPushes(relativeBitBoard, toSquare, pushMask, moves);
-                    AddSinglePawnCaptures(relativeBitBoard, toSquare, pushMask, captureMask, moves);
+                var unblockedSinglePushes = singlePushes & ~relativeBitBoard.OccupiedSquares;
+                var unblockedAndLegalSinglePushes = unblockedSinglePushes & pushMask;
+                var promotionPushes = relativeBitBoard.PromotionRank & unblockedAndLegalSinglePushes;
+                var nonPromotionPushes = ~relativeBitBoard.PromotionRank & unblockedAndLegalSinglePushes;
+                var firstPushes = unblockedSinglePushes & relativeBitBoard.SecondRank;
+
+                var potentialWestCaptureMask = remainingPawns.PawnCaptureWest(relativeBitBoard.Colour);
+                var potentialEastCaptureMask = remainingPawns.PawnCaptureEast(relativeBitBoard.Colour);
+
+                var potentialWestCaptures = potentialWestCaptureMask & relativeBitBoard.OpponentSquares;
+                var potentialEastCaptures = potentialEastCaptureMask & relativeBitBoard.OpponentSquares;
+
+                var potentialPiecesWest = potentialWestCaptures.PawnCaptureEast(relativeBitBoard.OpponentColour);
+                var potentialPiecesEast = potentialEastCaptures.PawnCaptureWest(relativeBitBoard.OpponentColour);
+
+                var potentialCapturePieces = potentialPiecesWest | potentialPiecesEast;
+
+                if (promotionPushes > 0)
+                {
+                    foreach (var pieceSquare in promotionPushes.ToList())
+                    {
+                        var fromSquare = pieceSquare.PawnBackward(relativeBitBoard.Colour, 1);
+                        
+                        AddPromotions(relativeBitBoard, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, moves);
+                    }
+                }
+
+                if (nonPromotionPushes > 0)
+                {
+                    foreach (var pieceSquare in nonPromotionPushes.ToList())
+                    {
+                        var fromSquare = pieceSquare.PawnBackward(relativeBitBoard.Colour, 1);
+
+                        moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
+                    }
+                }
+
+                if (firstPushes > 0)
+                {
+                    var doublePushes = firstPushes.PawnForward(relativeBitBoard.Colour, 1);
+
+                    var validDoublePushes = doublePushes & ~relativeBitBoard.OccupiedSquares & pushMask;
+
+                    if (validDoublePushes > 0)
+                    {
+                        foreach (var pieceSquare in validDoublePushes.ToList())
+                        {
+                            var fromSquare = pieceSquare.PawnBackward(relativeBitBoard.Colour, 2);
+
+                            moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
+                        }
+                    }
+                }
+
+                // Very basic but if En Passant is set then check any pawn on the row
+                if (relativeBitBoard.EnPassant > 0)
+                {
+                    var remainingPotentialEnPassant = remainingPawns & relativeBitBoard.EnPassantDiscoveredCheckRank;
+
+                    potentialCapturePieces |= remainingPotentialEnPassant;
+                }
+
+                if (potentialCapturePieces > 0)
+                {
+                    foreach (var pieceSquare in potentialCapturePieces.ToList())
+                        AddSinglePawnCaptures(relativeBitBoard, pieceSquare.ToSquare(), pushMask, captureMask, moves);
                 }
             }
 

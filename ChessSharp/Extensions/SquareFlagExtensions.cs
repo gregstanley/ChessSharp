@@ -75,16 +75,35 @@ namespace ChessSharp.Extensions
             [SquareFlag.H8] = 63
         };
 
+        public static SquareFlag PawnBackward(this SquareFlag square, Colour colour, int numRanks) =>
+            square.PawnForward(colour.Opposite(), numRanks);
+
         public static SquareFlag PawnForward(this SquareFlag square, Colour colour, int numRanks) =>
             colour == Colour.White
                 ? (SquareFlag)((ulong)square << (8 * numRanks))
                 : (SquareFlag)((ulong)square >> (8 * numRanks));
+
+        public static SquareFlag PawnCaptureWest(this SquareFlag square, Colour colour) =>
+            colour == Colour.White
+                ? (SquareFlag)((ulong)square << 7)
+                : (SquareFlag)((ulong)square >> 9);
+
+        public static SquareFlag PawnCaptureEast(this SquareFlag square, Colour colour) =>
+            colour == Colour.White
+                ? (SquareFlag)((ulong)square << 9)
+                : (SquareFlag)((ulong)square >> 7);
 
         public static SquareFlag ShiftRankUp(this SquareFlag square, int numRanks) =>
             (SquareFlag)((ulong)square << (8 * numRanks));
 
         public static SquareFlag ShiftRankDown(this SquareFlag square, int numRanks) =>
             (SquareFlag)((ulong)square >> (8 * numRanks));
+
+        public static SquareFlag ShiftFileLeft(this SquareFlag square, int numFiles) =>
+            (SquareFlag)((ulong)square >> (1 * numFiles));
+
+        public static SquareFlag ShiftFileRight(this SquareFlag square, int numFiles) =>
+            (SquareFlag)((ulong)square << (1 * numFiles));
 
         public static byte GetInstanceNumber(this SquareFlag squares, SquareFlag square)
         {

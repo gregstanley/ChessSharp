@@ -154,8 +154,14 @@ namespace ChessSharp.Models
         public SquareFlag StartRank =>
             Colour == Colour.White ? SquareFlagConstants.r2 : SquareFlagConstants.r7;
 
+        public SquareFlag SecondRank =>
+            Colour == Colour.White ? SquareFlagConstants.r3 : SquareFlagConstants.r6;
+
         public SquareFlag EnPassantDiscoveredCheckRank =>
             Colour == Colour.White ? SquareFlagConstants.r5 : SquareFlagConstants.r4;
+
+        public SquareFlag PrePromotionRank =>
+            Colour == Colour.White ? SquareFlagConstants.r7 : SquareFlagConstants.r2;
 
         public SquareFlag PromotionRank =>
             Colour == Colour.White ? SquareFlagConstants.r8 : SquareFlagConstants.r1;
