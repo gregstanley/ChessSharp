@@ -242,47 +242,7 @@ namespace ChessSharp
 
             throw new Exception($"Failed to find piece for {square}");
         }
-
-        public Colour GetPieceColour(SquareFlag square)
-        {
-            if (White.HasFlag(square))
-                return Colour.White;
-
-            if (Black.HasFlag(square))
-                return Colour.Black;
-
-            return Colour.None;
-        }
-
-        public PieceType GetPieceType(SquareFlag square)
-        {
-            var colour = GetPieceColour(square);
-
-            if (colour == Colour.None)
-                return PieceType.None;
-
-            if (colour == Colour.White)
-            {
-                if (WhitePawns.HasFlag(square)) return PieceType.Pawn;
-                if (WhiteRooks.HasFlag(square)) return PieceType.Rook;
-                if (WhiteKnights.HasFlag(square)) return PieceType.Knight;
-                if (WhiteBishops.HasFlag(square)) return PieceType.Bishop;
-                if (WhiteQueens.HasFlag(square)) return PieceType.Queen;
-                if (WhiteKing.HasFlag(square)) return PieceType.King;
-            }
-            else
-            {
-                if (BlackPawns.HasFlag(square)) return PieceType.Pawn;
-                if (BlackRooks.HasFlag(square)) return PieceType.Rook;
-                if (BlackKnights.HasFlag(square)) return PieceType.Knight;
-                if (BlackBishops.HasFlag(square)) return PieceType.Bishop;
-                if (BlackQueens.HasFlag(square)) return PieceType.Queen;
-                if (BlackKing.HasFlag(square)) return PieceType.King;
-            }
-
-            throw new Exception($"Failed to find piece for {square}");
-        }
-
+        
         public RelativeBitBoard RelativeTo(Colour colour)
         {
             var opponentColour = colour.Opposite();
@@ -340,71 +300,74 @@ namespace ChessSharp
 
                 state = RemoveCastleAvailability(colour, state);
             }
+            else if (moveType == MoveType.EnPassant)
+            {
+                MovePiece(colour, pieceType, fromSquare, toSquare);
+
+                // Capturing behind the opponent pawn so shift as if we are opponent
+                var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
+
+                RemovePiece(colour.Opposite(), captureSquare);
+            }
+            else if (moveType == MoveType.PromotionQueen)
+            {
+                if (capturePieceType != PieceType.None)
+                    RemovePiece(colour.Opposite(), toSquare);
+
+                MovePiece(colour, pieceType, fromSquare, toSquare);
+
+                PromotePiece(colour, PieceType.Queen, toSquare);
+            }
+            else if (moveType == MoveType.PromotionRook)
+            {
+                if (capturePieceType != PieceType.None)
+                    RemovePiece(colour.Opposite(), toSquare);
+
+                MovePiece(colour, pieceType, fromSquare, toSquare);
+
+                PromotePiece(colour, PieceType.Rook, toSquare);
+            }
+            else if (moveType == MoveType.PromotionBishop)
+            {
+                if (capturePieceType != PieceType.None)
+                    RemovePiece(colour.Opposite(), toSquare);
+
+                MovePiece(colour, pieceType, fromSquare, toSquare);
+
+                PromotePiece(colour, PieceType.Bishop, toSquare);
+            }
+            else if (moveType == MoveType.PromotionKnight)
+            {
+                if (capturePieceType != PieceType.None)
+                    RemovePiece(colour.Opposite(), toSquare);
+
+                MovePiece(colour, pieceType, fromSquare, toSquare);
+                    
+                PromotePiece(colour, PieceType.Knight, toSquare);
+            }
             else if (pieceType == PieceType.Pawn)
             {
-                if (moveType == MoveType.EnPassant)
+                // We can only move forward two from start square
+                var toSquareTemp = fromSquare.PawnForward(colour, 2);
+
+                // So if the 'to' square is the same it might set en passant flag
+                if (toSquareTemp == toSquare)
                 {
-                    MovePiece(colour, pieceType, fromSquare, toSquare);
-
-                    // Capturing behind the opponent pawn so shift as if we are opponent
-                    var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
-
-                    RemovePiece(colour.Opposite(), captureSquare);
-                }
-                else if (moveType == MoveType.PromotionQueen)
-                {
-                    if (capturePieceType != PieceType.None)
-                        RemovePiece(colour.Opposite(), toSquare);
-
-                    MovePiece(colour, pieceType, fromSquare, toSquare);
-
-                    PromotePiece(colour, PieceType.Queen, toSquare);
-                }
-                else if (moveType == MoveType.PromotionRook)
-                {
-                    if (capturePieceType != PieceType.None)
-                    {
-                        RemovePiece(colour.Opposite(), toSquare);
-                    }
-
-                    MovePiece(colour, pieceType, fromSquare, toSquare);
-
-                    PromotePiece(colour, PieceType.Rook, toSquare);
-                }
-                else if (moveType == MoveType.PromotionBishop)
-                {
-                    if (capturePieceType != PieceType.None)
-                    {
-                        RemovePiece(colour.Opposite(), toSquare);
-                    }
-
-                    MovePiece(colour, pieceType, fromSquare, toSquare);
-
-                    PromotePiece(colour, PieceType.Bishop, toSquare);
-                }
-                else if (moveType == MoveType.PromotionKnight)
-                {
-                    if (capturePieceType != PieceType.None)
-                        RemovePiece(colour.Opposite(), toSquare);
-
-
-                    MovePiece(colour, pieceType, fromSquare, toSquare);
-                    
-                    PromotePiece(colour, PieceType.Knight, toSquare);
-                }
-                else
-                {
-                    // We can only move forward two from start square
-                    var toSquareTemp = fromSquare.PawnForward(colour, 2);
-
-                    // So if the 'to' square is the same it might set en passant flag
-                    if (toSquareTemp == toSquare)
-                    {
-                        var targetSquare = (SquareFlag)((ulong)toSquare >> Math.Abs((int)MoveDirection.West));
+                    var targetSquare = (SquareFlag)((ulong)toSquare >> Math.Abs((int)MoveDirection.West));
                         
-                        //var targetPieceColour = GetPieceColour(targetSquare);
-                        //var targetPieceType = GetPieceType(targetSquare);
-                        var targetPiece = GetPiece(targetSquare);
+                    var targetPiece = GetPiece(targetSquare);
+
+                    if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
+                    {
+                        var enPassantSquare = fromSquare.PawnForward(colour, 1);
+
+                        state = state.AddEnPassantSquare(enPassantSquare);
+                    }
+                    else
+                    {
+                        targetSquare = (SquareFlag)((ulong)toSquare << (int)MoveDirection.East);
+
+                        targetPiece = GetPiece(targetSquare);
 
                         if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                         {
@@ -412,32 +375,39 @@ namespace ChessSharp
 
                             state = state.AddEnPassantSquare(enPassantSquare);
                         }
-                        else
-                        {
-                            targetSquare = (SquareFlag)((ulong)toSquare << (int)MoveDirection.East);
-
-                            //targetPieceColour = GetPieceColour(targetSquare);
-                            //targetPieceType = GetPieceType(targetSquare);
-                            targetPiece = GetPiece(targetSquare);
-
-                            if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
-                            {
-                                var enPassantSquare = fromSquare.PawnForward(colour, 1);
-
-                                state = state.AddEnPassantSquare(enPassantSquare);
-                            }
-                        }
                     }
-
-                    MovePiece(colour, pieceType, fromSquare, toSquare);
-                    
-                    if (capturePieceType != PieceType.None)
-                        RemovePiece(colour.Opposite(), toSquare);
                 }
+
+                MovePiece(colour, pieceType, fromSquare, toSquare);
+                    
+                if (capturePieceType != PieceType.None)
+                    RemovePiece(colour.Opposite(), toSquare);
             }
             else
             {
                 MovePiece(colour, pieceType, fromSquare, toSquare);
+
+                if (pieceType == PieceType.Rook)
+                {
+                    if (colour == Colour.White)
+                    {
+                        if (fromSquare == SquareFlagConstants.WhiteKingSideRookStartSquare)
+                            state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
+                        else if (fromSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare)
+                            state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
+                    }
+                    else
+                    {
+                        if (fromSquare == SquareFlagConstants.BlackKingSideRookStartSquare)
+                            state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
+                        else if (fromSquare == SquareFlagConstants.BlackQueenSideRookStartSquare)
+                            state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
+                    }
+                }
+                else if (pieceType == PieceType.King)
+                {
+                    state = RemoveCastleAvailability(colour, state);
+                }
 
                 if (capturePieceType != PieceType.None)
                 {
@@ -447,87 +417,17 @@ namespace ChessSharp
                     {
                         if (colour == Colour.White)
                         {
-                            if (BlackCanCastleKingSide && 
-                                toSquare == SquareFlagConstants.BlackKingSideRookStartSquare)
-                            {
+                            if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare)
                                 state = RemoveCastleAvailability(Colour.Black, MoveType.CastleKing, state);
-                            }
-                            else if (BlackCanCastleQueenSide &&
-                                toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare)
-                            {
+                            else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare)
                                 state = RemoveCastleAvailability(Colour.Black, MoveType.CastleQueen, state);
-                            }
                         }
                         else
                         {
-                            if (WhiteCanCastleKingSide &&
-                                toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare)
-                            {
+                            if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare)
                                 state = RemoveCastleAvailability(Colour.White, MoveType.CastleKing, state);
-                            }
-                            else if (WhiteCanCastleQueenSide &&
-                                toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare)
-                            {
+                            else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare)
                                 state = RemoveCastleAvailability(Colour.White, MoveType.CastleQueen, state);
-                            }
-                        }
-                    }
-                }
-
-                // Castling rights management
-                if (colour == Colour.White)
-                {
-                    if (state.HasFlag(BoardState.WhiteCanCastleKingSide))
-                    {
-                        if (pieceType == PieceType.Rook)
-                        {
-                            if (fromSquare == SquareFlagConstants.WhiteKingSideRookStartSquare)
-                                state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
-                        }
-                        else if (pieceType == PieceType.King)
-                        {
-                            state = RemoveCastleAvailability(colour, state);
-                        }
-                    }
-
-                    if (state.HasFlag(BoardState.WhiteCanCastleQueenSide))
-                    {
-                        if (pieceType == PieceType.Rook)
-                        {
-                            if (fromSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare)
-                                state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
-                        }
-                        else if (pieceType == PieceType.King)
-                        {
-                            state = RemoveCastleAvailability(colour, state);
-                        }
-                    }
-                }
-                else
-                {
-                    if (state.HasFlag(BoardState.BlackCanCastleKingSide))
-                    {
-                        if (pieceType == PieceType.Rook)
-                        {
-                            if (fromSquare == SquareFlagConstants.BlackKingSideRookStartSquare)
-                                state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
-                        }
-                        else if (pieceType == PieceType.King)
-                        {
-                            state = RemoveCastleAvailability(colour, state);
-                        }
-                    }
-
-                    if (state.HasFlag(BoardState.BlackCanCastleQueenSide))
-                    {
-                        if (pieceType == PieceType.Rook)
-                        {
-                            if (fromSquare == SquareFlagConstants.BlackQueenSideRookStartSquare)
-                                state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
-                        }
-                        else if (pieceType == PieceType.King)
-                        {
-                            state = RemoveCastleAvailability(colour, state);
                         }
                     }
                 }
@@ -629,6 +529,16 @@ namespace ChessSharp
             _moves.Pop();
         }
 
+        private Colour GetPieceColour(SquareFlag square)
+        {
+            if (White.HasFlag(square))
+                return Colour.White;
+
+            if (Black.HasFlag(square))
+                return Colour.Black;
+
+            return Colour.None;
+        }
 
         private void MakeWhiteKingSideCastle()
         {
@@ -815,65 +725,47 @@ namespace ChessSharp
 
         private void PromotePiece(Colour colour, PieceType promoteTo, SquareFlag square)
         {
-            if (colour == Colour.White)
+            switch (colour)
             {
-                if (promoteTo == PieceType.Rook)
-                {
+                case Colour.White when promoteTo == PieceType.Rook:
                     WhitePawns &= ~square;
                     WhiteRooks |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Knight)
-                {
+                case Colour.White when promoteTo == PieceType.Knight:
                     WhitePawns &= ~square;
                     WhiteKnights |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Bishop)
-                {
+                case Colour.White when promoteTo == PieceType.Bishop:
                     WhitePawns &= ~square;
                     WhiteBishops |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Queen)
-                {
+                case Colour.White when promoteTo == PieceType.Queen:
                     WhitePawns &= ~square;
                     WhiteQueens |= square;
                     return;
-                }
-            }
-            else
-            {
-                if (promoteTo == PieceType.Rook)
-                {
+
+                case Colour.Black when promoteTo == PieceType.Rook:
                     BlackPawns &= ~square;
                     BlackRooks |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Knight)
-                {
+                case Colour.Black when promoteTo == PieceType.Knight:
                     BlackPawns &= ~square;
                     BlackKnights |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Bishop)
-                {
+                case Colour.Black when promoteTo == PieceType.Bishop:
                     BlackPawns &= ~square;
                     BlackBishops |= square;
                     return;
-                }
 
-                if (promoteTo == PieceType.Queen)
-                {
+                case Colour.Black when promoteTo == PieceType.Queen:
                     BlackPawns &= ~square;
                     BlackQueens |= square;
                     return;
-                }
             }
         }
 
