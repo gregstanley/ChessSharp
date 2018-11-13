@@ -53,6 +53,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
+
             var pawnMoveViews = GetPawnMoveViews(moves);
             var rookMoveViews = GetRookMoveViews(moves);
             var knightMoveViews = GetKnightMoveViews(moves);
