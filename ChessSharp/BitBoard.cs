@@ -242,7 +242,31 @@ namespace ChessSharp
 
             throw new Exception($"Failed to find piece for {square}");
         }
-        
+
+        public byte GetInstanceNumber(Piece piece, SquareFlag square)
+        {
+            if (piece.Colour == Colour.White)
+            {
+                if (piece.Type == PieceType.Pawn) return WhitePawns.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Rook) return WhiteRooks.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Knight) return WhiteKnights.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Bishop) return WhiteBishops.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Queen) return WhiteQueens.GetInstanceNumber(square);
+                if (piece.Type == PieceType.King) return WhiteKing.GetInstanceNumber(square);
+            }
+            else
+            {
+                if (piece.Type == PieceType.Pawn) return BlackPawns.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Rook) return BlackRooks.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Knight) return BlackKnights.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Bishop) return BlackBishops.GetInstanceNumber(square);
+                if (piece.Type == PieceType.Queen) return BlackQueens.GetInstanceNumber(square);
+                if (piece.Type == PieceType.King) return BlackKing.GetInstanceNumber(square);
+            }
+
+            return 0;
+        }
+
         public RelativeBitBoard RelativeTo(Colour colour)
         {
             var opponentColour = colour.Opposite();
