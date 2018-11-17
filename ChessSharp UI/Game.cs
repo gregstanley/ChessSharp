@@ -78,6 +78,9 @@ namespace ChessSharp_UI
 
         public MoveViewer TryApplyMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
         {
+            if (fromSquareIndex == toSquareIndex)
+                return new MoveViewer(0);
+
             var moveViews = AvailableMoves;
 
             var fromSquare = (SquareFlag)(1ul << fromSquareIndex);
@@ -85,16 +88,55 @@ namespace ChessSharp_UI
 
             MoveViewer move = null;
 
-            if (promotionPieceType == PieceType.Queen)
-                move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen);
-            else if (promotionPieceType == PieceType.Rook)
-                move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook);
-            else if (promotionPieceType == PieceType.Bishop)
-                move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop);
-            else if (promotionPieceType == PieceType.Knight)
-                move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight);
-            else
-                move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare);
+            if (HumanColour == Colour.White && fromSquare == SquareFlagConstants.WhiteKingStartSquare)
+            {
+                if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare && _workspace.BitBoard.WhiteCanCastleKingSide)
+                {
+                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleKing);
+
+                    if (move == null)
+                        return new MoveViewer(0);
+                }
+                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && _workspace.BitBoard.WhiteCanCastleQueenSide)
+                {
+                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen);
+
+                    if (move == null)
+                        return new MoveViewer(0);
+                }
+            }
+
+            if (HumanColour == Colour.Black && fromSquare == SquareFlagConstants.BlackKingStartSquare)
+            {
+                if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare && _workspace.BitBoard.BlackCanCastleKingSide)
+                {
+                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleKing);
+
+                    if (move == null)
+                        return new MoveViewer(0);
+                }
+                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && _workspace.BitBoard.BlackCanCastleQueenSide)
+                {
+                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen);
+
+                    if (move == null)
+                        return new MoveViewer(0);
+                }
+            }
+
+            if (move == null)
+            {
+                if (promotionPieceType == PieceType.Queen)
+                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen);
+                else if (promotionPieceType == PieceType.Rook)
+                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook);
+                else if (promotionPieceType == PieceType.Bishop)
+                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop);
+                else if (promotionPieceType == PieceType.Knight)
+                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight);
+                else
+                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare);
+            }
 
             if (move == null)
                 return new MoveViewer(0);

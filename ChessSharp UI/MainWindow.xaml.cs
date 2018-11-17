@@ -116,7 +116,7 @@ namespace ChessSharp_UI
                 return;
             }
 
-            DoMoves();
+            DoSearch();
         }
 
         private void PromotionTypeSelector_PieceSelected(object sender, PromotionTypeEventArgs args)
@@ -125,10 +125,10 @@ namespace ChessSharp_UI
 
             var result = ProcessNextMove(args.PieceType);
 
-            DoMoves();
+            DoSearch();
         }
 
-        private void DoMoves()
+        private void DoSearch()
         {
             UpdateUI();
 
