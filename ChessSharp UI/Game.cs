@@ -65,8 +65,8 @@ namespace ChessSharp_UI
             if (!promotionMoves.Any())
                 return false;
 
-            var fromSquare = (SquareFlag)(1ul << fromSquareIndex);
-            var toSquare = (SquareFlag)(1ul << toSquareIndex);
+            var fromSquare = ToSquareFlag(fromSquareIndex);
+            var toSquare = ToSquareFlag(toSquareIndex);
 
             var promotionMoveMatches = promotionMoves.Where(x => x.From == fromSquare && x.To == toSquare);
 
@@ -83,63 +83,20 @@ namespace ChessSharp_UI
 
             var moveViews = AvailableMoves;
 
-            var fromSquare = (SquareFlag)(1ul << fromSquareIndex);
-            var toSquare = (SquareFlag)(1ul << toSquareIndex);
+            var fromSquare = ToSquareFlag(fromSquareIndex);
+            var toSquare = ToSquareFlag(toSquareIndex);
 
-            MoveViewer move = null;
+            var move = TryPromotions(fromSquare, toSquare, AvailableMoves, promotionPieceType);
 
-            if (HumanColour == Colour.White && fromSquare == SquareFlagConstants.WhiteKingStartSquare)
-            {
-                if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare && _workspace.BitBoard.WhiteCanCastleKingSide)
-                {
-                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleKing);
+            if (move.Value == 0)
+                move = TryCastles(_workspace, fromSquare, toSquare, AvailableMoves);
 
-                    if (move == null)
-                        return new MoveViewer(0);
-                }
-                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && _workspace.BitBoard.WhiteCanCastleQueenSide)
-                {
-                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen);
+            if (move.Value == 0)
+                move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare)
+                    ?? new MoveViewer(0);
 
-                    if (move == null)
-                        return new MoveViewer(0);
-                }
-            }
-
-            if (HumanColour == Colour.Black && fromSquare == SquareFlagConstants.BlackKingStartSquare)
-            {
-                if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare && _workspace.BitBoard.BlackCanCastleKingSide)
-                {
-                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleKing);
-
-                    if (move == null)
-                        return new MoveViewer(0);
-                }
-                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && _workspace.BitBoard.BlackCanCastleQueenSide)
-                {
-                    move = moveViews.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen);
-
-                    if (move == null)
-                        return new MoveViewer(0);
-                }
-            }
-
-            if (move == null)
-            {
-                if (promotionPieceType == PieceType.Queen)
-                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen);
-                else if (promotionPieceType == PieceType.Rook)
-                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook);
-                else if (promotionPieceType == PieceType.Bishop)
-                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop);
-                else if (promotionPieceType == PieceType.Knight)
-                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight);
-                else
-                    move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare);
-            }
-
-            if (move == null)
-                return new MoveViewer(0);
+            if (move.Value == 0)
+                return move;
 
             DoMove(move);
 
@@ -173,6 +130,9 @@ namespace ChessSharp_UI
         public SquareFlag GetSquaresWithPieceOn() =>
             _workspace.BitBoard.White | _workspace.BitBoard.Black;
 
+        private SquareFlag ToSquareFlag(int squareIndex) =>
+            (SquareFlag)(1ul << squareIndex);
+
         private void DoMove(MoveViewer move)
         {
             _workspace.MakeMove(move.Value);
@@ -188,6 +148,60 @@ namespace ChessSharp_UI
             _moveGenerator.Generate(_workspace, moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
+        }
+
+        private MoveViewer TryCastles(MoveGenerationWorkspace workspace, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
+        {
+            if (workspace.Colour == Colour.White && fromSquare == SquareFlagConstants.WhiteKingStartSquare)
+            {
+                if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare && workspace.BitBoard.WhiteCanCastleKingSide)
+                {
+                    return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
+                        ?? new MoveViewer(0);
+                }
+                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && workspace.BitBoard.WhiteCanCastleQueenSide)
+                {
+                    return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
+                        ?? new MoveViewer(0);
+                }
+            }
+
+            if (workspace.Colour == Colour.Black && fromSquare == SquareFlagConstants.BlackKingStartSquare)
+            {
+                if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare && _workspace.BitBoard.BlackCanCastleKingSide)
+                {
+                    return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
+                        ?? new MoveViewer(0);
+                }
+                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && _workspace.BitBoard.BlackCanCastleQueenSide)
+                {
+                    return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
+                        ?? new MoveViewer(0);
+                }
+            }
+
+            return new MoveViewer(0);
+        }
+
+        private MoveViewer TryPromotions(SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves, PieceType promotionPieceType = PieceType.None)
+        {
+            switch (promotionPieceType)
+            {
+                case PieceType.Queen:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen)
+                        ?? new MoveViewer(0);
+                case PieceType.Rook:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook)
+                        ?? new MoveViewer(0);
+                case PieceType.Bishop:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop)
+                        ?? new MoveViewer(0);
+                case PieceType.Knight:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight)
+                        ?? new MoveViewer(0);
+                default:
+                    return new MoveViewer(0);
+            }
         }
     }
 }
