@@ -58,6 +58,8 @@ namespace ChessSharp_UI
             Reset();
 
             UpdateUI();
+
+            DoSearch();
         }
 
         private void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
@@ -192,9 +194,6 @@ namespace ChessSharp_UI
         private int IndexToFile(int squareIndex) =>
             (squareIndex % 8) + 1;
 
-        private SquareFlag ToSquareFlag(int squareIndex) =>
-            (SquareFlag)(1ul << squareIndex);
-
         private void UpdateUI()
         {
             ThinkingUI.Visibility = _isThinking ? Visibility.Visible : Visibility.Collapsed;
@@ -235,10 +234,7 @@ namespace ChessSharp_UI
             }
 
             if (!_currentGame.AvailableMoves.Any())
-            {
                 CheckmateUi.Visibility = Visibility.Visible;
-                return;
-            }
         }
 
         private Image GetImage(int squareIndex)
@@ -254,7 +250,7 @@ namespace ChessSharp_UI
             if (piece.Type == PieceType.None)
                 return null;
 
-            var square = ToSquareFlag(squareIndex);
+            var square = squareIndex.ToSquareFlag();
 
             var instanceNumber = _currentGame.GetInstanceNumber(piece, square);
 

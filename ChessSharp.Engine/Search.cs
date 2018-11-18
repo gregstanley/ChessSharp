@@ -14,7 +14,7 @@ namespace ChessSharp.Engine
 
         public MoveGenerator MoveGenerator { get; }
 
-        public List<MovePerft> Go(BitBoard bitBoard, Colour colour, int depth)
+        public List<MovePerft> Go(MoveGenerationWorkspace workspace, int depth)
         {
             var depthMoves = new List<uint>[64];
 
@@ -23,7 +23,7 @@ namespace ChessSharp.Engine
 
             var nodeMoves = depthMoves[depth];
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, colour);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, colour);
 
             MoveGenerator.Generate(workspace, nodeMoves);
 

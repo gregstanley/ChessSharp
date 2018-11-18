@@ -1,6 +1,7 @@
 ﻿using ChessSharp;
 using ChessSharp.Engine;
 using ChessSharp.Enums;
+using ChessSharp.Extensions;
 using ChessSharp.Models;
 using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
@@ -12,15 +13,15 @@ namespace ChessSharp_UI
     {
         public int Ply { get; private set; } = 1;
 
-        public Colour Turn { get { return Ply % 2 == 1 ? Colour.White : Colour.Black; } }
+        public Colour ToPlay { get { return Ply % 2 == 1 ? Colour.White : Colour.Black; } }
 
         public int HalfTurnCounter { get; private set; } = 0;
 
-        public int FullTurnNumber { get { return (int)(Ply + 1) / 2; } }
+        public int FullTurnNumber { get { return (Ply + 1) / 2; } }
 
         public Colour HumanColour { get; private set; } = Colour.None;
 
-        public bool IsHumanTurn { get { return HumanColour != Colour.None && Turn == HumanColour; } }
+        public bool IsHumanTurn { get { return HumanColour != Colour.None && ToPlay == HumanColour; } }
 
         public IEnumerable<MoveViewer> AvailableMoves { get; private set; }
 
@@ -65,8 +66,8 @@ namespace ChessSharp_UI
             if (!promotionMoves.Any())
                 return false;
 
-            var fromSquare = ToSquareFlag(fromSquareIndex);
-            var toSquare = ToSquareFlag(toSquareIndex);
+            var fromSquare = fromSquareIndex.ToSquareFlag();
+            var toSquare = toSquareIndex.ToSquareFlag();
 
             var promotionMoveMatches = promotionMoves.Where(x => x.From == fromSquare && x.To == toSquare);
 
@@ -81,10 +82,8 @@ namespace ChessSharp_UI
             if (fromSquareIndex == toSquareIndex)
                 return new MoveViewer(0);
 
-            var moveViews = AvailableMoves;
-
-            var fromSquare = ToSquareFlag(fromSquareIndex);
-            var toSquare = ToSquareFlag(toSquareIndex);
+            var fromSquare = fromSquareIndex.ToSquareFlag();
+            var toSquare = toSquareIndex.ToSquareFlag();
 
             var move = TryPromotions(fromSquare, toSquare, AvailableMoves, promotionPieceType);
 
@@ -92,7 +91,7 @@ namespace ChessSharp_UI
                 move = TryCastles(_workspace, fromSquare, toSquare, AvailableMoves);
 
             if (move.Value == 0)
-                move = moveViews.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare)
+                move = AvailableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare)
                     ?? new MoveViewer(0);
 
             if (move.Value == 0)
@@ -105,7 +104,7 @@ namespace ChessSharp_UI
 
         public MoveViewer CpuMove()
         {
-            var moves = _search.Go(_workspace.BitBoard, Turn, 1);
+            var moves = _search.Go(_workspace, 1);
 
             var chosenMove = moves.FirstOrDefault();
 
@@ -117,21 +116,14 @@ namespace ChessSharp_UI
             return chosenMove.Move;
         }
 
-        public Piece GetPiece(int squareIndex)
-        {
-            var square = (SquareFlag)(1ul << squareIndex);
-
-            return _workspace.BitBoard.GetPiece(square);
-        }
+        public Piece GetPiece(int squareIndex) =>
+            _workspace.BitBoard.GetPiece(squareIndex.ToSquareFlag());
 
         public byte GetInstanceNumber(Piece piece, SquareFlag square) =>
             _workspace.BitBoard.GetInstanceNumber(piece, square);
 
         public SquareFlag GetSquaresWithPieceOn() =>
             _workspace.BitBoard.White | _workspace.BitBoard.Black;
-
-        private SquareFlag ToSquareFlag(int squareIndex) =>
-            (SquareFlag)(1ul << squareIndex);
 
         private void DoMove(MoveViewer move)
         {
@@ -140,7 +132,7 @@ namespace ChessSharp_UI
             Ply++;
 
             // Seems odd that separate things are tracking current colour, not sure how better to handle it though
-            if (_workspace.Colour != Turn)
+            if (_workspace.Colour != ToPlay)
                 throw new System.Exception("Game and Workspace out of sync");
 
             var moves = new List<uint>();
