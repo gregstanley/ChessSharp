@@ -46,7 +46,7 @@ namespace ChessSharp_UI
 
             _moveGenerator = new MoveGenerator();
 
-            _search = new Search(_moveGenerator);
+            _search = new Search(_moveGenerator, new Evaluation());
 
             var moves = new List<uint>();
 
@@ -104,9 +104,9 @@ namespace ChessSharp_UI
 
         public MoveViewer CpuMove()
         {
-            var moves = _search.Go(_workspace, 1);
+            var moves = _search.Go(_workspace, 3, true);
 
-            var chosenMove = moves.FirstOrDefault();
+            var chosenMove = moves.OrderByDescending(x => x.Score).FirstOrDefault();
 
             if (chosenMove == null)
                 return new MoveViewer(0);

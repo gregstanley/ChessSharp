@@ -1,20 +1,20 @@
-﻿using ChessSharp.Enums;
-using ChessSharp.MoveGeneration;
-using System;
+﻿using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 
 namespace ChessSharp.Engine
 {
     public class Search
     {
-        public Search(MoveGenerator moveGenerator)
+        public Search(MoveGenerator moveGenerator, Evaluation evaluation)
         {
             MoveGenerator = moveGenerator;
+            _evaluation = evaluation;
         }
 
         public MoveGenerator MoveGenerator { get; }
+        private Evaluation _evaluation { get; }
 
-        public List<MovePerft> Go(MoveGenerationWorkspace workspace, int depth)
+        public List<MoveEvaluation> Go(MoveGenerationWorkspace workspace, int depth, bool isMax)
         {
             var depthMoves = new List<uint>[64];
 
@@ -23,15 +23,9 @@ namespace ChessSharp.Engine
 
             var nodeMoves = depthMoves[depth];
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, colour);
-
             MoveGenerator.Generate(workspace, nodeMoves);
 
-            var count = 0;
-
-            //var movesView = moves.Select(x => new MoveViewer(x));
-
-            var movePerfts = new List<MovePerft>(64);
+            var moveEvaluations = new List<MoveEvaluation>(128);
 
             foreach (var move in nodeMoves)
             {
@@ -39,24 +33,20 @@ namespace ChessSharp.Engine
 
                 workspace.MakeMove(move);
 
-                //var checkers = GetCheckers(bitBoard, colour);
+                var evaluatedScore = -InnerPerft(workspace, depth - 1, !isMax, depthMoves);
 
-                var nodes = InnerPerft(workspace, depth - 1, depthMoves);
-
-                count += nodes;
-
-                movePerfts.Add(new MovePerft(moveView, nodes));
+                moveEvaluations.Add(new MoveEvaluation(moveView, evaluatedScore));
 
                 workspace.UnMakeMove(move);
             }
 
-            return movePerfts;
+            return moveEvaluations;
         }
 
-        private int InnerPerft(MoveGenerationWorkspace workspace, int depth, List<uint>[] depthMoves)
+        private double InnerPerft(MoveGenerationWorkspace workspace, int depth, bool isMax, List<uint>[] depthMoves)
         {
             if (depth == 0)
-                return 1;
+                return _evaluation.Evaluate(workspace.BitBoard) * (isMax ? -1 : 1);
 
             var nodeMoves = depthMoves[depth];
 
@@ -65,31 +55,25 @@ namespace ChessSharp.Engine
 
             MoveGenerator.Generate(workspace, nodeMoves);
 
-            var count = 0;
-
-            //var movesView = moves.Select(x => new MoveViewer(x));
-            //var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
-
-            //var movePerfts = new List<MovePerft>();
+            var bestScore = -10000d;
+            var bestMove = 0u;
 
             foreach (var move in nodeMoves)
             {
-                //var moveView = new MoveViewer(move);
-
                 workspace.MakeMove(move);
 
-                //var checkers = GetCheckers(bitBoard, colour);
+                var evaluatedScore = -InnerPerft(workspace, depth - 1, !isMax, depthMoves);
 
-                var nodes = InnerPerft(workspace, depth - 1, depthMoves);
-
-                count += nodes;
-
-                //movePerfts.Add(new MovePerft(moveView, nodes));
+                if (evaluatedScore > bestScore)
+                {
+                    bestScore = evaluatedScore;
+                    bestMove = move;
+                }
 
                 workspace.UnMakeMove(move);
             }
 
-            return count;
+            return bestScore;
         }
     }
 }
