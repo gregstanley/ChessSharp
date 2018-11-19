@@ -104,7 +104,7 @@ namespace ChessSharp_UI
 
         public MoveViewer CpuMove()
         {
-            var moves = _search.Go(_workspace, 3, true);
+            var moves = _search.Go(_workspace, 3, HumanColour == Colour.White);
 
             var chosenMove = moves.OrderByDescending(x => x.Score).FirstOrDefault();
 

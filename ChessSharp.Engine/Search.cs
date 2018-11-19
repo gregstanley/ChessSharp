@@ -5,14 +5,15 @@ namespace ChessSharp.Engine
 {
     public class Search
     {
-        public Search(MoveGenerator moveGenerator, Evaluation evaluation)
+        public Search(MoveGenerator moveGenerator, PositionEvaluator positionEvaluator)
         {
-            MoveGenerator = moveGenerator;
-            _evaluation = evaluation;
+            _moveGenerator = moveGenerator;
+            _positionEvaluator = positionEvaluator;
         }
 
-        public MoveGenerator MoveGenerator { get; }
-        private Evaluation _evaluation { get; }
+        private MoveGenerator _moveGenerator;
+
+        private PositionEvaluator _positionEvaluator;
 
         public List<MoveEvaluation> Go(MoveGenerationWorkspace workspace, int depth, bool isMax)
         {
@@ -23,7 +24,7 @@ namespace ChessSharp.Engine
 
             var nodeMoves = depthMoves[depth];
 
-            MoveGenerator.Generate(workspace, nodeMoves);
+            _moveGenerator.Generate(workspace, nodeMoves);
 
             var moveEvaluations = new List<MoveEvaluation>(128);
 
@@ -46,14 +47,14 @@ namespace ChessSharp.Engine
         private double InnerPerft(MoveGenerationWorkspace workspace, int depth, bool isMax, List<uint>[] depthMoves)
         {
             if (depth == 0)
-                return _evaluation.Evaluate(workspace.BitBoard) * (isMax ? -1 : 1);
+                return _positionEvaluator.Evaluate(workspace.BitBoard) * (isMax ? -1 : 1);
 
             var nodeMoves = depthMoves[depth];
 
             // Must wipe any existing moves each time we enter a depth
             nodeMoves.Clear();
 
-            MoveGenerator.Generate(workspace, nodeMoves);
+            _moveGenerator.Generate(workspace, nodeMoves);
 
             var bestScore = -10000d;
             var bestMove = 0u;

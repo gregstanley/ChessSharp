@@ -5,7 +5,7 @@ using System;
 
 namespace ChessSharp.Engine
 {
-    public class Evaluation
+    public class PositionEvaluator
     {
         public double Evaluate(BitBoard bitBoard)
         {
@@ -27,10 +27,6 @@ namespace ChessSharp.Engine
 
         private double GetAbsolutePieceValue(BitBoard bitBoard, SquareFlag square, Piece piece)
         {
-            //var rf = square.ToRankFile();
-            //var r = rf.Rank - 1;
-            //var f = (int)rf.File;
-
             var squareIndex = square.ToSquareIndex();
             var r = squareIndex / 8;
             var f = squareIndex % 8;
