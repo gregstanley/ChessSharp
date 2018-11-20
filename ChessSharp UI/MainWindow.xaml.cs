@@ -44,20 +44,28 @@ namespace ChessSharp_UI
 
         private void BtnNewGameWhite_Click(object sender, RoutedEventArgs e)
         {
-            _currentGame = new Game(new BitBoard(), Colour.White);
+            var bitBoard = new BitBoard();
+
+            _currentGame = new Game(bitBoard, Colour.White);
 
             Reset();
 
             UpdateUI();
+
+            BoardUserControl.Load(_currentGame);
         }
 
         private void BtnNewGameBlack_Click(object sender, RoutedEventArgs e)
         {
-            _currentGame = new Game(new BitBoard(), Colour.Black);
+            var bitBoard = new BitBoard();
+
+            _currentGame = new Game(bitBoard, Colour.Black);
 
             Reset();
 
             UpdateUI();
+
+            BoardUserControl.Load(_currentGame);
 
             DoSearch();
         }
@@ -235,6 +243,8 @@ namespace ChessSharp_UI
 
             if (!_currentGame.AvailableMoves.Any())
                 CheckmateUi.Visibility = Visibility.Visible;
+
+            BoardUserControl.Load(_currentGame);
         }
 
         private Image GetImage(int squareIndex)
@@ -326,6 +336,24 @@ namespace ChessSharp_UI
             };
 
             return imageMaps;
+        }
+
+        private void BoardUserControl_PieceMoved(object sender, UserMovedPieceEventArgs args)
+        {
+            _fromSquareIndex = args.FromSquareIndex;
+            _toSquareIndex = args.ToSquareIndex;
+
+            var result = ProcessNextMove(PieceType.None);
+
+            if (result.IsFailure)
+            {
+                if (result.Error == "Pawn promotion")
+                    PromotionTypeSelector.Visibility = Visibility.Visible;
+
+                return;
+            }
+
+            DoSearch();
         }
     }
 }

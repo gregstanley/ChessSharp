@@ -74,6 +74,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MoveAppliedEventArgs.cs" />
+    <Compile Include="UserMovedPieceEventArgs.cs" />
+    <Page Include="BoardUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -81,6 +87,9 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="BoardUserControl.xaml.cs">
+      <DependentUpon>BoardUserControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Game.cs" />
     <Compile Include="ImageMap.cs" />
@@ -182,6 +191,20 @@
       <Project>{55560F9A-EF04-4FD7-9440-A811FB0FFA37}</Project>
       <Name>ChessSharp</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icons-40x40-BlackBishop.png" />
+    <Resource Include="Images\Icons-40x40-BlackKing.png" />
+    <Resource Include="Images\Icons-40x40-BlackKnight.png" />
+    <Resource Include="Images\Icons-40x40-BlackPawn.png" />
+    <Resource Include="Images\Icons-40x40-BlackQueen.png" />
+    <Resource Include="Images\Icons-40x40-BlackRook.png" />
+    <Resource Include="Images\Icons-40x40-WhiteBishop.png" />
+    <Resource Include="Images\Icons-40x40-WhiteKing.png" />
+    <Resource Include="Images\Icons-40x40-WhiteKnight.png" />
+    <Resource Include="Images\Icons-40x40-WhitePawn.png" />
+    <Resource Include="Images\Icons-40x40-WhiteQueen.png" />
+    <Resource Include="Images\Icons-40x40-WhiteRook.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />

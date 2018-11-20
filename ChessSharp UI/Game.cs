@@ -11,6 +11,10 @@ namespace ChessSharp_UI
 {
     public class Game
     {
+        public delegate void MoveAppliedEventDelegate(object sender, MoveAppliedEventArgs args);
+
+        public event MoveAppliedEventDelegate MoveApplied;
+
         public int Ply { get; private set; } = 1;
 
         public Colour ToPlay { get { return Ply % 2 == 1 ? Colour.White : Colour.Black; } }
@@ -46,7 +50,7 @@ namespace ChessSharp_UI
 
             _moveGenerator = new MoveGenerator();
 
-            _search = new Search(_moveGenerator, new Evaluation());
+            _search = new Search(_moveGenerator, new PositionEvaluator());
 
             var moves = new List<uint>();
 
@@ -116,6 +120,9 @@ namespace ChessSharp_UI
             return chosenMove.Move;
         }
 
+        public BitBoard GetBitBoard() =>
+            _workspace.BitBoard;
+
         public Piece GetPiece(int squareIndex) =>
             _workspace.BitBoard.GetPiece(squareIndex.ToSquareFlag());
 
@@ -140,6 +147,8 @@ namespace ChessSharp_UI
             _moveGenerator.Generate(_workspace, moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
+
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move));
         }
 
         private MoveViewer TryCastles(MoveGenerationWorkspace workspace, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
