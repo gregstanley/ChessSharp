@@ -32,7 +32,7 @@ namespace ChessSharp_UI
 
         public int ToSquareIndex { get; private set; }
 
-        private int CanvasBorderSizeInPixels = 5;
+        private int BorderSizeInPixels = 5;
 
         private int GridSizeInPixels = 42;
 
@@ -53,16 +53,12 @@ namespace ChessSharp_UI
 
             _currentGame.MoveApplied += _currentGame_MoveApplied;
 
-            Update();
+            Update(new MoveViewer(0));
         }
 
-        private void Update()
+        private void Update(MoveViewer move)
         {
-            var canvasShape = CanvasShape;
-
             BoardCanvas.Children.Clear();
-
-            BoardCanvas.Children.Add(canvasShape);
 
             var board = _currentGame.GetBitBoard();
 
@@ -82,12 +78,18 @@ namespace ChessSharp_UI
 
         private void _currentGame_MoveApplied(object sender, MoveAppliedEventArgs args)
         {
-            Update();
+            Update(args.Move);
         }
 
         private void AddPieces(Colour colour, PieceType pieceType, SquareFlag squares, int gridSize)
         {
-            var usedImages = new List<Image>();
+            var dropShadowEffect = new DropShadowEffect
+            {
+                BlurRadius = 2,
+                Direction = 315,
+                Opacity = 0.5,
+                ShadowDepth = 2
+            };
 
             foreach (var square in squares.ToList())
             {
@@ -97,14 +99,7 @@ namespace ChessSharp_UI
 
                 var imagePath = $"Images/Icons-40x40-{colour}{pieceName}.png";
 
-                BitmapImage bitmapImage = new BitmapImage(new Uri(imagePath, UriKind.Relative));
-
-                var dropShadowEffect = new DropShadowEffect();
-
-                dropShadowEffect.BlurRadius = 2;
-                dropShadowEffect.Direction = 315;
-                dropShadowEffect.Opacity = 0.5;
-                dropShadowEffect.ShadowDepth = 2;
+                var bitmapImage = new BitmapImage(new Uri(imagePath, UriKind.Relative));
 
                 var image = new Image
                 {
@@ -117,58 +112,50 @@ namespace ChessSharp_UI
 
                 BoardCanvas.Children.Add(image);
 
-                if (image == null)
-                {
-                    var bp = true;
-                }
-                else
-                {
-                    image.Visibility = Visibility.Visible;
+                image.Visibility = Visibility.Visible;
 
-                    usedImages.Add(image);
+                var rank = IndexToRank(squareIndex);
+                var file = IndexToFile(squareIndex);
 
-                    var rank = IndexToRank(squareIndex);
-                    var file = IndexToFile(squareIndex);
+                var xy = GetScreenPosition(GridSizeInPixels, rank, file);
 
-                    var xy = GetScreenPosition(GridSizeInPixels, rank, file);
-
-                    Canvas.SetLeft(image, xy.X);
-                    Canvas.SetTop(image, xy.Y);
-                }
+                Canvas.SetLeft(image, xy.X);
+                Canvas.SetTop(image, xy.Y); 
             }
         }
         
-        private void BoardCanvas_MouseDown(object sender, MouseButtonEventArgs e)
+        private void Board_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (_currentGame == null)
                 return;
 
             Point p = e.GetPosition(this);
 
-            double x = p.X - CanvasBorderSizeInPixels;
-            double y = p.Y - CanvasBorderSizeInPixels;
+            double x = p.X - BorderSizeInPixels;
+            double y = p.Y - BorderSizeInPixels;
 
             var file = (int)(x / GridSizeInPixels);
             var rank = (int)(8 - (y / GridSizeInPixels));
 
-            FromSquareIndex = ConvertToSquareIndex((int)rank, (int)file);
+            FromSquareIndex = ConvertToSquareIndex(rank, file);
 
             FromLabel.Content = FromSquareIndex;
         }
         
-        private void BoardCanvas_MouseUp(object sender, MouseButtonEventArgs e)
+        private void Board_MouseUp(object sender, MouseButtonEventArgs e)
         {
             if (_currentGame == null)
                 return;
 
             Point p = e.GetPosition(this);
-            double x = p.X - CanvasBorderSizeInPixels;
-            double y = p.Y - CanvasBorderSizeInPixels;
+
+            double x = p.X - BorderSizeInPixels;
+            double y = p.Y - BorderSizeInPixels;
 
             var file = (int)(x / GridSizeInPixels);
             var rank = (int)(8 - (y / GridSizeInPixels));
 
-            ToSquareIndex = ConvertToSquareIndex((int)rank, (int)file);
+            ToSquareIndex = ConvertToSquareIndex(rank, file);
 
             ToLabel.Content = ToSquareIndex;
 
@@ -190,7 +177,9 @@ namespace ChessSharp_UI
 
             var squarePadding = (GridSizeInPixels - ImageSizeInPixels) / 2;
 
-            return new Point((int)x + CanvasBorderSizeInPixels + squarePadding, (int)y + CanvasBorderSizeInPixels + squarePadding);
+            var padding = BorderSizeInPixels + squarePadding;
+
+            return new Point(x + padding, y + padding);
         }
 
         private int ConvertToSquareIndex(int rank, int file) =>

@@ -6,8 +6,8 @@
              xmlns:local="clr-namespace:ChessSharp_UI"
              mc:Ignorable="d" 
              d:DesignHeight="346" Height="346" Width="346">
-    <Grid Height="346" Width="346">
-        <Border BorderBrush="#FF787878" BorderThickness="4" Width="346" Height="346" Background="#FF311D74"/>
+    <Grid Height="346" Width="346" MouseDown="Board_MouseDown" MouseUp="Board_MouseUp">
+        <Border BorderBrush="#FF555555" BorderThickness="4" Width="346" Height="346" Background="#FF0C0521"/>
 
         <Grid x:Name="SquaresUi" Width="Auto" Height="Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
 
@@ -106,9 +106,21 @@
             <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="7" Opacity="0.75" />
 
         </Grid>
-        <Canvas x:Name="BoardCanvas" Height="346" Width="346" MouseDown="BoardCanvas_MouseDown" MouseUp="BoardCanvas_MouseUp" HorizontalAlignment="Left" VerticalAlignment="Top">
-            <Rectangle x:Name="CanvasShape" Width="346" Height="346" Fill="FloralWhite" Opacity="0.3" />
+
+        <Rectangle x:Name="BoardSquareOverlay" Width="336" Height="336" Opacity="0.2" HorizontalAlignment="Center" VerticalAlignment="Center" >
+            <Rectangle.Fill>
+                <RadialGradientBrush>
+                    <GradientStop Color="#FF3D3E38" Offset="1"/>
+                    <GradientStop Color="#FFF5FFDC"/>
+                </RadialGradientBrush>
+            </Rectangle.Fill>
+        </Rectangle>
+
+        <Canvas x:Name="BoardCanvas" Height="346" Width="346" HorizontalAlignment="Left" VerticalAlignment="Top">
+
         </Canvas>
+
+
         <Label x:Name="FromLabel" Content="From" VerticalAlignment="Bottom" />
         <Label x:Name="ToLabel" Content="To" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
     </Grid>
