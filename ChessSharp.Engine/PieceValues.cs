@@ -2,7 +2,7 @@
 
 namespace ChessSharp.Engine
 {
-    public class PieceValues
+    internal class PieceValues
     {
         private static double[][] _blackPawn = null;
         private static double[][] _blackBishop = null;

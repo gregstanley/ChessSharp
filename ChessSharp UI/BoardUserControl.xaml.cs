@@ -1,21 +1,15 @@
 ﻿using ChessSharp;
+using ChessSharp.Engine;
+using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace ChessSharp_UI
 {
@@ -26,7 +20,11 @@ namespace ChessSharp_UI
     {
         public delegate void UserMovedPieceEventDelegate(object sender, UserMovedPieceEventArgs args);
 
+        public delegate void PromotionTypeSelectedEventDelegate(object sender, PromotionTypeSelectedEventArgs args);
+
         public event UserMovedPieceEventDelegate PieceMoved;
+
+        public event PromotionTypeSelectedEventDelegate PromotionTypeSelected;
 
         public int FromSquareIndex { get; private set; }
 
@@ -40,27 +38,45 @@ namespace ChessSharp_UI
 
         private Image[] _pieces = new Image[64];
 
-        private Game _currentGame;
+        private IGameEventBroadcaster _gameEvents;
+
+        private GameState _currentGameState;
 
         public BoardUserControl()
         {
             InitializeComponent();
+
+            PromotionUserControl.Visibility = Visibility.Collapsed;
         }
 
-        public void Load(Game game)
+        public void Load(IGameEventBroadcaster gameEvents, GameState gameState)
         {
-            _currentGame = game ?? throw new ArgumentNullException(nameof(game));
+            _gameEvents = gameEvents ?? throw new ArgumentNullException(nameof(gameEvents));
 
-            _currentGame.MoveApplied += _currentGame_MoveApplied;
+            _gameEvents.MoveApplied += _gameEvents_MoveApplied;
+            _gameEvents.PromotionTypeRequired += _gameEvents_PromotionTypeRequired;
 
-            Update(new MoveViewer(0));
+            PromotionUserControl.PromotionTypeSelected += PromotionUserControl_PromotionTypeSelected;
+
+            Update(new MoveViewer(0), gameState);
         }
 
-        private void Update(MoveViewer move)
+        private void PromotionUserControl_PromotionTypeSelected(object sender, PromotionTypeSelectedEventArgs args) =>
+            PromotionTypeSelected?.Invoke(this, args);
+
+        private void _gameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
+            Update(args.Move, args.GameState);
+
+        private void _gameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
+            PromotionUserControl.Open(args);
+
+        private void Update(MoveViewer move, GameState gameState)
         {
+            _currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+
             BoardCanvas.Children.Clear();
 
-            var board = _currentGame.GetBitBoard();
+            var board = _currentGameState;
 
             AddPieces(Colour.White, PieceType.Pawn, board.WhitePawns, GridSizeInPixels);
             AddPieces(Colour.White, PieceType.Rook, board.WhiteRooks, GridSizeInPixels);
@@ -74,11 +90,6 @@ namespace ChessSharp_UI
             AddPieces(Colour.Black, PieceType.Bishop, board.BlackBishops, GridSizeInPixels);
             AddPieces(Colour.Black, PieceType.Queen, board.BlackQueens, GridSizeInPixels);
             AddPieces(Colour.Black, PieceType.King, board.BlackKing, GridSizeInPixels);
-        }
-
-        private void _currentGame_MoveApplied(object sender, MoveAppliedEventArgs args)
-        {
-            Update(args.Move);
         }
 
         private void AddPieces(Colour colour, PieceType pieceType, SquareFlag squares, int gridSize)
@@ -126,9 +137,6 @@ namespace ChessSharp_UI
         
         private void Board_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (_currentGame == null)
-                return;
-
             Point p = e.GetPosition(this);
 
             double x = p.X - BorderSizeInPixels;
@@ -144,9 +152,6 @@ namespace ChessSharp_UI
         
         private void Board_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (_currentGame == null)
-                return;
-
             Point p = e.GetPosition(this);
 
             double x = p.X - BorderSizeInPixels;
@@ -158,11 +163,6 @@ namespace ChessSharp_UI
             ToSquareIndex = ConvertToSquareIndex(rank, file);
 
             ToLabel.Content = ToSquareIndex;
-
-            var piece = _currentGame.GetPiece(FromSquareIndex);
-
-            if (piece.Colour != _currentGame.HumanColour)
-                return;
 
             var xy = GetScreenPosition(GridSizeInPixels, (int)rank, (int)file);
 

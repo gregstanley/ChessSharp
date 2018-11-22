@@ -1,5 +1,4 @@
-﻿using ChessSharp;
-using ChessSharp.Engine;
+﻿using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using ChessSharp.Models;
@@ -7,13 +6,17 @@ using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ChessSharp_UI
+namespace ChessSharp.Engine
 {
-    public class Game
+    public class Game : IGameEventBroadcaster
     {
         public delegate void MoveAppliedEventDelegate(object sender, MoveAppliedEventArgs args);
 
+        public delegate void PromotionTypeRequiredEventDelegate(object sender, PromotionTypeRequiredEventArgs args);
+
         public event MoveAppliedEventDelegate MoveApplied;
+
+        public event PromotionTypeRequiredEventDelegate PromotionTypeRequired; 
 
         public int Ply { get; private set; } = 1;
 
@@ -29,6 +32,8 @@ namespace ChessSharp_UI
 
         public IEnumerable<MoveViewer> AvailableMoves { get; private set; }
 
+        private readonly BitBoard _bitBoard;
+
         private readonly MoveGenerationWorkspace _workspace;
 
         private readonly MoveGenerator _moveGenerator;
@@ -37,13 +42,15 @@ namespace ChessSharp_UI
 
         public static Game FromFen(Fen fen, Colour humanColour = Colour.None)
         {
-            var board = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromFen(fen);
 
-            return new Game(board, humanColour);
+            return new Game(bitBoard, humanColour);
         }
 
         public Game(BitBoard board, Colour humanColour = Colour.None)
         {
+            _bitBoard = board;
+
             HumanColour = humanColour;
 
             _workspace = new MoveGenerationWorkspace(board, Colour.White);
@@ -78,6 +85,8 @@ namespace ChessSharp_UI
             if (!promotionMoveMatches.Any())
                 return false;
 
+            PromotionTypeRequired?.Invoke(this, new PromotionTypeRequiredEventArgs(fromSquareIndex, toSquareIndex));
+
             return true;
         }
 
@@ -108,6 +117,18 @@ namespace ChessSharp_UI
 
         public MoveViewer CpuMove()
         {
+            var chosenMove = AvailableMoves.FirstOrDefault();
+
+            if (chosenMove == null)
+                return new MoveViewer(0);
+
+            DoMove(chosenMove);
+
+            return chosenMove;
+        }
+
+        public MoveViewer CpuMoveSmart()
+        {
             var moves = _search.Go(_workspace, 3, HumanColour == Colour.White);
 
             var chosenMove = moves.OrderByDescending(x => x.Score).FirstOrDefault();
@@ -121,16 +142,16 @@ namespace ChessSharp_UI
         }
 
         public BitBoard GetBitBoard() =>
-            _workspace.BitBoard;
+            _bitBoard;
 
         public Piece GetPiece(int squareIndex) =>
-            _workspace.BitBoard.GetPiece(squareIndex.ToSquareFlag());
+            _bitBoard.GetPiece(squareIndex.ToSquareFlag());
 
         public byte GetInstanceNumber(Piece piece, SquareFlag square) =>
-            _workspace.BitBoard.GetInstanceNumber(piece, square);
+            _bitBoard.GetInstanceNumber(piece, square);
 
         public SquareFlag GetSquaresWithPieceOn() =>
-            _workspace.BitBoard.White | _workspace.BitBoard.Black;
+            _bitBoard.White | _workspace.BitBoard.Black;
 
         private void DoMove(MoveViewer move)
         {
@@ -148,8 +169,10 @@ namespace ChessSharp_UI
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
 
-            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move));
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState()));
         }
+
+        public GameState GetGameState() => GameState.From(this);
 
         private MoveViewer TryCastles(MoveGenerationWorkspace workspace, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
         {

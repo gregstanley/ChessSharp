@@ -1,10 +1,11 @@
-﻿using ChessSharp.Enums;
+﻿using ChessSharp.Engine.Events;
+using ChessSharp.Enums;
 using System.Windows;
 using System.Windows.Controls;
 
 namespace ChessSharp_UI
 {
-    public delegate void PieceSelectedEventDelegate(object sender, PromotionTypeEventArgs args);
+    public delegate void PieceSelectedEventDelegate(object sender, PromotionTypeSelectedEventArgs args);
 
     public partial class PromotionTypeUserControl : UserControl
     {
@@ -17,22 +18,22 @@ namespace ChessSharp_UI
 
         private void ButtonQueen_Click(object sender, RoutedEventArgs e)
         {
-            PieceSelected?.Invoke(this, new PromotionTypeEventArgs(PieceType.Queen));
+            PieceSelected?.Invoke(this, new PromotionTypeSelectedEventArgs(0, 0, PieceType.Queen));
         }
 
         private void ButtonBishop_Click(object sender, RoutedEventArgs e)
         {
-            PieceSelected?.Invoke(this, new PromotionTypeEventArgs(PieceType.Bishop));
+            PieceSelected?.Invoke(this, new PromotionTypeSelectedEventArgs(0, 0, PieceType.Bishop));
         }
 
         private void ButtonKnight_Click(object sender, RoutedEventArgs e)
         {
-            PieceSelected?.Invoke(this, new PromotionTypeEventArgs(PieceType.Knight));
+            PieceSelected?.Invoke(this, new PromotionTypeSelectedEventArgs(0, 0, PieceType.Knight));
         }
 
         private void ButtonRook_Click(object sender, RoutedEventArgs e)
         {
-            PieceSelected?.Invoke(this, new PromotionTypeEventArgs(PieceType.Rook));
+            PieceSelected?.Invoke(this, new PromotionTypeSelectedEventArgs(0, 0, PieceType.Rook));
         }
     }
 }

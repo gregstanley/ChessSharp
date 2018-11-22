@@ -9,7 +9,7 @@
     <Grid Height="346" Width="346" MouseDown="Board_MouseDown" MouseUp="Board_MouseUp">
         <Border BorderBrush="#FF555555" BorderThickness="4" Width="346" Height="346" Background="#FF0C0521"/>
 
-        <Grid x:Name="SquaresUi" Width="Auto" Height="Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
+        <Grid x:Name="SquaresGrid" Width="Auto" Height="Auto" HorizontalAlignment="Center" VerticalAlignment="Center">
 
             <Grid.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -107,7 +107,7 @@
 
         </Grid>
 
-        <Rectangle x:Name="BoardSquareOverlay" Width="336" Height="336" Opacity="0.2" HorizontalAlignment="Center" VerticalAlignment="Center" >
+        <Rectangle x:Name="BoardSquareOverlayRectangle" Width="336" Height="336" Opacity="0.2" HorizontalAlignment="Center" VerticalAlignment="Center" >
             <Rectangle.Fill>
                 <RadialGradientBrush>
                     <GradientStop Color="#FF3D3E38" Offset="1"/>
@@ -120,8 +120,10 @@
 
         </Canvas>
 
-
         <Label x:Name="FromLabel" Content="From" VerticalAlignment="Bottom" />
         <Label x:Name="ToLabel" Content="To" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
+        
+        <local:PromotionTypeSelectorUserControl x:Name="PromotionUserControl" HorizontalAlignment="Center" Height="60" Margin="0,0,0,0" VerticalAlignment="Center" Width="225"/>
+
     </Grid>
 </UserControl>

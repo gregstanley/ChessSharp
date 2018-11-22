@@ -267,6 +267,6 @@
         <Label x:Name="EndPositionUI" Content="Label" HorizontalAlignment="Left" Margin="634,40,0,0" VerticalAlignment="Top" Width="51"/>
         <local:PromotionTypeUserControl x:Name="PromotionTypeSelector" HorizontalAlignment="Left" Height="100" Margin="440,264,0,0" VerticalAlignment="Top" Width="324" PieceSelected="PromotionTypeSelector_PieceSelected"/>
         <Label x:Name="ErrorUi" Content="No Errors" HorizontalAlignment="Left" Margin="243,810,0,0" VerticalAlignment="Top" Width="720" FontSize="18" Background="#FFFF0B0B"/>
-        <local:BoardUserControl x:Name="BoardUserControl" Width="346" Height="346" Margin="1002,313,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" PieceMoved="BoardUserControl_PieceMoved"/>
+        <local:BoardUserControl x:Name="BoardUserControl" Width="346" Height="346" Margin="1002,313,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" PieceMoved="BoardUserControl_PieceMoved" PromotionTypeSelected="BoardUserControl_PieceSelected"/>
     </Grid>
 </Window>

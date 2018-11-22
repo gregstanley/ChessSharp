@@ -1,8 +1,8 @@
-﻿using System.Windows;
+﻿using System;
 
-namespace ChessSharp_UI
+namespace ChessSharp.Engine.Events
 {
-    public class UserMovedPieceEventArgs : RoutedEventArgs
+    public class UserMovedPieceEventArgs : EventArgs
     {
         public int FromSquareIndex { get; }
 

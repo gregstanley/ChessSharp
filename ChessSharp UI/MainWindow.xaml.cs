@@ -1,4 +1,6 @@
 ﻿using ChessSharp;
+using ChessSharp.Engine;
+using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using CSharpFunctionalExtensions;
@@ -52,7 +54,7 @@ namespace ChessSharp_UI
 
             UpdateUI();
 
-            BoardUserControl.Load(_currentGame);
+            BoardUserControl.Load(_currentGame, _currentGame.GetGameState());
         }
 
         private void BtnNewGameBlack_Click(object sender, RoutedEventArgs e)
@@ -65,7 +67,7 @@ namespace ChessSharp_UI
 
             UpdateUI();
 
-            BoardUserControl.Load(_currentGame);
+            BoardUserControl.Load(_currentGame, _currentGame.GetGameState());
 
             DoSearch();
         }
@@ -119,21 +121,7 @@ namespace ChessSharp_UI
             var result = ProcessNextMove(PieceType.None);
 
             if (result.IsFailure)
-            {
-                if (result.Error == "Pawn promotion")
-                    PromotionTypeSelector.Visibility = Visibility.Visible;
-
                 return;
-            }
-
-            DoSearch();
-        }
-
-        private void PromotionTypeSelector_PieceSelected(object sender, PromotionTypeEventArgs args)
-        {
-            PromotionTypeSelector.Visibility = Visibility.Collapsed;
-
-            var result = ProcessNextMove(args.PieceType);
 
             DoSearch();
         }
@@ -144,7 +132,7 @@ namespace ChessSharp_UI
 
             _isThinking = true;
 
-            var result = ProcessNextMove(PieceType.None);
+            var chosenMove = _currentGame.CpuMove();
 
             _isThinking = false;
 
@@ -154,16 +142,6 @@ namespace ChessSharp_UI
         private Result<MoveViewer> ProcessNextMove(PieceType promotionType)
         {
             MoveViewer move = null;
-
-            if (!_currentGame.IsHumanTurn)
-            {
-                move = _currentGame.CpuMove();
-
-                if (move.Value == 0)
-                    Result.Fail<MoveViewer>("No moves available");
-
-                return Result.Ok(move);
-            }
 
             if (promotionType != PieceType.None)
             {
@@ -176,7 +154,6 @@ namespace ChessSharp_UI
                 return Result.Ok(move);
             }
 
-            // Try to convert the request into a move and then look to see if that would be a pawn promotion
             var isPawnPromotion = _currentGame.IsMovePromotion(_fromSquareIndex, _toSquareIndex);
 
             if (isPawnPromotion)
@@ -243,8 +220,6 @@ namespace ChessSharp_UI
 
             if (!_currentGame.AvailableMoves.Any())
                 CheckmateUi.Visibility = Visibility.Visible;
-
-            BoardUserControl.Load(_currentGame);
         }
 
         private Image GetImage(int squareIndex)
@@ -340,18 +315,33 @@ namespace ChessSharp_UI
 
         private void BoardUserControl_PieceMoved(object sender, UserMovedPieceEventArgs args)
         {
+            if (_isThinking)
+                return;
+
             _fromSquareIndex = args.FromSquareIndex;
             _toSquareIndex = args.ToSquareIndex;
 
             var result = ProcessNextMove(PieceType.None);
 
+            // TODO: Issue invalid move event
             if (result.IsFailure)
-            {
-                if (result.Error == "Pawn promotion")
-                    PromotionTypeSelector.Visibility = Visibility.Visible;
-
                 return;
-            }
+
+            DoSearch();
+        }
+
+        private void BoardUserControl_PieceSelected(object sender, PromotionTypeSelectedEventArgs args)
+        {
+            var result = ProcessNextMove(args.PieceType);
+
+            DoSearch();
+        }
+
+        private void PromotionTypeSelector_PieceSelected(object sender, PromotionTypeSelectedEventArgs args)
+        {
+            PromotionTypeSelector.Visibility = Visibility.Collapsed;
+
+            var result = ProcessNextMove(args.PieceType);
 
             DoSearch();
         }

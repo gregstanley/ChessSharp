@@ -51,11 +51,13 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
     </Reference>
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -74,8 +76,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MoveAppliedEventArgs.cs" />
-    <Compile Include="UserMovedPieceEventArgs.cs" />
+    <Compile Include="PromotionTypeSelectorUserControl.xaml.cs">
+      <DependentUpon>PromotionTypeSelectorUserControl.xaml</DependentUpon>
+    </Compile>
     <Page Include="BoardUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -91,19 +94,21 @@
     <Compile Include="BoardUserControl.xaml.cs">
       <DependentUpon>BoardUserControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Game.cs" />
     <Compile Include="ImageMap.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PromotionTypeSelectorUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PromotionTypeUserControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PromotionTypeEventArgs.cs" />
     <Compile Include="PromotionTypeUserControl.xaml.cs">
       <DependentUpon>PromotionTypeUserControl.xaml</DependentUpon>
     </Compile>
