@@ -118,9 +118,9 @@ namespace ChessSharp_UI
 
             var xy = GetScreenPosition(SquarePixels, (int)rank, (int)file);
 
-            var result = ProcessNextMove(PieceType.None);
+            var move = _currentGame.TryMove(_fromSquareIndex, _toSquareIndex, PieceType.None);
 
-            if (result.IsFailure)
+            if (move.Value == 0)
                 return;
 
             DoSearch();
@@ -139,36 +139,36 @@ namespace ChessSharp_UI
             UpdateUI();
         }
 
-        private Result<MoveViewer> ProcessNextMove(PieceType promotionType)
-        {
-            MoveViewer move = null;
+        //private Result<MoveViewer> ProcessNextMove(PieceType promotionType)
+        //{
+        //    MoveViewer move = null;
 
-            if (promotionType != PieceType.None)
-            {
-                // Second entry into function where the promotion type has now been defined
-                move = _currentGame.TryApplyMove(_fromSquareIndex, _toSquareIndex, promotionType);
+        //    if (promotionType != PieceType.None)
+        //    {
+        //        // Second entry into function where the promotion type has now been defined
+        //        move = _currentGame.TryApplyMove(_fromSquareIndex, _toSquareIndex, promotionType);
 
-                if (move.Value == 0)
-                    return Result.Fail<MoveViewer>("Invalid");
+        //        if (move.Value == 0)
+        //            return Result.Fail<MoveViewer>("Invalid");
 
-                return Result.Ok(move);
-            }
+        //        return Result.Ok(move);
+        //    }
 
-            var isPawnPromotion = _currentGame.IsMovePromotion(_fromSquareIndex, _toSquareIndex);
+        //    var isPawnPromotion = _currentGame.IsMovePromotion(_fromSquareIndex, _toSquareIndex);
 
-            if (isPawnPromotion)
-            {
-                // If it is then we have to stop and get the desired promotion type before continuing
-                return Result.Fail<MoveViewer>("Pawn promotion");
-            }
+        //    if (isPawnPromotion)
+        //    {
+        //        // If it is then we have to stop and get the desired promotion type before continuing
+        //        return Result.Fail<MoveViewer>("Pawn promotion");
+        //    }
 
-            move = _currentGame.TryApplyMove(_fromSquareIndex, _toSquareIndex, promotionType);
+        //    move = _currentGame.TryApplyMove(_fromSquareIndex, _toSquareIndex, promotionType);
 
-            if (move.Value == 0)
-                return Result.Fail<MoveViewer>("Invalid");
+        //    if (move.Value == 0)
+        //        return Result.Fail<MoveViewer>("Invalid");
 
-            return Result.Ok(move);
-        }
+        //    return Result.Ok(move);
+        //}
 
         private int ToSquareIndex(int rank, int file) =>
             ((rank - 1) * 8) + file;
@@ -321,10 +321,9 @@ namespace ChessSharp_UI
             _fromSquareIndex = args.FromSquareIndex;
             _toSquareIndex = args.ToSquareIndex;
 
-            var result = ProcessNextMove(PieceType.None);
+            var move = _currentGame.TryMove(args.FromSquareIndex, args.ToSquareIndex, PieceType.None);
 
-            // TODO: Issue invalid move event
-            if (result.IsFailure)
+            if (move.Value == 0)
                 return;
 
             DoSearch();
@@ -332,7 +331,10 @@ namespace ChessSharp_UI
 
         private void BoardUserControl_PieceSelected(object sender, PromotionTypeSelectedEventArgs args)
         {
-            var result = ProcessNextMove(args.PieceType);
+            var move = _currentGame.TryMove(args.FromSquareIndex, args.ToSquareIndex, args.PieceType);
+
+            if (move.Value == 0)
+                return;
 
             DoSearch();
         }
@@ -341,7 +343,10 @@ namespace ChessSharp_UI
         {
             PromotionTypeSelector.Visibility = Visibility.Collapsed;
 
-            var result = ProcessNextMove(args.PieceType);
+            var move = _currentGame.TryMove(args.FromSquareIndex, args.ToSquareIndex, args.PieceType);
+
+            if (move.Value == 0)
+                return;
 
             DoSearch();
         }

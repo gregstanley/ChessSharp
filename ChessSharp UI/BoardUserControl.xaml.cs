@@ -53,26 +53,41 @@ namespace ChessSharp_UI
         {
             _gameEvents = gameEvents ?? throw new ArgumentNullException(nameof(gameEvents));
 
-            _gameEvents.MoveApplied += _gameEvents_MoveApplied;
+            _gameEvents.InvalidMove += _gameEvents_InvalidMove;
             _gameEvents.PromotionTypeRequired += _gameEvents_PromotionTypeRequired;
+            _gameEvents.MoveApplied += _gameEvents_MoveApplied;
+            _gameEvents.Checkmate += _gameEvents_Checkmate;
 
             PromotionUserControl.PromotionTypeSelected += PromotionUserControl_PromotionTypeSelected;
 
             Update(new MoveViewer(0), gameState);
         }
 
-        private void PromotionUserControl_PromotionTypeSelected(object sender, PromotionTypeSelectedEventArgs args) =>
-            PromotionTypeSelected?.Invoke(this, args);
-
-        private void _gameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
-            Update(args.Move, args.GameState);
+        private void _gameEvents_InvalidMove(object sender, InvalidMoveEventArgs args)
+        {
+            InvalidMoveLabel.Visibility = Visibility.Visible;
+        }
 
         private void _gameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
             PromotionUserControl.Open(args);
 
+        private void _gameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
+            Update(args.Move, args.GameState);
+
+        private void _gameEvents_Checkmate(object sender, CheckmateEventArgs args)
+        {
+            CheckmateLabel.Visibility = Visibility.Visible;
+        }
+
+        private void PromotionUserControl_PromotionTypeSelected(object sender, PromotionTypeSelectedEventArgs args) =>
+            PromotionTypeSelected?.Invoke(this, args);
+
         private void Update(MoveViewer move, GameState gameState)
         {
             _currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+
+            InvalidMoveLabel.Visibility = Visibility.Collapsed;
+            CheckmateLabel.Visibility = Visibility.Collapsed;
 
             BoardCanvas.Children.Clear();
 

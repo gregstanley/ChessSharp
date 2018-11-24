@@ -10,13 +10,21 @@ namespace ChessSharp.Engine
 {
     public class Game : IGameEventBroadcaster
     {
-        public delegate void MoveAppliedEventDelegate(object sender, MoveAppliedEventArgs args);
+        public delegate void InvalidMoveEventDelegate(object sender, InvalidMoveEventArgs args);
 
         public delegate void PromotionTypeRequiredEventDelegate(object sender, PromotionTypeRequiredEventArgs args);
 
+        public delegate void MoveAppliedEventDelegate(object sender, MoveAppliedEventArgs args);
+
+        public delegate void CheckmateEventDelegate(object sender, CheckmateEventArgs args);
+
+        public event InvalidMoveEventDelegate InvalidMove;
+
+        public event PromotionTypeRequiredEventDelegate PromotionTypeRequired;
+
         public event MoveAppliedEventDelegate MoveApplied;
 
-        public event PromotionTypeRequiredEventDelegate PromotionTypeRequired; 
+        public event CheckmateEventDelegate Checkmate;
 
         public int Ply { get; private set; } = 1;
 
@@ -66,7 +74,7 @@ namespace ChessSharp.Engine
             AvailableMoves = moves.Select(x => new MoveViewer(x));
         }
 
-        public bool IsMovePromotion(int fromSquareIndex, int toSquareIndex)
+        private bool IsMovePromotion(int fromSquareIndex, int toSquareIndex)
         {
             var promotionMoves = AvailableMoves.Where(x =>
                    x.MoveType == MoveType.PromotionQueen
@@ -85,12 +93,10 @@ namespace ChessSharp.Engine
             if (!promotionMoveMatches.Any())
                 return false;
 
-            PromotionTypeRequired?.Invoke(this, new PromotionTypeRequiredEventArgs(fromSquareIndex, toSquareIndex));
-
             return true;
         }
 
-        public MoveViewer TryApplyMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
+        public MoveViewer TryFindMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
         {
             if (fromSquareIndex == toSquareIndex)
                 return new MoveViewer(0);
@@ -107,12 +113,13 @@ namespace ChessSharp.Engine
                 move = AvailableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare)
                     ?? new MoveViewer(0);
 
-            if (move.Value == 0)
-                return move;
-
-            DoMove(move);
-
             return move;
+            //if (move.Value == 0)
+            //    return move;
+
+            //DoMove(move);
+
+            //return move;
         }
 
         public MoveViewer CpuMove()
@@ -122,7 +129,7 @@ namespace ChessSharp.Engine
             if (chosenMove == null)
                 return new MoveViewer(0);
 
-            DoMove(chosenMove);
+            ApplyMove(chosenMove);
 
             return chosenMove;
         }
@@ -136,7 +143,7 @@ namespace ChessSharp.Engine
             if (chosenMove == null)
                 return new MoveViewer(0);
 
-            DoMove(chosenMove.Move);
+            ApplyMove(chosenMove.Move);
 
             return chosenMove.Move;
         }
@@ -153,7 +160,52 @@ namespace ChessSharp.Engine
         public SquareFlag GetSquaresWithPieceOn() =>
             _bitBoard.White | _workspace.BitBoard.Black;
 
-        private void DoMove(MoveViewer move)
+        public MoveViewer TryMove(int fromSquareIndex, int toSquareIndex, PieceType promotionType = PieceType.None)
+        {
+            MoveViewer move = null;
+
+            // Second entry into function where the promotion type has now been defined
+            if (promotionType != PieceType.None)
+            {
+                move = TryFindMove(fromSquareIndex, toSquareIndex, promotionType);
+
+                if (move.Value == 0)
+                {
+                    InvalidMove?.Invoke(this, new InvalidMoveEventArgs());
+
+                    return new MoveViewer(0);
+                }
+
+                ApplyMove(move);
+
+                return move;
+            }
+
+            var isPawnPromotion = IsMovePromotion(fromSquareIndex, toSquareIndex);
+
+            if (isPawnPromotion)
+            {
+                // If it is then we have to stop and get the desired promotion type before continuing
+                PromotionTypeRequired?.Invoke(this, new PromotionTypeRequiredEventArgs(fromSquareIndex, toSquareIndex));
+
+                return new MoveViewer(0);
+            }
+
+            move = TryFindMove(fromSquareIndex, toSquareIndex);
+
+            if (move.Value == 0)
+            {
+                InvalidMove?.Invoke(this, new InvalidMoveEventArgs());
+
+                return new MoveViewer(0);
+            }
+
+            ApplyMove(move);
+
+            return move;
+        }
+
+        private void ApplyMove(MoveViewer move)
         {
             _workspace.MakeMove(move.Value);
 
@@ -163,13 +215,16 @@ namespace ChessSharp.Engine
             if (_workspace.Colour != ToPlay)
                 throw new System.Exception("Game and Workspace out of sync");
 
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState()));
+
             var moves = new List<uint>();
 
             _moveGenerator.Generate(_workspace, moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
 
-            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState()));
+            if (!AvailableMoves.Any())
+                Checkmate?.Invoke(this, new CheckmateEventArgs());
         }
 
         public GameState GetGameState() => GameState.From(this);

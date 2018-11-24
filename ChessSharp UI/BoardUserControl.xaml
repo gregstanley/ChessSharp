@@ -122,8 +122,32 @@
 
         <Label x:Name="FromLabel" Content="From" VerticalAlignment="Bottom" />
         <Label x:Name="ToLabel" Content="To" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
-        
+
         <local:PromotionTypeSelectorUserControl x:Name="PromotionUserControl" HorizontalAlignment="Center" Height="60" Margin="0,0,0,0" VerticalAlignment="Center" Width="225"/>
+
+        <Label x:Name="InvalidMoveLabel" Content="Invalid" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="48" Background="#00000000">
+            <Label.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="1"/>
+                    <GradientStop Color="#FFD64949" Offset="0.003"/>
+                </LinearGradientBrush>
+            </Label.Foreground>
+            <Label.Effect>
+                <DropShadowEffect Opacity="0.8" ShadowDepth="3" RenderingBias="Quality" Direction="328"/>
+            </Label.Effect>
+        </Label>
+
+        <Label x:Name="CheckmateLabel" Content="Checkmate" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="48" Background="#00000000" FontStyle="Italic" FontWeight="Bold" FontStretch="Expanded">
+            <Label.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF95FFDD" Offset="1"/>
+                    <GradientStop Color="#FF3599D3" Offset="0.008"/>
+                </LinearGradientBrush>
+            </Label.Foreground>
+            <Label.Effect>
+                <DropShadowEffect Opacity="0.8" ShadowDepth="3" RenderingBias="Quality" Direction="328"/>
+            </Label.Effect>
+        </Label>
 
     </Grid>
 </UserControl>

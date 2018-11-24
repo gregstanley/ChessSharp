@@ -4,8 +4,12 @@ namespace ChessSharp.Engine.Events
 {
     public interface IGameEventBroadcaster
     {
-        event MoveAppliedEventDelegate MoveApplied;
+        event InvalidMoveEventDelegate InvalidMove;
 
         event PromotionTypeRequiredEventDelegate PromotionTypeRequired;
+
+        event MoveAppliedEventDelegate MoveApplied;
+
+        event CheckmateEventDelegate Checkmate;
     }
 }
