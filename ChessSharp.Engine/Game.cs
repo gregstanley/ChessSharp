@@ -3,8 +3,10 @@ using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using ChessSharp.Models;
 using ChessSharp.MoveGeneration;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ChessSharp.Engine
 {
@@ -14,13 +16,21 @@ namespace ChessSharp.Engine
 
         public delegate void PromotionTypeRequiredEventDelegate(object sender, PromotionTypeRequiredEventArgs args);
 
+        public delegate void SearchStartedEventDelegate(object sender, EventArgs args);
+
+        public delegate void SearchCompletedEventDelegate(object sender, EventArgs args);
+
         public delegate void MoveAppliedEventDelegate(object sender, MoveAppliedEventArgs args);
 
-        public delegate void CheckmateEventDelegate(object sender, CheckmateEventArgs args);
+        public delegate void CheckmateEventDelegate(object sender, EventArgs args);
 
         public event InvalidMoveEventDelegate InvalidMove;
 
         public event PromotionTypeRequiredEventDelegate PromotionTypeRequired;
+
+        public event SearchStartedEventDelegate SearchStarted;
+
+        public event SearchCompletedEventDelegate SearchCompleted;
 
         public event MoveAppliedEventDelegate MoveApplied;
 
@@ -74,28 +84,6 @@ namespace ChessSharp.Engine
             AvailableMoves = moves.Select(x => new MoveViewer(x));
         }
 
-        private bool IsMovePromotion(int fromSquareIndex, int toSquareIndex)
-        {
-            var promotionMoves = AvailableMoves.Where(x =>
-                   x.MoveType == MoveType.PromotionQueen
-                || x.MoveType == MoveType.PromotionRook
-                || x.MoveType == MoveType.PromotionBishop
-                || x.MoveType == MoveType.PromotionKnight);
-
-            if (!promotionMoves.Any())
-                return false;
-
-            var fromSquare = fromSquareIndex.ToSquareFlag();
-            var toSquare = toSquareIndex.ToSquareFlag();
-
-            var promotionMoveMatches = promotionMoves.Where(x => x.From == fromSquare && x.To == toSquare);
-
-            if (!promotionMoveMatches.Any())
-                return false;
-
-            return true;
-        }
-
         public MoveViewer TryFindMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
         {
             if (fromSquareIndex == toSquareIndex)
@@ -110,19 +98,12 @@ namespace ChessSharp.Engine
                 move = TryCastles(_workspace, fromSquare, toSquare, AvailableMoves);
 
             if (move.Value == 0)
-                move = AvailableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare)
-                    ?? new MoveViewer(0);
+                move = AvailableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare) ?? new MoveViewer(0);
 
             return move;
-            //if (move.Value == 0)
-            //    return move;
-
-            //DoMove(move);
-
-            //return move;
         }
 
-        public MoveViewer CpuMove()
+        public MoveViewer CpuMoveFirst()
         {
             var chosenMove = AvailableMoves.FirstOrDefault();
 
@@ -134,9 +115,13 @@ namespace ChessSharp.Engine
             return chosenMove;
         }
 
-        public MoveViewer CpuMoveSmart()
+        public async Task<MoveViewer> CpuMove(int maxDepth)
         {
-            var moves = _search.Go(_workspace, 3, HumanColour == Colour.White);
+            SearchStarted?.Invoke(this, new EventArgs());
+
+            var moves = await Task.Run(() => _search.Go(_workspace, maxDepth, HumanColour == Colour.White));
+
+            SearchCompleted?.Invoke(this, new EventArgs());
 
             var chosenMove = moves.OrderByDescending(x => x.Score).FirstOrDefault();
 
@@ -147,6 +132,8 @@ namespace ChessSharp.Engine
 
             return chosenMove.Move;
         }
+
+        public GameState GetGameState() => GameState.From(this);
 
         public BitBoard GetBitBoard() =>
             _bitBoard;
@@ -205,29 +192,48 @@ namespace ChessSharp.Engine
             return move;
         }
 
-        private void ApplyMove(MoveViewer move)
+        private bool IsMovePromotion(int fromSquareIndex, int toSquareIndex)
         {
-            _workspace.MakeMove(move.Value);
+            var promotionMoves = AvailableMoves.Where(x =>
+                   x.MoveType == MoveType.PromotionQueen
+                || x.MoveType == MoveType.PromotionRook
+                || x.MoveType == MoveType.PromotionBishop
+                || x.MoveType == MoveType.PromotionKnight);
 
-            Ply++;
+            if (!promotionMoves.Any())
+                return false;
 
-            // Seems odd that separate things are tracking current colour, not sure how better to handle it though
-            if (_workspace.Colour != ToPlay)
-                throw new System.Exception("Game and Workspace out of sync");
+            var fromSquare = fromSquareIndex.ToSquareFlag();
+            var toSquare = toSquareIndex.ToSquareFlag();
 
-            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState()));
+            var promotionMoveMatches = promotionMoves.Where(x => x.From == fromSquare && x.To == toSquare);
 
-            var moves = new List<uint>();
+            if (!promotionMoveMatches.Any())
+                return false;
 
-            _moveGenerator.Generate(_workspace, moves);
-
-            AvailableMoves = moves.Select(x => new MoveViewer(x));
-
-            if (!AvailableMoves.Any())
-                Checkmate?.Invoke(this, new CheckmateEventArgs());
+            return true;
         }
 
-        public GameState GetGameState() => GameState.From(this);
+        private MoveViewer TryPromotions(SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves, PieceType promotionPieceType = PieceType.None)
+        {
+            switch (promotionPieceType)
+            {
+                case PieceType.Queen:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen)
+                        ?? new MoveViewer(0);
+                case PieceType.Rook:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook)
+                        ?? new MoveViewer(0);
+                case PieceType.Bishop:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop)
+                        ?? new MoveViewer(0);
+                case PieceType.Knight:
+                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight)
+                        ?? new MoveViewer(0);
+                default:
+                    return new MoveViewer(0);
+            }
+        }
 
         private MoveViewer TryCastles(MoveGenerationWorkspace workspace, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
         {
@@ -262,25 +268,26 @@ namespace ChessSharp.Engine
             return new MoveViewer(0);
         }
 
-        private MoveViewer TryPromotions(SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves, PieceType promotionPieceType = PieceType.None)
+        private void ApplyMove(MoveViewer move)
         {
-            switch (promotionPieceType)
-            {
-                case PieceType.Queen:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen)
-                        ?? new MoveViewer(0);
-                case PieceType.Rook:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook)
-                        ?? new MoveViewer(0);
-                case PieceType.Bishop:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop)
-                        ?? new MoveViewer(0);
-                case PieceType.Knight:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight)
-                        ?? new MoveViewer(0);
-                default:
-                    return new MoveViewer(0);
-            }
+            _workspace.MakeMove(move.Value);
+
+            Ply++;
+
+            // Seems odd that separate things are tracking current colour, not sure how better to handle it though
+            if (_workspace.Colour != ToPlay)
+                throw new System.Exception("Game and Workspace out of sync");
+
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState()));
+
+            var moves = new List<uint>();
+
+            _moveGenerator.Generate(_workspace, moves);
+
+            AvailableMoves = moves.Select(x => new MoveViewer(x));
+
+            if (!AvailableMoves.Any())
+                Checkmate?.Invoke(this, new EventArgs());
         }
     }
 }

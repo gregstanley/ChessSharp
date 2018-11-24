@@ -132,7 +132,7 @@ namespace ChessSharp_UI
 
             _isThinking = true;
 
-            var chosenMove = _currentGame.CpuMove();
+            var chosenMove = _currentGame.CpuMove(3);
 
             _isThinking = false;
 
@@ -224,6 +224,8 @@ namespace ChessSharp_UI
 
         private Image GetImage(int squareIndex)
         {
+            return null;
+
             if (_currentGame == null)
                 return null;
 

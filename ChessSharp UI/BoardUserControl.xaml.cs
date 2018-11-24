@@ -42,9 +42,15 @@ namespace ChessSharp_UI
 
         private GameState _currentGameState;
 
+        private bool _isThinking = false;
+
         public BoardUserControl()
         {
             InitializeComponent();
+
+            InvalidMoveLabel.Visibility = Visibility.Collapsed;
+            ThinkingLabel.Visibility = Visibility.Collapsed;
+            CheckmateLabel.Visibility = Visibility.Collapsed;
 
             PromotionUserControl.Visibility = Visibility.Collapsed;
         }
@@ -55,6 +61,8 @@ namespace ChessSharp_UI
 
             _gameEvents.InvalidMove += _gameEvents_InvalidMove;
             _gameEvents.PromotionTypeRequired += _gameEvents_PromotionTypeRequired;
+            _gameEvents.SearchStarted += _gameEvents_SearchStarted;
+            _gameEvents.SearchCompleted += _gameEvents_SearchCompleted;
             _gameEvents.MoveApplied += _gameEvents_MoveApplied;
             _gameEvents.Checkmate += _gameEvents_Checkmate;
 
@@ -71,10 +79,24 @@ namespace ChessSharp_UI
         private void _gameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
             PromotionUserControl.Open(args);
 
+        private void _gameEvents_SearchStarted(object sender, EventArgs args)
+        {
+            _isThinking = true;
+
+            ThinkingLabel.Visibility = Visibility.Visible;
+        }
+
+        private void _gameEvents_SearchCompleted(object sender, EventArgs args)
+        {
+            _isThinking = false;
+
+            ThinkingLabel.Visibility = Visibility.Collapsed;
+        }
+
         private void _gameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
             Update(args.Move, args.GameState);
 
-        private void _gameEvents_Checkmate(object sender, CheckmateEventArgs args)
+        private void _gameEvents_Checkmate(object sender, EventArgs args)
         {
             CheckmateLabel.Visibility = Visibility.Visible;
         }
@@ -86,7 +108,10 @@ namespace ChessSharp_UI
         {
             _currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
 
+            _isThinking = false;
+
             InvalidMoveLabel.Visibility = Visibility.Collapsed;
+            ThinkingLabel.Visibility = Visibility.Collapsed;
             CheckmateLabel.Visibility = Visibility.Collapsed;
 
             BoardCanvas.Children.Clear();
@@ -152,6 +177,9 @@ namespace ChessSharp_UI
         
         private void Board_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            if (_isThinking)
+                return;
+
             Point p = e.GetPosition(this);
 
             double x = p.X - BorderSizeInPixels;
@@ -167,6 +195,9 @@ namespace ChessSharp_UI
         
         private void Board_MouseUp(object sender, MouseButtonEventArgs e)
         {
+            if (_isThinking)
+                return;
+
             Point p = e.GetPosition(this);
 
             double x = p.X - BorderSizeInPixels;

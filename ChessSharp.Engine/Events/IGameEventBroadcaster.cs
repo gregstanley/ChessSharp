@@ -8,6 +8,10 @@ namespace ChessSharp.Engine.Events
 
         event PromotionTypeRequiredEventDelegate PromotionTypeRequired;
 
+        event SearchStartedEventDelegate SearchStarted;
+
+        event SearchCompletedEventDelegate SearchCompleted;
+
         event MoveAppliedEventDelegate MoveApplied;
 
         event CheckmateEventDelegate Checkmate;

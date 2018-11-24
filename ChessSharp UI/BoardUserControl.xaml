@@ -137,6 +137,18 @@
             </Label.Effect>
         </Label>
 
+        <Label x:Name="ThinkingLabel" Content="Thinking..." HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="48" Background="#00000000">
+            <Label.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="Black" Offset="1"/>
+                    <GradientStop Color="#FFD6D649" Offset="0.003"/>
+                </LinearGradientBrush>
+            </Label.Foreground>
+            <Label.Effect>
+                <DropShadowEffect Opacity="0.8" ShadowDepth="3" RenderingBias="Quality" Direction="328"/>
+            </Label.Effect>
+        </Label>
+        
         <Label x:Name="CheckmateLabel" Content="Checkmate" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="48" Background="#00000000" FontStyle="Italic" FontWeight="Bold" FontStretch="Expanded">
             <Label.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
