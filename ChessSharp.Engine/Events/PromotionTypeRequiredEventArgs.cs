@@ -1,17 +1,10 @@
-﻿using System;
-
-namespace ChessSharp.Engine.Events
+﻿namespace ChessSharp.Engine.Events
 {
-    public class PromotionTypeRequiredEventArgs : EventArgs
+    public class PromotionTypeRequiredEventArgs : UserMovedPieceEventArgs
     {
         public PromotionTypeRequiredEventArgs(int fromSquareIndex, int toSquareIndex)
+            : base(fromSquareIndex, toSquareIndex)
         {
-            FromSquareIndex = fromSquareIndex;
-            ToSquareIndex = toSquareIndex;
         }
-
-        public int FromSquareIndex { get; }
-
-        public int ToSquareIndex { get; }
     }
 }

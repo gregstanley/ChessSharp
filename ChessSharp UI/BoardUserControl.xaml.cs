@@ -210,10 +210,9 @@ namespace ChessSharp_UI
 
             ToLabel.Content = ToSquareIndex;
 
-            var xy = GetScreenPosition(GridSizeInPixels, (int)rank, (int)file);
+            var xy = GetScreenPosition(GridSizeInPixels, rank, file);
 
-            PieceMoved?.Invoke(this, new UserMovedPieceEventArgs(
-                FromSquareIndex, ToSquareIndex, UserMovedPieceEventArgs.MoveResult.Ordinary));
+            PieceMoved?.Invoke(this, new UserMovedPieceEventArgs(FromSquareIndex, ToSquareIndex));
         }
         
         private Point GetScreenPosition(int gridSize, int rank, int file)

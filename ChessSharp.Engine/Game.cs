@@ -158,7 +158,7 @@ namespace ChessSharp.Engine
 
                 if (move.Value == 0)
                 {
-                    InvalidMove?.Invoke(this, new InvalidMoveEventArgs());
+                    InvalidMove?.Invoke(this, new InvalidMoveEventArgs(fromSquareIndex, toSquareIndex));
 
                     return new MoveViewer(0);
                 }
@@ -182,7 +182,7 @@ namespace ChessSharp.Engine
 
             if (move.Value == 0)
             {
-                InvalidMove?.Invoke(this, new InvalidMoveEventArgs());
+                InvalidMove?.Invoke(this, new InvalidMoveEventArgs(fromSquareIndex, toSquareIndex));
 
                 return new MoveViewer(0);
             }

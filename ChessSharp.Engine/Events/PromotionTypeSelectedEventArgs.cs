@@ -2,18 +2,13 @@
 
 namespace ChessSharp.Engine.Events
 {
-    public class PromotionTypeSelectedEventArgs
+    public class PromotionTypeSelectedEventArgs : UserMovedPieceEventArgs
     {
         public PromotionTypeSelectedEventArgs(int fromSquareIndex, int toSquareIndex, PieceType pieceType)
+            : base(fromSquareIndex, toSquareIndex)
         {
-            FromSquareIndex = fromSquareIndex;
-            ToSquareIndex = toSquareIndex;
             PieceType = pieceType;
         }
-
-        public int FromSquareIndex { get; }
-
-        public int ToSquareIndex { get; }
 
         public PieceType PieceType { get; }
     }

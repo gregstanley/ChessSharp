@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace ChessSharp.Engine.Events
+﻿namespace ChessSharp.Engine.Events
 {
-    public class InvalidMoveEventArgs : EventArgs
+    public class InvalidMoveEventArgs : UserMovedPieceEventArgs
     {
-        public InvalidMoveEventArgs()
+        public InvalidMoveEventArgs(int fromSquareIndex, int toSquareIndex)
+            : base(fromSquareIndex, toSquareIndex)
         {
         }
     }
