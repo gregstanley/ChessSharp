@@ -76,10 +76,17 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GameUserControl.xaml.cs">
+      <DependentUpon>GameUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PromotionTypeSelectorUserControl.xaml.cs">
       <DependentUpon>PromotionTypeSelectorUserControl.xaml</DependentUpon>
     </Compile>
     <Page Include="BoardUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="GameUserControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -103,15 +110,8 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PromotionTypeUserControl.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="PromotionTypeUserControl.xaml.cs">
-      <DependentUpon>PromotionTypeUserControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
