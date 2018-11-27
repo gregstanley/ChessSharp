@@ -36,25 +36,44 @@ namespace ChessSharp.Engine
 
         public SquareFlag BlackKing { get; }
 
+        public bool WhiteCanCastleKingSide { get; }
+
+        public bool WhiteCanCastleQueenSide { get; }
+
+        public bool BlackCanCastleKingSide { get; }
+
+        public bool BlackCanCastleQueenSide { get; }
+
+        public double Evaluation { get; }
+
         public static GameState From(Game game)
         {
             var bitBoard = game.GetBitBoard();
 
             return new GameState(game.Ply, game.ToPlay, game.HalfTurnCounter, game.FullTurnNumber,
+                game.GetBitBoard().WhiteCanCastleKingSide, game.GetBitBoard().WhiteCanCastleQueenSide,
+                game.GetBitBoard().BlackCanCastleKingSide, game.GetBitBoard().BlackCanCastleQueenSide,
                 bitBoard.WhitePawns, bitBoard.WhiteRooks, bitBoard.WhiteKnights, bitBoard.WhiteBishops, bitBoard.WhiteQueens,
                 bitBoard.WhiteKing, bitBoard.BlackPawns, bitBoard.BlackRooks, bitBoard.BlackKnights, bitBoard.BlackBishops,
-                bitBoard.BlackQueens, bitBoard.BlackKing);
+                bitBoard.BlackQueens, bitBoard.BlackKing, game.Evaluate());
         }
 
         private GameState(int ply, Colour toPlay, int halfTurnCounter, int fullTurnNumber,
+            bool whiteCanCastleKingSide, bool whiteCanCastleQueenSide,
+            bool blackCanCastleKingSide, bool blackCanCastleQueenSide,
             SquareFlag whitePawns, SquareFlag whiteRooks, SquareFlag whiteKnights, SquareFlag whiteBishops,
             SquareFlag whiteQueens, SquareFlag whiteKing, SquareFlag blackPawns, SquareFlag blackRooks,
-            SquareFlag blackKnights, SquareFlag blackBishops, SquareFlag blackQueens, SquareFlag blackKing)
+            SquareFlag blackKnights, SquareFlag blackBishops, SquareFlag blackQueens, SquareFlag blackKing,
+            double evaluation)
         {
             Ply = ply;
             ToPlay = toPlay;
             HalfTurnCounter = halfTurnCounter;
             FullTurnNumber = fullTurnNumber;
+            WhiteCanCastleKingSide = whiteCanCastleKingSide;
+            WhiteCanCastleQueenSide = whiteCanCastleQueenSide;
+            BlackCanCastleKingSide = blackCanCastleKingSide;
+            BlackCanCastleQueenSide = blackCanCastleQueenSide;
             WhitePawns = whitePawns;
             WhiteRooks = whiteRooks;
             WhiteKnights = whiteKnights;
@@ -67,6 +86,7 @@ namespace ChessSharp.Engine
             BlackBishops = blackBishops;
             BlackQueens = blackQueens;
             BlackKing = blackKing;
+            Evaluation = evaluation;
         }
     }
 }

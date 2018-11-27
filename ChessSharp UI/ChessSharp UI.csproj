@@ -211,6 +211,9 @@
     <Resource Include="Images\Icons-40x40-WhiteQueen.png" />
     <Resource Include="Images\Icons-40x40-WhiteRook.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\iconfinder_gnome-session-switch_30685.png" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.21\build\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

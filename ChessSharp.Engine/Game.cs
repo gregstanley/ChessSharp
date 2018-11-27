@@ -56,6 +56,8 @@ namespace ChessSharp.Engine
 
         private readonly MoveGenerator _moveGenerator;
 
+        private readonly PositionEvaluator _positionEvaluator;
+
         private readonly Search _search;
 
         public static Game FromFen(Fen fen, Colour humanColour = Colour.None)
@@ -75,7 +77,9 @@ namespace ChessSharp.Engine
 
             _moveGenerator = new MoveGenerator();
 
-            _search = new Search(_moveGenerator, new PositionEvaluator());
+            _positionEvaluator = new PositionEvaluator();
+
+            _search = new Search(_moveGenerator, _positionEvaluator);
 
             var moves = new List<uint>();
 
@@ -132,6 +136,8 @@ namespace ChessSharp.Engine
 
             return chosenMove.Move;
         }
+
+        public double Evaluate() => _positionEvaluator.Evaluate(_bitBoard);
 
         public GameState GetGameState() => GameState.From(this);
 

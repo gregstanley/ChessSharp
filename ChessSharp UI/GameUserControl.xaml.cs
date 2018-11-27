@@ -2,6 +2,7 @@
 using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace ChessSharp_UI
@@ -19,7 +20,14 @@ namespace ChessSharp_UI
         {
             _game = game;
 
-            HalfTurnNumberLabel.Content = _game.FullTurnNumber;
+            _game.MoveApplied += _game_MoveApplied;
+
+            WhiteCastleKingSide.Visibility = Visibility.Visible;
+            WhiteCastleQueenSide.Visibility = Visibility.Visible;
+            BlackCastleKingSide.Visibility = Visibility.Visible;
+            BlackCastleQueenSide.Visibility = Visibility.Visible;
+
+            FullTurnNumberLabel.Content = _game.FullTurnNumber;
 
             BoardUserControl.Load(_game, _game.GetGameState());
         }
@@ -28,11 +36,41 @@ namespace ChessSharp_UI
         {
             _game = game;
 
-            HalfTurnNumberLabel.Content = _game.FullTurnNumber;
+            _game.MoveApplied += _game_MoveApplied;
+
+            WhiteCastleKingSide.Visibility = Visibility.Visible;
+            WhiteCastleQueenSide.Visibility = Visibility.Visible;
+            BlackCastleKingSide.Visibility = Visibility.Visible;
+            BlackCastleQueenSide.Visibility = Visibility.Visible;
+
+            FullTurnNumberLabel.Content = _game.FullTurnNumber;
 
             BoardUserControl.Load(_game, _game.GetGameState());
 
             return DoSearch();
+        }
+
+        private void _game_MoveApplied(object sender, MoveAppliedEventArgs args)
+        {
+            FullTurnNumberLabel.Content = args.GameState.FullTurnNumber;
+
+            EvaluationLabel.Content = args.GameState.Evaluation;
+
+            WhiteCastleKingSide.Visibility = args.GameState.WhiteCanCastleKingSide
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+            WhiteCastleQueenSide.Visibility = args.GameState.WhiteCanCastleQueenSide
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+            BlackCastleKingSide.Visibility = args.GameState.BlackCanCastleKingSide
+                ? Visibility.Visible
+                : Visibility.Collapsed;
+
+            BlackCastleQueenSide.Visibility = args.GameState.BlackCanCastleQueenSide
+                ? Visibility.Visible
+                : Visibility.Collapsed;
         }
 
         private Task DoSearch() => _game.CpuMove(3);

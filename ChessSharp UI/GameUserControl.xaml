@@ -10,18 +10,41 @@
         <Rectangle HorizontalAlignment="Left" Height="432" Margin="0,0,0,0" Stroke="Black" VerticalAlignment="Top" Width="773">
             <Rectangle.Fill>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF858585" Offset="0"/>
-                    <GradientStop Color="#FFA391AA" Offset="1"/>
-                    <GradientStop Color="#FFEAEAEA" Offset="0.195"/>
+                    <GradientStop Color="#FF404040" Offset="0"/>
+                    <GradientStop Color="#FF404040" Offset="1"/>
+                    <GradientStop Color="White" Offset="0.195"/>
+                    <GradientStop Color="#FFE7DCFF" Offset="0.771"/>
                 </LinearGradientBrush>
             </Rectangle.Fill>
         </Rectangle>
-        <local:BoardUserControl x:Name="BoardUserControl" HorizontalAlignment="Left" Width="346" Height="346" Margin="25,25,0,0" VerticalAlignment="Top" Background="Black" PieceMoved="BoardUserControl_PieceMoved" PromotionTypeSelected="BoardUserControl_PieceSelected" >
+        <local:BoardUserControl x:Name="BoardUserControl" HorizontalAlignment="Left" Width="346" Height="346" Margin="25,41,0,0" VerticalAlignment="Top" Background="Black" PieceMoved="BoardUserControl_PieceMoved" PromotionTypeSelected="BoardUserControl_PieceSelected" >
             <local:BoardUserControl.Effect>
                 <DropShadowEffect ShadowDepth="10" BlurRadius="10" RenderingBias="Quality" Color="#FF666666"/>
             </local:BoardUserControl.Effect>
         </local:BoardUserControl>
-        <Label x:Name="HalfTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="396,25,0,0" VerticalAlignment="Top" />
+        <Label x:Name="HalfTurnCountLabel" Content="1" HorizontalAlignment="Left" Margin="404,41,0,0" VerticalAlignment="Top" Width="90" />
+        <Image x:Name="WhiteCastleQueenSide" HorizontalAlignment="Left" Height="32" Margin="98,390,0,0" VerticalAlignment="Top" Width="32" Source="Images/iconfinder_gnome-session-switch_30685.png">
+            <Image.Effect>
+                <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
+            </Image.Effect>
+        </Image>
+        <Image x:Name="WhiteCastleKingSide" HorizontalAlignment="Left" Height="32" Margin="266,390,0,0" VerticalAlignment="Top" Width="32" Source="Images/iconfinder_gnome-session-switch_30685.png">
+            <Image.Effect>
+                <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
+            </Image.Effect>
+        </Image>
+        <Image x:Name="BlackCastleQueenSide" HorizontalAlignment="Left" Height="32" Margin="98,7,0,0" VerticalAlignment="Top" Width="32" Source="Images/iconfinder_gnome-session-switch_30685.png">
+            <Image.Effect>
+                <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
+            </Image.Effect>
+        </Image>
+        <Image x:Name="BlackCastleKingSide" HorizontalAlignment="Left" Height="32" Margin="266,7,0,0" VerticalAlignment="Top" Width="32" Source="Images/iconfinder_gnome-session-switch_30685.png">
+            <Image.Effect>
+                <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
+            </Image.Effect>
+        </Image>
+        <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="404,72,0,0" VerticalAlignment="Top" Width="90" />
+        <Label x:Name="EvaluationLabel" Content="0" HorizontalAlignment="Left" Margin="154,10,0,0" VerticalAlignment="Top" Width="90" />
 
     </Grid>
 </UserControl>
