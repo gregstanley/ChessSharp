@@ -7,8 +7,8 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="498.126" Width="779.607">
     <Grid>
-        <Button x:Name="BtnNewGameWhite" Content="New Game as White" HorizontalAlignment="Left" Margin="41,10,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameWhite_Click"/>
-        <Button x:Name="BtnNewGameBlack" Content="New Game as Black" HorizontalAlignment="Left" Margin="191,10,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameBlack_Click"/>
-        <local:GameUserControl x:Name="GameUserControl" HorizontalAlignment="Left" Margin="0,35,0,0" Width="794" Height="440" VerticalAlignment="Top"/>
+        <local:GameUserControl x:Name="GameUserControl" HorizontalAlignment="Left" Margin="0,2,-22,0" Width="794" Height="440" VerticalAlignment="Top"/>
+        <Button x:Name="BtnNewGameWhite" Content="New Game as White" HorizontalAlignment="Left" Margin="448,15,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameWhite_Click"/>
+        <Button x:Name="BtnNewGameBlack" Content="New Game as Black" HorizontalAlignment="Left" Margin="612,15,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameBlack_Click"/>
     </Grid>
 </Window>

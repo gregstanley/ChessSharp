@@ -123,16 +123,13 @@ namespace ChessSharp.Extensions
 
         public static byte Count(this SquareFlag squares)
         {
+            // Solution from: https://stackoverflow.com/questions/12171584/what-is-the-fastest-way-to-count-set-bits-in-uint32
             byte count = 0;
 
-            var a = (ulong)squares;
-
-            while (a > 0)
+            while (squares != 0)
             {
-                if ((a & 1) > 0)
-                    ++count;
-
-                a >>= 1;
+                count++;
+                squares &= squares - 1;
             }
 
             return count;
@@ -245,6 +242,36 @@ namespace ChessSharp.Extensions
             }
 
             return 32 + x - 1;
+        }
+
+        public static IEnumerable<int> ToSquareIndexList(this SquareFlag squares)
+        {
+            var ulsquares = (ulong)squares;
+
+            var a = (uint)(ulsquares & 0b00000000_00000000_00000000_00000000_11111111_11111111_11111111_11111111);
+            var b = (uint)((ulsquares & 0b11111111_11111111_11111111_11111111_00000000_00000000_00000000_00000000) >> 32);
+
+            var x = 0;
+
+            while (a > 0)
+            {
+                if ((a & 1) > 0)
+                    yield return x;
+
+                a >>= 1;
+                ++x;
+            }
+
+            x = 0;
+
+            while (b > 0)
+            {
+                if ((b & 1) > 0)
+                    yield return 32 + x;
+
+                b >>= 1;
+                ++x;
+            }
         }
 
         public static IEnumerable<SquareFlag> ToList(this SquareFlag squares)

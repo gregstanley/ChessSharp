@@ -45,6 +45,8 @@
         </Image>
         <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="404,72,0,0" VerticalAlignment="Top" Width="90" />
         <Label x:Name="EvaluationLabel" Content="0" HorizontalAlignment="Left" Margin="154,10,0,0" VerticalAlignment="Top" Width="90" />
+        <Label x:Name="PositionCountLabel" Content="1" HorizontalAlignment="Left" Margin="315,10,0,0" VerticalAlignment="Top" Width="90" />
+        <TextBox x:Name="OutputTextBox" HorizontalAlignment="Left" Height="284" Margin="404,103,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="345" Background="#FF2B2B2B" Foreground="#FFA3D3CC"/>
 
     </Grid>
 </UserControl>

@@ -13,9 +13,6 @@ using System.Windows.Media.Imaging;
 
 namespace ChessSharp_UI
 {
-    /// <summary>
-    /// Interaction logic for Board.xaml
-    /// </summary>
     public partial class BoardUserControl : UserControl
     {
         public delegate void UserMovedPieceEventDelegate(object sender, UserMovedPieceEventArgs args);
@@ -210,11 +207,9 @@ namespace ChessSharp_UI
 
             ToLabel.Content = ToSquareIndex;
 
-            var xy = GetScreenPosition(GridSizeInPixels, rank, file);
-
             PieceMoved?.Invoke(this, new UserMovedPieceEventArgs(FromSquareIndex, ToSquareIndex));
         }
-        
+
         private Point GetScreenPosition(int gridSize, int rank, int file)
         {
             double x = (file - 1) * gridSize;

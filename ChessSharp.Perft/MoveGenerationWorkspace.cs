@@ -22,6 +22,8 @@ namespace ChessSharp.MoveGeneration
 
         public Colour Colour { get; private set; }
 
+        public byte Ply { get; private set; }
+
         public RelativeBitBoard RelativeBitBoard =>
             BitBoard.RelativeTo(Colour);
 
@@ -29,12 +31,14 @@ namespace ChessSharp.MoveGeneration
         {
             BitBoard.MakeMove(move);
             Colour = Colour.Opposite();
+            ++Ply;
         }
 
         public void UnMakeMove(uint move)
         {
             BitBoard.UnMakeMove(move);
             Colour = Colour.Opposite();
+            --Ply;
         }
     }
 }

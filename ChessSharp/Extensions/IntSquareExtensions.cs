@@ -5,6 +5,9 @@ namespace ChessSharp.Extensions
 {
     public static class IntSquareExtensions
     {
+        public static ulong ToSquareFlagUlong(this int squareIndex) =>
+            1ul << squareIndex;
+
         public static SquareFlag ToSquareFlag(this int squareIndex)
         {
             if (squareIndex < 0 || squareIndex > 63)

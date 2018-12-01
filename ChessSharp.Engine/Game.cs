@@ -18,7 +18,7 @@ namespace ChessSharp.Engine
 
         public delegate void SearchStartedEventDelegate(object sender, EventArgs args);
 
-        public delegate void SearchCompletedEventDelegate(object sender, EventArgs args);
+        public delegate void SearchCompletedEventDelegate(object sender, SearchCompleteEventArgs args);
 
         public delegate void MoveAppliedEventDelegate(object sender, MoveAppliedEventArgs args);
 
@@ -49,6 +49,8 @@ namespace ChessSharp.Engine
         public bool IsHumanTurn { get { return HumanColour != Colour.None && ToPlay == HumanColour; } }
 
         public IEnumerable<MoveViewer> AvailableMoves { get; private set; }
+
+        public int SearchedPositionsCount => _search.PositionCount;
 
         private readonly BitBoard _bitBoard;
 
@@ -123,11 +125,14 @@ namespace ChessSharp.Engine
         {
             SearchStarted?.Invoke(this, new EventArgs());
 
-            var moves = await Task.Run(() => _search.Go(_workspace, maxDepth, HumanColour == Colour.White));
+            var searchResults = await Task.Run(() => _search.Go(_workspace, maxDepth));
 
-            SearchCompleted?.Invoke(this, new EventArgs());
+            SearchCompleted?.Invoke(this, new SearchCompleteEventArgs(searchResults));
 
-            var chosenMove = moves.OrderByDescending(x => x.Score).FirstOrDefault();
+            var chosenMove = searchResults.MoveEvaluations
+                .OrderByDescending(x => x.Score).FirstOrDefault();
+
+            //var chosenMove = moves.OrderByDescending(x => x.Score).FirstOrDefault();
 
             if (chosenMove == null)
                 return new MoveViewer(0);
@@ -294,6 +299,11 @@ namespace ChessSharp.Engine
 
             if (!AvailableMoves.Any())
                 Checkmate?.Invoke(this, new EventArgs());
+        }
+
+        private void _search_SearchCompleted(object sender, SearchCompleteEventArgs args)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -21,6 +21,7 @@ namespace ChessSharp_UI
             _game = game;
 
             _game.MoveApplied += _game_MoveApplied;
+            _game.SearchCompleted += _game_SearchCompleted;
 
             WhiteCastleKingSide.Visibility = Visibility.Visible;
             WhiteCastleQueenSide.Visibility = Visibility.Visible;
@@ -73,7 +74,14 @@ namespace ChessSharp_UI
                 : Visibility.Collapsed;
         }
 
-        private Task DoSearch() => _game.CpuMove(3);
+        private void _game_SearchCompleted(object sender, SearchCompleteEventArgs args)
+        {
+            PositionCountLabel.Content = args.SearchResults.SearchedPositionCount;
+
+            OutputTextBox.Text = args.SearchResults.ToResultsString();
+        }
+
+        private Task DoSearch() => _game.CpuMove(5);
 
         private async void BoardUserControl_PieceMoved(object sender, UserMovedPieceEventArgs args) =>
             await OnPieceMoved(args); 
