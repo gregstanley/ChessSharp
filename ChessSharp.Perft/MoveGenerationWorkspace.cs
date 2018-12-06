@@ -27,18 +27,22 @@ namespace ChessSharp.MoveGeneration
         public RelativeBitBoard RelativeBitBoard =>
             BitBoard.RelativeTo(Colour);
 
-        public void MakeMove(uint move)
+        public ulong MakeMove(uint move)
         {
             BitBoard.MakeMove(move);
             Colour = Colour.Opposite();
             ++Ply;
+
+            return BitBoard.Key;
         }
 
-        public void UnMakeMove(uint move)
+        public ulong UnMakeMove(uint move)
         {
             BitBoard.UnMakeMove(move);
             Colour = Colour.Opposite();
             --Ply;
+
+            return BitBoard.Key;
         }
     }
 }

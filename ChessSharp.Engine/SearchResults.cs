@@ -8,7 +8,8 @@ namespace ChessSharp.Engine
     public class SearchResults
     {
         public SearchResults(int positionCount, IReadOnlyCollection<long> elapsedMilliseconds,
-            IReadOnlyCollection<MoveEvaluation> moveEvaluations, uint[][] primaryVariations)
+            IReadOnlyCollection<MoveEvaluation> moveEvaluations, uint[][] primaryVariations,
+            TranspositionTable transpositionTable)
         {
             SearchedPositionCount = positionCount;
             ElapsedMilliseconds = elapsedMilliseconds;
@@ -20,6 +21,8 @@ namespace ChessSharp.Engine
                 output.Add(primaryVariation.Select(x => new MoveViewer(x)).ToList());
 
             PrimaryVariations = output;
+
+            _transpositionTable = transpositionTable;
         }
 
         public string ToResultsString()
@@ -27,6 +30,10 @@ namespace ChessSharp.Engine
             var sb = new StringBuilder();
 
             sb.AppendLine($"Total positions: {SearchedPositionCount}");
+
+            sb.AppendLine($"TT access: {_transpositionTable.AccessCount}");
+            sb.AppendLine($"TT hits: {_transpositionTable.HitCount}");
+            sb.AppendLine($"TT conflict: {_transpositionTable.ConflictCount}");
 
             sb.AppendLine("=== Iteration timers ===");
 
@@ -62,5 +69,7 @@ namespace ChessSharp.Engine
         public IReadOnlyCollection<MoveEvaluation> MoveEvaluations { get; }
 
         public IReadOnlyCollection<IReadOnlyCollection<MoveViewer>> PrimaryVariations { get; }
+
+        private TranspositionTable _transpositionTable { get; }
     }
 }
