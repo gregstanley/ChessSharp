@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{341D7D2B-1981-4C79-A743-62A21C54DE52}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Chess.Engine", "Chess.Engine\Chess.Engine.csproj", "{D6BB767B-223B-4F23-B71F-28C85911E988}"
@@ -22,7 +23,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp Perft", "ChessSh
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.MoveGeneration", "ChessSharp.Perft\ChessSharp.MoveGeneration.csproj", "{51868C9F-D04F-4A81-8276-6E315D22D852}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessSharp.Engine", "ChessSharp.Engine\ChessSharp.Engine.csproj", "{7D3CDE19-976D-44A4-B510-7C78BC584EC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.Engine", "ChessSharp.Engine\ChessSharp.Engine.csproj", "{7D3CDE19-976D-44A4-B510-7C78BC584EC4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessSharp UI", "ChessSharp UI\ChessSharp UI.csproj", "{4F613A7E-0606-4EC9-AEA3-C9D593ADDDFC}"
 EndProject

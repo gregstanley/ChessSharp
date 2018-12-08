@@ -315,15 +315,11 @@ namespace ChessSharp
             var pieceType = move.GetPieceType();
             var capturePieceType = move.GetCapturePieceType();
 
-            var isSpecialMove = false;
-
             // Copy current state
             var state = _boardStates.Peek().Next();
 
             if (moveType == MoveType.CastleKing)
             {
-                isSpecialMove = true;
-
                 if (colour == Colour.White)
                     MakeWhiteKingSideCastle();
                 else
@@ -333,8 +329,6 @@ namespace ChessSharp
             }
             else if (moveType == MoveType.CastleQueen)
             {
-                isSpecialMove = true;
-
                 if (colour == Colour.White)
                     MakeWhiteQueenSideCastle();
                 else
@@ -344,8 +338,6 @@ namespace ChessSharp
             }
             else if (moveType == MoveType.EnPassant)
             {
-                isSpecialMove = true;
-
                 MovePiece(colour, pieceType, fromSquare, toSquare);
 
                 // Capturing behind the opponent pawn so shift as if we are opponent
@@ -355,8 +347,6 @@ namespace ChessSharp
             }
             else if (moveType == MoveType.PromotionQueen)
             {
-                isSpecialMove = true;
-
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
 
@@ -366,8 +356,6 @@ namespace ChessSharp
             }
             else if (moveType == MoveType.PromotionRook)
             {
-                isSpecialMove = true;
-
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
 
@@ -377,8 +365,6 @@ namespace ChessSharp
             }
             else if (moveType == MoveType.PromotionBishop)
             {
-                isSpecialMove = true;
-
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
 
@@ -388,8 +374,6 @@ namespace ChessSharp
             }
             else if (moveType == MoveType.PromotionKnight)
             {
-                isSpecialMove = true;
-
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
 
@@ -463,8 +447,6 @@ namespace ChessSharp
 
                 if (capturePieceType != PieceType.None)
                 {
-                    isSpecialMove = true;
-
                     RemovePiece(colour.Opposite(), toSquare);
                     
                     if (capturePieceType == PieceType.Rook)
@@ -504,12 +486,8 @@ namespace ChessSharp
             var pieceType = move.GetPieceType();
             var capturePieceType = move.GetCapturePieceType();
 
-            var isSpecialMove = false;
-
             if (moveType == MoveType.CastleKing)
             {
-                isSpecialMove = true;
-
                 if (colour == Colour.White)
                     UnMakeWhiteKingSideCastle();
                 else
@@ -517,8 +495,6 @@ namespace ChessSharp
             }
             else if (moveType == MoveType.CastleQueen)
             {
-                isSpecialMove = true;
-
                 if (colour == Colour.White)
                     UnMakeWhiteQueenSideCastle();
                 else
@@ -528,8 +504,6 @@ namespace ChessSharp
             {
                 if (moveType == MoveType.EnPassant)
                 {
-                    isSpecialMove = true;
-
                     // Capturing behind the opponent pawn so shift as if we are opponent
                     var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
 
@@ -539,8 +513,6 @@ namespace ChessSharp
                 }
                 else if (moveType == MoveType.PromotionQueen)
                 {
-                    isSpecialMove = true;
-
                     DemotePiece(colour, PieceType.Queen, toSquare);
 
                     MovePiece(colour, pieceType, toSquare, fromSquare);
@@ -550,8 +522,6 @@ namespace ChessSharp
                 }
                 else if (moveType == MoveType.PromotionRook)
                 {
-                    isSpecialMove = true;
-
                     DemotePiece(colour, PieceType.Rook, toSquare);
 
                     MovePiece(colour, pieceType, toSquare, fromSquare);
@@ -561,8 +531,6 @@ namespace ChessSharp
                 }
                 else if (moveType == MoveType.PromotionBishop)
                 {
-                    isSpecialMove = true;
-
                     DemotePiece(colour, PieceType.Bishop, toSquare);
 
                     MovePiece(colour, pieceType, toSquare, fromSquare);
@@ -572,8 +540,6 @@ namespace ChessSharp
                 }
                 else if (moveType == MoveType.PromotionKnight)
                 {
-                    isSpecialMove = true;
-
                     DemotePiece(colour, PieceType.Knight, toSquare);
 
                     MovePiece(colour, pieceType, toSquare, fromSquare);
@@ -595,8 +561,6 @@ namespace ChessSharp
 
                 if (capturePieceType != PieceType.None)
                 {
-                    isSpecialMove = true;
-
                     MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
                 }
             }
