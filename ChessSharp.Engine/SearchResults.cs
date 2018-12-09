@@ -8,7 +8,7 @@ namespace ChessSharp.Engine
     public class SearchResults
     {
         public SearchResults(int positionCount, IReadOnlyCollection<long> elapsedMilliseconds,
-            IReadOnlyCollection<MoveEvaluation> moveEvaluations, uint[][] primaryVariations,
+            IReadOnlyCollection<MoveEvaluation> moveEvaluations, uint[][] principalVariations,
             TranspositionTable transpositionTable)
         {
             SearchedPositionCount = positionCount;
@@ -17,10 +17,10 @@ namespace ChessSharp.Engine
 
             var output = new List<List<MoveViewer>>();
 
-            foreach(var primaryVariation in primaryVariations)
-                output.Add(primaryVariation.Select(x => new MoveViewer(x)).ToList());
+            foreach(var principalVariation in principalVariations)
+                output.Add(principalVariation.Select(x => new MoveViewer(x)).ToList());
 
-            PrimaryVariations = output;
+            PrincipalVariations = output;
 
             _transpositionTable = transpositionTable;
         }
@@ -49,12 +49,12 @@ namespace ChessSharp.Engine
             foreach (var moveEvaluation in MoveEvaluations.OrderByDescending(x => x.Score))
                 sb.AppendLine($"{moveEvaluation.Move.From} {moveEvaluation.Move.To} {moveEvaluation.Score}");
 
-            sb.AppendLine("=== Primary variations ===");
+            sb.AppendLine("=== Principal variations ===");
 
-            foreach (var primaryVariation in PrimaryVariations)
+            foreach (var principalVariation in PrincipalVariations)
             {
-                foreach (var move in primaryVariation)
-                    sb.Append($"{move.From}{move.To} ");
+                foreach (var move in principalVariation)
+                    sb.Append($"{move.GetNotation()} ");
 
                 sb.AppendLine();
             }
@@ -68,7 +68,7 @@ namespace ChessSharp.Engine
 
         public IReadOnlyCollection<MoveEvaluation> MoveEvaluations { get; }
 
-        public IReadOnlyCollection<IReadOnlyCollection<MoveViewer>> PrimaryVariations { get; }
+        public IReadOnlyCollection<IReadOnlyCollection<MoveViewer>> PrincipalVariations { get; }
 
         private TranspositionTable _transpositionTable { get; }
     }

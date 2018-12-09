@@ -1,4 +1,5 @@
-﻿using ChessSharp.Enums;
+﻿using ChessSharp.Engine.Events;
+using ChessSharp.Enums;
 using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -8,6 +9,10 @@ namespace ChessSharp.Engine
 {
     public class Search
     {
+        public delegate void InfoEventDelegate(object sender, InfoEventArgs args);
+
+        public event InfoEventDelegate Info;
+
         public int PositionCount { get; private set; }
 
         private MoveGenerator _moveGenerator;
@@ -15,6 +20,8 @@ namespace ChessSharp.Engine
         private PositionEvaluator _positionEvaluator;
 
         private TranspositionTable TranspositionTable { get; set; } = new TranspositionTable();
+
+        private readonly Stopwatch _stopWatch = new Stopwatch();
 
         public Search(MoveGenerator moveGenerator, PositionEvaluator positionEvaluator)
         {
@@ -24,6 +31,8 @@ namespace ChessSharp.Engine
 
         public SearchResults Go(MoveGenerationWorkspace workspace, int maxDepth)
         {
+            _stopWatch.Restart();
+
             PositionCount = 0;
 
             TranspositionTable.ResetCounters();
@@ -64,12 +73,15 @@ namespace ChessSharp.Engine
 
             var currentMaxDepth = 1;
 
-            var sw = new Stopwatch();
+            var lap = _stopWatch.ElapsedMilliseconds;
+
             var iterationLaps = new List<long>();
+
+            Info info;
 
             while (currentMaxDepth <= maxDepth)
             {
-                sw.Restart();
+                //sw.Restart();
 
                 existingTransposition = TranspositionTable.Find(workspace.BitBoard.Key);
 
@@ -99,8 +111,6 @@ namespace ChessSharp.Engine
                     var evaluatedScore = -PrincipalVariationSearch(workspace, currentMaxDepth - 1, 1, double.MinValue, double.MaxValue,
                         depthMoves, principalVariation);
 
-                    moveEvaluations.Add(new MoveEvaluation(moveView, evaluatedScore));
-
                     var afterKey = workspace.UnMakeMove(move);
 
                     if (evaluatedScore > bestScore)
@@ -109,7 +119,13 @@ namespace ChessSharp.Engine
                         bestScore = evaluatedScore;
 
                         UpdatePrincipalVariation(principalVariation, masterPrincipalVariation, 0, move);
+
+                        info = new InfoNewPv(PositionCount, _stopWatch.ElapsedMilliseconds, currentMaxDepth, bestMove, bestScore, TranspositionTable);
+
+                        Info?.Invoke(this, new InfoEventArgs(info));
                     }
+
+                    moveEvaluations.Add(new MoveEvaluation(moveView, evaluatedScore));
                 }
 
                 foreach (var move in nodeMoves)
@@ -124,8 +140,6 @@ namespace ChessSharp.Engine
                     var evaluatedScore = -PrincipalVariationSearch(workspace, currentMaxDepth - 1, 1, double.MinValue, double.MaxValue,
                         depthMoves, principalVariation);
 
-                    moveEvaluations.Add(new MoveEvaluation(moveView, evaluatedScore));
-
                     var afterKey = workspace.UnMakeMove(move);
 
                     if (evaluatedScore > bestScore)
@@ -134,17 +148,31 @@ namespace ChessSharp.Engine
                         bestScore = evaluatedScore;
 
                         UpdatePrincipalVariation(principalVariation, masterPrincipalVariation, 0, move);
+
+                        info = new InfoNewPv(PositionCount, _stopWatch.ElapsedMilliseconds, currentMaxDepth, bestMove, bestScore, TranspositionTable);
+
+                        Info?.Invoke(this, new InfoEventArgs(info));
                     }
+
+                    moveEvaluations.Add(new MoveEvaluation(moveView, evaluatedScore));
                 }
 
                 TranspositionTable.Set(transpositionKey, currentMaxDepth, workspace.Colour, bestScore, bestMove);
 
-                ++currentMaxDepth;
+                var iterationLength = _stopWatch.ElapsedMilliseconds - lap;
 
-                iterationLaps.Add(sw.ElapsedMilliseconds);
+                lap = _stopWatch.ElapsedMilliseconds;
+
+                iterationLaps.Add(iterationLength);
+            
+                info = new InfoDepthComplete(PositionCount, _stopWatch.ElapsedMilliseconds, currentMaxDepth, masterPrincipalVariation, TranspositionTable);
+
+                Info?.Invoke(this, new InfoEventArgs(info));
+
+                ++currentMaxDepth;
             }
 
-            sw.Stop();
+            _stopWatch.Reset();
 
             return new SearchResults(PositionCount, iterationLaps, moveEvaluations, principalVariations, TranspositionTable);
         }
@@ -223,7 +251,9 @@ namespace ChessSharp.Engine
                     evaluatedScore = -PrincipalVariationSearch(workspace, depth - 1, ply + 1, -alpha - 1, -alpha, depthMoves, principalVariation);
 
                     if (alpha < evaluatedScore && evaluatedScore < beta) // in fail-soft ... && score < beta ) is common
+                    {
                         evaluatedScore = -PrincipalVariationSearch(workspace, depth - 1, ply + 1, -beta, -evaluatedScore, depthMoves, principalVariation); // re-search
+                    }
                 }
 
                 var afterKey = workspace.UnMakeMove(move);
@@ -251,6 +281,13 @@ namespace ChessSharp.Engine
                 {
                     _moveGenerator.Generate(workspace, nodeMoves);
                     needsToGenerate = false;
+                }
+
+                if (ply == 1)
+                {
+                    var info = new Info(PositionCount, _stopWatch.ElapsedMilliseconds, depth, TranspositionTable);
+
+                    Info?.Invoke(this, new InfoEventArgs(info));
                 }
             }
 

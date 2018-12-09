@@ -1,6 +1,7 @@
 ﻿using ChessSharp.Engine;
 using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
+using System;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,6 +23,7 @@ namespace ChessSharp_UI
 
             _game.MoveApplied += _game_MoveApplied;
             _game.SearchCompleted += _game_SearchCompleted;
+            _game.Info += _game_Info;
 
             WhiteCastleKingSide.Visibility = Visibility.Visible;
             WhiteCastleQueenSide.Visibility = Visibility.Visible;
@@ -31,6 +33,27 @@ namespace ChessSharp_UI
             FullTurnNumberLabel.Content = _game.FullTurnNumber;
 
             BoardUserControl.Load(_game, _game.GetGameState());
+        }
+
+        private void _game_Info(object sender, InfoEventArgs args)
+        {
+            Dispatcher.BeginInvoke(new Action(() =>
+            {
+                InfoTimeTextBlock.Text = args.Info.GetTimeString();
+                InfoTtTextBlock.Text = args.Info.GetTtString();
+
+                if (args.Info is InfoDepthComplete info2)
+                {
+                    InfoPvTextBlock.Text = info2.GetPvString();
+                    return;
+                }
+
+                if (args.Info is InfoNewPv info3)
+                {
+                    InfoPvTextBlock2.Text = info3.GetBestMoveString();
+                    return;
+                }
+            }));
         }
 
         public Task NewGameBlack(Game game)
@@ -76,8 +99,6 @@ namespace ChessSharp_UI
 
         private void _game_SearchCompleted(object sender, SearchCompleteEventArgs args)
         {
-            PositionCountLabel.Content = args.SearchResults.SearchedPositionCount;
-
             OutputTextBox.Text = args.SearchResults.ToResultsString();
         }
 

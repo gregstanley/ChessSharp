@@ -24,6 +24,8 @@ namespace ChessSharp.Engine
 
         public delegate void CheckmateEventDelegate(object sender, EventArgs args);
 
+        public delegate void InfoEventDelegate(object sender, InfoEventArgs args);
+
         public event InvalidMoveEventDelegate InvalidMove;
 
         public event PromotionTypeRequiredEventDelegate PromotionTypeRequired;
@@ -35,6 +37,8 @@ namespace ChessSharp.Engine
         public event MoveAppliedEventDelegate MoveApplied;
 
         public event CheckmateEventDelegate Checkmate;
+
+        public event InfoEventDelegate Info;
 
         public int Ply { get; private set; } = 1;
 
@@ -83,11 +87,18 @@ namespace ChessSharp.Engine
 
             _search = new Search(_moveGenerator, _positionEvaluator);
 
+            _search.Info += _search_Info;
+
             var moves = new List<uint>();
 
             _moveGenerator.Generate(_workspace, moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
+        }
+
+        private void _search_Info(object sender, InfoEventArgs args)
+        {
+            Info?.Invoke(this, args);
         }
 
         public MoveViewer TryFindMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
@@ -299,11 +310,6 @@ namespace ChessSharp.Engine
 
             if (!AvailableMoves.Any())
                 Checkmate?.Invoke(this, new EventArgs());
-        }
-
-        private void _search_SearchCompleted(object sender, SearchCompleteEventArgs args)
-        {
-            throw new NotImplementedException();
         }
     }
 }
