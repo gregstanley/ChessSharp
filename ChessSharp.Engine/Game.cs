@@ -44,9 +44,9 @@ namespace ChessSharp.Engine
 
         public Colour ToPlay { get { return Ply % 2 == 1 ? Colour.White : Colour.Black; } }
 
-        public int HalfTurnCounter { get; private set; } = 0;
+        public int HalfMoveClock { get; private set; } = 0;
 
-        public int FullTurnNumber { get { return (Ply + 1) / 2; } }
+        public int FullTurn { get { return (Ply + 1) / 2; } }
 
         public Colour HumanColour { get; private set; } = Colour.None;
 
@@ -96,11 +96,6 @@ namespace ChessSharp.Engine
             AvailableMoves = moves.Select(x => new MoveViewer(x));
         }
 
-        private void _search_Info(object sender, InfoEventArgs args)
-        {
-            Info?.Invoke(this, args);
-        }
-
         public MoveViewer TryFindMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
         {
             if (fromSquareIndex == toSquareIndex)
@@ -143,8 +138,6 @@ namespace ChessSharp.Engine
             var chosenMove = searchResults.MoveEvaluations
                 .OrderByDescending(x => x.Score).FirstOrDefault();
 
-            //var chosenMove = moves.OrderByDescending(x => x.Score).FirstOrDefault();
-
             if (chosenMove == null)
                 return new MoveViewer(0);
 
@@ -153,15 +146,13 @@ namespace ChessSharp.Engine
             return chosenMove.Move;
         }
 
-        public double Evaluate() => _positionEvaluator.Evaluate(_bitBoard);
-
-        public GameState GetGameState() => GameState.From(this);
-
-        public BitBoard GetBitBoard() =>
-            _bitBoard;
-
-        public Piece GetPiece(int squareIndex) =>
-            _bitBoard.GetPiece(squareIndex.ToSquareFlag());
+        public GameState GetGameState() =>
+            new GameState(Ply, ToPlay, HalfMoveClock, FullTurn,
+                _bitBoard.WhiteCanCastleKingSide, _bitBoard.WhiteCanCastleQueenSide,
+                _bitBoard.BlackCanCastleKingSide, _bitBoard.BlackCanCastleQueenSide,
+                _bitBoard.WhitePawns, _bitBoard.WhiteRooks, _bitBoard.WhiteKnights, _bitBoard.WhiteBishops, _bitBoard.WhiteQueens,
+                _bitBoard.WhiteKing, _bitBoard.BlackPawns, _bitBoard.BlackRooks, _bitBoard.BlackKnights, _bitBoard.BlackBishops,
+                _bitBoard.BlackQueens, _bitBoard.BlackKing, _bitBoard.EnPassant);
 
         public byte GetInstanceNumber(Piece piece, SquareFlag square) =>
             _bitBoard.GetInstanceNumber(piece, square);
@@ -212,6 +203,11 @@ namespace ChessSharp.Engine
             ApplyMove(move);
 
             return move;
+        }
+
+        private void _search_Info(object sender, InfoEventArgs args)
+        {
+            Info?.Invoke(this, args);
         }
 
         private bool IsMovePromotion(int fromSquareIndex, int toSquareIndex)
@@ -298,9 +294,9 @@ namespace ChessSharp.Engine
 
             // Seems odd that separate things are tracking current colour, not sure how better to handle it though
             if (_workspace.Colour != ToPlay)
-                throw new System.Exception("Game and Workspace out of sync");
+                throw new Exception("Game and Workspace out of sync");
 
-            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState()));
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
 
             var moves = new List<uint>();
 
@@ -311,5 +307,7 @@ namespace ChessSharp.Engine
             if (!AvailableMoves.Any())
                 Checkmate?.Invoke(this, new EventArgs());
         }
+
+        private int Evaluate() => _positionEvaluator.Evaluate(_bitBoard);
     }
 }

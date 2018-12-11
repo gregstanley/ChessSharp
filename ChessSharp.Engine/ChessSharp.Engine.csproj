@@ -5,6 +5,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="GameState.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="GameState.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\ChessSharp.Perft\ChessSharp.MoveGeneration.csproj" />
     <ProjectReference Include="..\ChessSharp\ChessSharp.csproj" />
   </ItemGroup>

@@ -57,15 +57,15 @@ namespace ChessSharp
             _castleRights[(int)CastleRights.BlackCanCastleQueenSide] = 4046274221665667751;
         }
 
-        public ulong Hash(BitBoard bitBoard, Colour colour)
+        public ulong Hash(IBoard board, Colour colour)
         {
-            var squares = (bitBoard.White | bitBoard.Black).ToList();
+            var squares = (board.White | board.Black).ToList();
 
             ulong hash = 0ul;
 
             foreach (var square in squares)
             {
-                var piece = bitBoard.GetPiece(square);
+                var piece = BoardHelpers.GetPiece(board, square);
 
                 hash ^= _squares[square.ToSquareIndex(), (int)Index(piece)];
             }

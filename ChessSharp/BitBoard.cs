@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace ChessSharp
 {
-    public class BitBoard
+    public class BitBoard : IBoard
     {
         private const BoardState DefaultState =
             BoardState.WhiteCanCastleKingSide
@@ -67,10 +67,14 @@ namespace ChessSharp
                 blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.BoardState);
         }
 
-        private Zobrist _keyGen { get; set; }
         public ulong Key { get; private set; } = 0;
+
+        private Zobrist _keyGen { get; set; }
+        
         private Stack<BoardState> _boardStates { get; } = new Stack<BoardState>(256);
+
         private Stack<uint> _moves { get; } = new Stack<uint>(256);
+
         private RelativeBitBoard _relativeBitBoard { get; }
 
         private enum PieceStateOffset
@@ -226,35 +230,6 @@ namespace ChessSharp
         public SquareFlag GetKingSquare(Colour colour) =>
             colour == Colour.White ? WhiteKing : BlackKing;
 
-        public Piece GetPiece(SquareFlag square)
-        {
-            var colour = GetPieceColour(square);
-
-            if (colour == Colour.None)
-                return new Piece(colour, PieceType.None);
-
-            if (colour == Colour.White)
-            {
-                if (WhitePawns.HasFlag(square)) return new Piece(colour, PieceType.Pawn);
-                if (WhiteRooks.HasFlag(square)) return new Piece(colour, PieceType.Rook);
-                if (WhiteKnights.HasFlag(square)) return new Piece(colour, PieceType.Knight);
-                if (WhiteBishops.HasFlag(square)) return new Piece(colour, PieceType.Bishop);
-                if (WhiteQueens.HasFlag(square)) return new Piece(colour, PieceType.Queen);
-                if (WhiteKing.HasFlag(square)) return new Piece(colour, PieceType.King);
-            }
-            else
-            {
-                if (BlackPawns.HasFlag(square)) return new Piece(colour, PieceType.Pawn);
-                if (BlackRooks.HasFlag(square)) return new Piece(colour, PieceType.Rook);
-                if (BlackKnights.HasFlag(square)) return new Piece(colour, PieceType.Knight);
-                if (BlackBishops.HasFlag(square)) return new Piece(colour, PieceType.Bishop);
-                if (BlackQueens.HasFlag(square)) return new Piece(colour, PieceType.Queen);
-                if (BlackKing.HasFlag(square)) return new Piece(colour, PieceType.King);
-            }
-
-            throw new Exception($"Failed to find piece for {square}");
-        }
-
         public byte GetInstanceNumber(Piece piece, SquareFlag square)
         {
             if (piece.Colour == Colour.White)
@@ -390,8 +365,8 @@ namespace ChessSharp
                 if (toSquareTemp == toSquare)
                 {
                     var targetSquare = (SquareFlag)((ulong)toSquare >> Math.Abs((int)MoveDirection.West));
-                        
-                    var targetPiece = GetPiece(targetSquare);
+
+                    var targetPiece = BoardHelpers.GetPiece(this, targetSquare);
 
                     if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                     {
@@ -403,7 +378,7 @@ namespace ChessSharp
                     {
                         targetSquare = (SquareFlag)((ulong)toSquare << (int)MoveDirection.East);
 
-                        targetPiece = GetPiece(targetSquare);
+                        targetPiece = BoardHelpers.GetPiece(this, targetSquare);
 
                         if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                         {
@@ -569,17 +544,6 @@ namespace ChessSharp
 
             _boardStates.Pop();
             _moves.Pop();
-        }
-
-        private Colour GetPieceColour(SquareFlag square)
-        {
-            if (White.HasFlag(square))
-                return Colour.White;
-
-            if (Black.HasFlag(square))
-                return Colour.Black;
-
-            return Colour.None;
         }
 
         private void MakeWhiteKingSideCastle()

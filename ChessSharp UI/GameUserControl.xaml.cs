@@ -47,7 +47,7 @@ namespace ChessSharp_UI
             BlackCastleKingSide.Visibility = Visibility.Visible;
             BlackCastleQueenSide.Visibility = Visibility.Visible;
 
-            FullTurnNumberLabel.Content = _game.FullTurnNumber;
+            FullTurnNumberLabel.Content = _game.FullTurn;
 
             BoardUserControl.Load(_game, _game.GetGameState());
         }
@@ -85,9 +85,9 @@ namespace ChessSharp_UI
 
         private void _game_MoveApplied(object sender, MoveAppliedEventArgs args)
         {
-            FullTurnNumberLabel.Content = args.GameState.FullTurnNumber;
+            FullTurnNumberLabel.Content = args.GameState.FullTurn;
 
-            var score = Math.Round(args.GameState.Evaluation * 0.01, 2);
+            var score = Math.Round(args.Evaluation * 0.01, 2);
 
             EvaluationLabel.Content = score;
 
@@ -155,6 +155,13 @@ namespace ChessSharp_UI
             return NewGameBlack(game);
         }
 
-        private Task DoSearch() => _game.CpuMove(5);
+        private async Task DoSearch()
+        {
+            await _game.CpuMove(5);
+
+            var fen = Fen.From(_game.GetGameState(), _game.ToPlay, _game.HalfMoveClock, _game.FullTurn);
+
+            FenTextBox.Text = fen;
+        }
     }
 }
