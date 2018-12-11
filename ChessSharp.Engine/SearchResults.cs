@@ -33,7 +33,7 @@ namespace ChessSharp.Engine
 
             sb.AppendLine($"TT access: {_transpositionTable.AccessCount}");
             sb.AppendLine($"TT hits: {_transpositionTable.HitCount}");
-            sb.AppendLine($"TT conflict: {_transpositionTable.ConflictCount}");
+            sb.AppendLine($"TT conflict: {_transpositionTable.ReplaceCount}");
 
             sb.AppendLine("=== Iteration timers ===");
 

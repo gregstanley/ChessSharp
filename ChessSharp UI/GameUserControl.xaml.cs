@@ -1,4 +1,5 @@
-﻿using ChessSharp.Engine;
+﻿using ChessSharp;
+using ChessSharp.Engine;
 using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using System;
@@ -10,6 +11,8 @@ namespace ChessSharp_UI
 {
     public partial class GameUserControl : UserControl
     {
+        private TranspositionTable _transpositionTable = new TranspositionTable();
+
         public Game _game;
 
         public GameUserControl()
@@ -17,9 +20,23 @@ namespace ChessSharp_UI
             InitializeComponent();
         }
 
-        public void NewGameWhite(Game game)
+        private void NewGame(Game game)
         {
-            _game = game;
+            if (_game != null)
+            {
+                _game.MoveApplied -= _game_MoveApplied;
+                _game.SearchCompleted -= _game_SearchCompleted;
+                _game.Info -= _game_Info;
+            }
+
+            if (game != null)
+            {
+                _game = game;
+            }
+            else
+            {
+                _game = new Game(new BitBoard(), _transpositionTable, Colour.White);
+            }
 
             _game.MoveApplied += _game_MoveApplied;
             _game.SearchCompleted += _game_SearchCompleted;
@@ -33,6 +50,16 @@ namespace ChessSharp_UI
             FullTurnNumberLabel.Content = _game.FullTurnNumber;
 
             BoardUserControl.Load(_game, _game.GetGameState());
+        }
+
+        public void NewGameWhite(Game game) =>
+            NewGame(game);
+
+        public Task NewGameBlack(Game game)
+        {
+            NewGame(game);
+
+            return DoSearch();
         }
 
         private void _game_Info(object sender, InfoEventArgs args)
@@ -56,29 +83,13 @@ namespace ChessSharp_UI
             }));
         }
 
-        public Task NewGameBlack(Game game)
-        {
-            _game = game;
-
-            _game.MoveApplied += _game_MoveApplied;
-
-            WhiteCastleKingSide.Visibility = Visibility.Visible;
-            WhiteCastleQueenSide.Visibility = Visibility.Visible;
-            BlackCastleKingSide.Visibility = Visibility.Visible;
-            BlackCastleQueenSide.Visibility = Visibility.Visible;
-
-            FullTurnNumberLabel.Content = _game.FullTurnNumber;
-
-            BoardUserControl.Load(_game, _game.GetGameState());
-
-            return DoSearch();
-        }
-
         private void _game_MoveApplied(object sender, MoveAppliedEventArgs args)
         {
             FullTurnNumberLabel.Content = args.GameState.FullTurnNumber;
 
-            EvaluationLabel.Content = args.GameState.Evaluation;
+            var score = Math.Round(args.GameState.Evaluation * 0.01, 2);
+
+            EvaluationLabel.Content = score;
 
             WhiteCastleKingSide.Visibility = args.GameState.WhiteCanCastleKingSide
                 ? Visibility.Visible
@@ -102,13 +113,15 @@ namespace ChessSharp_UI
             OutputTextBox.Text = args.SearchResults.ToResultsString();
         }
 
-        private Task DoSearch() => _game.CpuMove(5);
-
+        
         private async void BoardUserControl_PieceMoved(object sender, UserMovedPieceEventArgs args) =>
             await OnPieceMoved(args); 
 
         private async void BoardUserControl_PieceSelected(object sender, PromotionTypeSelectedEventArgs args) =>
             await OnPieceSelected(args);
+
+        private async void GoBtn_Click(object sender, RoutedEventArgs e) =>
+            await NewGameFromFen();
 
         private Task OnPieceMoved(UserMovedPieceEventArgs args)
         {
@@ -123,5 +136,25 @@ namespace ChessSharp_UI
 
             return move.Value == 0 ? Task.CompletedTask : DoSearch();
         }
+
+        private Task NewGameFromFen()
+        {
+            var fen = Fen.Parse(FenTextBox.Text);
+
+            var board = BitBoard.FromFen(fen);
+
+            var game = new Game(board, _transpositionTable, Colour.White);
+
+            if (fen.ToPlay == Colour.White)
+            {
+                NewGameWhite(game);
+
+                return Task.CompletedTask;
+            }
+
+            return NewGameBlack(game);
+        }
+
+        private Task DoSearch() => _game.CpuMove(5);
     }
 }

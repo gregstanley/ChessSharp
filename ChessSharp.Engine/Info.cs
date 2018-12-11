@@ -12,7 +12,9 @@ namespace ChessSharp.Engine
             Depth = depth;
             TtAccessCount = transpositionTable.AccessCount;
             TtHitCount = transpositionTable.HitCount;
-            TtConflictCount = transpositionTable.ConflictCount;
+            TtMissCount = transpositionTable.MissCount;
+            TtConflictCount = transpositionTable.ReplaceCount;
+            TtUsage = Math.Round(transpositionTable.Usage, 1);
         }
 
         public string GetTimeString()
@@ -36,7 +38,9 @@ namespace ChessSharp.Engine
             sb.AppendLine($"Total positions: {SearchedPositionCount}");
             sb.AppendLine($"TT access: {TtAccessCount}");
             sb.AppendLine($"TT hits: {TtHitCount}");
+            sb.AppendLine($"TT misses: {TtMissCount}");
             sb.AppendLine($"TT conflict: {TtConflictCount}");
+            sb.AppendLine($"TT usage: {TtUsage}%");
 
             return sb.ToString();
         }
@@ -51,6 +55,10 @@ namespace ChessSharp.Engine
 
         public long TtHitCount { get; }
 
+        public long TtMissCount { get; }
+
         public long TtConflictCount { get; }
+
+        public double TtUsage { get; }
     }
 }

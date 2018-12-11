@@ -8,6 +8,8 @@ namespace ChessSharp_UI
 {
     public partial class MainWindow : Window
     {
+        private TranspositionTable _transpositionTable = new TranspositionTable();
+
         public MainWindow()
         {
             InitializeComponent();
@@ -19,10 +21,22 @@ namespace ChessSharp_UI
         private async void BtnNewGameBlack_Click(object sender, RoutedEventArgs e) =>
             await NewGameBlack();
 
-        private void NewGameWhite() =>
-            GameUserControl.NewGameWhite(new Game(new BitBoard(), Colour.White));
+        private void NewGameWhite()
+        {
+            _transpositionTable.Reset();
 
-        private Task NewGameBlack() =>
-            GameUserControl.NewGameBlack(new Game(new BitBoard(), Colour.Black));
+            var game = new Game(new BitBoard(), _transpositionTable, Colour.White);
+
+            GameUserControl.NewGameWhite(game);
+        }
+
+        private Task NewGameBlack()
+        {
+            _transpositionTable.Reset();
+
+            var game = new Game(new BitBoard(), _transpositionTable, Colour.Black);
+
+            return GameUserControl.NewGameBlack(game);
+        }
     }
 }

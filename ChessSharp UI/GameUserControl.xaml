@@ -45,15 +45,17 @@
         </Image>
         <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="444,46,0,0" VerticalAlignment="Top" Width="38" />
         <Label x:Name="EvaluationLabel" Content="0" HorizontalAlignment="Left" Margin="154,10,0,0" VerticalAlignment="Top" Width="90" />
-        <TextBox x:Name="OutputTextBox" HorizontalAlignment="Left" Height="118" Margin="391,269,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="285" Background="#FF2B2B2B" Foreground="#FFA3D3CC"/>
-        <TextBlock x:Name="InfoTimeTextBlock" HorizontalAlignment="Left" Margin="391,98,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="131" Height="92"/>
-        <TextBlock x:Name="InfoTtTextBlock" HorizontalAlignment="Left" Margin="537,98,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="139" Height="92"/>
-        <TextBlock x:Name="InfoPvTextBlock" HorizontalAlignment="Left" Margin="391,195,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="285" Height="32"/>
-        <TextBlock x:Name="InfoPvTextBlock2" HorizontalAlignment="Left" Margin="391,232,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="285" Height="32"/>
+        <TextBox x:Name="OutputTextBox" HorizontalAlignment="Left" Height="95" Margin="391,292,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="285" Background="#FF2B2B2B" Foreground="#FFA3D3CC"/>
+        <TextBlock x:Name="InfoTimeTextBlock" HorizontalAlignment="Left" Margin="391,98,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="131" Height="101"/>
+        <TextBlock x:Name="InfoTtTextBlock" HorizontalAlignment="Left" Margin="537,98,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="139" Height="101"/>
+        <TextBlock x:Name="InfoPvTextBlock" HorizontalAlignment="Left" Margin="391,204,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="285" Height="32"/>
+        <TextBlock x:Name="InfoPvTextBlock2" HorizontalAlignment="Left" Margin="391,241,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="285" Height="32"/>
         <Label x:Name="HalfTurnCountLabel1" Content="Half turns:" HorizontalAlignment="Left" Margin="472,46,0,0" VerticalAlignment="Top"/>
         <Label x:Name="FullTurnsCountLabel" Content="Full turns:" HorizontalAlignment="Left" Margin="386,46,0,0" VerticalAlignment="Top"/>
         <Label x:Name="TimerInfo" Content="Timer:" HorizontalAlignment="Left" Margin="386,72,0,0" VerticalAlignment="Top"/>
         <Label x:Name="TtInfo" Content="TT:" HorizontalAlignment="Left" Margin="532,72,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.52,0.538"/>
+        <TextBox x:Name="FenTextBox" HorizontalAlignment="Left" Height="23" Margin="25,425,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="457" Background="#FFE6E6E6" Foreground="#FF303068" Text="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"/>
+        <Button x:Name="GoBtn" Content="Go" HorizontalAlignment="Left" Margin="296,461,0,0" VerticalAlignment="Top" Width="75" Click="GoBtn_Click"/>
 
     </Grid>
 </UserControl>

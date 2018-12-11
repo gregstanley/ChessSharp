@@ -6,22 +6,23 @@ namespace ChessSharp.Engine
 {
     public class PositionEvaluator
     {
-        public const double PawnValue = 10;
-        public const double KnightValue = 30;
-        public const double BishopValue = 30;
-        public const double RookValue = 50;
-        public const double QueenValue = 90;
-        public const double KingValue = 900;
+        // https://www.chessprogramming.org/Point_Value
+        public const int PawnValue = 100;
+        public const int KnightValue = 350;
+        public const int BishopValue = 350;
+        public const int RookValue = 525;
+        public const int QueenValue = 1000;
+        public const int KingValue = 10000;
 
         public PositionEvaluator()
         {
             PieceValues.Init();
         }
 
-        public double Evaluate(BitBoard bitBoard)
+        public int Evaluate(BitBoard bitBoard)
         {
-            var whiteScore = 0d;
-            var blackScore = 0d;
+            var whiteScore = 0;
+            var blackScore = 0;
 
             var isPawn = 0ul;
             var isRook = 0ul;
@@ -42,13 +43,13 @@ namespace ChessSharp.Engine
                     buffer1[2] = (ulong)bitBoard.WhiteKnights;
                     buffer1[3] = (ulong)bitBoard.WhiteBishops;
 
-                    buffer2[0] = square;
-                    buffer2[1] = square;
-                    buffer2[2] = square;
-                    buffer2[3] = square;
+                    //buffer2[0] = square;
+                    //buffer2[1] = square;
+                    //buffer2[2] = square;
+                    //buffer2[3] = square;
 
                     var vector1 = new Vector<ulong>(buffer1);
-                    var vector2 = new Vector<ulong>(buffer2);
+                    var vector2 = new Vector<ulong>(square);
 
                     var vectorOut = Vector.BitwiseAnd(vector1, vector2);
 
@@ -117,13 +118,13 @@ namespace ChessSharp.Engine
                     buffer1[2] = (ulong)bitBoard.BlackKnights;
                     buffer1[3] = (ulong)bitBoard.BlackBishops;
 
-                    buffer2[0] = square;
-                    buffer2[1] = square;
-                    buffer2[2] = square;
-                    buffer2[3] = square;
+                    //buffer2[0] = square;
+                    //buffer2[1] = square;
+                    //buffer2[2] = square;
+                    //buffer2[3] = square;
 
                     var vector1 = new Vector<ulong>(buffer1);
-                    var vector2 = new Vector<ulong>(buffer2);
+                    var vector2 = new Vector<ulong>(square);
 
                     var vectorOut = Vector.BitwiseAnd(vector1, vector2);
 
@@ -181,9 +182,10 @@ namespace ChessSharp.Engine
                 }
             }
 
-            double eval = whiteScore - blackScore;
+            var eval = whiteScore - blackScore;
 
-            return Math.Round(eval * 0.1, 2);
+            return eval;
+            //return Math.Round(eval * 0.1, 2);
         }
     }
 }

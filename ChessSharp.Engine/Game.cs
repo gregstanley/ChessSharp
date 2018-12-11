@@ -70,10 +70,10 @@ namespace ChessSharp.Engine
         {
             var bitBoard = BitBoard.FromFen(fen);
 
-            return new Game(bitBoard, humanColour);
+            return new Game(bitBoard, new TranspositionTable(),  humanColour);
         }
 
-        public Game(BitBoard board, Colour humanColour = Colour.None)
+        public Game(BitBoard board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
         {
             _bitBoard = board;
 
@@ -85,7 +85,7 @@ namespace ChessSharp.Engine
 
             _positionEvaluator = new PositionEvaluator();
 
-            _search = new Search(_moveGenerator, _positionEvaluator);
+            _search = new Search(_moveGenerator, _positionEvaluator, transpositionTable);
 
             _search.Info += _search_Info;
 
