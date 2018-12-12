@@ -112,7 +112,6 @@ namespace ChessSharp_UI
         {
             OutputTextBox.Text = args.SearchResults.ToResultsString();
         }
-
         
         private async void BoardUserControl_PieceMoved(object sender, UserMovedPieceEventArgs args) =>
             await OnPieceMoved(args); 
@@ -139,13 +138,13 @@ namespace ChessSharp_UI
 
         private Task NewGameFromFen()
         {
-            var fen = Fen.Parse(FenTextBox.Text);
+            var gameState = FenHelpers.Parse(FenTextBox.Text);
 
-            var board = BitBoard.FromFen(fen);
+            var board = BitBoard.FromGameState(gameState);
 
             var game = new Game(board, _transpositionTable, Colour.White);
 
-            if (fen.ToPlay == Colour.White)
+            if (gameState.ToPlay == Colour.White)
             {
                 NewGameWhite(game);
 
@@ -159,9 +158,7 @@ namespace ChessSharp_UI
         {
             await _game.CpuMove(5);
 
-            var fen = Fen.From(_game.GetGameState(), _game.ToPlay, _game.HalfMoveClock, _game.FullTurn);
-
-            FenTextBox.Text = fen;
+            FenTextBox.Text = FenHelpers.ToFen(_game.GetGameState());
         }
     }
 }

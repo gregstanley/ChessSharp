@@ -15,6 +15,38 @@ namespace ChessSharp
             | BoardState.BlackCanCastleKingSide
             | BoardState.BlackCanCastleQueenSide;
 
+        public static BitBoard FromGameState(GameState gameState)
+        {
+            var boardState = (BoardState)0;
+
+            if (gameState.WhiteCanCastleKingSide)
+                boardState |= BoardState.WhiteCanCastleKingSide;
+
+            if (gameState.WhiteCanCastleQueenSide)
+                boardState |= BoardState.WhiteCanCastleQueenSide;
+
+            if (gameState.BlackCanCastleKingSide)
+                boardState |= BoardState.BlackCanCastleKingSide;
+
+            if (gameState.BlackCanCastleQueenSide)
+                boardState |= BoardState.BlackCanCastleQueenSide;
+
+            return new BitBoard(
+                gameState.WhitePawns,
+                gameState.WhiteRooks,
+                gameState.WhiteKnights,
+                gameState.WhiteBishops,
+                gameState.WhiteQueens,
+                gameState.WhiteKing,
+                gameState.BlackPawns,
+                gameState.BlackRooks,
+                gameState.BlackKnights,
+                gameState.BlackBishops,
+                gameState.BlackQueens,
+                gameState.BlackKing,
+                boardState);
+        }
+
         public static BitBoard FromFen(Fen fen)
         {
             var squares = fen.GetSquaresStates();

@@ -154,12 +154,6 @@ namespace ChessSharp.Engine
                 _bitBoard.WhiteKing, _bitBoard.BlackPawns, _bitBoard.BlackRooks, _bitBoard.BlackKnights, _bitBoard.BlackBishops,
                 _bitBoard.BlackQueens, _bitBoard.BlackKing, _bitBoard.EnPassant);
 
-        public byte GetInstanceNumber(Piece piece, SquareFlag square) =>
-            _bitBoard.GetInstanceNumber(piece, square);
-
-        public SquareFlag GetSquaresWithPieceOn() =>
-            _bitBoard.White | _workspace.BitBoard.Black;
-
         public MoveViewer TryMove(int fromSquareIndex, int toSquareIndex, PieceType promotionType = PieceType.None)
         {
             MoveViewer move = null;
