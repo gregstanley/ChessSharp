@@ -37,7 +37,6 @@ namespace ChessSharp.Engine.Tests
             var rootKey = KeyGenerator.Hash(bitBoard, Colour.White);
 
             var whiteMove = 28866u;
-            var blackMove = 43927u;
 
             Assert.Equal(DefaultKey, rootKey);
 
@@ -79,9 +78,7 @@ namespace ChessSharp.Engine.Tests
         [Fact]
         public void Board_MakeUnMake_WhiteCaptureCorrectKeys()
         {
-            var fen = Fen.Parse("K6k/8/8/8/8/3p4/4P3/8 w - -");
-
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard("K6k/8/8/8/8/3p4/4P3/8 w - -");
 
             var rootKey = KeyGenerator.Hash(bitBoard, Colour.White);
 
@@ -102,9 +99,7 @@ namespace ChessSharp.Engine.Tests
         [Fact]
         public void Board_MakeUnMake_WhiteEnPassantCapture()
         {
-            var fen = Fen.Parse("K6k/8/8/3Pp3/8/8/8/8 w - e6");
-
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard("K6k/8/8/3Pp3/8/8/8/8 w - e6");
 
             var rootKey = KeyGenerator.Hash(bitBoard, Colour.White);
 
@@ -137,9 +132,7 @@ namespace ChessSharp.Engine.Tests
         [Fact]
         public void Board_MakeUnMake_CastleKeysCorrect()
         {
-            var fen = Fen.Parse("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
-
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
 
             var rootKey = KeyGenerator.Hash(bitBoard, Colour.White);
 
@@ -173,9 +166,7 @@ namespace ChessSharp.Engine.Tests
         [Fact]
         public void White_Empty_OnePush_Promotion()
         {
-            var fen = Fen.Parse("K6k/3P4/8/8/8/8/8/8 w - -");
-
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard("K6k/3P4/8/8/8/8/8/8 w - -");
 
             var rootKey = KeyGenerator.Hash(bitBoard, Colour.White);
 
@@ -208,7 +199,7 @@ namespace ChessSharp.Engine.Tests
             Assert.Equal(beforeKey, bitBoard.Key);
         }
 
-        protected BitBoard CreateBitBoard(Fen fen) =>
-            BitBoard.FromFen(fen);
+        protected BitBoard CreateBitBoard(string fen) =>
+            BitBoard.FromGameState(FenHelpers.Parse(fen));
     }
 }

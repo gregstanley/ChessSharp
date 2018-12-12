@@ -289,9 +289,9 @@ namespace ChessSharp.Tests
 
         private BitBoard Create(string fenString)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            return BitBoard.FromFen(fen);
+            return BitBoard.FromGameState(gameState);
         }
     }
 }

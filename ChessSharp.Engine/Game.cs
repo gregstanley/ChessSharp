@@ -66,13 +66,6 @@ namespace ChessSharp.Engine
 
         private readonly Search _search;
 
-        public static Game FromFen(Fen fen, Colour humanColour = Colour.None)
-        {
-            var bitBoard = BitBoard.FromFen(fen);
-
-            return new Game(bitBoard, new TranspositionTable(),  humanColour);
-        }
-
         public Game(BitBoard board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
         {
             _bitBoard = board;

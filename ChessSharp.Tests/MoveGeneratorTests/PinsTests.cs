@@ -16,14 +16,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/8/8/K7/1R2Pp1k/8/8/8 b - - 0 1", 1)]
         public void PawnNotActuallyPinned(string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -52,14 +51,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData(17, "8/8/8/8/KR2Ppk1/8/6P1/8 b - e3 0 1", 1)]
         public void Position3_Variants_EnPassantDiscovered(int id, string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -73,14 +71,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/4r3/4k3/K3p3/3P4/8/4R3/8 b - - 0 1", 1)]
         public void PawnPinnedByRookAndCannotCapture(string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -94,14 +91,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/5k2/8/3p4/2B5/8/8/K7 b - - 0 1", 1)]
         public void PawnPinnedByBishopButCanCapture(string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -115,14 +111,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/8/8/K7/1R2Pn1k/8/8/8 b - - 0 1", 8)]
         public void KnightNotActuallyPinned(string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -140,14 +135,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/4R3/8/4rP2/K3k3/8/8/8 b - - 0 1", 2)]
         public void RookPinned(string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -161,14 +155,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/8/4K3/k3N3/8/5p2/4r3/8 b - - 0 1", 0)]
         public void KnightPinned(string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -182,14 +175,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/8/4k3/K2b4/4P3/1Q6/8/8 b - - 0 1", 2)]
         public void BishopPinned(string fenString, int expectedMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 

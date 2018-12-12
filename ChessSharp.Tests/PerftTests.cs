@@ -26,15 +26,14 @@ namespace ChessSharp.Tests
         public void Default_ToDepth1_Only()
         {
             // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-            var fen = Fen.Parse(Fen.Default);
+            var gameState = FenHelpers.Parse(FenHelpers.Default);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var moves = new List<uint>(20);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             _moveGeneratorFixture.MoveGenerator.Generate(workspace, moves);
 
@@ -52,10 +51,10 @@ namespace ChessSharp.Tests
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
             // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-            var fen = Fen.Parse(Fen.Default);
+            var gameState = FenHelpers.Parse(FenHelpers.Default);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var moves = new List<uint>(20);
 
@@ -63,7 +62,7 @@ namespace ChessSharp.Tests
 
             var depth = 5;
 
-            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+            perftRunner.Go(bitBoard, gameState.ToPlay, depth, metrics);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 
@@ -98,10 +97,10 @@ namespace ChessSharp.Tests
         public void Position2()
         {
             // "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
-            var fen = Fen.Parse(Fen.Position2);
+            var gameState = FenHelpers.Parse(FenHelpers.Position2);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var metrics = new Dictionary<int, PerftMetrics>();
 
@@ -109,7 +108,7 @@ namespace ChessSharp.Tests
 
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
-            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+            perftRunner.Go(bitBoard, gameState.ToPlay, depth, metrics);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 
@@ -137,10 +136,10 @@ namespace ChessSharp.Tests
         public void Position3()
         {
             // "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -"
-            var fen = Fen.Parse(Fen.Position3);
+            var gameState = FenHelpers.Parse(FenHelpers.Position3);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var metrics = new Dictionary<int, PerftMetrics>();
 
@@ -148,7 +147,7 @@ namespace ChessSharp.Tests
 
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
-            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+            perftRunner.Go(bitBoard, gameState.ToPlay, depth, metrics);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 
@@ -187,10 +186,10 @@ namespace ChessSharp.Tests
         public void Position4()
         {
             // "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1"
-            var fen = Fen.Parse(Fen.Position4);
+            var gameState = FenHelpers.Parse(FenHelpers.Position4);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var metrics = new Dictionary<int, PerftMetrics>();
 
@@ -198,7 +197,7 @@ namespace ChessSharp.Tests
 
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
-            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+            perftRunner.Go(bitBoard, gameState.ToPlay, depth, metrics);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 
@@ -228,10 +227,10 @@ namespace ChessSharp.Tests
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
             // "8/PPP4k/8/8/8/8/4Kppp/8 w - - 0 1"
-            var fen = Fen.Parse("8/PPP4k/8/8/8/8/4Kppp/8 w - - 0 1");
+            var gameState = FenHelpers.Parse("8/PPP4k/8/8/8/8/4Kppp/8 w - - 0 1");
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var moves = new List<uint>(20);
 
@@ -239,7 +238,7 @@ namespace ChessSharp.Tests
 
             var depth = 5;
 
-            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+            perftRunner.Go(bitBoard, gameState.ToPlay, depth, metrics);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 
@@ -257,10 +256,10 @@ namespace ChessSharp.Tests
             var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
 
             // "8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28"
-            var fen = Fen.Parse("8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28");
+            var gameState = FenHelpers.Parse("8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28");
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var moves = new List<uint>(20);
 
@@ -268,7 +267,7 @@ namespace ChessSharp.Tests
 
             var depth = 5;
 
-            perftRunner.Go(bitBoard, fen.ToPlay, depth, metrics);
+            perftRunner.Go(bitBoard, gameState.ToPlay, depth, metrics);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 
@@ -309,14 +308,14 @@ namespace ChessSharp.Tests
         {
             var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
 
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var moves = new List<uint>(20);
 
-            var movePerfts = perftRunner.Go(bitBoard, fen.ToPlay, depth);
+            var movePerfts = perftRunner.Go(bitBoard, gameState.ToPlay, depth);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 
@@ -329,14 +328,14 @@ namespace ChessSharp.Tests
         {
             var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
 
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = BitBoard.FromFen(fen);
-            var bitBoardReference = BitBoard.FromFen(fen);
+            var bitBoard = BitBoard.FromGameState(gameState);
+            var bitBoardReference = BitBoard.FromGameState(gameState);
 
             var moves = new List<uint>(20);
 
-            var movePerfts = perftRunner.Go(bitBoard, fen.ToPlay, depth);
+            var movePerfts = perftRunner.Go(bitBoard, gameState.ToPlay, depth);
 
             TestHelpers.AssertEqual(bitBoard, bitBoardReference);
 

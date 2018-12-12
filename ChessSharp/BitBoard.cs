@@ -31,6 +31,9 @@ namespace ChessSharp
             if (gameState.BlackCanCastleQueenSide)
                 boardState |= BoardState.BlackCanCastleQueenSide;
 
+            if (gameState.EnPassant != 0)
+                boardState = boardState.AddEnPassantSquare(gameState.EnPassant);
+
             return new BitBoard(
                 gameState.WhitePawns,
                 gameState.WhiteRooks,
@@ -45,58 +48,6 @@ namespace ChessSharp
                 gameState.BlackQueens,
                 gameState.BlackKing,
                 boardState);
-        }
-
-        public static BitBoard FromFen(Fen fen)
-        {
-            var squares = fen.GetSquaresStates();
-
-            var whitePawns = (SquareFlag)0;
-            var whiteRooks = (SquareFlag)0;
-            var whiteKnights = (SquareFlag)0;
-            var whiteBishops = (SquareFlag)0;
-            var whiteQueens = (SquareFlag)0;
-            var whiteKing = (SquareFlag)0;
-            var blackPawns = (SquareFlag)0;
-            var blackRooks = (SquareFlag)0;
-            var blackKnights = (SquareFlag)0;
-            var blackBishops = (SquareFlag)0;
-            var blackQueens = (SquareFlag)0;
-            var blackKing = (SquareFlag)0;
-
-            foreach (var square in squares)
-            {
-                if (square.Colour == Colour.None)
-                    continue;
-
-                if (square.Colour == Colour.White)
-                {
-                    switch (square.Type)
-                    {
-                        case PieceType.Pawn: whitePawns |= square.Square; break;
-                        case PieceType.Rook: whiteRooks |= square.Square; break;
-                        case PieceType.Knight: whiteKnights |= square.Square; break;
-                        case PieceType.Bishop: whiteBishops |= square.Square; break;
-                        case PieceType.Queen: whiteQueens |= square.Square; break;
-                        case PieceType.King: whiteKing |= square.Square; break;
-                    }
-                }
-                else
-                {
-                    switch (square.Type)
-                    {
-                        case PieceType.Pawn: blackPawns |= square.Square; break;
-                        case PieceType.Rook: blackRooks |= square.Square; break;
-                        case PieceType.Knight: blackKnights |= square.Square; break;
-                        case PieceType.Bishop: blackBishops |= square.Square; break;
-                        case PieceType.Queen: blackQueens |= square.Square; break;
-                        case PieceType.King: blackKing |= square.Square; break;
-                    }
-                }
-            }
-
-            return new BitBoard(whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueens, whiteKing,
-                blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing, fen.BoardState);
         }
 
         public ulong Key { get; private set; } = 0;

@@ -71,15 +71,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             .ToList();
 
         protected BitBoard CreateBitBoard(string fenString) =>
-            BitBoard.FromFen(Fen.Parse(fenString));
+            BitBoard.FromGameState(FenHelpers.Parse(fenString));
 
-        protected BitBoard CreateBitBoard(Fen fen) =>
-            BitBoard.FromFen(fen);
+        protected BitBoard CreateBitBoard(GameState gameState) =>
+            BitBoard.FromGameState(gameState);
 
         protected RelativeBitBoard CreateRelativeBitBoard(string fenString) =>
-            CreateRelativeBitBoard(Fen.Parse(fenString));
+            CreateRelativeBitBoard(FenHelpers.Parse(fenString));
 
-        protected RelativeBitBoard CreateRelativeBitBoard(Fen fen) =>
-            BitBoard.FromFen(fen).RelativeTo(fen.ToPlay);
+        protected RelativeBitBoard CreateRelativeBitBoard(GameState gameState) =>
+            BitBoard.FromGameState(gameState).RelativeTo(gameState.ToPlay);
     }
 }

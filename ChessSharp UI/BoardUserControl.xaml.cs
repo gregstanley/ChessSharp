@@ -1,5 +1,4 @@
 ﻿using ChessSharp;
-using ChessSharp.Engine;
 using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using ChessSharp.Extensions;

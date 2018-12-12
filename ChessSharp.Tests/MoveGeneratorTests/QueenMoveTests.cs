@@ -33,14 +33,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("1k6/4P3/8/8/4q3/8/8/2K5 b - -", SquareFlag.E7, 26)]
         public void E4_UnblockedCapture(string fenString, SquareFlag captureSquare, int expectedQueenMoveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(fenString);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -48,7 +47,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var captures = GetCaptureMoveViews(moves);
 
-            var capture1 = MoveBuilder.Create(fen.ToPlay, PieceType.Queen, SquareFlag.E4.ToSquare(), captureSquare.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
+            var capture1 = MoveBuilder.Create(gameState.ToPlay, PieceType.Queen, SquareFlag.E4.ToSquare(), captureSquare.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
 
             Assert.Equal(expectedQueenMoveCount, queenMoves.Count);
             Assert.Contains(capture1, captures.Select(x => x.Value));
@@ -73,14 +72,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("7q/8/8/8/8/8/8/4K1k1 b - -", 21)]
         public void A1_H8_0Capture(string fenString, int moveCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -92,14 +90,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [Fact]
         public void B2_21Moves_0Captures_Correct()
         {
-            var fen = Fen.Parse("8/8/8/k7/8/8/1Q6/4K3 w - -");
+            var gameState = FenHelpers.Parse("8/8/8/k7/8/8/1Q6/4K3 w - -");
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -111,14 +108,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [Fact]
         public void E4_16Moves_8Captures_Correct()
         {
-            var fen = Fen.Parse("K7/8/2p1p1p1/8/2p1Q1p1/8/2p1p1p1/k7 w - -");
+            var gameState = FenHelpers.Parse("K7/8/2p1p1p1/8/2p1Q1p1/8/2p1p1p1/k7 w - -");
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 

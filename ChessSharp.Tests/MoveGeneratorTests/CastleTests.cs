@@ -21,7 +21,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, Colour.White, moves);
             var workspace = new MoveGenerationWorkspace(bitBoard, Colour.White);
 
             MoveGenerator.Generate(workspace, moves);
@@ -53,7 +52,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, Colour.White, moves);
             var workspace = new MoveGenerationWorkspace(bitBoard, Colour.White);
 
             MoveGenerator.Generate(workspace, moves);
@@ -81,14 +79,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("R3k2r/1b4bq/8/8/8/8/7B/4K2R b Kk -", 0, 0)]
         public void PeterEllis_Variations(string fenString, int castleKingExpectedCount, int castleQueenExpectedCount)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 

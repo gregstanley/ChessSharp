@@ -15,14 +15,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("4k3/8/8/8/8/5q2/8/r2QK2r w - - 0 1")]
         public void OnlyKingMovesAllowed(string fenString)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(fenString);
 
             var moves = new List<uint>(10);
 
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
@@ -43,14 +42,12 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("8/4p3/3p4/2k4Q/K1b4q/3rn3/8/8 b - - 0 1")]
         public void OnlyBlocksAndKingMovesAllowed(string fenString)
         {
-            var fen = Fen.Parse(fenString);
+            var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fen);
+            var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
-
-            //MoveGenerator.Generate(bitBoard, fen.ToPlay, moves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, fen.ToPlay);
+            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(workspace, moves);
 
