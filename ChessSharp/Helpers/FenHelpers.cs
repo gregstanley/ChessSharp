@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ChessSharp
+namespace ChessSharp.Helpers
 {
     public static class FenHelpers
     {
@@ -45,7 +45,7 @@ namespace ChessSharp
                 {
                     var index = (rank * 8) + file;
 
-                    var piece = BoardHelpers.GetPiece(gameState, index.ToSquareFlag());
+                    var piece = PieceMapHelpers.GetPiece(gameState, index.ToSquareFlag());
 
                     if (piece.Type == PieceType.None)
                     {

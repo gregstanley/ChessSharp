@@ -2,7 +2,7 @@
 
 namespace ChessSharp.Models
 {
-    public interface IBoard
+    public interface IPieceMap
     {
         SquareFlag WhitePawns { get; }
 

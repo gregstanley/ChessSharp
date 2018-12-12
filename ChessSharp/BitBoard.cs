@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
+using ChessSharp.Helpers;
 using ChessSharp.Models;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Linq;
 
 namespace ChessSharp
 {
-    public class BitBoard : IBoard
+    public class BitBoard : IPieceMap
     {
         private const BoardState DefaultState =
             BoardState.WhiteCanCastleKingSide
@@ -349,7 +350,7 @@ namespace ChessSharp
                 {
                     var targetSquare = (SquareFlag)((ulong)toSquare >> Math.Abs((int)MoveDirection.West));
 
-                    var targetPiece = BoardHelpers.GetPiece(this, targetSquare);
+                    var targetPiece = PieceMapHelpers.GetPiece(this, targetSquare);
 
                     if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                     {
@@ -361,7 +362,7 @@ namespace ChessSharp
                     {
                         targetSquare = (SquareFlag)((ulong)toSquare << (int)MoveDirection.East);
 
-                        targetPiece = BoardHelpers.GetPiece(this, targetSquare);
+                        targetPiece = PieceMapHelpers.GetPiece(this, targetSquare);
 
                         if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                         {

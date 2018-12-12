@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
+using ChessSharp.Helpers;
 using ChessSharp.Models;
 using Pcg;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace ChessSharp
             _castleRights[(int)CastleRights.BlackCanCastleQueenSide] = 4046274221665667751;
         }
 
-        public ulong Hash(IBoard board, Colour colour)
+        public ulong Hash(IPieceMap board, Colour colour)
         {
             var squares = (board.White | board.Black).ToList();
 
@@ -65,7 +66,7 @@ namespace ChessSharp
 
             foreach (var square in squares)
             {
-                var piece = BoardHelpers.GetPiece(board, square);
+                var piece = PieceMapHelpers.GetPiece(board, square);
 
                 hash ^= _squares[square.ToSquareIndex(), (int)Index(piece)];
             }

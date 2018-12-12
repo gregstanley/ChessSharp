@@ -1,4 +1,5 @@
 ﻿using ChessSharp.Enums;
+using ChessSharp.Helpers;
 using ChessSharp.Models;
 using Xunit;
 

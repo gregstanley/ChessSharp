@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
+using ChessSharp.Helpers;
 using Xunit;
 
 namespace ChessSharp.Tests

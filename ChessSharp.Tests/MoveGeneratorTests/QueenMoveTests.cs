@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
+using ChessSharp.Helpers;
 using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 using System.Linq;

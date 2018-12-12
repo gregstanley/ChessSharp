@@ -2,7 +2,7 @@
 
 namespace ChessSharp.Models
 {
-    public interface IGameState : IBoard
+    public interface IGameState : IPieceMap
     {
         int Ply { get; }
 

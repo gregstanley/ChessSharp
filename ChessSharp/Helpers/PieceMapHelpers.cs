@@ -2,11 +2,11 @@
 using ChessSharp.Models;
 using System;
 
-namespace ChessSharp
+namespace ChessSharp.Helpers
 {
-    public class BoardHelpers
+    public class PieceMapHelpers
     {
-        public static Piece GetPiece(IBoard board, SquareFlag square)
+        public static Piece GetPiece(IPieceMap board, SquareFlag square)
         {
             var colour = GetPieceColour(board, square);
 
@@ -35,7 +35,7 @@ namespace ChessSharp
             throw new Exception($"Failed to find piece for {square}");
         }
 
-        private static Colour GetPieceColour(IBoard board, SquareFlag square)
+        private static Colour GetPieceColour(IPieceMap board, SquareFlag square)
         {
             if (board.White.HasFlag(square))
                 return Colour.White;

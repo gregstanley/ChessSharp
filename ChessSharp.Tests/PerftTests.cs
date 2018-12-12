@@ -1,4 +1,5 @@
-﻿using ChessSharp.MoveGeneration;
+﻿using ChessSharp.Helpers;
+using ChessSharp.MoveGeneration;
 using Serilog;
 using Serilog.Core;
 using System.Collections.Generic;

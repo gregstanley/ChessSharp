@@ -279,6 +279,11 @@ namespace ChessSharp.Engine
 
             Ply++;
 
+            if (move.PieceType == PieceType.Pawn || move.CapturePieceType != PieceType.None)
+                HalfMoveClock = 0;
+            else
+                ++HalfMoveClock;
+
             // Seems odd that separate things are tracking current colour, not sure how better to handle it though
             if (_workspace.Colour != ToPlay)
                 throw new Exception("Game and Workspace out of sync");

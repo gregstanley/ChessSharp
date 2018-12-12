@@ -1,4 +1,5 @@
-﻿using ChessSharp.MoveGeneration;
+﻿using ChessSharp.Helpers;
+using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 using Xunit;
 

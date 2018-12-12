@@ -3,7 +3,7 @@ using ChessSharp.Models;
 
 namespace ChessSharp
 {
-    public class GameState : IBoard
+    public class GameState : IPieceMap
     {
         public GameState(
             int ply,

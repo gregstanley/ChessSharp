@@ -2,6 +2,7 @@
 using ChessSharp.Engine;
 using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
+using ChessSharp.Helpers;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -86,6 +87,7 @@ namespace ChessSharp_UI
         private void _game_MoveApplied(object sender, MoveAppliedEventArgs args)
         {
             FullTurnNumberLabel.Content = args.GameState.FullTurn;
+            HalfTurnCountLabel.Content = args.GameState.HalfMoveClock;
 
             var score = Math.Round(args.Evaluation * 0.01, 2);
 
