@@ -22,9 +22,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var pawnMoveViews = GetPawnMoveViews(moves);
             var rookMoveViews = GetRookMoveViews(moves);
@@ -48,9 +46,8 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(10);
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var pawnMoveViews = GetPawnMoveViews(moves);
             var rookMoveViews = GetRookMoveViews(moves);

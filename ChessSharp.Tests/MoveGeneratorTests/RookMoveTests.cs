@@ -23,9 +23,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetRookMoveViews(moves);
 
@@ -46,9 +44,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetRookMoveViews(moves);
 
@@ -73,9 +69,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetRookMoveViews(moves);
 
@@ -95,9 +89,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetRookMoveViews(moves);
 

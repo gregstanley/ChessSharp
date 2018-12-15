@@ -1,7 +1,6 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ChessSharp.MoveGeneration
 {
@@ -14,7 +13,7 @@ namespace ChessSharp.MoveGeneration
 
         public MoveGenerator MoveGenerator { get; }
 
-        public List<MovePerft> Go(BitBoard bitBoard, Colour colour, int depth)
+        public List<MovePerft> Go(BitBoard bitBoard, Colour colour, ushort depth)
         {
             var depthMoves = new List<uint>[64];
 
@@ -23,13 +22,9 @@ namespace ChessSharp.MoveGeneration
 
             var nodeMoves = depthMoves[depth];
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, colour);
-
-            MoveGenerator.Generate(workspace, nodeMoves);
+            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
 
             var count = 0;
-
-            //var movesView = moves.Select(x => new MoveViewer(x));
 
             var movePerfts = new List<MovePerft>(64);
 
@@ -37,23 +32,21 @@ namespace ChessSharp.MoveGeneration
             {
                 var moveView = new MoveViewer(move);
 
-                workspace.MakeMove(move);
+                bitBoard.MakeMove(move);
 
-                //var checkers = GetCheckers(bitBoard, colour);
-
-                var nodes = InnerPerft(workspace, depth - 1, depthMoves);
+                var nodes = InnerPerft(bitBoard, colour.Opposite(), (ushort)(depth - 1), depthMoves);
 
                 count += nodes;
 
                 movePerfts.Add(new MovePerft(moveView, nodes));
 
-                workspace.UnMakeMove(move);
+                bitBoard.UnMakeMove(move);
             }
 
             return movePerfts;
         }
 
-        private int InnerPerft(MoveGenerationWorkspace workspace, int depth, List<uint>[] depthMoves)
+        private int InnerPerft(BitBoard bitBoard, Colour colour, ushort depth, List<uint>[] depthMoves)
         {
             if (depth == 0)
                 return 1;
@@ -63,49 +56,22 @@ namespace ChessSharp.MoveGeneration
             // Must wipe any existing moves each time we enter a depth
             nodeMoves.Clear();
 
-            MoveGenerator.Generate(workspace, nodeMoves);
-
             var count = 0;
 
-            //var movesView = moves.Select(x => new MoveViewer(x));
-            //var captures = moves.Where(x => x.GetCapturePieceType() != PieceType.None);
-
-            //var movePerfts = new List<MovePerft>();
-
-            foreach (var move in nodeMoves)
+            foreach(var move in MoveGenerator.GenerateChunk(depth, bitBoard, colour))
             {
-                //var moveView = new MoveViewer(move);
+                var moveView = new MoveViewer(move);
 
-                workspace.MakeMove(move);
+                bitBoard.MakeMove(move);
 
-                //var checkers = GetCheckers(bitBoard, colour);
-
-                var nodes = InnerPerft(workspace, depth - 1, depthMoves);
+                var nodes = InnerPerft(bitBoard, colour.Opposite(), (ushort)(depth - 1), depthMoves);
 
                 count += nodes;
 
-                //movePerfts.Add(new MovePerft(moveView, nodes));
-
-                workspace.UnMakeMove(move);
+                bitBoard.UnMakeMove(move);
             }
 
             return count;
         }
-
-        //private SquareFlag GetCheckers(BitBoard bitBoard, Colour colour)
-        //{
-        //    var relativeBitBoard = bitBoard.RelativeTo(colour);
-
-        //    var checkersPawn = MoveGenerator.GetPawnCheckers(relativeBitBoard, relativeBitBoard.MyKing);
-        //    var checkersKnight = MoveGenerator.GetKnightCheckers(relativeBitBoard, relativeBitBoard.MyKing);
-        //    var checkersRook = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Rook, PieceType.Rook);
-        //    var checkersBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Bishop);
-        //    var checkersQueenAsRook = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Rook, PieceType.Queen);
-        //    var checkersQueenAsBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Queen);
-
-        //    var checkers = checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
-
-        //    return checkers;
-        //}
     }
 }

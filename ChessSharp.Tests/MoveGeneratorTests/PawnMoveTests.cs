@@ -32,9 +32,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var pawnMoveViews = GetPawnMoveViews(moves);
 
@@ -54,9 +52,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -76,9 +72,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -95,9 +89,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -113,9 +105,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var pawnMoves = GetPawnMoveViews(moves);
 
@@ -163,9 +153,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             // Purely for debugging
             var pawnMoves = GetPawnMoveViews(moves);
@@ -214,9 +202,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -232,9 +218,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -250,9 +234,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var move1 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.B3.ToSquare(), PieceType.None, MoveType.Ordinary);
             var move2 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.G2.ToSquare(), SquareFlag.G3.ToSquare(), PieceType.None, MoveType.Ordinary);
@@ -282,9 +264,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var promotion1 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionQueen);
             var promotion2 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionRook);
@@ -306,9 +286,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var promotion1 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.E8.ToSquare(), PieceType.Knight, MoveType.PromotionQueen);
             var promotion2 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.E8.ToSquare(), PieceType.Knight, MoveType.PromotionRook);
@@ -330,9 +308,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var promotion1 = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.A1.ToSquare(), PieceType.Rook, MoveType.PromotionQueen);
             var promotion2 = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.A1.ToSquare(), PieceType.Rook, MoveType.PromotionRook);
@@ -356,9 +332,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var capture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.E2.ToSquare(), SquareFlag.D3.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
 
@@ -376,9 +350,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var enPassantCapture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D5.ToSquare(), SquareFlag.E6.ToSquare(), PieceType.Pawn, MoveType.EnPassant);
 
@@ -396,9 +368,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var enPassantCapture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D6.ToSquare(), SquareFlag.E7.ToSquare(), PieceType.Pawn, MoveType.EnPassant);
 
@@ -416,9 +386,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var illegalMove = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D6.ToSquare(), SquareFlag.D7.ToSquare(), PieceType.None, MoveType.Ordinary);
 

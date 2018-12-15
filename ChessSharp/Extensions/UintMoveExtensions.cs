@@ -22,6 +22,8 @@ namespace ChessSharp.Extensions
 
         public static MoveType GetMoveType(this uint value) => (MoveType)((value & _moveTypeMask) >> 19);
 
+        public static byte GetNumCheckers(this uint value) => (byte)((value & _numCheckersMask) >> 22);
+
         private static SquareFlag[] _indices = new SquareFlag[]
         {
              SquareFlag.A1,
@@ -96,5 +98,6 @@ namespace ChessSharp.Extensions
         private static readonly uint _toMask                 = 0b00000000_00000000_11111100_00000000;
         private static readonly uint _capturePieceTypeMask   = 0b00000000_00000111_00000000_00000000;
         private static readonly uint _moveTypeMask           = 0b00000000_00111000_00000000_00000000;
+        private static readonly uint _numCheckersMask        = 0b00000000_11000000_00000000_00000000;
     }
 }

@@ -6,7 +6,7 @@ namespace ChessSharp.Tests
     {
         public MoveGeneratorFixture()
         {
-            MoveGenerator = new MoveGenerator();
+            MoveGenerator = new MoveGenerator(32);
         }
 
         public MoveGenerator MoveGenerator { get; private set; }

@@ -1,6 +1,7 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using ChessSharp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -13,11 +14,49 @@ namespace ChessSharp.MoveGeneration
     public class MoveGenerator
     {
         private static readonly AttackBitmaps AttackBitmaps = new AttackBitmaps();
+
         private static readonly Vector<ulong> VectorZero = new Vector<ulong>(0);
 
-        public void Generate(MoveGenerationWorkspace workspace, IList<uint> moves)
+        private MoveGenerationWorkspace[] _workspaces;
+
+        public MoveGenerator()
         {
-            var relativeBitBoard = workspace.RelativeBitBoard;
+            _workspaces = new MoveGenerationWorkspace[1];
+
+            _workspaces[0] = new MoveGenerationWorkspace(0);
+        }
+
+        public MoveGenerator(int workspaceCount)
+        {
+            _workspaces = new MoveGenerationWorkspace[workspaceCount];
+
+            for (var i = 0; i < workspaceCount; ++i)
+                _workspaces[i] = new MoveGenerationWorkspace(i);
+        }
+
+        public void Generate(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        {
+            foreach (var move in GenerateChunk(0, bitBoard, colour))
+                moves.Add(move);
+        }
+
+        public void Generate(ushort depth, BitBoard bitBoard, Colour colour, IList<uint> moves)
+        {
+            if (depth >= _workspaces.Length)
+                throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
+
+            foreach (var move in GenerateChunk(depth, bitBoard, colour))
+                moves.Add(move);
+        }
+
+        public IEnumerable<uint> GenerateChunk(ushort depth, BitBoard bitBoard, Colour colour)//MoveGenerationWorkspace workspace)
+        {
+            if (depth >= _workspaces.Length)
+                throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
+
+            var workspace = _workspaces[depth];
+
+            var relativeBitBoard = workspace.Reset(bitBoard, colour);
 
             var kingSquare = relativeBitBoard.MyKing.ToSquare();
 
@@ -108,26 +147,42 @@ namespace ChessSharp.MoveGeneration
 
             var safeSquaresAsList = FindSafeSquares(relativeBitBoard, workspace, semiSafeAttackableSquaresAsList);
 
+            var numCheckers = checkers.Count();
+
             foreach (var toSquare in safeSquaresAsList)
             {
                 if (relativeBitBoard.OpponentSquares.HasFlag(toSquare))
                 {
                     var capturePieceType = relativeBitBoard.GetPieceType(toSquare);
 
-                    moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), capturePieceType, MoveType.Ordinary));
+                    var kingMove = MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), capturePieceType, MoveType.Ordinary, 0);// numCheckers);
+
+                    workspace.KingCaptureMoveBuffer.Add(kingMove);
                 }
                 else
                 {
-                    moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
+                    var kingMove = MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), PieceType.None, MoveType.Ordinary, 0);// numCheckers);
+
+                    workspace.KingNonCaptureMoveBuffer.Add(kingMove);
                 }
             }
 
-            var numCheckers = checkers.Count();
-
             // If in Check by more than one piece then only options are King moves - which we already have
             if (numCheckers > 1)
-                return;
+            {
+                foreach (var move in workspace.KingCaptureMoveBuffer)
+                    yield return move;
 
+                workspace.KingCaptureMoveBuffer.Clear();
+
+                foreach (var move in workspace.KingNonCaptureMoveBuffer)
+                    yield return move;
+
+                workspace.KingNonCaptureMoveBuffer.Clear();
+
+                yield break;
+            }
+            
             // https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/
             // By default - whole board. If in Check it becomes limited to the Checker (no other captures count)
             var captureMask = SquareFlagConstants.All;
@@ -159,13 +214,18 @@ namespace ChessSharp.MoveGeneration
             else
             {
                 // Only run castle logic if we are not in check
-                AddCastles(relativeBitBoard, workspace, kingSquare, moves);
+                AddCastles(relativeBitBoard, workspace, kingSquare, workspace.NonCaptureMoveBuffer);
             }
 
             var kingRayAttackSquaresWithoutKing = kingRayAttackSquares & ~kingSquare.Flag;
 
             // Pass the relative bitboard in separately to avoid it being re-generated
-            var pinnedSquares = AddPinnedMoves(workspace, relativeBitBoard, kingSquare, kingRayAttackSquaresWithoutKing, pushMask, captureMask, moves);
+            var pinnedSquares = AddPinnedMoves(workspace, relativeBitBoard, kingSquare, kingRayAttackSquaresWithoutKing, pushMask, captureMask, workspace.CaptureMoveBuffer, workspace.NonCaptureMoveBuffer);
+
+            foreach (var move in workspace.CaptureMoveBuffer)
+                yield return move;
+
+            workspace.CaptureMoveBuffer.Clear();
 
             var legalMask = pushMask | captureMask;
 
@@ -175,7 +235,7 @@ namespace ChessSharp.MoveGeneration
             var remainingKnights = (SquareFlag)0;
             var remainingRooks = (SquareFlag)0;
             var remainingBishops = (SquareFlag)0;
-            
+
             if (Vector<ulong>.Count == 4)
             {
                 buffer1[0] = (ulong)relativeBitBoard.MyPawns;
@@ -228,13 +288,32 @@ namespace ChessSharp.MoveGeneration
 
                 var potentialCapturePieces = potentialPiecesWest | potentialPiecesEast;
 
+                // Very basic but if En Passant is set then check any pawn on the row
+                if (relativeBitBoard.EnPassant > 0)
+                {
+                    var remainingPotentialEnPassant = remainingPawns & relativeBitBoard.EnPassantDiscoveredCheckRank;
+
+                    potentialCapturePieces |= remainingPotentialEnPassant;
+                }
+
+                if (potentialCapturePieces > 0)
+                {
+                    foreach (var pieceSquare in potentialCapturePieces.ToList())
+                        AddIndividualPawnCaptures(relativeBitBoard, pieceSquare.ToSquare(), pushMask, captureMask, workspace.CaptureMoveBuffer, workspace.NonCaptureMoveBuffer);
+                }
+
+                foreach (var move in workspace.CaptureMoveBuffer)
+                    yield return move;
+
+                workspace.CaptureMoveBuffer.Clear();
+
                 if (promotionPushes > 0)
                 {
                     foreach (var pieceSquare in promotionPushes.ToList())
                     {
                         var fromSquare = pieceSquare.PawnBackward(relativeBitBoard.Colour, 1);
-                        
-                        AddPromotions(relativeBitBoard, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, moves);
+
+                        AddPromotions(relativeBitBoard, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, workspace.CaptureMoveBuffer, workspace.NonCaptureMoveBuffer);
                     }
                 }
 
@@ -244,7 +323,7 @@ namespace ChessSharp.MoveGeneration
                     {
                         var fromSquare = pieceSquare.PawnBackward(relativeBitBoard.Colour, 1);
 
-                        moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
+                        workspace.NonCaptureMoveBuffer.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
                     }
                 }
 
@@ -260,51 +339,73 @@ namespace ChessSharp.MoveGeneration
                         {
                             var fromSquare = pieceSquare.PawnBackward(relativeBitBoard.Colour, 2);
 
-                            moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
+                            workspace.NonCaptureMoveBuffer.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare.ToSquare(), pieceSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
                         }
                     }
-                }
-
-                // Very basic but if En Passant is set then check any pawn on the row
-                if (relativeBitBoard.EnPassant > 0)
-                {
-                    var remainingPotentialEnPassant = remainingPawns & relativeBitBoard.EnPassantDiscoveredCheckRank;
-
-                    potentialCapturePieces |= remainingPotentialEnPassant;
-                }
-
-                if (potentialCapturePieces > 0)
-                {
-                    foreach (var pieceSquare in potentialCapturePieces.ToList())
-                        AddIndividualPawnCaptures(relativeBitBoard, pieceSquare.ToSquare(), pushMask, captureMask, moves);
                 }
             }
 
             if (relativeBitBoard.MyKnights > 0)
             {
                 foreach (var pieceSquareFlag in remainingKnights.ToList())
-                    AddIndividualKnightMoves(relativeBitBoard, pieceSquareFlag.ToSquare(), legalMask, moves);
+                    AddIndividualKnightMoves(relativeBitBoard, pieceSquareFlag.ToSquare(), legalMask, workspace.CaptureMoveBuffer, workspace.NonCaptureMoveBuffer);
             }
+
+            foreach (var move in workspace.CaptureMoveBuffer)
+                yield return move;
+
+            workspace.CaptureMoveBuffer.Clear();
 
             if (relativeBitBoard.MyRooks > 0)
             {
                 foreach (var pieceSquare in remainingRooks.ToList())
-                    AddIndividualRayMoves(relativeBitBoard, pieceSquare.ToSquare(), PieceType.Rook, PieceType.Rook, legalMask, moves);
+                    AddIndividualRayMoves(relativeBitBoard, pieceSquare.ToSquare(), PieceType.Rook, PieceType.Rook, legalMask, workspace.CaptureMoveBuffer, workspace.NonCaptureMoveBuffer);
             }
+
+            foreach (var move in workspace.CaptureMoveBuffer)
+                yield return move;
+
+            workspace.CaptureMoveBuffer.Clear();
 
             if (relativeBitBoard.MyBishops > 0)
             {
                 foreach (var pieceSquare in remainingBishops.ToList())
-                    AddIndividualRayMoves(relativeBitBoard, pieceSquare.ToSquare(), PieceType.Bishop, PieceType.Bishop, legalMask, moves);
+                    AddIndividualRayMoves(relativeBitBoard, pieceSquare.ToSquare(), PieceType.Bishop, PieceType.Bishop, legalMask, workspace.CaptureMoveBuffer, workspace.NonCaptureMoveBuffer);
             }
+
+            foreach (var move in workspace.CaptureMoveBuffer)
+                yield return move;
+
+            workspace.CaptureMoveBuffer.Clear();
 
             if (relativeBitBoard.MyQueens > 0)
             {
                 var remainingQueens = relativeBitBoard.MyQueens & remainingSquares;
 
                 foreach (var pieceSquare in remainingQueens.ToList())
-                    AddIndividualQueenMoves(relativeBitBoard, pieceSquare.ToSquare(), legalMask, moves);
+                    AddIndividualQueenMoves(relativeBitBoard, pieceSquare.ToSquare(), legalMask, workspace.CaptureMoveBuffer, workspace.NonCaptureMoveBuffer);
             }
+
+            foreach (var move in workspace.CaptureMoveBuffer)
+                yield return move;
+
+            workspace.CaptureMoveBuffer.Clear();
+
+            foreach (var move in workspace.KingCaptureMoveBuffer)
+                yield return move;
+
+            workspace.KingCaptureMoveBuffer.Clear();
+
+            // Finally, clear out all the non-capture moves
+            foreach (var move in workspace.NonCaptureMoveBuffer)
+                yield return move;
+
+            workspace.NonCaptureMoveBuffer.Clear();
+
+            foreach (var move in workspace.KingNonCaptureMoveBuffer)
+                yield return move;
+
+            workspace.KingNonCaptureMoveBuffer.Clear();
         }
 
         private IList<SquareFlag> FindSafeSquares(RelativeBitBoard relativeBitBoard, MoveGenerationWorkspace workspace, IEnumerable<SquareFlag> attackableSquares)
@@ -453,7 +554,7 @@ namespace ChessSharp.MoveGeneration
         }
 
         private SquareFlag AddPinnedMoves(MoveGenerationWorkspace workspace, RelativeBitBoard relativeBitBoard, Square kingSquare,
-            SquareFlag kingRayAttackSquares, SquareFlag pushMask, SquareFlag captureMask, IList<uint> moves)
+            SquareFlag kingRayAttackSquares, SquareFlag pushMask, SquareFlag captureMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
             var potentialPins = kingRayAttackSquares & relativeBitBoard.MySquares;
 
@@ -509,22 +610,22 @@ namespace ChessSharp.MoveGeneration
             var pinnedPieces = (SquareFlag)0;
 
             if (pinningRooks > 0)
-                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquare, potentialPins, pinningRooks, false, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(relativeBitBoard, kingSquare, potentialPins, pinningRooks, false, pushMask, captureMask, captureMoves, nonCaptureMoves);
 
             if (pinningBishops > 0)
-                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquare, potentialPins, pinningBishops, true, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(relativeBitBoard, kingSquare, potentialPins, pinningBishops, true, pushMask, captureMask, captureMoves, nonCaptureMoves);
 
             if (pinningQueensNonDiagonal > 0)
-                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquare, potentialPins, pinningQueensNonDiagonal, false, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(relativeBitBoard, kingSquare, potentialPins, pinningQueensNonDiagonal, false, pushMask, captureMask, captureMoves, nonCaptureMoves);
 
             if (pinningQueensDiagonal > 0)
-                pinnedPieces |= AddPinnedMovesInternal(workspace.BitBoard, relativeBitBoard, kingSquare, potentialPins, pinningQueensDiagonal, true, pushMask, captureMask, moves);
+                pinnedPieces |= AddPinnedMovesInternal(relativeBitBoard, kingSquare, potentialPins, pinningQueensDiagonal, true, pushMask, captureMask, captureMoves, nonCaptureMoves);
 
             return pinnedPieces;
         }
 
-        private SquareFlag AddPinnedMovesInternal(BitBoard bitBoard, RelativeBitBoard relativeBitBoard, Square kingSquare, SquareFlag potentialPins,
-            SquareFlag pinners, bool diagonal, SquareFlag pushMask, SquareFlag captureMask, IList<uint> moves)
+        private SquareFlag AddPinnedMovesInternal(RelativeBitBoard relativeBitBoard, Square kingSquare, SquareFlag potentialPins,
+            SquareFlag pinners, bool diagonal, SquareFlag pushMask, SquareFlag captureMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
             var pinnedSquares = (SquareFlag)0;
             var pinnersAsList = pinners.ToList();
@@ -548,19 +649,19 @@ namespace ChessSharp.MoveGeneration
                 switch (pieceType)
                 {
                     case PieceType.Pawn when !diagonal:
-                        AddIndividualPawnPushes(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), pushPath, moves);
+                        AddIndividualPawnPushes(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), pushPath, captureMoves, nonCaptureMoves);
                         break;
                     case PieceType.Pawn when diagonal:
-                        AddIndividualPawnCaptures(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), pushPath, capturePath, moves);
+                        AddIndividualPawnCaptures(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), pushPath, capturePath, captureMoves, nonCaptureMoves);
                         break;
                     case PieceType.Rook:
-                        AddIndividualRayMoves(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), PieceType.Rook, PieceType.Rook, pushPath | capturePath, moves);
+                        AddIndividualRayMoves(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), PieceType.Rook, PieceType.Rook, pushPath | capturePath, captureMoves, nonCaptureMoves);
                         break;
                     case PieceType.Bishop:
-                        AddIndividualRayMoves(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), PieceType.Bishop, PieceType.Bishop, pushPath | capturePath, moves);
+                        AddIndividualRayMoves(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), PieceType.Bishop, PieceType.Bishop, pushPath | capturePath, captureMoves, nonCaptureMoves);
                         break;
                     case PieceType.Queen:
-                        AddIndividualQueenMoves(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), pushPath | capturePath, moves);
+                        AddIndividualQueenMoves(relativeBitBoard, squarePinnedByThisPiece.ToSquare(), pushPath | capturePath, captureMoves, nonCaptureMoves);
                         break;
                 }
             }
@@ -568,7 +669,7 @@ namespace ChessSharp.MoveGeneration
             return pinnedSquares;
         }
         
-        private void AddIndividualPawnPushes(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag pushMask, IList<uint> moves)
+        private void AddIndividualPawnPushes(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag pushMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
             var toSquare = fromSquare.Flag
                 .PawnForward(relativeBitBoard.Colour, 1)
@@ -580,9 +681,9 @@ namespace ChessSharp.MoveGeneration
             if (pushMask.HasFlag(toSquare.Flag))
             {
                 if (relativeBitBoard.PromotionRank.HasFlag(toSquare.Flag))
-                    AddPromotions(relativeBitBoard, fromSquare, toSquare, PieceType.None, moves);
+                    AddPromotions(relativeBitBoard, fromSquare, toSquare, PieceType.None, captureMoves, nonCaptureMoves);
                 else
-                    moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
+                    nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
             }
 
             // Possible that we can block check with double push
@@ -597,11 +698,11 @@ namespace ChessSharp.MoveGeneration
 
                 // Promotions not possible from start rank
                 if (!relativeBitBoard.OccupiedSquares.HasFlag(toSquare.Flag))
-                    moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
+                    nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, PieceType.None, MoveType.Ordinary));
             }
         }
 
-        private void AddIndividualPawnCaptures(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag pushMask, SquareFlag captureMask, IList<uint> moves)
+        private void AddIndividualPawnCaptures(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag pushMask, SquareFlag captureMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
             var captureSquares = relativeBitBoard.Colour == Colour.White
                 ? AttackBitmaps.PawnCapturesWhite[fromSquare.Index].ToList()
@@ -670,35 +771,42 @@ namespace ChessSharp.MoveGeneration
                     }
 
                     if (relativeBitBoard.PromotionRank.HasFlag(toSquare))
-                        AddPromotions(relativeBitBoard, fromSquare, toSquare.ToSquare(), capturePieceType, moves);
+                    {
+                        AddPromotions(relativeBitBoard, fromSquare, toSquare.ToSquare(), capturePieceType, captureMoves, nonCaptureMoves);
+                    }
                     else if (!discoveredCheck)
-                        moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare.ToSquare(), capturePieceType, moveType));
+                    {
+                        if (capturePieceType != PieceType.None)
+                            captureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare.ToSquare(), capturePieceType, moveType));
+                        else
+                            nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare.ToSquare(), capturePieceType, moveType));
+                    }
                 }
             }
         }
 
-        private void AddIndividualKnightMoves(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag legalMask, IList<uint> moves)
+        private void AddIndividualKnightMoves(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag legalMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
             var attackableSquaresIncludingSelfCaptures = AttackBitmaps.KnightAttacks[fromSquare.Index];
             var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MySquares;
             var legalAttackableSquares = attackableSquares & legalMask;
 
-            ToOrdinaryMoves(relativeBitBoard, PieceType.Knight, fromSquare, legalAttackableSquares, moves);
+            ToOrdinaryMoves(relativeBitBoard, PieceType.Knight, fromSquare, legalAttackableSquares, captureMoves, nonCaptureMoves);
         }
 
-        private void AddIndividualQueenMoves(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag legalMask, IList<uint> moves)
+        private void AddIndividualQueenMoves(RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag legalMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
-            AddIndividualRayMoves(relativeBitBoard, fromSquare, PieceType.Rook, PieceType.Queen, legalMask, moves);
-            AddIndividualRayMoves(relativeBitBoard, fromSquare, PieceType.Bishop, PieceType.Queen, legalMask, moves);
+            AddIndividualRayMoves(relativeBitBoard, fromSquare, PieceType.Rook, PieceType.Queen, legalMask, captureMoves, nonCaptureMoves);
+            AddIndividualRayMoves(relativeBitBoard, fromSquare, PieceType.Bishop, PieceType.Queen, legalMask, captureMoves, nonCaptureMoves);
         }
 
-        private void AddIndividualRayMoves(RelativeBitBoard relativeBitBoard, Square fromSquare, PieceType rayType, PieceType pieceType, SquareFlag legalMask, IList<uint> moves)
+        private void AddIndividualRayMoves(RelativeBitBoard relativeBitBoard, Square fromSquare, PieceType rayType, PieceType pieceType, SquareFlag legalMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
             var attackableSquaresIncludingSelfCaptures = GetAttackableSquares(fromSquare, rayType, relativeBitBoard.OccupiedSquares);
             var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MySquares;
             var legalAttackableSquares = attackableSquares & legalMask;
 
-            ToOrdinaryMoves(relativeBitBoard, pieceType, fromSquare, legalAttackableSquares, moves);
+            ToOrdinaryMoves(relativeBitBoard, pieceType, fromSquare, legalAttackableSquares, captureMoves, nonCaptureMoves);
         }
 
         private void AddCastles(RelativeBitBoard relativeBitBoard, MoveGenerationWorkspace workspace, Square kingSquare, IList<uint> moves)
@@ -759,12 +867,22 @@ namespace ChessSharp.MoveGeneration
             }
         }
 
-        private void AddPromotions(RelativeBitBoard relativeBitBoard, Square fromSquare, Square toSquare, PieceType capturePieceType, IList<uint> moves)
+        private void AddPromotions(RelativeBitBoard relativeBitBoard, Square fromSquare, Square toSquare, PieceType capturePieceType, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
-            moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionQueen));
-            moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionRook));
-            moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionKnight));
-            moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionBishop));
+            if (capturePieceType != PieceType.None)
+            {
+                captureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionQueen));
+                captureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionRook));
+                captureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionKnight));
+                captureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionBishop));
+            }
+            else
+            {
+                nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionQueen));
+                nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionRook));
+                nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionKnight));
+                nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, PieceType.Pawn, fromSquare, toSquare, capturePieceType, MoveType.PromotionBishop));
+            }
         }
 
         private SquareFlag GetAttackableSquares(Square fromSquare, PieceType rayType, SquareFlag occupiedSquares)
@@ -784,18 +902,22 @@ namespace ChessSharp.MoveGeneration
             return attackableSquaresIncludingSelfCaptures;
         }
 
-        private void ToOrdinaryMoves(RelativeBitBoard relativeBitBoard, PieceType pieceType, Square fromSquare, SquareFlag attackableSquares, IList<uint> moves)
+        private void ToOrdinaryMoves(RelativeBitBoard relativeBitBoard, PieceType pieceType, Square fromSquare, SquareFlag attackableSquares, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
         {
             var attackableSquaresAsList = attackableSquares.ToList();
 
             foreach (var toSquare in attackableSquaresAsList)
             {
-                var capturePieceType = PieceType.None;
+                if (!relativeBitBoard.OpponentSquares.HasFlag(toSquare))
+                {
+                    nonCaptureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, pieceType, fromSquare, toSquare.ToSquare(), PieceType.None, MoveType.Ordinary));
 
-                if (relativeBitBoard.OpponentSquares.HasFlag(toSquare))
-                    capturePieceType = relativeBitBoard.GetPieceType(toSquare);
+                    continue;
+                }
 
-                moves.Add(MoveBuilder.Create(relativeBitBoard.Colour, pieceType, fromSquare, toSquare.ToSquare(), capturePieceType, MoveType.Ordinary));
+                var capturePieceType = relativeBitBoard.GetPieceType(toSquare);
+
+                captureMoves.Add(MoveBuilder.Create(relativeBitBoard.Colour, pieceType, fromSquare, toSquare.ToSquare(), capturePieceType, MoveType.Ordinary));
             }
         }
     }

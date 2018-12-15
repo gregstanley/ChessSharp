@@ -98,7 +98,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Move_Constructor_AccessTwice_NoChange()
         {
-            var move = MoveBuilder.Create(Colour.White, PieceType.Knight, SquareFlag.D5.ToSquare(), SquareFlag.E7.ToSquare(), PieceType.Pawn, MoveType.CastleKing);
+            var move = MoveBuilder.Create(Colour.White, PieceType.Knight, SquareFlag.D5.ToSquare(), SquareFlag.E7.ToSquare(), PieceType.Pawn, MoveType.CastleKing, 2);
 
             Assert.Equal(Colour.White, move.GetColour());
             Assert.Equal(Colour.White, move.GetColour());
@@ -112,6 +112,7 @@ namespace ChessSharp.Tests
             Assert.Equal(PieceType.Pawn, move.GetCapturePieceType());
             Assert.Equal(MoveType.CastleKing, move.GetMoveType());
             Assert.Equal(MoveType.CastleKing, move.GetMoveType());
+            Assert.Equal(2, move.GetNumCheckers());
         }
 
         [Fact]

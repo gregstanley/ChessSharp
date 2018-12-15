@@ -5,44 +5,64 @@ using System.Collections.Generic;
 
 namespace ChessSharp.MoveGeneration
 {
-    public class MoveGenerationWorkspace
+    internal class MoveGenerationWorkspace
     {
+        internal int DepthKey { get; }
+
+        internal RelativeBitBoard RelativeBitBoard = new RelativeBitBoard();
+
         internal ulong[] Buffer1 = new ulong[4];
+
         internal ulong[] Buffer2 = new ulong[4];
 
         internal List<SquareFlag> SafeSquares = new List<SquareFlag>(32);
 
-        public MoveGenerationWorkspace(BitBoard bitBoard, Colour colour)
+        internal List<uint> KingCaptureMoveBuffer = new List<uint>(4);
+
+        internal List<uint> KingNonCaptureMoveBuffer = new List<uint>(8);
+
+        internal List<uint> CaptureMoveBuffer = new List<uint>(64);
+
+        internal List<uint> NonCaptureMoveBuffer = new List<uint>(64);
+
+        public MoveGenerationWorkspace(int depthKey)
         {
-            BitBoard = bitBoard;
-            Colour = colour;
+            DepthKey = depthKey;
         }
 
-        public BitBoard BitBoard { get; private set; }
-
-        public Colour Colour { get; private set; }
-
-        public byte Ply { get; private set; }
-
-        public RelativeBitBoard RelativeBitBoard =>
-            BitBoard.RelativeTo(Colour);
-
-        public ulong MakeMove(uint move)
+        public RelativeBitBoard Reset(BitBoard bitBoard, Colour colour)
         {
-            BitBoard.MakeMove(move);
-            Colour = Colour.Opposite();
-            ++Ply;
+            ClearBuffers();
 
-            return BitBoard.Key;
+            var opponentColour = colour.Opposite();
+
+            bitBoard.RelativeTo(colour);
+
+            RelativeBitBoard.Set(colour,
+                 bitBoard.GetPawnSquares(colour),
+                 bitBoard.GetRookSquares(colour),
+                 bitBoard.GetKnightSquares(colour),
+                 bitBoard.GetBishopSquares(colour),
+                 bitBoard.GetQueenSquares(colour),
+                 bitBoard.GetKingSquare(colour),
+                 bitBoard.GetPawnSquares(opponentColour),
+                 bitBoard.GetRookSquares(opponentColour),
+                 bitBoard.GetKnightSquares(opponentColour),
+                 bitBoard.GetBishopSquares(opponentColour),
+                 bitBoard.GetQueenSquares(opponentColour),
+                 bitBoard.GetKingSquare(opponentColour),
+                 bitBoard.GetBoardState());
+
+            return RelativeBitBoard;
         }
 
-        public ulong UnMakeMove(uint move)
+        private void ClearBuffers()
         {
-            BitBoard.UnMakeMove(move);
-            Colour = Colour.Opposite();
-            --Ply;
-
-            return BitBoard.Key;
+            SafeSquares.Clear();
+            KingCaptureMoveBuffer.Clear();
+            KingNonCaptureMoveBuffer.Clear();
+            CaptureMoveBuffer.Clear();
+            NonCaptureMoveBuffer.Clear();
         }
     }
 }

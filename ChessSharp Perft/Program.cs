@@ -16,7 +16,7 @@ namespace ChessSharp_Perft
 
             Console.WriteLine("Initialising data");
 
-            var moveGenerator = new MoveGenerator();
+            var moveGenerator = new MoveGenerator(16);
 
             var fenString = FenHelpers.Default;
 
@@ -69,7 +69,7 @@ namespace ChessSharp_Perft
             Console.ReadKey();
         }
 
-        private static double PerftDepth(PerftRunner perftRunner, BitBoard bitBoard, GameState gameState, int depth)
+        private static double PerftDepth(PerftRunner perftRunner, BitBoard bitBoard, GameState gameState, ushort depth)
         {
             var moves = new List<uint>(20);
 
@@ -93,7 +93,6 @@ namespace ChessSharp_Perft
 
             Console.WriteLine($"Total: {totalNodes}");
 
-            //var nps = ((double)totalNodes / stopWatch.ElapsedTicks) * TimeSpan.TicksPerSecond;
             var elapsedMilliseconds = stopWatch.ElapsedMilliseconds;
 
             if (elapsedMilliseconds == 0)

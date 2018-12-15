@@ -16,7 +16,6 @@ namespace ChessSharp.MoveGeneration
 
         public void Go(BitBoard bitBoard, Colour colour, int depth, IDictionary<int, PerftMetrics> metrics)
         {
-            //var moves = new List<uint>(256);
             var moves = new List<uint>[256];
 
             for (var i = 0; i <= depth; i++)
@@ -28,10 +27,7 @@ namespace ChessSharp.MoveGeneration
             var nodeMoves = moves[depth];
             var depthMetrics = metrics[depth];
 
-            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, colour);
-
-            MoveGenerator.Generate(workspace, nodeMoves);
+            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
 
             var movesView = nodeMoves.Select(x => new MoveViewer(x));
 
@@ -63,17 +59,13 @@ namespace ChessSharp.MoveGeneration
             if (depth == 0)
                 return;
 
-            //var moves = new List<uint>(256);
             var nodeMoves = moves[depth];
             var depthMetrics = metrics[depth];
 
             // Must wipe any existing moves each time we enter a depth
             nodeMoves.Clear();
 
-            //MoveGenerator.Generate(bitBoard, colour, nodeMoves);
-            var workspace = new MoveGenerationWorkspace(bitBoard, colour);
-
-            MoveGenerator.Generate(workspace, nodeMoves);
+            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
 
             var movesView = nodeMoves.Select(x => new MoveViewer(x));
 

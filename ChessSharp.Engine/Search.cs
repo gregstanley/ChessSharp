@@ -1,5 +1,6 @@
 ﻿using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
+using ChessSharp.Extensions;
 using ChessSharp.MoveGeneration;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,7 +16,7 @@ namespace ChessSharp.Engine
 
         public int PositionCount { get; private set; }
 
-        private MoveGenerator _moveGenerator;
+        private readonly MoveGenerator _moveGenerator;
 
         private PositionEvaluator _positionEvaluator;
 
@@ -30,7 +31,7 @@ namespace ChessSharp.Engine
             _transpositionTable = transpositionTable;
         }
 
-        public SearchResults Go(MoveGenerationWorkspace workspace, int maxDepth)
+        public SearchResults Go(BitBoard bitBoard, Colour colour, int maxDepth)
         {
             _stopWatch.Restart();
 
@@ -38,7 +39,7 @@ namespace ChessSharp.Engine
 
             _transpositionTable.NextIteration();
 
-            var transpositionKey = workspace.BitBoard.Key;
+            var transpositionKey = bitBoard.Key;
 
             var existingTransposition = _transpositionTable.Find(transpositionKey);
 
@@ -50,14 +51,9 @@ namespace ChessSharp.Engine
                     previousBestMove = existingTransposition.BestMove;
             }
 
-            var depthMoves = new List<uint>[64];
+            var nodeMoves = new List<uint>(256);
 
-            for (var i = 0; i <= maxDepth; i++)
-                depthMoves[i] = new List<uint>(256);
-
-            var nodeMoves = depthMoves[maxDepth];
-
-            _moveGenerator.Generate(workspace, nodeMoves);
+            _moveGenerator.Generate(bitBoard, colour, nodeMoves);
 
             var moveEvaluations = new List<MoveEvaluation>(128);
 
@@ -80,7 +76,7 @@ namespace ChessSharp.Engine
 
             while (currentMaxDepth <= maxDepth)
             {
-                existingTransposition = _transpositionTable.Find(workspace.BitBoard.Key);
+                existingTransposition = _transpositionTable.Find(bitBoard.Key);
 
                 if (existingTransposition != null)
                 {
@@ -101,14 +97,11 @@ namespace ChessSharp.Engine
                 {
                     var move = previousBestMove;
 
-                    var moveView = new MoveViewer(move);
+                    bitBoard.MakeMove(move);
 
-                    var beforeKey = workspace.MakeMove(move);
+                    var evaluatedScore = -PrincipalVariationSearch(bitBoard, colour.Opposite(), (byte)(currentMaxDepth - 1), 1, int.MinValue, int.MaxValue, principalVariation);
 
-                    var evaluatedScore = -PrincipalVariationSearch(workspace, (byte)(currentMaxDepth - 1), 1, int.MinValue, int.MaxValue,
-                        depthMoves, principalVariation);
-
-                    var afterKey = workspace.UnMakeMove(move);
+                    bitBoard.UnMakeMove(move);
 
                     if (evaluatedScore > bestScore)
                     {
@@ -122,7 +115,7 @@ namespace ChessSharp.Engine
                         Info?.Invoke(this, new InfoEventArgs(info));
                     }
 
-                    moveEvaluations.Add(new MoveEvaluation(moveView, evaluatedScore));
+                    moveEvaluations.Add(new MoveEvaluation(new MoveViewer(move), evaluatedScore));
                 }
 
                 foreach (var move in nodeMoves)
@@ -132,12 +125,11 @@ namespace ChessSharp.Engine
 
                     var moveView = new MoveViewer(move);
 
-                    var beforeKey = workspace.MakeMove(move);
+                    bitBoard.MakeMove(move);
 
-                    var evaluatedScore = -PrincipalVariationSearch(workspace, (byte)(currentMaxDepth - 1), 1, int.MinValue, int.MaxValue,
-                        depthMoves, principalVariation);
+                    var evaluatedScore = -PrincipalVariationSearch(bitBoard, colour.Opposite(), (byte)(currentMaxDepth - 1), 1, int.MinValue, int.MaxValue, principalVariation);
 
-                    var afterKey = workspace.UnMakeMove(move);
+                    bitBoard.UnMakeMove(move);
 
                     if (evaluatedScore > bestScore)
                     {
@@ -154,7 +146,7 @@ namespace ChessSharp.Engine
                     moveEvaluations.Add(new MoveEvaluation(moveView, evaluatedScore));
                 }
 
-                _transpositionTable.Set(transpositionKey, (byte)currentMaxDepth, workspace.Colour, bestScore, bestMove);
+                _transpositionTable.Set(transpositionKey, (byte)currentMaxDepth, colour, bestScore, bestMove);
 
                 var iterationLength = _stopWatch.ElapsedMilliseconds - lap;
 
@@ -174,23 +166,18 @@ namespace ChessSharp.Engine
             return new SearchResults(PositionCount, iterationLaps, moveEvaluations, principalVariations, _transpositionTable);
         }
 
-        private int PrincipalVariationSearch(MoveGenerationWorkspace workspace, byte depth, int ply, int alpha, int beta, List<uint>[] depthMoves, uint[] parentPrincipalVariation)
+        private int PrincipalVariationSearch(BitBoard bitBoard, Colour colour, byte depth, ushort ply, int alpha, int beta, uint[] parentPrincipalVariation)
         {
             ++PositionCount;
 
             if (depth == 0)
-                return _positionEvaluator.Evaluate(workspace.BitBoard) * (workspace.Colour == Colour.White ? 1 : -1);
+                return _positionEvaluator.Evaluate(bitBoard) * (colour == Colour.White ? 1 : -1);
 
-            var nodeMoves = depthMoves[depth];
-
-            var transpositionKey = workspace.BitBoard.Key;
+            var transpositionKey = bitBoard.Key;
 
             var existingTransposition = _transpositionTable.Find(transpositionKey);
 
             uint previousBestMove = 0;
-
-            // Must wipe any existing moves each time we enter a depth
-            nodeMoves.Clear();
 
             if (existingTransposition != null)
             {
@@ -201,60 +188,45 @@ namespace ChessSharp.Engine
                     previousBestMove = existingTransposition.BestMove;
             }
 
-            var needsToGenerate = true;
-
-            if (previousBestMove != 0)
-            {
-                nodeMoves.Add(previousBestMove);
-            }
-            else
-            {
-                _moveGenerator.Generate(workspace, nodeMoves);
-                needsToGenerate = false;
-            }
-
             var bestScore = int.MinValue;
             var bestMove = 0u;
 
             var isFirst = true;
 
-            var moveIndex = 0;
-
             var principalVariation = new uint[64];
 
             var bSearchPv = true;
 
-            //foreach(var move in GetNextMove(workspace, nodeMoves, previousBestMove))
-            while (moveIndex < nodeMoves.Count)
+            foreach(var move in GetNextMove(_moveGenerator, ply, bitBoard, colour, previousBestMove))
             {
-                var move = nodeMoves[moveIndex++];
-
                 if (!isFirst && move == previousBestMove)
                     continue;
 
                 isFirst = false;
 
-                var beforeKey = workspace.MakeMove(move);
+                bitBoard.MakeMove(move);
 
                 var evaluatedScore = 0;
+
+                var oppositeColour = colour.Opposite();
 
                 // https://www.chessprogramming.org/Principal_Variation_Search
                 if (bSearchPv)
                 {
-                    evaluatedScore = -PrincipalVariationSearch(workspace, (byte)(depth - 1), ply + 1, -beta, -alpha, depthMoves, principalVariation);
+                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, (byte)(depth - 1), (ushort)(ply + 1), -beta, -alpha, principalVariation);
                 }
                 else
                 {
-                    evaluatedScore = -PrincipalVariationSearch(workspace, (byte)(depth - 1), ply + 1, -alpha - 1, -alpha, depthMoves, principalVariation);
+                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, (byte)(depth - 1), (ushort)(ply + 1), -alpha - 1, -alpha, principalVariation);
 
                     if (alpha < evaluatedScore && evaluatedScore < beta) // in fail-soft ... && score < beta ) is common
                     {
-                        evaluatedScore = -PrincipalVariationSearch(workspace, (byte)(depth - 1), ply + 1, -beta, -evaluatedScore, depthMoves, principalVariation); // re-search
+                        evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, (byte)(depth - 1), (ushort)(ply + 1), -beta, -evaluatedScore, principalVariation); // re-search
                     }
                 }
 
-                var afterKey = workspace.UnMakeMove(move);
-                
+                bitBoard.UnMakeMove(move);
+
                 if (alpha < evaluatedScore)
                 {
                     // alpha = Math.Max(bestScore, evaluatedScore);
@@ -274,12 +246,6 @@ namespace ChessSharp.Engine
 
                 bSearchPv = false;
                 
-                if (needsToGenerate)
-                {
-                    _moveGenerator.Generate(workspace, nodeMoves);
-                    needsToGenerate = false;
-                }
-
                 if (ply == 1)
                 {
                     var info = new Info(PositionCount, _stopWatch.ElapsedMilliseconds, depth, _transpositionTable);
@@ -288,7 +254,7 @@ namespace ChessSharp.Engine
                 }
             }
 
-            _transpositionTable.Set(transpositionKey, depth, workspace.Colour, bestScore, bestMove);
+            _transpositionTable.Set(transpositionKey, depth, colour, bestScore, bestMove);
 
             if (alpha == int.MinValue)
                 alpha = -10000 - depth;
@@ -296,18 +262,16 @@ namespace ChessSharp.Engine
             return alpha;
         }
 
-        private IEnumerable<uint> GetNextMove(MoveGenerationWorkspace workspace, List<uint> nodeMoves, uint previousBestMove)
+        private IEnumerable<uint> GetNextMove(MoveGenerator moveGenerator, ushort ply, BitBoard bitBoard, Colour colour, uint previousBestMove)
         {
-            if (previousBestMove != 0)
+            if (previousBestMove > 0)
                 yield return previousBestMove;
 
-            _moveGenerator.Generate(workspace, nodeMoves);
-
-            foreach (var move in nodeMoves)
+            foreach (var move in moveGenerator.GenerateChunk(ply, bitBoard, colour))
                 yield return move;
         }
 
-        private void UpdatePrincipalVariation(uint[] source, uint[] target, int ply, uint move)
+        private void UpdatePrincipalVariation(uint[] source, uint[] target, ushort ply, uint move)
         {
             var i = ply;
 

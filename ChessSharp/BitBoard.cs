@@ -214,6 +214,9 @@ namespace ChessSharp
         public SquareFlag GetKingSquare(Colour colour) =>
             colour == Colour.White ? WhiteKing : BlackKing;
 
+        public BoardState GetBoardState() =>
+            _boardStates.Peek();
+
         public byte GetInstanceNumber(Piece piece, SquareFlag square)
         {
             if (piece.Colour == Colour.White)

@@ -34,9 +34,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            _moveGeneratorFixture.MoveGenerator.Generate(workspace, moves);
+            _moveGeneratorFixture.MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveView = moves.Select(x => new MoveViewer(x));
             var moveCount = moves.Count;
@@ -305,7 +303,7 @@ namespace ChessSharp.Tests
         [InlineData("K1k5/8/P7/8/8/8/8/8 w - - 0 1", 6, 2217)] //--Self Stalemate
         [InlineData("8/k1P5/8/1K6/8/8/8/8 w - - 0 1", 7, 567584)] //--Stalemate & Checkmate
         [InlineData("8/8/2k5/5q2/5n2/8/5K2/8 b - - 0 1", 4, 23527)] //--Stalemate & Checkmate
-        public void PeterEllisJones(string fenString, int depth, int expectedNodeCount)
+        public void PeterEllisJones(string fenString, ushort depth, int expectedNodeCount)
         {
             var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
 
@@ -325,7 +323,7 @@ namespace ChessSharp.Tests
 
         [Theory]
         [InlineData("r3k2r/1b4bq/8/8/8/8/7B/1R2K2R w Kkq - 0 1", 2, 1101)]
-        public void PeterEllisJones3(string fenString, int depth, int expectedNodeCount)
+        public void PeterEllisJones3(string fenString, ushort depth, int expectedNodeCount)
         {
             var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
 

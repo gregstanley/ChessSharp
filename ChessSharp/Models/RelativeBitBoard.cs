@@ -8,6 +8,11 @@ namespace ChessSharp.Models
     {
         private BoardState _boardState { get; set; }
 
+        public RelativeBitBoard()
+        {
+
+        }
+
         public RelativeBitBoard(Colour colour, SquareFlag myPawns, SquareFlag myRooks, 
             SquareFlag myKnights, SquareFlag myBishops, SquareFlag myQueens, SquareFlag myKing, 
             SquareFlag opponentPawns, SquareFlag opponentRooks, SquareFlag opponentKnights, 

@@ -27,9 +27,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -63,9 +63,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
 
@@ -89,9 +89,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
 
@@ -111,9 +111,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
 
@@ -139,9 +139,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -165,9 +165,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -183,9 +183,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -201,9 +201,9 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
+            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 

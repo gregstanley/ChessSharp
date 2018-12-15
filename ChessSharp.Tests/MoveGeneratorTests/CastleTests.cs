@@ -22,9 +22,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, Colour.White);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -53,9 +51,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, Colour.White);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -86,9 +82,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(10);
 
-            var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
-            MoveGenerator.Generate(workspace, moves);
+            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 

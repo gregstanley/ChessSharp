@@ -50,6 +50,8 @@ namespace ChessSharp.Engine
 
         public Colour HumanColour { get; private set; } = Colour.None;
 
+        public Colour CpuColour { get; private set; } = Colour.None;
+
         public bool IsHumanTurn { get { return HumanColour != Colour.None && ToPlay == HumanColour; } }
 
         public IEnumerable<MoveViewer> AvailableMoves { get; private set; }
@@ -58,23 +60,20 @@ namespace ChessSharp.Engine
 
         private readonly BitBoard _bitBoard;
 
-        private readonly MoveGenerationWorkspace _workspace;
-
-        private readonly MoveGenerator _moveGenerator;
-
         private readonly PositionEvaluator _positionEvaluator;
 
         private readonly Search _search;
+
+        private readonly MoveGenerator _moveGenerator;
 
         public Game(BitBoard board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
         {
             _bitBoard = board;
 
             HumanColour = humanColour;
+            CpuColour = humanColour.Opposite();
 
-            _workspace = new MoveGenerationWorkspace(board, Colour.White);
-
-            _moveGenerator = new MoveGenerator();
+            _moveGenerator = new MoveGenerator(16);
 
             _positionEvaluator = new PositionEvaluator();
 
@@ -84,7 +83,7 @@ namespace ChessSharp.Engine
 
             var moves = new List<uint>();
 
-            _moveGenerator.Generate(_workspace, moves);
+            _moveGenerator.Generate(_bitBoard, Colour.White, moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
         }
@@ -100,7 +99,7 @@ namespace ChessSharp.Engine
             var move = TryPromotions(fromSquare, toSquare, AvailableMoves, promotionPieceType);
 
             if (move.Value == 0)
-                move = TryCastles(_workspace, fromSquare, toSquare, AvailableMoves);
+                move = TryCastles(_bitBoard, HumanColour, fromSquare, toSquare, AvailableMoves);
 
             if (move.Value == 0)
                 move = AvailableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare) ?? new MoveViewer(0);
@@ -115,7 +114,7 @@ namespace ChessSharp.Engine
             if (chosenMove == null)
                 return new MoveViewer(0);
 
-            ApplyMove(chosenMove);
+            ApplyMove(_bitBoard, CpuColour, chosenMove);
 
             return chosenMove;
         }
@@ -124,17 +123,18 @@ namespace ChessSharp.Engine
         {
             SearchStarted?.Invoke(this, new EventArgs());
 
-            var searchResults = await Task.Run(() => _search.Go(_workspace, maxDepth));
+            var searchResults = await Task.Run(() => _search.Go(_bitBoard, CpuColour, maxDepth));
 
             SearchCompleted?.Invoke(this, new SearchCompleteEventArgs(searchResults));
 
             var chosenMove = searchResults.MoveEvaluations
-                .OrderByDescending(x => x.Score).FirstOrDefault();
+                .OrderByDescending(x => x.Score)
+                .FirstOrDefault();
 
             if (chosenMove == null)
                 return new MoveViewer(0);
 
-            ApplyMove(chosenMove.Move);
+            ApplyMove(_bitBoard, CpuColour, chosenMove.Move);
 
             return chosenMove.Move;
         }
@@ -163,7 +163,7 @@ namespace ChessSharp.Engine
                     return new MoveViewer(0);
                 }
 
-                ApplyMove(move);
+                ApplyMove(_bitBoard, HumanColour, move);
 
                 return move;
             }
@@ -187,7 +187,7 @@ namespace ChessSharp.Engine
                 return new MoveViewer(0);
             }
 
-            ApplyMove(move);
+            ApplyMove(_bitBoard, HumanColour, move);
 
             return move;
         }
@@ -240,30 +240,30 @@ namespace ChessSharp.Engine
             }
         }
 
-        private MoveViewer TryCastles(MoveGenerationWorkspace workspace, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
+        private MoveViewer TryCastles(BitBoard bitBoard, Colour colour, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
         {
-            if (workspace.Colour == Colour.White && fromSquare == SquareFlagConstants.WhiteKingStartSquare)
+            if (colour == Colour.White && fromSquare == SquareFlagConstants.WhiteKingStartSquare)
             {
-                if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare && workspace.BitBoard.WhiteCanCastleKingSide)
+                if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare && bitBoard.WhiteCanCastleKingSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
                         ?? new MoveViewer(0);
                 }
-                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && workspace.BitBoard.WhiteCanCastleQueenSide)
+                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && bitBoard.WhiteCanCastleQueenSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
                         ?? new MoveViewer(0);
                 }
             }
 
-            if (workspace.Colour == Colour.Black && fromSquare == SquareFlagConstants.BlackKingStartSquare)
+            if (colour == Colour.Black && fromSquare == SquareFlagConstants.BlackKingStartSquare)
             {
-                if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare && _workspace.BitBoard.BlackCanCastleKingSide)
+                if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare && bitBoard.BlackCanCastleKingSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
                         ?? new MoveViewer(0);
                 }
-                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && _workspace.BitBoard.BlackCanCastleQueenSide)
+                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && bitBoard.BlackCanCastleQueenSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
                         ?? new MoveViewer(0);
@@ -273,9 +273,9 @@ namespace ChessSharp.Engine
             return new MoveViewer(0);
         }
 
-        private void ApplyMove(MoveViewer move)
+        private void ApplyMove(BitBoard bitBoard, Colour colour, MoveViewer move)
         {
-            _workspace.MakeMove(move.Value);
+            bitBoard.MakeMove(move.Value);
 
             Ply++;
 
@@ -284,15 +284,11 @@ namespace ChessSharp.Engine
             else
                 ++HalfMoveClock;
 
-            // Seems odd that separate things are tracking current colour, not sure how better to handle it though
-            if (_workspace.Colour != ToPlay)
-                throw new Exception("Game and Workspace out of sync");
-
             MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
 
             var moves = new List<uint>();
 
-            _moveGenerator.Generate(_workspace, moves);
+            _moveGenerator.Generate(bitBoard, colour.Opposite(), moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
 
