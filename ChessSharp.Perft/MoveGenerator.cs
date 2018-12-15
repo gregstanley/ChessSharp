@@ -17,21 +17,21 @@ namespace ChessSharp.MoveGeneration
 
         private static readonly Vector<ulong> VectorZero = new Vector<ulong>(0);
 
-        private MoveGenerationWorkspace[] _workspaces;
+        private MoveGenerationWorkspace[] workspaces;
 
         public MoveGenerator()
         {
-            _workspaces = new MoveGenerationWorkspace[1];
+            workspaces = new MoveGenerationWorkspace[1];
 
-            _workspaces[0] = new MoveGenerationWorkspace(0);
+            workspaces[0] = new MoveGenerationWorkspace(0);
         }
 
         public MoveGenerator(int workspaceCount)
         {
-            _workspaces = new MoveGenerationWorkspace[workspaceCount];
+            workspaces = new MoveGenerationWorkspace[workspaceCount];
 
             for (var i = 0; i < workspaceCount; ++i)
-                _workspaces[i] = new MoveGenerationWorkspace(i);
+                workspaces[i] = new MoveGenerationWorkspace(i);
         }
 
         public void Generate(BitBoard bitBoard, Colour colour, IList<uint> moves)
@@ -42,19 +42,19 @@ namespace ChessSharp.MoveGeneration
 
         public void Generate(ushort depth, BitBoard bitBoard, Colour colour, IList<uint> moves)
         {
-            if (depth >= _workspaces.Length)
+            if (depth >= workspaces.Length)
                 throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
 
             foreach (var move in GenerateChunk(depth, bitBoard, colour))
                 moves.Add(move);
         }
 
-        public IEnumerable<uint> GenerateChunk(ushort depth, BitBoard bitBoard, Colour colour)//MoveGenerationWorkspace workspace)
+        public IEnumerable<uint> GenerateChunk(ushort depth, BitBoard bitBoard, Colour colour)
         {
-            if (depth >= _workspaces.Length)
+            if (depth >= workspaces.Length)
                 throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
 
-            var workspace = _workspaces[depth];
+            var workspace = workspaces[depth];
 
             var relativeBitBoard = workspace.Reset(bitBoard, colour);
 
@@ -155,13 +155,13 @@ namespace ChessSharp.MoveGeneration
                 {
                     var capturePieceType = relativeBitBoard.GetPieceType(toSquare);
 
-                    var kingMove = MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), capturePieceType, MoveType.Ordinary, 0);// numCheckers);
+                    var kingMove = MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), capturePieceType, MoveType.Ordinary, 0); // numCheckers);
 
                     workspace.KingCaptureMoveBuffer.Add(kingMove);
                 }
                 else
                 {
-                    var kingMove = MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), PieceType.None, MoveType.Ordinary, 0);// numCheckers);
+                    var kingMove = MoveBuilder.Create(relativeBitBoard.Colour, PieceType.King, kingSquare, toSquare.ToSquare(), PieceType.None, MoveType.Ordinary, 0); // numCheckers);
 
                     workspace.KingNonCaptureMoveBuffer.Add(kingMove);
                 }
@@ -410,8 +410,6 @@ namespace ChessSharp.MoveGeneration
 
         private IList<SquareFlag> FindSafeSquares(RelativeBitBoard relativeBitBoard, MoveGenerationWorkspace workspace, IEnumerable<SquareFlag> attackableSquares)
         {
-            //var safeSquares = (SquareFlag)0;
-
             var safeSquares = workspace.SafeSquares;
 
             safeSquares.Clear();
@@ -546,15 +544,21 @@ namespace ChessSharp.MoveGeneration
                     continue;
                 }
 
-                //safeSquares |= attackableSquare;
                 safeSquares.Add(attackableSquare);
             }
 
             return safeSquares;
         }
 
-        private SquareFlag AddPinnedMoves(MoveGenerationWorkspace workspace, RelativeBitBoard relativeBitBoard, Square kingSquare,
-            SquareFlag kingRayAttackSquares, SquareFlag pushMask, SquareFlag captureMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
+        private SquareFlag AddPinnedMoves(
+            MoveGenerationWorkspace workspace,
+            RelativeBitBoard relativeBitBoard,
+            Square kingSquare,
+            SquareFlag kingRayAttackSquares,
+            SquareFlag pushMask,
+            SquareFlag captureMask,
+            IList<uint> captureMoves,
+            IList<uint> nonCaptureMoves)
         {
             var potentialPins = kingRayAttackSquares & relativeBitBoard.MySquares;
 
@@ -624,8 +628,16 @@ namespace ChessSharp.MoveGeneration
             return pinnedPieces;
         }
 
-        private SquareFlag AddPinnedMovesInternal(RelativeBitBoard relativeBitBoard, Square kingSquare, SquareFlag potentialPins,
-            SquareFlag pinners, bool diagonal, SquareFlag pushMask, SquareFlag captureMask, IList<uint> captureMoves, IList<uint> nonCaptureMoves)
+        private SquareFlag AddPinnedMovesInternal(
+            RelativeBitBoard relativeBitBoard,
+            Square kingSquare,
+            SquareFlag potentialPins,
+            SquareFlag pinners,
+            bool diagonal,
+            SquareFlag pushMask,
+            SquareFlag captureMask,
+            IList<uint> captureMoves,
+            IList<uint> nonCaptureMoves)
         {
             var pinnedSquares = (SquareFlag)0;
             var pinnersAsList = pinners.ToList();
