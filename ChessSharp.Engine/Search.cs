@@ -10,42 +10,42 @@ namespace ChessSharp.Engine
 {
     public class Search
     {
+        private readonly Stopwatch stopWatch = new Stopwatch();
+
+        private readonly MoveGenerator moveGenerator;
+
+        private readonly PositionEvaluator positionEvaluator;
+
+        private readonly TranspositionTable transpositionTable;
+
+        public Search(MoveGenerator moveGenerator, PositionEvaluator positionEvaluator, TranspositionTable transpositionTable)
+        {
+            this.moveGenerator = moveGenerator;
+            this.positionEvaluator = positionEvaluator;
+            this.transpositionTable = transpositionTable;
+        }
+
         public delegate void InfoEventDelegate(object sender, InfoEventArgs args);
 
         public event InfoEventDelegate Info;
 
         public int PositionCount { get; private set; }
 
-        private readonly MoveGenerator _moveGenerator;
-
-        private PositionEvaluator _positionEvaluator;
-
-        private TranspositionTable _transpositionTable;
-
-        private readonly Stopwatch _stopWatch = new Stopwatch();
-
-        public Search(MoveGenerator moveGenerator, PositionEvaluator positionEvaluator, TranspositionTable transpositionTable)
-        {
-            _moveGenerator = moveGenerator;
-            _positionEvaluator = positionEvaluator;
-            _transpositionTable = transpositionTable;
-        }
-
         public SearchResults Go(BitBoard bitBoard, Colour colour, int maxDepth)
         {
-            _stopWatch.Restart();
+            stopWatch.Restart();
 
             PositionCount = 0;
 
-            _transpositionTable.NextIteration();
+            transpositionTable.NextIteration();
 
             var transpositionKey = bitBoard.Key;
 
-            var existingTransposition = _transpositionTable.Find(transpositionKey);
+            var existingTransposition = transpositionTable.Find(transpositionKey);
 
             uint previousBestMove = 0;
 
-            if (existingTransposition != null)
+            if (existingTransposition.Key != 0)
             {
                 if (existingTransposition.BestMove != 0)
                     previousBestMove = existingTransposition.BestMove;
@@ -53,22 +53,22 @@ namespace ChessSharp.Engine
 
             var nodeMoves = new List<uint>(256);
 
-            _moveGenerator.Generate(bitBoard, colour, nodeMoves);
+            moveGenerator.Generate(bitBoard, colour, nodeMoves);
 
             var moveEvaluations = new List<MoveEvaluation>(128);
 
-            //http://mediocrechess.blogspot.com/2006/12/programming-extracting-principal.html
+            // http://mediocrechess.blogspot.com/2006/12/programming-extracting-principal.html
             var principalVariations = new uint[maxDepth][];
 
             for (var i = 0; i < maxDepth; ++i)
                 principalVariations[i] = new uint[i + 1];
 
             if (!nodeMoves.Any())
-                return new SearchResults(PositionCount, new List<long>(), moveEvaluations, principalVariations, _transpositionTable);
+                return new SearchResults(PositionCount, new List<long>(), moveEvaluations, principalVariations, transpositionTable);
 
             var currentMaxDepth = 1;
 
-            var lap = _stopWatch.ElapsedMilliseconds;
+            var lap = stopWatch.ElapsedMilliseconds;
 
             var iterationLaps = new List<long>();
 
@@ -76,9 +76,9 @@ namespace ChessSharp.Engine
 
             while (currentMaxDepth <= maxDepth)
             {
-                existingTransposition = _transpositionTable.Find(bitBoard.Key);
+                existingTransposition = transpositionTable.Find(bitBoard.Key);
 
-                if (existingTransposition != null)
+                if (existingTransposition.Key != 0)
                 {
                     if (existingTransposition.BestMove != 0)
                         previousBestMove = existingTransposition.BestMove;
@@ -114,7 +114,7 @@ namespace ChessSharp.Engine
 
                         UpdatePrincipalVariation(principalVariation, masterPrincipalVariation, 0, move);
 
-                        info = new InfoNewPv(PositionCount, _stopWatch.ElapsedMilliseconds, currentMaxDepth, bestMove, bestScore, _transpositionTable);
+                        info = new InfoNewPv(PositionCount, stopWatch.ElapsedMilliseconds, currentMaxDepth, bestMove, bestScore, transpositionTable);
 
                         Info?.Invoke(this, new InfoEventArgs(info));
                     }
@@ -122,7 +122,6 @@ namespace ChessSharp.Engine
                     moveEvaluations.Add(new MoveEvaluation(new MoveViewer(move), evaluatedScore));
                 }
 
-                
                 foreach (var move in nodeMoves)
                 {
                     if (move == previousBestMove)
@@ -147,7 +146,7 @@ namespace ChessSharp.Engine
 
                         UpdatePrincipalVariation(principalVariation, masterPrincipalVariation, 0, move);
 
-                        info = new InfoNewPv(PositionCount, _stopWatch.ElapsedMilliseconds, currentMaxDepth, bestMove, bestScore, _transpositionTable);
+                        info = new InfoNewPv(PositionCount, stopWatch.ElapsedMilliseconds, currentMaxDepth, bestMove, bestScore, transpositionTable);
 
                         Info?.Invoke(this, new InfoEventArgs(info));
                     }
@@ -160,24 +159,24 @@ namespace ChessSharp.Engine
                     .Select(x => x.Move.Value)
                     .ToList();
 
-                _transpositionTable.Set(transpositionKey, (byte)currentMaxDepth, colour, bestScore, bestMove);
+                transpositionTable.Set(transpositionKey, (byte)currentMaxDepth, colour, bestScore, bestMove);
 
-                var iterationLength = _stopWatch.ElapsedMilliseconds - lap;
+                var iterationLength = stopWatch.ElapsedMilliseconds - lap;
 
-                lap = _stopWatch.ElapsedMilliseconds;
+                lap = stopWatch.ElapsedMilliseconds;
 
                 iterationLaps.Add(iterationLength);
             
-                info = new InfoDepthComplete(PositionCount, _stopWatch.ElapsedMilliseconds, currentMaxDepth, masterPrincipalVariation, _transpositionTable);
+                info = new InfoDepthComplete(PositionCount, stopWatch.ElapsedMilliseconds, currentMaxDepth, masterPrincipalVariation, transpositionTable);
 
                 Info?.Invoke(this, new InfoEventArgs(info));
 
                 ++currentMaxDepth;
             }
 
-            _stopWatch.Reset();
+            stopWatch.Reset();
 
-            return new SearchResults(PositionCount, iterationLaps, moveEvaluations, principalVariations, _transpositionTable);
+            return new SearchResults(PositionCount, iterationLaps, moveEvaluations, principalVariations, transpositionTable);
         }
 
         private int PrincipalVariationSearch(BitBoard bitBoard, Colour colour, byte depth, ushort ply, int alpha, int beta, uint[] parentPrincipalVariation)
@@ -185,15 +184,15 @@ namespace ChessSharp.Engine
             ++PositionCount;
 
             if (depth == 0)
-                return _positionEvaluator.Evaluate(bitBoard) * (colour == Colour.White ? 1 : -1);
+                return positionEvaluator.Evaluate(bitBoard) * (colour == Colour.White ? 1 : -1);
 
             var transpositionKey = bitBoard.Key;
 
-            var existingTransposition = _transpositionTable.Find(transpositionKey);
+            var existingTransposition = transpositionTable.Find(transpositionKey);
 
             uint previousBestMove = 0;
 
-            if (existingTransposition != null)
+            if (existingTransposition.Key != 0)
             {
                 if (existingTransposition.Depth > 1 && existingTransposition.Depth > depth)
                     return existingTransposition.Evaluation;
@@ -205,18 +204,14 @@ namespace ChessSharp.Engine
             var bestScore = int.MinValue;
             var bestMove = 0u;
 
-            var isFirst = true;
-
             var principalVariation = new uint[64];
 
             var moveCount = 1;
 
-            foreach(var move in GetNextMove(_moveGenerator, ply, bitBoard, colour, previousBestMove))
+            foreach (var move in GetNextMove(moveGenerator, ply, bitBoard, colour, previousBestMove))
             {
-                if (!isFirst && move == previousBestMove)
+                if (moveCount > 1 && move == previousBestMove)
                     continue;
-
-                isFirst = false;
 
                 bitBoard.MakeMove(move);
 
@@ -239,11 +234,13 @@ namespace ChessSharp.Engine
                     if (ply > 3 && moveCount > 3 && move.GetCapturePieceType() == PieceType.None && move.GetNumCheckers() == 0 && nextDepth > 0)
                         --nextDepth;
 
+                    // Search with aspiration window
                     evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -alpha - 1, -alpha, principalVariation);
 
-                    if (alpha < evaluatedScore && evaluatedScore < beta) // in fail-soft ... && score < beta ) is common
+                    if (alpha < evaluatedScore && evaluatedScore < beta)
                     {
-                        evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -beta, -evaluatedScore, principalVariation); // re-search
+                        // Re-search
+                        evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -beta, -evaluatedScore, principalVariation);
                     }
                 }
 
@@ -251,8 +248,8 @@ namespace ChessSharp.Engine
 
                 if (alpha < evaluatedScore)
                 {
-                    // alpha = Math.Max(bestScore, evaluatedScore);
-                    alpha = evaluatedScore; // alpha acts like max in MiniMax
+                    // alpha = Math.Max(bestScore, evaluatedScore); // alpha acts like max in MiniMax
+                    alpha = evaluatedScore;
 
                     bestMove = move;
                     bestScore = evaluatedScore;
@@ -262,23 +259,21 @@ namespace ChessSharp.Engine
 
                 if (alpha > beta)
                 {
-                    // Cut node
-                    break; // fail-hard beta-cutoff
+                    // Fail-hard beta-cutoff
+                    break; 
                 }
-
-                //bSearchPv = false;
 
                 ++moveCount;
 
                 if (ply == 1)
                 {
-                    var info = new Info(PositionCount, _stopWatch.ElapsedMilliseconds, depth, _transpositionTable);
+                    var info = new Info(PositionCount, stopWatch.ElapsedMilliseconds, depth, transpositionTable);
 
                     Info?.Invoke(this, new InfoEventArgs(info));
                 }
             }
 
-            _transpositionTable.Set(transpositionKey, depth, colour, bestScore, bestMove);
+            transpositionTable.Set(transpositionKey, depth, colour, bestScore, bestMove);
 
             if (alpha == int.MinValue)
                 alpha = PieceValues.CheckmateValue + ply;

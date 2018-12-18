@@ -5,10 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessSharp_UI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="533.126" Width="779.607">
+        Title="ChessSharp" Height="590" Width="910" Icon="Images/Icons-40x40-BlackKing.png" WindowStartupLocation="CenterScreen" Cursor="Arrow"  >
+    <Window.Background>
+        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+            <GradientStop Color="#FFDEDBC5" Offset="0"/>
+            <GradientStop Color="White" Offset="0.131"/>
+            <GradientStop Color="#FF443044" Offset="1"/>
+        </LinearGradientBrush>
+    </Window.Background>
     <Grid>
-        <local:GameUserControl x:Name="GameUserControl" HorizontalAlignment="Left" Margin="0,2,-22,0" Width="794" Height="500" VerticalAlignment="Top"/>
-        <Button x:Name="BtnNewGameWhite" Content="New Game as White" HorizontalAlignment="Left" Margin="448,15,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameWhite_Click"/>
-        <Button x:Name="BtnNewGameBlack" Content="New Game as Black" HorizontalAlignment="Left" Margin="612,15,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameBlack_Click"/>
+        <local:GameUserControl x:Name="GameUserControl" Margin="0,0,0,0" Height="590" VerticalAlignment="Top" HorizontalAlignment="Left" Width="905"/>
+        <Button x:Name="BtnNewGameWhite" Content="New Game as White" HorizontalAlignment="Left" Margin="10,519,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameWhite_Click"/>
+        <Button x:Name="BtnNewGameBlack" Content="New Game as Black" HorizontalAlignment="Left" Margin="320,519,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameBlack_Click"/>
     </Grid>
 </Window>

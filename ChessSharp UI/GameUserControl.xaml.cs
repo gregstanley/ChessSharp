@@ -161,6 +161,8 @@ namespace ChessSharp_UI
             await _game.CpuMove(5);
 
             FenTextBox.Text = FenHelpers.ToFen(_game.GetGameState());
+
+            var ttUsage = _transpositionTable.VerfiyUsage();
         }
     }
 }

@@ -14,31 +14,17 @@ namespace ChessSharp_UI
 {
     public partial class BoardUserControl : UserControl
     {
-        public delegate void UserMovedPieceEventDelegate(object sender, UserMovedPieceEventArgs args);
+        private const int BorderSizeInPixels = 5;
 
-        public delegate void PromotionTypeSelectedEventDelegate(object sender, PromotionTypeSelectedEventArgs args);
+        private const int GridSizeInPixels = 42;
 
-        public event UserMovedPieceEventDelegate PieceMoved;
+        private const int ImageSizeInPixels = 40;
 
-        public event PromotionTypeSelectedEventDelegate PromotionTypeSelected;
+        private IGameEventBroadcaster gameEvents;
 
-        public int FromSquareIndex { get; private set; }
+        private GameState currentGameState;
 
-        public int ToSquareIndex { get; private set; }
-
-        private int BorderSizeInPixels = 5;
-
-        private int GridSizeInPixels = 42;
-
-        private int ImageSizeInPixels = 40;
-
-        private Image[] _pieces = new Image[64];
-
-        private IGameEventBroadcaster _gameEvents;
-
-        private GameState _currentGameState;
-
-        private bool _isThinking = false;
+        private bool isThinking = false;
 
         public BoardUserControl()
         {
@@ -51,48 +37,58 @@ namespace ChessSharp_UI
             PromotionUserControl.Visibility = Visibility.Collapsed;
         }
 
+        public delegate void UserMovedPieceEventDelegate(object sender, UserMovedPieceEventArgs args);
+
+        public delegate void PromotionTypeSelectedEventDelegate(object sender, PromotionTypeSelectedEventArgs args);
+
+        public event UserMovedPieceEventDelegate PieceMoved;
+
+        public event PromotionTypeSelectedEventDelegate PromotionTypeSelected;
+
+        public int FromSquareIndex { get; private set; }
+
+        public int ToSquareIndex { get; private set; }
+
         public void Load(IGameEventBroadcaster gameEvents, GameState gameState)
         {
-            _gameEvents = gameEvents ?? throw new ArgumentNullException(nameof(gameEvents));
+            this.gameEvents = gameEvents ?? throw new ArgumentNullException(nameof(gameEvents));
 
-            _gameEvents.InvalidMove += _gameEvents_InvalidMove;
-            _gameEvents.PromotionTypeRequired += _gameEvents_PromotionTypeRequired;
-            _gameEvents.SearchStarted += _gameEvents_SearchStarted;
-            _gameEvents.SearchCompleted += _gameEvents_SearchCompleted;
-            _gameEvents.MoveApplied += _gameEvents_MoveApplied;
-            _gameEvents.Checkmate += _gameEvents_Checkmate;
+            this.gameEvents.InvalidMove += gameEvents_InvalidMove;
+            this.gameEvents.PromotionTypeRequired += gameEvents_PromotionTypeRequired;
+            this.gameEvents.SearchStarted += gameEvents_SearchStarted;
+            this.gameEvents.SearchCompleted += gameEvents_SearchCompleted;
+            this.gameEvents.MoveApplied += gameEvents_MoveApplied;
+            this.gameEvents.Checkmate += gameEvents_Checkmate;
 
             PromotionUserControl.PromotionTypeSelected += PromotionUserControl_PromotionTypeSelected;
 
             Update(new MoveViewer(0), gameState);
         }
 
-        private void _gameEvents_InvalidMove(object sender, InvalidMoveEventArgs args)
-        {
+        private void gameEvents_InvalidMove(object sender, InvalidMoveEventArgs args) =>
             InvalidMoveLabel.Visibility = Visibility.Visible;
-        }
 
-        private void _gameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
+        private void gameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
             PromotionUserControl.Open(args);
 
-        private void _gameEvents_SearchStarted(object sender, EventArgs args)
+        private void gameEvents_SearchStarted(object sender, EventArgs args)
         {
-            _isThinking = true;
+            isThinking = true;
 
             ThinkingLabel.Visibility = Visibility.Visible;
         }
 
-        private void _gameEvents_SearchCompleted(object sender, EventArgs args)
+        private void gameEvents_SearchCompleted(object sender, EventArgs args)
         {
-            _isThinking = false;
+            isThinking = false;
 
             ThinkingLabel.Visibility = Visibility.Collapsed;
         }
 
-        private void _gameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
+        private void gameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
             Update(args.Move, args.GameState);
 
-        private void _gameEvents_Checkmate(object sender, EventArgs args)
+        private void gameEvents_Checkmate(object sender, EventArgs args)
         {
             CheckmateLabel.Visibility = Visibility.Visible;
         }
@@ -102,9 +98,9 @@ namespace ChessSharp_UI
 
         private void Update(MoveViewer move, GameState gameState)
         {
-            _currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+            currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
 
-            _isThinking = false;
+            isThinking = false;
 
             InvalidMoveLabel.Visibility = Visibility.Collapsed;
             ThinkingLabel.Visibility = Visibility.Collapsed;
@@ -112,7 +108,7 @@ namespace ChessSharp_UI
 
             BoardCanvas.Children.Clear();
 
-            var board = _currentGameState;
+            var board = currentGameState;
 
             AddPieces(Colour.White, PieceType.Pawn, board.WhitePawns, GridSizeInPixels);
             AddPieces(Colour.White, PieceType.Rook, board.WhiteRooks, GridSizeInPixels);
@@ -173,7 +169,7 @@ namespace ChessSharp_UI
         
         private void Board_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (_isThinking)
+            if (isThinking)
                 return;
 
             Point p = e.GetPosition(this);
@@ -191,7 +187,7 @@ namespace ChessSharp_UI
         
         private void Board_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (_isThinking)
+            if (isThinking)
                 return;
 
             Point p = e.GetPosition(this);
@@ -222,7 +218,7 @@ namespace ChessSharp_UI
         }
 
         private int ConvertToSquareIndex(int rank, int file) =>
-            rank * 8 + file;
+            (rank * 8) + file;
 
         private int IndexToRank(int squareIndex) =>
             (squareIndex / 8) + 1;

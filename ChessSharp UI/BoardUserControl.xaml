@@ -40,70 +40,70 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Row="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="1" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="1" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Grid.Row="2" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Grid.Row="2" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Grid.Row="2" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Grid.Row="2" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Grid.Row="2" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Grid.Row="2" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Grid.Row="2" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Grid.Row="2" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Row="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="3" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="3" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Grid.Row="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Grid.Row="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Grid.Row="4" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Grid.Row="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Grid.Row="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Grid.Row="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Grid.Row="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Grid.Row="4" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Row="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="5" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="5" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Grid.Row="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Grid.Row="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Grid.Row="6" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Grid.Row="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Grid.Row="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Grid.Row="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Grid.Row="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Grid.Row="6" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Row="7" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="7" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="7" Opacity="0.75"  />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="7" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="7" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="7" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="7" Opacity="0.75" />
-            <Rectangle Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="7" Opacity="0.75" />
+            <Rectangle x:Name="A8" Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Opacity="0.75" />
+            <Rectangle x:Name="B8" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Opacity="0.75" />
+            <Rectangle x:Name="C8" Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Opacity="0.75"  />
+            <Rectangle x:Name="D8" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Opacity="0.75" />
+            <Rectangle x:Name="E8" Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Opacity="0.75" />
+            <Rectangle x:Name="F8" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Opacity="0.75" />
+            <Rectangle x:Name="G8" Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Opacity="0.75" />
+            <Rectangle x:Name="H8" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Opacity="0.75" />
+            <Rectangle x:Name="A7" Width="42" Height="42" Fill="LightSlateGray" Grid.Row="1" Opacity="0.75" />
+            <Rectangle x:Name="B7" Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="1" Opacity="0.75" />
+            <Rectangle x:Name="C7" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="1" Opacity="0.75"  />
+            <Rectangle x:Name="D7" Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="1" Opacity="0.75" />
+            <Rectangle x:Name="E7" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="1" Opacity="0.75" />
+            <Rectangle x:Name="F7" Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="1" Opacity="0.75" />
+            <Rectangle x:Name="G7" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="1" Opacity="0.75" />
+            <Rectangle x:Name="H7" Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="1" Opacity="0.75" />
+            <Rectangle x:Name="A6" Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Grid.Row="2" Opacity="0.75" />
+            <Rectangle x:Name="B6" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Grid.Row="2" Opacity="0.75" />
+            <Rectangle x:Name="C6" Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Grid.Row="2" Opacity="0.75"  />
+            <Rectangle x:Name="D6" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Grid.Row="2" Opacity="0.75" />
+            <Rectangle x:Name="E6" Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Grid.Row="2" Opacity="0.75" />
+            <Rectangle x:Name="F6" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Grid.Row="2" Opacity="0.75" />
+            <Rectangle x:Name="G6" Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Grid.Row="2" Opacity="0.75" />
+            <Rectangle x:Name="H6" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Grid.Row="2" Opacity="0.75" />
+            <Rectangle x:Name="A5" Width="42" Height="42" Fill="LightSlateGray" Grid.Row="3" Opacity="0.75" />
+            <Rectangle x:Name="B5" Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="3" Opacity="0.75" />
+            <Rectangle x:Name="C5" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="3" Opacity="0.75"  />
+            <Rectangle x:Name="D5" Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="3" Opacity="0.75" />
+            <Rectangle x:Name="E5" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="3" Opacity="0.75" />
+            <Rectangle x:Name="F5" Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="3" Opacity="0.75" />
+            <Rectangle x:Name="G5" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="3" Opacity="0.75" />
+            <Rectangle x:Name="H5" Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="3" Opacity="0.75" />
+            <Rectangle x:Name="A4" Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Grid.Row="4" Opacity="0.75" />
+            <Rectangle x:Name="B4" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Grid.Row="4" Opacity="0.75" />
+            <Rectangle x:Name="C4" Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Grid.Row="4" Opacity="0.75"  />
+            <Rectangle x:Name="D4" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Grid.Row="4" Opacity="0.75" />
+            <Rectangle x:Name="E4" Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Grid.Row="4" Opacity="0.75" />
+            <Rectangle x:Name="F4" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Grid.Row="4" Opacity="0.75" />
+            <Rectangle x:Name="G4" Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Grid.Row="4" Opacity="0.75" />
+            <Rectangle x:Name="H4" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Grid.Row="4" Opacity="0.75" />
+            <Rectangle x:Name="A3" Width="42" Height="42" Fill="LightSlateGray" Grid.Row="5" Opacity="0.75" />
+            <Rectangle x:Name="B3" Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="5" Opacity="0.75" />
+            <Rectangle x:Name="C3" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="5" Opacity="0.75"  />
+            <Rectangle x:Name="D3" Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="5" Opacity="0.75" />
+            <Rectangle x:Name="E3" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="5" Opacity="0.75" />
+            <Rectangle x:Name="F3" Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="5" Opacity="0.75" />
+            <Rectangle x:Name="G3" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="5" Opacity="0.75" />
+            <Rectangle x:Name="H3" Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="5" Opacity="0.75" />
+            <Rectangle x:Name="A2" Width="42" Height="42" Fill="FloralWhite" Grid.Column="0" Grid.Row="6" Opacity="0.75" />
+            <Rectangle x:Name="B2" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="1" Grid.Row="6" Opacity="0.75" />
+            <Rectangle x:Name="C2" Width="42" Height="42" Fill="FloralWhite" Grid.Column="2" Grid.Row="6" Opacity="0.75"  />
+            <Rectangle x:Name="D2" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="3" Grid.Row="6" Opacity="0.75" />
+            <Rectangle x:Name="E2" Width="42" Height="42" Fill="FloralWhite" Grid.Column="4" Grid.Row="6" Opacity="0.75" />
+            <Rectangle x:Name="F2" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="5" Grid.Row="6" Opacity="0.75" />
+            <Rectangle x:Name="G2" Width="42" Height="42" Fill="FloralWhite" Grid.Column="6" Grid.Row="6" Opacity="0.75" />
+            <Rectangle x:Name="H2" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="7" Grid.Row="6" Opacity="0.75" />
+            <Rectangle x:Name="A1" Width="42" Height="42" Fill="LightSlateGray" Grid.Row="7" Opacity="0.75" />
+            <Rectangle x:Name="B1" Width="42" Height="42" Fill="FloralWhite" Grid.Column="1" Grid.Row="7" Opacity="0.75" />
+            <Rectangle x:Name="C1" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="2" Grid.Row="7" Opacity="0.75"  />
+            <Rectangle x:Name="D1" Width="42" Height="42" Fill="FloralWhite" Grid.Column="3" Grid.Row="7" Opacity="0.75" />
+            <Rectangle x:Name="E1" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="4" Grid.Row="7" Opacity="0.75" />
+            <Rectangle x:Name="F1" Width="42" Height="42" Fill="FloralWhite" Grid.Column="5" Grid.Row="7" Opacity="0.75" />
+            <Rectangle x:Name="G1" Width="42" Height="42" Fill="LightSlateGray" Grid.Column="6" Grid.Row="7" Opacity="0.75" />
+            <Rectangle x:Name="H1" Width="42" Height="42" Fill="FloralWhite" Grid.Column="7" Grid.Row="7" Opacity="0.75" />
 
         </Grid>
 
@@ -153,11 +153,11 @@
             <Label.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FF95FFDD" Offset="1"/>
-                    <GradientStop Color="#FF3599D3" Offset="0.008"/>
+                    <GradientStop Color="#FF1EA2BF" Offset="0.008"/>
                 </LinearGradientBrush>
             </Label.Foreground>
             <Label.Effect>
-                <DropShadowEffect Opacity="0.8" ShadowDepth="3" RenderingBias="Quality" Direction="328"/>
+                <DropShadowEffect Opacity="0.8" RenderingBias="Quality" Direction="328" ShadowDepth="4" BlurRadius="6"/>
             </Label.Effect>
         </Label>
 

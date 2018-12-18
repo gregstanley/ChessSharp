@@ -8,6 +8,8 @@ namespace ChessSharp.Engine
     {
         private const int Size = 0xFFFFF;
 
+        private readonly Transposition emptyTransposition = new Transposition();
+
         private readonly int availableSlots = (Size + 1) * 4;
 
         private readonly Transposition[] tableA = new Transposition[Size + 1];
@@ -94,7 +96,7 @@ namespace ChessSharp.Engine
 
                 if (transposition.Key == 0)
                 {
-                    table[index].Set(key, depth, colour, evaluation, bestMove, iteration);
+                    table[index].Set(key, depth, colour, evaluation, bestMove, (byte)iteration);
 
                     ++SetCount;
 
@@ -112,7 +114,7 @@ namespace ChessSharp.Engine
                 if (transposition.Depth >= depth)
                     return;
 
-                table[index].Set(key, depth, colour, evaluation, bestMove, iteration);
+                table[index].Set(key, depth, colour, evaluation, bestMove, (byte)iteration);
 
                 return;
             }
@@ -123,7 +125,7 @@ namespace ChessSharp.Engine
             // var tB = _tableB[index];
             // var tC = _tableC[index];
             // var tD = _tableD[index];
-            replaceTranspositionTable[index].Set(key, depth, colour, evaluation, bestMove, iteration);
+            replaceTranspositionTable[index].Set(key, depth, colour, evaluation, bestMove, (byte)iteration);
         }
 
         public Transposition Find(ulong key)
@@ -147,7 +149,34 @@ namespace ChessSharp.Engine
 
             Interlocked.Increment(ref missCount);
 
-            return null;
+            return emptyTransposition;
+        }
+
+        public bool VerfiyUsage()
+        {
+            var available = 0;
+            var count = 0;
+
+            for (var i = 0; i < Size + 1; ++i)
+            {
+                available += 4;
+
+                if (tableA[i].Key != 0)
+                    ++count;
+
+                if (tableB[i].Key != 0)
+                    ++count;
+
+                if (tableC[i].Key != 0)
+                    ++count;
+
+                if (tableD[i].Key != 0)
+                    ++count;
+            }
+
+            var usage = ((double)count / available) * 100;
+
+            return usage == Usage;
         }
 
         private IEnumerable<Transposition[]> GetNextTable()
