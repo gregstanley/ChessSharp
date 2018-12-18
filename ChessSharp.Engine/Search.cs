@@ -209,8 +209,6 @@ namespace ChessSharp.Engine
 
             var principalVariation = new uint[64];
 
-            //var bSearchPv = true;
-
             var moveCount = 1;
 
             foreach(var move in GetNextMove(_moveGenerator, ply, bitBoard, colour, previousBestMove))
@@ -227,26 +225,25 @@ namespace ChessSharp.Engine
                 var oppositeColour = colour.Opposite();
 
                 var nextDepth = (byte)(depth - 1);
+                var nextPly = (ushort)(ply + 1);
 
                 // https://www.chessprogramming.org/Principal_Variation_Search
                 if (moveCount == 1)
                 {
-                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, (ushort)(ply + 1), -beta, -alpha, principalVariation);
+                    // Always do a full search on the first/PV move
+                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -beta, -alpha, principalVariation);
                 }
                 else
                 {
                     // Late Move Reduction http://mediocrechess.blogspot.com/2007/03/other-late-move-reduction-lmr.html
-                    // TODO: Add IsCheck check
-                    if (ply > 3 && moveCount > 3 && move.GetCapturePieceType() == PieceType.None && nextDepth > 0)
-                    {
+                    if (ply > 3 && moveCount > 3 && move.GetCapturePieceType() == PieceType.None && move.GetNumCheckers() == 0 && nextDepth > 0)
                         --nextDepth;
-                    }
 
-                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, (ushort)(ply + 1), -alpha - 1, -alpha, principalVariation);
+                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -alpha - 1, -alpha, principalVariation);
 
                     if (alpha < evaluatedScore && evaluatedScore < beta) // in fail-soft ... && score < beta ) is common
                     {
-                        evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, (ushort)(ply + 1), -beta, -evaluatedScore, principalVariation); // re-search
+                        evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -beta, -evaluatedScore, principalVariation); // re-search
                     }
                 }
 
