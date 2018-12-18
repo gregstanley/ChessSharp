@@ -11,7 +11,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
     public class KingMoveTests : MoveGeneratorTestsBase
     {
         public KingMoveTests(MoveGeneratorFixture moveGeneratorFixture)
-            :base(moveGeneratorFixture)
+            : base(moveGeneratorFixture)
         {
         }
 
@@ -26,8 +26,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var bitBoard = CreateBitBoard(gameState);
 
             var moves = new List<uint>(20);
-
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
 
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
@@ -63,8 +61,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
@@ -89,8 +85,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
@@ -111,15 +105,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             
             var moves = new List<uint>(20);
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
 
             var captureViews = GetCaptureMoveViews(moves);
 
-            var capture1 = MoveBuilder.Create(gameState.ToPlay, PieceType.King, SquareFlag.E4.ToSquare(), toSquare.ToSquare(), PieceType.Rook, MoveType.Ordinary);
+            var capture1 = MoveBuilder.Create(gameState.ToPlay, PieceType.King, SquareFlag.E4.ToSquare(), toSquare.ToSquare(), PieceType.Rook, MoveType.Ordinary, 1);
 
             Assert.Equal(expectedMovesCount, kingMoves.Count());
 
@@ -139,15 +131,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
             var captureViews = GetCaptureMoveViews(moves);
 
-            var capture1 = MoveBuilder.Create(gameState.ToPlay, PieceType.King, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
+            var capture1 = MoveBuilder.Create(gameState.ToPlay, PieceType.King, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.Pawn, MoveType.Ordinary, 1);
 
             Assert.Equal(expectedMovesCount, moveCount);
 
@@ -165,8 +155,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
@@ -183,13 +171,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
             Assert.Equal(10, moveCount);
+
+            Assert.Equal(1, moves.First().GetNumCheckers());
         }
 
         [Fact]
@@ -201,13 +189,13 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves = new List<uint>(20);
 
-            //var workspace = new MoveGenerationWorkspace(bitBoard, gameState.ToPlay);
-
             MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
             Assert.Equal(3, moveCount);
+
+            Assert.Equal(2, moves.First().GetNumCheckers());
         }
     }
 }

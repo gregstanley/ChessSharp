@@ -11,14 +11,14 @@ namespace ChessSharp.Engine.Tests
     {
         private const ulong DefaultKey = 4872067785823381739ul;
 
-        protected Zobrist KeyGenerator => _keyGeneratorFixture.KeyGenerator;
-
-        private KeyGeneratorFixture _keyGeneratorFixture;
+        private KeyGeneratorFixture keyGeneratorFixture;
 
         public ZobristTests(KeyGeneratorFixture keyGeneratorFixture)
         {
-            _keyGeneratorFixture = keyGeneratorFixture;
+            this.keyGeneratorFixture = keyGeneratorFixture;
         }
+
+        protected Zobrist KeyGenerator => keyGeneratorFixture.KeyGenerator;
 
         [Fact]
         public void DefaultBoard_HasExpectedKey()
@@ -137,8 +137,13 @@ namespace ChessSharp.Engine.Tests
 
             var rootKey = KeyGenerator.Hash(bitBoard, Colour.White);
 
-            var castle = MoveBuilder.Create(Colour.White, PieceType.King, SquareFlagConstants.WhiteKingStartSquare.ToSquare(),
-                SquareFlagConstants.WhiteKingSideRookStartSquare.ToSquare(), PieceType.None, MoveType.CastleKing);
+            var castle = MoveBuilder.Create(
+                Colour.White,
+                PieceType.King,
+                SquareFlagConstants.WhiteKingStartSquare.ToSquare(),
+                SquareFlagConstants.WhiteKingSideRookStartSquare.ToSquare(),
+                PieceType.None,
+                MoveType.CastleKing);
 
             var beforeKey = bitBoard.Key;
 
