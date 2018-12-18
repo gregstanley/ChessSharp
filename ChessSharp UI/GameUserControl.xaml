@@ -18,13 +18,13 @@
             </Rectangle.Fill>
         </Rectangle>
         <Border BorderBrush="#FF8F8F8F" BorderThickness="1" HorizontalAlignment="Left" Height="445" Margin="10,10,0,0" VerticalAlignment="Top" Width="440" Background="#FFE2E2E2" Opacity="0.5"/>
-        <Border BorderBrush="#FF8F8F8F" BorderThickness="1" HorizontalAlignment="Left" Height="285" Margin="461,10,0,0" VerticalAlignment="Top" Width="429" Background="#FFE2E2E2" Opacity="0.5"/>
+        <Border BorderBrush="#FF8F8F8F" BorderThickness="1" HorizontalAlignment="Left" Height="285" Margin="461,10,0,0" VerticalAlignment="Top" Width="390" Background="#FFE2E2E2" Opacity="0.5"/>
         <local:BoardUserControl x:Name="BoardUserControl" HorizontalAlignment="Left" Width="346" Height="346" Margin="55,54,0,0" VerticalAlignment="Top" Background="Black" PieceMoved="BoardUserControl_PieceMoved" PromotionTypeSelected="BoardUserControl_PieceSelected" >
             <local:BoardUserControl.Effect>
                 <DropShadowEffect ShadowDepth="6" BlurRadius="8" RenderingBias="Quality" Color="#FF666666"/>
             </local:BoardUserControl.Effect>
         </local:BoardUserControl>
-        <Label x:Name="HalfTurnCountLabel" Content="1" HorizontalAlignment="Left" Margin="613,64,0,0" VerticalAlignment="Top" Width="38" />
+        <Label x:Name="HalfTurnCountLabel" Content="1" HorizontalAlignment="Left" Margin="627,54,0,0" VerticalAlignment="Top" Width="38" />
         <Image x:Name="WhiteCastleQueenSide" HorizontalAlignment="Left" Height="32" Margin="55,400,0,0" VerticalAlignment="Top" Width="32" Source="Images/iconfinder_gnome-session-switch_30685.png">
             <Image.Effect>
                 <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
@@ -45,17 +45,16 @@
                 <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
             </Image.Effect>
         </Image>
-        <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="525,64,0,0" VerticalAlignment="Top" Width="38" />
-        <Label x:Name="EvaluationLabel" Content="0" HorizontalAlignment="Left" Margin="473,33,0,0" VerticalAlignment="Top" Width="284" />
+        <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="525,54,0,0" VerticalAlignment="Top" Width="38" />
+        <Label x:Name="EvaluationLabel" HorizontalContentAlignment="Center" Content="0" HorizontalAlignment="Left" Margin="190,17,0,0" VerticalAlignment="Top" Width="75" FontWeight="Bold" FontSize="20" />
         <TextBlock x:Name="InfoTimeTextBlock" HorizontalAlignment="Left" Margin="472,116,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="131" Height="101"/>
         <TextBlock x:Name="InfoPvTextBlock" HorizontalAlignment="Left" Margin="472,222,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="285" Height="32"/>
         <TextBlock x:Name="InfoPvTextBlock2" HorizontalAlignment="Left" Margin="472,259,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="285" Height="32"/>
-        <Label x:Name="HalfTurnCountLabel1" Content="Half turns:" HorizontalAlignment="Left" Margin="553,64,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="FullTurnsCountLabel" Content="Full turns:" HorizontalAlignment="Left" Margin="467,64,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="TimerInfo" Content="Timer:" HorizontalAlignment="Left" Margin="467,90,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="HalfTurnCountLabel1" Content="Half turns:" HorizontalAlignment="Left" Margin="563,54,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="FullTurnsCountLabel" Content="Full turns:" HorizontalAlignment="Left" Margin="464,54,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="FenTextBox" HorizontalAlignment="Left" Height="23" Margin="10,460,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="440" Background="#FFE6E6E6" Foreground="#FF303068" Text="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" RenderTransformOrigin="0.5,-1.087" Opacity="0.8"/>
         <Button x:Name="GoBtn" Content="Go" HorizontalAlignment="Left" Margin="375,488,0,0" VerticalAlignment="Top" Width="75" Click="GoBtn_Click"/>
-        <TextBlock x:Name="GameHistoryTextBlock" HorizontalAlignment="Left" Margin="781,69,-20,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="139" Height="101"/>
+        <TextBox x:Name="GameHistoryTextBox" HorizontalAlignment="Left" Margin="670,59,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="165" Height="221"/>
         <TabControl HorizontalAlignment="Left" Height="240" Margin="461,300,0,0" VerticalAlignment="Top" Width="390">
             <TabItem Header="Transposition">
                 <Grid Background="#FFE5E5E5">

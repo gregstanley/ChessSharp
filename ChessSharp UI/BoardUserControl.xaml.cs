@@ -53,42 +53,42 @@ namespace ChessSharp_UI
         {
             this.gameEvents = gameEvents ?? throw new ArgumentNullException(nameof(gameEvents));
 
-            this.gameEvents.InvalidMove += gameEvents_InvalidMove;
-            this.gameEvents.PromotionTypeRequired += gameEvents_PromotionTypeRequired;
-            this.gameEvents.SearchStarted += gameEvents_SearchStarted;
-            this.gameEvents.SearchCompleted += gameEvents_SearchCompleted;
-            this.gameEvents.MoveApplied += gameEvents_MoveApplied;
-            this.gameEvents.Checkmate += gameEvents_Checkmate;
+            this.gameEvents.InvalidMove += GameEvents_InvalidMove;
+            this.gameEvents.PromotionTypeRequired += GameEvents_PromotionTypeRequired;
+            this.gameEvents.SearchStarted += GameEvents_SearchStarted;
+            this.gameEvents.SearchCompleted += GameEvents_SearchCompleted;
+            this.gameEvents.MoveApplied += GameEvents_MoveApplied;
+            this.gameEvents.Checkmate += GameEvents_Checkmate;
 
             PromotionUserControl.PromotionTypeSelected += PromotionUserControl_PromotionTypeSelected;
 
             Update(new MoveViewer(0), gameState);
         }
 
-        private void gameEvents_InvalidMove(object sender, InvalidMoveEventArgs args) =>
+        private void GameEvents_InvalidMove(object sender, InvalidMoveEventArgs args) =>
             InvalidMoveLabel.Visibility = Visibility.Visible;
 
-        private void gameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
+        private void GameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
             PromotionUserControl.Open(args);
 
-        private void gameEvents_SearchStarted(object sender, EventArgs args)
+        private void GameEvents_SearchStarted(object sender, EventArgs args)
         {
             isThinking = true;
 
             ThinkingLabel.Visibility = Visibility.Visible;
         }
 
-        private void gameEvents_SearchCompleted(object sender, EventArgs args)
+        private void GameEvents_SearchCompleted(object sender, EventArgs args)
         {
             isThinking = false;
 
             ThinkingLabel.Visibility = Visibility.Collapsed;
         }
 
-        private void gameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
+        private void GameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
             Update(args.Move, args.GameState);
 
-        private void gameEvents_Checkmate(object sender, EventArgs args)
+        private void GameEvents_Checkmate(object sender, EventArgs args)
         {
             CheckmateLabel.Visibility = Visibility.Visible;
         }

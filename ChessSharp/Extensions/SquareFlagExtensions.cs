@@ -7,7 +7,7 @@ namespace ChessSharp.Extensions
 {
     public static class SquareFlagExtensions
     {
-        private static Dictionary<SquareFlag, int> _indices = new Dictionary<SquareFlag, int>
+        private static Dictionary<SquareFlag, int> indices = new Dictionary<SquareFlag, int>
         {
             [SquareFlag.A1] = 0,
             [SquareFlag.B1] = 1,
@@ -143,12 +143,14 @@ namespace ChessSharp.Extensions
             return square;
         }
 
+        /*
         // Checking the Dictionary first is mightly expensive. Better to not look for something that doesn't exist.
         //public static int ToSquareIndex(this SquareFlag square) =>
         //    _indices.ContainsKey(square) ? _indices[square] : -1;
         // Even looking up in the dictionary is slow. Better to count!
         //public static int ToSquareIndex(this SquareFlag square) =>
         //    _indices[square];
+        */
 
         public static int ToSquareIndex(this SquareFlag square)
         {
@@ -317,7 +319,7 @@ namespace ChessSharp.Extensions
         {
             IList<SquareFlag> squaresAsList = new List<SquareFlag>();
 
-            for(var i = 1ul; i > 0; i = i << 1)
+            for (var i = 1ul; i > 0; i = i << 1)
                 if (squares.HasFlag((SquareFlag)i)) squaresAsList.Add((SquareFlag)i);
 
             return (IReadOnlyList<SquareFlag>)squaresAsList;
