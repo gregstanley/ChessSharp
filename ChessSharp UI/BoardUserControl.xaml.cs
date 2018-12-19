@@ -9,6 +9,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Effects;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 
 namespace ChessSharp_UI
 {
@@ -26,15 +27,22 @@ namespace ChessSharp_UI
 
         private bool isThinking = false;
 
+        private DispatcherTimer dispatcherTimer = new DispatcherTimer();
+
         public BoardUserControl()
         {
             InitializeComponent();
 
-            InvalidMoveLabel.Visibility = Visibility.Collapsed;
+            IllegalMoveLabel.Visibility = Visibility.Collapsed;
             ThinkingLabel.Visibility = Visibility.Collapsed;
+            DrawLabel.Visibility = Visibility.Collapsed;
             CheckmateLabel.Visibility = Visibility.Collapsed;
 
             PromotionUserControl.Visibility = Visibility.Collapsed;
+
+            dispatcherTimer.Tick += DispatcherTimer_Tick;
+
+            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
         }
 
         public delegate void UserMovedPieceEventDelegate(object sender, UserMovedPieceEventArgs args);
@@ -58,6 +66,7 @@ namespace ChessSharp_UI
             this.gameEvents.SearchStarted += GameEvents_SearchStarted;
             this.gameEvents.SearchCompleted += GameEvents_SearchCompleted;
             this.gameEvents.MoveApplied += GameEvents_MoveApplied;
+            this.gameEvents.Draw += GameEvents_Draw;
             this.gameEvents.Checkmate += GameEvents_Checkmate;
 
             PromotionUserControl.PromotionTypeSelected += PromotionUserControl_PromotionTypeSelected;
@@ -65,8 +74,19 @@ namespace ChessSharp_UI
             Update(new MoveViewer(0), gameState);
         }
 
-        private void GameEvents_InvalidMove(object sender, InvalidMoveEventArgs args) =>
-            InvalidMoveLabel.Visibility = Visibility.Visible;
+        private void GameEvents_InvalidMove(object sender, InvalidMoveEventArgs args)
+        {
+            IllegalMoveLabel.Visibility = Visibility.Visible;
+
+            dispatcherTimer.Start();
+        }
+
+        private void DispatcherTimer_Tick(object sender, EventArgs e)
+        {
+            dispatcherTimer.Stop();
+
+            IllegalMoveLabel.Visibility = Visibility.Collapsed;
+        }
 
         private void GameEvents_PromotionTypeRequired(object sender, PromotionTypeRequiredEventArgs args) =>
             PromotionUserControl.Open(args);
@@ -88,8 +108,17 @@ namespace ChessSharp_UI
         private void GameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
             Update(args.Move, args.GameState);
 
-        private void GameEvents_Checkmate(object sender, EventArgs args)
+        private void GameEvents_Draw(object sender, MoveAppliedEventArgs args)
         {
+            Update(args.Move, args.GameState);
+
+            DrawLabel.Visibility = Visibility.Visible;
+        }
+
+        private void GameEvents_Checkmate(object sender, MoveAppliedEventArgs args)
+        {
+            Update(args.Move, args.GameState);
+
             CheckmateLabel.Visibility = Visibility.Visible;
         }
 
@@ -102,8 +131,9 @@ namespace ChessSharp_UI
 
             isThinking = false;
 
-            InvalidMoveLabel.Visibility = Visibility.Collapsed;
+            IllegalMoveLabel.Visibility = Visibility.Collapsed;
             ThinkingLabel.Visibility = Visibility.Collapsed;
+            DrawLabel.Visibility = Visibility.Collapsed;
             CheckmateLabel.Visibility = Visibility.Collapsed;
 
             BoardCanvas.Children.Clear();

@@ -5,14 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessSharp_UI"
         mc:Ignorable="d"
-        Title="ChessSharp" Height="590" Width="910" Icon="Images/Icons-40x40-BlackKing.png" WindowStartupLocation="CenterScreen" Cursor="Arrow"  >
-    <Window.Background>
-        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-            <GradientStop Color="#FFDEDBC5" Offset="0"/>
-            <GradientStop Color="White" Offset="0.131"/>
-            <GradientStop Color="#FF443044" Offset="1"/>
-        </LinearGradientBrush>
-    </Window.Background>
+        Title="ChessSharp" Height="590" Width="910" Icon="Images/Icons-40x40-BlackKing.png" WindowStartupLocation="CenterScreen" Cursor="Arrow" Background="#FF858383"  >
     <Grid>
         <local:GameUserControl x:Name="GameUserControl" Margin="0,0,0,0" Height="590" VerticalAlignment="Top" HorizontalAlignment="Left" Width="905"/>
         <Button x:Name="BtnNewGameWhite" Content="New Game as White" HorizontalAlignment="Left" Margin="10,519,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameWhite_Click"/>

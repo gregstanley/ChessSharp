@@ -28,7 +28,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var moves2 = new List<uint>(64);
 
-            foreach (var move in MoveGenerator.GenerateChunk(0, bitBoard, Colour.White))
+            foreach (var move in MoveGenerator.GenerateStream(0, bitBoard, Colour.White))
                 moves2.Add(move);
 
             var moveViews1 = moves1.Select(x => new MoveViewer(x));

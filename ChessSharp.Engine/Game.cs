@@ -52,7 +52,9 @@ namespace ChessSharp.Engine
 
         public delegate void MoveAppliedEventDelegate(object sender, MoveAppliedEventArgs args);
 
-        public delegate void CheckmateEventDelegate(object sender, EventArgs args);
+        public delegate void DrawEventDelegate(object sender, MoveAppliedEventArgs args);
+
+        public delegate void CheckmateEventDelegate(object sender, MoveAppliedEventArgs args);
 
         public delegate void InfoEventDelegate(object sender, InfoEventArgs args);
 
@@ -65,6 +67,8 @@ namespace ChessSharp.Engine
         public event SearchCompletedEventDelegate SearchCompleted;
 
         public event MoveAppliedEventDelegate MoveApplied;
+
+        public event DrawEventDelegate Draw;
 
         public event CheckmateEventDelegate Checkmate;
 
@@ -311,7 +315,12 @@ namespace ChessSharp.Engine
             else
                 ++HalfMoveClock;
 
-            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
+            if (HalfMoveClock > 50)
+            {
+                Draw?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
+
+                return;
+            }
 
             var moves = new List<uint>();
 
@@ -320,7 +329,13 @@ namespace ChessSharp.Engine
             AvailableMoves = moves.Select(x => new MoveViewer(x));
 
             if (!AvailableMoves.Any())
-                Checkmate?.Invoke(this, new EventArgs());
+            {
+                Checkmate?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
+
+                return;
+            }
+
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
         }
 
         private int Evaluate() => positionEvaluator.Evaluate(bitBoard);

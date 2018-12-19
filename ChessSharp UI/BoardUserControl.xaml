@@ -125,7 +125,7 @@
 
         <local:PromotionTypeSelectorUserControl x:Name="PromotionUserControl" HorizontalAlignment="Center" Height="60" Margin="0,0,0,0" VerticalAlignment="Center" Width="225"/>
 
-        <Label x:Name="InvalidMoveLabel" Content="Invalid" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="48" Background="#00000000">
+        <Label x:Name="IllegalMoveLabel" Content="Illegal" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="48" Background="#00000000">
             <Label.Foreground>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="Black" Offset="1"/>
@@ -160,6 +160,18 @@
                 <DropShadowEffect Opacity="0.8" RenderingBias="Quality" Direction="328" ShadowDepth="4" BlurRadius="6"/>
             </Label.Effect>
         </Label>
-
+        
+        <Label x:Name="DrawLabel" Content="Draw" HorizontalAlignment="Center" Margin="0,0,0,0" VerticalAlignment="Center" FontSize="48" Background="#00000000" FontStyle="Italic" FontWeight="Bold" FontStretch="Expanded">
+            <Label.Foreground>
+                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                    <GradientStop Color="#FF95FFDD" Offset="1"/>
+                    <GradientStop Color="#FF1EA2BF" Offset="0.008"/>
+                </LinearGradientBrush>
+            </Label.Foreground>
+            <Label.Effect>
+                <DropShadowEffect Opacity="0.8" RenderingBias="Quality" Direction="328" ShadowDepth="4" BlurRadius="6"/>
+            </Label.Effect>
+        </Label>
+        
     </Grid>
 </UserControl>

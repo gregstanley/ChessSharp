@@ -14,6 +14,8 @@ namespace ChessSharp.Engine.Events
 
         event MoveAppliedEventDelegate MoveApplied;
 
+        event DrawEventDelegate Draw;
+
         event CheckmateEventDelegate Checkmate;
     }
 }

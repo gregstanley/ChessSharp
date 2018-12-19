@@ -13,9 +13,25 @@ namespace ChessSharp.Engine
             TtAccessCount = transpositionTable.AccessCount;
             TtHitCount = transpositionTable.HitCount;
             TtMissCount = transpositionTable.MissCount;
-            TtConflictCount = transpositionTable.ReplaceCount;
-            TtUsage = Math.Round(transpositionTable.Usage, 1);
+            TtReplaceCount = transpositionTable.ReplaceCount;
+            TtUsage = transpositionTable.Usage;
         }
+
+        public int SearchedPositionCount { get; }
+
+        public long ElapsedMilliseconds { get; }
+
+        public int Depth { get; }
+
+        public long TtAccessCount { get; }
+
+        public long TtHitCount { get; }
+
+        public long TtMissCount { get; }
+
+        public long TtReplaceCount { get; }
+
+        public double TtUsage { get; }
 
         public string GetTimeString()
         {
@@ -39,26 +55,10 @@ namespace ChessSharp.Engine
             sb.AppendLine($"TT access: {TtAccessCount}");
             sb.AppendLine($"TT hits: {TtHitCount}");
             sb.AppendLine($"TT misses: {TtMissCount}");
-            sb.AppendLine($"TT conflict: {TtConflictCount}");
+            sb.AppendLine($"TT replaced: {TtReplaceCount}");
             sb.AppendLine($"TT usage: {TtUsage}%");
 
             return sb.ToString();
         }
-
-        public int SearchedPositionCount { get; }
-
-        public long ElapsedMilliseconds { get; }
-
-        public int Depth { get; }
-
-        public long TtAccessCount { get; }
-
-        public long TtHitCount { get; }
-
-        public long TtMissCount { get; }
-
-        public long TtConflictCount { get; }
-
-        public double TtUsage { get; }
     }
 }

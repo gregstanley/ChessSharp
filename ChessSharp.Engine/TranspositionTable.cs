@@ -1,4 +1,5 @@
 ﻿using ChessSharp.Enums;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -52,7 +53,7 @@ namespace ChessSharp.Engine
         public long SetCount { get; private set; } = 0;
 
         public double Usage =>
-            SetCount == 0 ? 0 : ((double)SetCount / availableSlots) * 100;
+            SetCount == 0 ? 0 : Math.Round(((double)SetCount / availableSlots) * 100, 1);
 
         public void Reset()
         {

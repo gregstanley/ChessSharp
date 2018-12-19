@@ -34,7 +34,7 @@ namespace ChessSharp.MoveGeneration
 
         public void Generate(BitBoard bitBoard, Colour colour, IList<uint> moves)
         {
-            foreach (var move in GenerateChunk(0, bitBoard, colour))
+            foreach (var move in GenerateStream(0, bitBoard, colour))
                 moves.Add(move);
         }
 
@@ -43,11 +43,11 @@ namespace ChessSharp.MoveGeneration
             if (depth >= workspaces.Length)
                 throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
 
-            foreach (var move in GenerateChunk(depth, bitBoard, colour))
+            foreach (var move in GenerateStream(depth, bitBoard, colour))
                 moves.Add(move);
         }
 
-        public IEnumerable<uint> GenerateChunk(ushort depth, BitBoard bitBoard, Colour colour)
+        public IEnumerable<uint> GenerateStream(ushort depth, BitBoard bitBoard, Colour colour)
         {
             if (depth >= workspaces.Length)
                 throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
