@@ -112,18 +112,21 @@ namespace ChessSharp_UI
                 ? Visibility.Visible
                 : Visibility.Collapsed;
 
-            var moveHistory = Game.MoveHistory.Reverse().Select(x => x);
+            var history = Game.History
+                .Reverse()
+                .Skip(1)
+                .Select(x => x);
 
             var sb = new StringBuilder();
 
             var count = 0;
 
-            foreach (var move in moveHistory)
+            foreach (var snapshot in history)
             {
                 if (count % 2 == 0)
                     sb.Append($"{(count / 2) + 1}.");
 
-                sb.Append($" {move.GetNotation()}");
+                sb.Append($" {new MoveViewer(snapshot.Move).GetNotation()}");
 
                 if (count % 2 == 1)
                     sb.AppendLine();

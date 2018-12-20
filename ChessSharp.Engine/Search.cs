@@ -172,9 +172,6 @@ namespace ChessSharp.Engine
 
             foreach (var move in GetNextMove(moveGenerator, ply, bitBoard, colour, previousBestMove))
             {
-                if (moveCount > 1 && move == previousBestMove)
-                    continue;
-
                 bitBoard.MakeMove(move);
 
                 var evaluatedScore = 0;
@@ -252,7 +249,12 @@ namespace ChessSharp.Engine
                 yield return previousBestMove;
 
             foreach (var move in moveGenerator.GenerateStream(ply, bitBoard, colour))
+            {
+                if (move == previousBestMove)
+                    continue;
+
                 yield return move;
+            }
         }
 
         private void UpdatePrincipalVariation(uint[] source, uint[] target, ushort ply, uint move)

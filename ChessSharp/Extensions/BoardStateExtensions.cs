@@ -15,6 +15,7 @@ namespace ChessSharp.Extensions
         public static BoardState AddEnPassantSquare(this BoardState value, SquareFlag enPassantSquare) =>
             value.AddEnPassantIndex(enPassantSquare.ToSquareIndex());
 
+        // Get 'next' state by copying and removing en passant data
         public static BoardState Next(this BoardState value) =>
             (BoardState)((uint)value & ~_enPassantIndexMask);
 

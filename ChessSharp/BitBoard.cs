@@ -4,7 +4,6 @@ using ChessSharp.Helpers;
 using ChessSharp.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ChessSharp
 {
@@ -54,33 +53,8 @@ namespace ChessSharp
         public ulong Key { get; private set; } = 0;
 
         private Zobrist _keyGen { get; set; }
-        
-        private Stack<BoardState> _boardStates { get; } = new Stack<BoardState>(256);
 
-        private Stack<uint> _moves { get; } = new Stack<uint>(256);
-
-        private RelativeBitBoard _relativeBitBoard { get; }
-
-        private enum PieceStateOffset
-        {
-            Pawn = 0,
-            Rook = 8,
-            Knight = 10,
-            Bishop = 12,
-            Queen = 14,
-            King = 15
-        }
-
-        private int[] _pieceStateOffsets = new[]
-        {
-            0,
-            (int)PieceStateOffset.Pawn,
-            (int)PieceStateOffset.Rook,
-            (int)PieceStateOffset.Knight,
-            (int)PieceStateOffset.Bishop,
-            (int)PieceStateOffset.Queen,
-            (int)PieceStateOffset.King
-        };
+        private Stack<HistoryState> history { get; } = new Stack<HistoryState>(256);
 
         public BitBoard()
         {
@@ -99,15 +73,12 @@ namespace ChessSharp
             BlackQueens = SquareFlag.D8;
             BlackKing = SquareFlag.E8;
 
-            _boardStates.Push(DefaultState);
-
             _keyGen = new Zobrist();
             _keyGen.Init();
 
             Key = _keyGen.Hash(this, Colour.White);
 
-            _relativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
-                WhiteKing, BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing, _boardStates.Peek());
+            history.Push(new HistoryState(Key, 0, DefaultState));
         }
 
         public BitBoard(SquareFlag whitePawns,
@@ -137,15 +108,12 @@ namespace ChessSharp
             BlackQueens = blackQueens;
             BlackKing = blackKing;
 
-            _boardStates.Push(state);
-
             _keyGen = new Zobrist();
             _keyGen.Init();
 
             Key = _keyGen.Hash(this, Colour.White);
 
-            _relativeBitBoard = new RelativeBitBoard(Colour.White, WhitePawns, WhiteRooks, WhiteKnights, WhiteBishops, WhiteQueens,
-                WhiteKing, BlackPawns, BlackRooks, BlackKnights, BlackBishops, BlackQueens, BlackKing, _boardStates.Peek());
+            history.Push(new HistoryState(Key, 0, state));
         }
 
         public SquareFlag WhitePawns { get; private set; }
@@ -173,19 +141,19 @@ namespace ChessSharp
         public SquareFlag BlackKing { get; private set; }
 
         public SquareFlag EnPassant =>
-            _boardStates.Peek().GetEnPassantSquare();
+            CurrentState.GetEnPassantSquare();
 
         public bool WhiteCanCastleKingSide =>
-            _boardStates.Peek().HasFlag(BoardState.WhiteCanCastleKingSide);
+            CurrentState.HasFlag(BoardState.WhiteCanCastleKingSide);
 
         public bool WhiteCanCastleQueenSide =>
-            _boardStates.Peek().HasFlag(BoardState.WhiteCanCastleQueenSide);
+            CurrentState.HasFlag(BoardState.WhiteCanCastleQueenSide);
 
         public bool BlackCanCastleKingSide =>
-            _boardStates.Peek().HasFlag(BoardState.BlackCanCastleKingSide);
+            CurrentState.HasFlag(BoardState.BlackCanCastleKingSide);
 
         public bool BlackCanCastleQueenSide =>
-            _boardStates.Peek().HasFlag(BoardState.BlackCanCastleQueenSide);
+            CurrentState.HasFlag(BoardState.BlackCanCastleQueenSide);
 
         public SquareFlag White =>
             WhitePawns | WhiteRooks | WhiteKnights | WhiteBishops | WhiteQueens | WhiteKing;
@@ -214,8 +182,7 @@ namespace ChessSharp
         public SquareFlag GetKingSquare(Colour colour) =>
             colour == Colour.White ? WhiteKing : BlackKing;
 
-        public BoardState GetBoardState() =>
-            _boardStates.Peek();
+        public BoardState CurrentState => history.Peek().State;
 
         public byte GetInstanceNumber(Piece piece, SquareFlag square)
         {
@@ -241,30 +208,7 @@ namespace ChessSharp
             return 0;
         }
 
-        public RelativeBitBoard RelativeTo(Colour colour)
-        {
-            var opponentColour = colour.Opposite();
-
-            _relativeBitBoard.Set(colour,
-                 GetPawnSquares(colour),
-                 GetRookSquares(colour),
-                 GetKnightSquares(colour),
-                 GetBishopSquares(colour),
-                 GetQueenSquares(colour),
-                 GetKingSquare(colour),
-                 GetPawnSquares(opponentColour),
-                 GetRookSquares(opponentColour),
-                 GetKnightSquares(opponentColour),
-                 GetBishopSquares(opponentColour),
-                 GetQueenSquares(opponentColour),
-                 GetKingSquare(opponentColour),
-                 _boardStates.Peek());
-
-            return _relativeBitBoard;
-        }
-
-        public IReadOnlyCollection<MoveViewer> MoveHistory =>
-            _moves.Select(x => new MoveViewer(x)).ToList();
+        public IReadOnlyCollection<HistoryState> History => history;
 
         public void MakeMove(uint move)
         {
@@ -278,7 +222,7 @@ namespace ChessSharp
             var capturePieceType = move.GetCapturePieceType();
 
             // Copy current state
-            var state = _boardStates.Peek().Next();
+            var state = history.Peek().State.Next();
 
             if (moveType == MoveType.CastleKing)
             {
@@ -433,8 +377,7 @@ namespace ChessSharp
 
             Key = _keyGen.UpdateHash(Key, move);
 
-            _boardStates.Push(state);
-            _moves.Push(move);
+            history.Push(new HistoryState(Key, move, state));
         }
 
         public void UnMakeMove(uint move)
@@ -529,8 +472,7 @@ namespace ChessSharp
 
             Key = _keyGen.UpdateHash(Key, move);
 
-            _boardStates.Pop();
-            _moves.Pop();
+            history.Pop();
         }
 
         private void MakeWhiteKingSideCastle()

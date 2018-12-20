@@ -101,7 +101,7 @@ namespace ChessSharp.Engine
 
         public int SearchedPositionsCount => search.PositionCount;
 
-        public IReadOnlyCollection<MoveViewer> MoveHistory => bitBoard.MoveHistory;
+        public IReadOnlyCollection<HistoryState> History => bitBoard.History;
 
         public MoveViewer TryFindMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
         {

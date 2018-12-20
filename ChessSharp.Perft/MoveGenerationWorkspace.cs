@@ -40,8 +40,6 @@ namespace ChessSharp.MoveGeneration
 
             var opponentColour = colour.Opposite();
 
-            bitBoard.RelativeTo(colour);
-
             RelativeBitBoard.Set(
                 colour,
                 bitBoard.GetPawnSquares(colour),
@@ -56,7 +54,7 @@ namespace ChessSharp.MoveGeneration
                 bitBoard.GetBishopSquares(opponentColour),
                 bitBoard.GetQueenSquares(opponentColour),
                 bitBoard.GetKingSquare(opponentColour),
-                bitBoard.GetBoardState());
+                bitBoard.CurrentState);
 
             return RelativeBitBoard;
         }

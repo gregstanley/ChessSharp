@@ -76,11 +76,5 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
         protected BitBoard CreateBitBoard(GameState gameState) =>
             BitBoard.FromGameState(gameState);
-
-        protected RelativeBitBoard CreateRelativeBitBoard(string fenString) =>
-            CreateRelativeBitBoard(FenHelpers.Parse(fenString));
-
-        protected RelativeBitBoard CreateRelativeBitBoard(GameState gameState) =>
-            BitBoard.FromGameState(gameState).RelativeTo(gameState.ToPlay);
     }
 }
