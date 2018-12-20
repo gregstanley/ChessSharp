@@ -121,12 +121,40 @@ namespace ChessSharp_UI
 
             var count = 0;
 
+            MovesListBox.Items.Clear();
+
+            TurnItemUserControl item = null;
+
             foreach (var snapshot in history)
             {
-                if (count % 2 == 0)
-                    sb.Append($"{(count / 2) + 1}.");
+                var notation = new MoveViewer(snapshot.Move).GetNotation();
 
-                sb.Append($" {new MoveViewer(snapshot.Move).GetNotation()}");
+                if (count % 2 == 0)
+                {
+                    var turnNumber = (count / 2) + 1;
+
+                    item = new TurnItemUserControl();
+
+                    item.BlackMoveButton.Visibility = Visibility.Collapsed;
+
+                    item.TurnNumberLabel.Content = turnNumber;
+
+                    sb.Append($"{turnNumber}.");
+
+                    item.WhiteMoveButton.Content = notation;
+
+                    MovesListBox.Items.Add(item);
+                }
+                else
+                {
+                    //if (item == null)
+                    //    item = new TurnItemUserControl();
+                    item.BlackMoveButton.Visibility = Visibility.Visible;
+
+                    item.BlackMoveButton.Content = notation;
+                }
+
+                sb.Append($" {notation}");
 
                 if (count % 2 == 1)
                     sb.AppendLine();
@@ -134,7 +162,10 @@ namespace ChessSharp_UI
                 ++count;
             }
 
-            GameHistoryTextBox.Text = sb.ToString();
+            MovesListBox.SelectedIndex = MovesListBox.Items.Count - 1;
+            MovesListBox.ScrollIntoView(MovesListBox.SelectedItem);
+
+            //GameHistoryTextBox.Text = sb.ToString();
         }
 
         private void Game_SearchCompleted(object sender, SearchCompleteEventArgs args)
