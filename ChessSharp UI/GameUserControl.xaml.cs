@@ -63,7 +63,7 @@ namespace ChessSharp_UI
 
             FullTurnNumberLabel.Content = this.Game.FullTurn;
 
-            BoardUserControl.Load(this.Game, this.Game.GetGameState());
+            BoardUserControl.Load(this.Game);
         }
 
         private void Game_Info(object sender, InfoEventArgs args)
@@ -127,7 +127,7 @@ namespace ChessSharp_UI
 
             foreach (var snapshot in history)
             {
-                var notation = new MoveViewer(snapshot.Move).GetNotation();
+                var notation = new MoveViewer(snapshot.HistoryState.Move).GetNotation();
 
                 if (count % 2 == 0)
                 {
@@ -218,7 +218,7 @@ namespace ChessSharp_UI
         {
             await Game.CpuMove(5);
 
-            FenTextBox.Text = FenHelpers.ToFen(Game.GetGameState());
+            FenTextBox.Text = FenHelpers.ToFen(Game.CurrentState.GameState);
 
             // var ttUsage = _transpositionTable.VerfiyUsage();
         }

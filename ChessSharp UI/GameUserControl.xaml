@@ -45,7 +45,7 @@
             </Image.Effect>
         </Image>
         <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="619,56,0,0" VerticalAlignment="Top" Width="38" />
-        <Label x:Name="EvaluationLabel" HorizontalContentAlignment="Center" Content="0" HorizontalAlignment="Left" Margin="160,17,0,0" VerticalAlignment="Top" Width="75" FontWeight="Bold" FontSize="20" Foreground="#FFFFE2FE" Background="{x:Null}" >
+        <Label x:Name="EvaluationLabel" HorizontalContentAlignment="Center" Content="0" HorizontalAlignment="Left" Margin="160,22,0,0" VerticalAlignment="Top" Width="75" FontWeight="Bold" FontSize="20" Foreground="#FFD8AAFF" Background="{x:Null}" Height="32" >
             <Label.Effect>
                 <DropShadowEffect ShadowDepth="2" RenderingBias="Quality" Opacity="0.6"/>
             </Label.Effect>

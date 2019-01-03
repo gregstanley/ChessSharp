@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace ChessSharp.Engine
 {
-    public class Game : IGameEventBroadcaster
+    public class Game : IGame
     {
         private readonly BitBoard bitBoard;
 
@@ -19,6 +19,8 @@ namespace ChessSharp.Engine
         private readonly Search search;
 
         private readonly PositionEvaluator positionEvaluator;
+
+        private readonly Stack<GameHistoryNode> history = new Stack<GameHistoryNode>();
 
         public Game(BitBoard board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
         {
@@ -40,6 +42,8 @@ namespace ChessSharp.Engine
             moveGenerator.Generate(bitBoard, Colour.White, moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
+
+            history.Push(new GameHistoryNode(bitBoard.History.First(), GetGameState()));
         }
 
         public delegate void InvalidMoveEventDelegate(object sender, InvalidMoveEventArgs args);
@@ -101,7 +105,11 @@ namespace ChessSharp.Engine
 
         public int SearchedPositionsCount => search.PositionCount;
 
-        public IReadOnlyCollection<HistoryState> History => bitBoard.History;
+        //public IReadOnlyCollection<HistoryState> History => bitBoard.History;
+
+        public IReadOnlyCollection<GameHistoryNode> History => history;
+
+        public GameHistoryNode CurrentState => history.Last();
 
         public MoveViewer TryFindMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
         {
@@ -153,30 +161,6 @@ namespace ChessSharp.Engine
 
             return chosenMove.Move;
         }
-
-        public GameState GetGameState() =>
-            new GameState(
-                Ply,
-                ToPlay,
-                HalfMoveClock,
-                FullTurn,
-                bitBoard.WhiteCanCastleKingSide,
-                bitBoard.WhiteCanCastleQueenSide,
-                bitBoard.BlackCanCastleKingSide,
-                bitBoard.BlackCanCastleQueenSide,
-                bitBoard.WhitePawns,
-                bitBoard.WhiteRooks,
-                bitBoard.WhiteKnights,
-                bitBoard.WhiteBishops,
-                bitBoard.WhiteQueens,
-                bitBoard.WhiteKing,
-                bitBoard.BlackPawns,
-                bitBoard.BlackRooks,
-                bitBoard.BlackKnights,
-                bitBoard.BlackBishops,
-                bitBoard.BlackQueens,
-                bitBoard.BlackKing,
-                bitBoard.EnPassant);
 
         public MoveViewer TryMove(int fromSquareIndex, int toSquareIndex, PieceType promotionType = PieceType.None)
         {
@@ -315,9 +299,13 @@ namespace ChessSharp.Engine
             else
                 ++HalfMoveClock;
 
+            var currentState = GetGameState();
+
+            history.Push(new GameHistoryNode(bitBoard.History.First(), currentState));
+
             if (HalfMoveClock > 50)
             {
-                Draw?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
+                Draw?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
 
                 return;
             }
@@ -330,14 +318,38 @@ namespace ChessSharp.Engine
 
             if (!AvailableMoves.Any())
             {
-                Checkmate?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
+                Checkmate?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
 
                 return;
             }
 
-            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, GetGameState(), Evaluate()));
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
         }
 
         private int Evaluate() => positionEvaluator.Evaluate(bitBoard);
+
+        private GameState GetGameState() =>
+            new GameState(
+                Ply,
+                ToPlay,
+                HalfMoveClock,
+                FullTurn,
+                bitBoard.WhiteCanCastleKingSide,
+                bitBoard.WhiteCanCastleQueenSide,
+                bitBoard.BlackCanCastleKingSide,
+                bitBoard.BlackCanCastleQueenSide,
+                bitBoard.WhitePawns,
+                bitBoard.WhiteRooks,
+                bitBoard.WhiteKnights,
+                bitBoard.WhiteBishops,
+                bitBoard.WhiteQueens,
+                bitBoard.WhiteKing,
+                bitBoard.BlackPawns,
+                bitBoard.BlackRooks,
+                bitBoard.BlackKnights,
+                bitBoard.BlackBishops,
+                bitBoard.BlackQueens,
+                bitBoard.BlackKing,
+                bitBoard.EnPassant);
     }
 }

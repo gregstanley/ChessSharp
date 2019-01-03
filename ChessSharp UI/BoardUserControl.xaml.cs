@@ -1,4 +1,5 @@
 ﻿using ChessSharp;
+using ChessSharp.Engine;
 using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using ChessSharp.Extensions;
@@ -57,9 +58,9 @@ namespace ChessSharp_UI
 
         public int ToSquareIndex { get; private set; }
 
-        public void Load(IGameEventBroadcaster gameEvents, GameState gameState)
+        public void Load(IGame game)
         {
-            this.gameEvents = gameEvents ?? throw new ArgumentNullException(nameof(gameEvents));
+            this.gameEvents = game ?? throw new ArgumentNullException(nameof(game));
 
             this.gameEvents.InvalidMove += GameEvents_InvalidMove;
             this.gameEvents.PromotionTypeRequired += GameEvents_PromotionTypeRequired;
@@ -71,7 +72,7 @@ namespace ChessSharp_UI
 
             PromotionUserControl.PromotionTypeSelected += PromotionUserControl_PromotionTypeSelected;
 
-            Update(new MoveViewer(0), gameState);
+            Update(new MoveViewer(0), game.CurrentState.GameState);
         }
 
         private void GameEvents_InvalidMove(object sender, InvalidMoveEventArgs args)

@@ -54,7 +54,7 @@ namespace ChessSharp
 
         private Zobrist _keyGen { get; set; }
 
-        private Stack<HistoryState> history { get; } = new Stack<HistoryState>(256);
+        private Stack<HistoryState> history = new Stack<HistoryState>(256);
 
         public BitBoard()
         {
@@ -223,6 +223,9 @@ namespace ChessSharp
 
             // Copy current state
             var state = history.Peek().State.Next();
+
+            // TODO: Draw
+
 
             if (moveType == MoveType.CastleKing)
             {
