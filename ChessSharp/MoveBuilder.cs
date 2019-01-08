@@ -5,12 +5,23 @@ namespace ChessSharp
 {
     public static class MoveBuilder
     {
-        public static uint Create(Colour colour, PieceType pieceType, Square fromSquare,
-            Square toSquare, PieceType capturePieceType, MoveType moveType) =>
+        public static uint Create(
+            Colour colour,
+            PieceType pieceType,
+            Square fromSquare,
+            Square toSquare,
+            PieceType capturePieceType,
+            MoveType moveType) =>
             Create(colour, pieceType, fromSquare, toSquare, capturePieceType, moveType, 0);
 
-        public static uint Create(Colour colour, PieceType pieceType,
-            Square fromSquare, Square toSquare, PieceType capturePieceType, MoveType moveType, byte numCheckers)
+        public static uint Create(
+            Colour colour,
+            PieceType pieceType,
+            Square fromSquare,
+            Square toSquare,
+            PieceType capturePieceType,
+            MoveType moveType,
+            byte numCheckers)
         {
             var colourShift = colour == Colour.White ? (uint)0 : 1;
             var pieceTypeShift = (uint)pieceType << 1;

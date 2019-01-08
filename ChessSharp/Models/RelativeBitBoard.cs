@@ -5,19 +5,26 @@ using System;
 namespace ChessSharp.Models
 {
     public class RelativeBitBoard
-    {
-        private BoardState _boardState { get; set; }
-
+    {    
         public RelativeBitBoard()
         {
-
         }
 
-        public RelativeBitBoard(Colour colour, SquareFlag myPawns, SquareFlag myRooks, 
-            SquareFlag myKnights, SquareFlag myBishops, SquareFlag myQueens, SquareFlag myKing, 
-            SquareFlag opponentPawns, SquareFlag opponentRooks, SquareFlag opponentKnights, 
-            SquareFlag opponentBishops, SquareFlag opponentQueens, SquareFlag opponentKing, 
-            BoardState boardState)
+        public RelativeBitBoard(
+            Colour colour,
+            SquareFlag myPawns,
+            SquareFlag myRooks, 
+            SquareFlag myKnights,
+            SquareFlag myBishops,
+            SquareFlag myQueens,
+            SquareFlag myKing, 
+            SquareFlag opponentPawns,
+            SquareFlag opponentRooks,
+            SquareFlag opponentKnights, 
+            SquareFlag opponentBishops,
+            SquareFlag opponentQueens,
+            SquareFlag opponentKing, 
+            StateFlag boardState)
         {
             Colour = colour;
             OpponentColour = colour.Opposite();
@@ -93,11 +100,88 @@ namespace ChessSharp.Models
         public SquareFlag OccupiedSquares =>
             MySquares | OpponentSquares;
 
-        public void Set(Colour colour, SquareFlag myPawns, SquareFlag myRooks,
-            SquareFlag myKnights, SquareFlag myBishops, SquareFlag myQueens, SquareFlag myKing,
-            SquareFlag opponentPawns, SquareFlag opponentRooks, SquareFlag opponentKnights,
-            SquareFlag opponentBishops, SquareFlag opponentQueens, SquareFlag opponentKing,
-            BoardState boardState)
+        public SquareFlag StartRank =>
+            Colour == Colour.White ? SquareFlagConstants.R2 : SquareFlagConstants.R7;
+
+        public SquareFlag SecondRank =>
+            Colour == Colour.White ? SquareFlagConstants.R3 : SquareFlagConstants.R6;
+
+        public SquareFlag EnPassantDiscoveredCheckRank =>
+            Colour == Colour.White ? SquareFlagConstants.R5 : SquareFlagConstants.R4;
+
+        public SquareFlag PrePromotionRank =>
+            Colour == Colour.White ? SquareFlagConstants.R7 : SquareFlagConstants.R2;
+
+        public SquareFlag PromotionRank =>
+            Colour == Colour.White ? SquareFlagConstants.R8 : SquareFlagConstants.R1;
+
+        public SquareFlag KingStartSquare =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingStartSquare
+            : SquareFlagConstants.BlackKingStartSquare;
+
+        public SquareFlag KingSideRookStartSquare =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingSideRookStartSquare
+            : SquareFlagConstants.BlackKingSideRookStartSquare;
+
+        public SquareFlag QueenSideRookStartSquare =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideRookStartSquare
+            : SquareFlagConstants.BlackQueenSideRookStartSquare;
+
+        public SquareFlag QueenSideRookStep1Square =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideRookStep1Square
+            : SquareFlagConstants.BlackQueenSideRookStep1Square;
+
+        public SquareFlag KingSideCastleStep1 =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingSideCastleStep1
+            : SquareFlagConstants.BlackKingSideCastleStep1;
+
+        public SquareFlag KingSideCastleStep2 =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteKingSideCastleStep2
+            : SquareFlagConstants.BlackKingSideCastleStep2;
+
+        public SquareFlag QueenSideCastleStep1 =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideCastleStep1
+            : SquareFlagConstants.BlackQueenSideCastleStep1;
+
+        public SquareFlag QueenSideCastleStep2 =>
+            Colour == Colour.White
+            ? SquareFlagConstants.WhiteQueenSideCastleStep2
+            : SquareFlagConstants.BlackQueenSideCastleStep2;
+
+        public bool CanCastleKingSide =>
+            Colour == Colour.White
+            ? _boardState.HasFlag(StateFlag.WhiteCanCastleKingSide)
+            : _boardState.HasFlag(StateFlag.BlackCanCastleKingSide);
+
+        public bool CanCastleQueenSide =>
+            Colour == Colour.White
+            ? _boardState.HasFlag(StateFlag.WhiteCanCastleQueenSide)
+            : _boardState.HasFlag(StateFlag.BlackCanCastleQueenSide);
+
+        private StateFlag _boardState { get; set; }
+
+        public void Set(
+            Colour colour,
+            SquareFlag myPawns,
+            SquareFlag myRooks,
+            SquareFlag myKnights,
+            SquareFlag myBishops,
+            SquareFlag myQueens,
+            SquareFlag myKing,
+            SquareFlag opponentPawns,
+            SquareFlag opponentRooks,
+            SquareFlag opponentKnights,
+            SquareFlag opponentBishops,
+            SquareFlag opponentQueens,
+            SquareFlag opponentKing,
+            StateFlag boardState)
         {
             Colour = colour;
             OpponentColour = colour.Opposite();
@@ -155,70 +239,5 @@ namespace ChessSharp.Models
 
             throw new Exception($"Failed to find piece for {square}");
         }
-
-        public SquareFlag StartRank =>
-            Colour == Colour.White ? SquareFlagConstants.r2 : SquareFlagConstants.r7;
-
-        public SquareFlag SecondRank =>
-            Colour == Colour.White ? SquareFlagConstants.r3 : SquareFlagConstants.r6;
-
-        public SquareFlag EnPassantDiscoveredCheckRank =>
-            Colour == Colour.White ? SquareFlagConstants.r5 : SquareFlagConstants.r4;
-
-        public SquareFlag PrePromotionRank =>
-            Colour == Colour.White ? SquareFlagConstants.r7 : SquareFlagConstants.r2;
-
-        public SquareFlag PromotionRank =>
-            Colour == Colour.White ? SquareFlagConstants.r8 : SquareFlagConstants.r1;
-
-        public SquareFlag KingStartSquare =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteKingStartSquare
-            : SquareFlagConstants.BlackKingStartSquare;
-
-        public SquareFlag KingSideRookStartSquare =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteKingSideRookStartSquare
-            : SquareFlagConstants.BlackKingSideRookStartSquare;
-
-        public SquareFlag QueenSideRookStartSquare =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteQueenSideRookStartSquare
-            : SquareFlagConstants.BlackQueenSideRookStartSquare;
-
-        public SquareFlag QueenSideRookStep1Square =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteQueenSideRookStep1Square
-            : SquareFlagConstants.BlackQueenSideRookStep1Square;
-
-        public SquareFlag KingSideCastleStep1 =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteKingSideCastleStep1
-            : SquareFlagConstants.BlackKingSideCastleStep1;
-
-        public SquareFlag KingSideCastleStep2 =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteKingSideCastleStep2
-            : SquareFlagConstants.BlackKingSideCastleStep2;
-
-        public SquareFlag QueenSideCastleStep1 =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteQueenSideCastleStep1
-            : SquareFlagConstants.BlackQueenSideCastleStep1;
-
-        public SquareFlag QueenSideCastleStep2 =>
-            Colour == Colour.White
-            ? SquareFlagConstants.WhiteQueenSideCastleStep2
-            : SquareFlagConstants.BlackQueenSideCastleStep2;
-
-        public bool CanCastleKingSide =>
-            Colour == Colour.White
-            ? _boardState.HasFlag(BoardState.WhiteCanCastleKingSide)
-            : _boardState.HasFlag(BoardState.BlackCanCastleKingSide);
-
-        public bool CanCastleQueenSide =>
-            Colour == Colour.White
-            ? _boardState.HasFlag(BoardState.WhiteCanCastleQueenSide)
-            : _boardState.HasFlag(BoardState.BlackCanCastleQueenSide);
     }
 }

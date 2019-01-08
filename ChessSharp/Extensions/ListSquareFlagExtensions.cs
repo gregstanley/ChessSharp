@@ -9,7 +9,7 @@ namespace ChessSharp.Extensions
         {
             SquareFlag squares = 0;
 
-            foreach(var square in squaresAsList)
+            foreach (var square in squaresAsList)
                 squares |= square;
 
             return squares;

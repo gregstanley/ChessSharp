@@ -10,6 +10,8 @@ namespace ChessSharp
             Value = value;
         }
 
+        public uint Value { get; }
+
         public Colour Colour => Value.GetColour();
 
         public PieceType PieceType => Value.GetPieceType();
@@ -84,7 +86,5 @@ namespace ChessSharp
 
             return moveString;
         }
-
-        public uint Value { get; }
     }
 }

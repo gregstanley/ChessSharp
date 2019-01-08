@@ -4,27 +4,15 @@ namespace ChessSharp.Extensions
 {
     public static class UintMoveExtensions
     {
-        public static SquareFlag ToSquareFlag(this uint value) => _indices[value];
+        private static readonly uint ColourMask = 0b00000000_00000000_00000000_00000001;
+        private static readonly uint PieceTypeMask = 0b00000000_00000000_00000000_00001110;
+        private static readonly uint FromMask = 0b00000000_00000000_00000011_11110000;
+        private static readonly uint ToMask = 0b00000000_00000000_11111100_00000000;
+        private static readonly uint CapturePieceTypeMask = 0b00000000_00000111_00000000_00000000;
+        private static readonly uint MoveTypeMask = 0b00000000_00111000_00000000_00000000;
+        private static readonly uint NumCheckersMask = 0b00000000_11000000_00000000_00000000;
 
-        public static Colour GetColour(this uint value) => (value & _colourMask) == 0 ? Colour.White : Colour.Black;
-
-        public static PieceType GetPieceType(this uint value) => (PieceType)((value & _pieceTypeMask) >> 1);
-
-        public static SquareFlag GetFrom(this uint value) => ((value & _fromMask) >> 4).ToSquareFlag();
-
-        public static int GetFromIndex(this uint value) => (int)(value & _fromMask) >> 4;
-
-        public static SquareFlag GetTo(this uint value) => ((value & _toMask) >> 10).ToSquareFlag();
-
-        public static int GetToIndex(this uint value) => (int)(value & _toMask) >> 10;
-
-        public static PieceType GetCapturePieceType(this uint value) => (PieceType)((value & _capturePieceTypeMask) >> 16);
-
-        public static MoveType GetMoveType(this uint value) => (MoveType)((value & _moveTypeMask) >> 19);
-
-        public static byte GetNumCheckers(this uint value) => (byte)((value & _numCheckersMask) >> 22);
-
-        private static SquareFlag[] _indices = new SquareFlag[]
+        private static readonly SquareFlag[] Indices = new SquareFlag[]
         {
              SquareFlag.A1,
              SquareFlag.B1,
@@ -92,12 +80,24 @@ namespace ChessSharp.Extensions
              SquareFlag.H8
         };
 
-        private static readonly uint _colourMask             = 0b00000000_00000000_00000000_00000001;
-        private static readonly uint _pieceTypeMask          = 0b00000000_00000000_00000000_00001110;
-        private static readonly uint _fromMask               = 0b00000000_00000000_00000011_11110000;
-        private static readonly uint _toMask                 = 0b00000000_00000000_11111100_00000000;
-        private static readonly uint _capturePieceTypeMask   = 0b00000000_00000111_00000000_00000000;
-        private static readonly uint _moveTypeMask           = 0b00000000_00111000_00000000_00000000;
-        private static readonly uint _numCheckersMask        = 0b00000000_11000000_00000000_00000000;
+        public static SquareFlag ToSquareFlag(this uint value) => Indices[value];
+
+        public static Colour GetColour(this uint value) => (value & ColourMask) == 0 ? Colour.White : Colour.Black;
+
+        public static PieceType GetPieceType(this uint value) => (PieceType)((value & PieceTypeMask) >> 1);
+
+        public static SquareFlag GetFrom(this uint value) => ((value & FromMask) >> 4).ToSquareFlag();
+
+        public static int GetFromIndex(this uint value) => (int)(value & FromMask) >> 4;
+
+        public static SquareFlag GetTo(this uint value) => ((value & ToMask) >> 10).ToSquareFlag();
+
+        public static int GetToIndex(this uint value) => (int)(value & ToMask) >> 10;
+
+        public static PieceType GetCapturePieceType(this uint value) => (PieceType)((value & CapturePieceTypeMask) >> 16);
+
+        public static MoveType GetMoveType(this uint value) => (MoveType)((value & MoveTypeMask) >> 19);
+
+        public static byte GetNumCheckers(this uint value) => (byte)((value & NumCheckersMask) >> 22);
     }
 }

@@ -94,7 +94,7 @@ namespace ChessSharp.Helpers
             var board = parts[0];
             var colour = parts[1] == "w" ? Colour.White : Colour.Black;
 
-            BoardState castlingRights = ParseCastlingRights(parts[2]);
+            StateFlag castlingRights = ParseCastlingRights(parts[2]);
 
             SquareFlag enPassantSquare = 0;
 
@@ -113,7 +113,7 @@ namespace ChessSharp.Helpers
             return CreateGameState(board, colour, castlingRights, enPassantSquare, halfTurnCounter, fullMoveNumber);
         }
 
-        private static GameState CreateGameState(string board, Colour toPlay, BoardState castlingRights, SquareFlag enPassantSquare, int halfTurnCounter, int fullMoveNumber)
+        private static GameState CreateGameState(string board, Colour toPlay, StateFlag castlingRights, SquareFlag enPassantSquare, int halfTurnCounter, int fullMoveNumber)
         {
             var ranks = ExpandBoardString(board);
 
@@ -141,56 +141,82 @@ namespace ChessSharp.Helpers
                 {
                     switch (square.Type)
                     {
-                        case PieceType.Pawn: whitePawns |= square.Square; break;
-                        case PieceType.Rook: whiteRooks |= square.Square; break;
-                        case PieceType.Knight: whiteKnights |= square.Square; break;
-                        case PieceType.Bishop: whiteBishops |= square.Square; break;
-                        case PieceType.Queen: whiteQueens |= square.Square; break;
-                        case PieceType.King: whiteKing |= square.Square; break;
+                        case PieceType.Pawn: whitePawns |= square.Square;
+                            break;
+                        case PieceType.Rook: whiteRooks |= square.Square;
+                            break;
+                        case PieceType.Knight: whiteKnights |= square.Square;
+                            break;
+                        case PieceType.Bishop: whiteBishops |= square.Square;
+                            break;
+                        case PieceType.Queen: whiteQueens |= square.Square;
+                            break;
+                        case PieceType.King: whiteKing |= square.Square;
+                            break;
                     }
                 }
                 else
                 {
                     switch (square.Type)
                     {
-                        case PieceType.Pawn: blackPawns |= square.Square; break;
-                        case PieceType.Rook: blackRooks |= square.Square; break;
-                        case PieceType.Knight: blackKnights |= square.Square; break;
-                        case PieceType.Bishop: blackBishops |= square.Square; break;
-                        case PieceType.Queen: blackQueens |= square.Square; break;
-                        case PieceType.King: blackKing |= square.Square; break;
+                        case PieceType.Pawn: blackPawns |= square.Square;
+                            break;
+                        case PieceType.Rook: blackRooks |= square.Square;
+                            break;
+                        case PieceType.Knight: blackKnights |= square.Square;
+                            break;
+                        case PieceType.Bishop: blackBishops |= square.Square;
+                            break;
+                        case PieceType.Queen: blackQueens |= square.Square;
+                            break;
+                        case PieceType.King: blackKing |= square.Square;
+                            break;
                     }
                 }
             }
 
-            return new GameState(0, toPlay, halfTurnCounter, fullMoveNumber,
-                castlingRights.HasFlag(BoardState.WhiteCanCastleKingSide),
-                castlingRights.HasFlag(BoardState.WhiteCanCastleQueenSide),
-                castlingRights.HasFlag(BoardState.BlackCanCastleKingSide),
-                castlingRights.HasFlag(BoardState.BlackCanCastleKingSide),
-                whitePawns, whiteRooks, whiteKnights, whiteBishops, whiteQueens, whiteKing,
-                blackPawns, blackRooks, blackKnights, blackBishops, blackQueens, blackKing,
+            return new GameState(
+                0,
+                toPlay,
+                halfTurnCounter,
+                fullMoveNumber,
+                castlingRights.HasFlag(StateFlag.WhiteCanCastleKingSide),
+                castlingRights.HasFlag(StateFlag.WhiteCanCastleQueenSide),
+                castlingRights.HasFlag(StateFlag.BlackCanCastleKingSide),
+                castlingRights.HasFlag(StateFlag.BlackCanCastleKingSide),
+                whitePawns,
+                whiteRooks,
+                whiteKnights,
+                whiteBishops,
+                whiteQueens,
+                whiteKing,
+                blackPawns,
+                blackRooks,
+                blackKnights,
+                blackBishops,
+                blackQueens,
+                blackKing,
                 enPassantSquare);
         }
 
-        private static BoardState ParseCastlingRights(string castlingRights)
+        private static StateFlag ParseCastlingRights(string castlingRights)
         {
             if (castlingRights == "-")
                 return 0;
 
-            BoardState castlingState = 0;
+            StateFlag castlingState = 0;
 
             if (castlingRights.Contains("K"))
-                castlingState |= BoardState.WhiteCanCastleKingSide;
+                castlingState |= StateFlag.WhiteCanCastleKingSide;
 
             if (castlingRights.Contains("Q"))
-                castlingState |= BoardState.WhiteCanCastleQueenSide;
+                castlingState |= StateFlag.WhiteCanCastleQueenSide;
 
             if (castlingRights.Contains("k"))
-                castlingState |= BoardState.BlackCanCastleKingSide;
+                castlingState |= StateFlag.BlackCanCastleKingSide;
 
             if (castlingRights.Contains("q"))
-                castlingState |= BoardState.BlackCanCastleQueenSide;
+                castlingState |= StateFlag.BlackCanCastleQueenSide;
 
             return castlingState;
         }

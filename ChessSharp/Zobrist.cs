@@ -9,6 +9,12 @@ namespace ChessSharp
 {
     public class Zobrist
     {
+        private ulong[,] squares = new ulong[64, 12];
+
+        private ulong[] colours = new ulong[2];
+
+        private ulong[] castleRights = new ulong[4];
+
         private enum CastleRights
         {
             WhiteCanCastleKingSide,
@@ -33,29 +39,21 @@ namespace ChessSharp
             BlackKing
         }
 
-        private ulong[,] _squares = new ulong[64, 12];
-
-        private ulong[] _colours = new ulong[2];
-
-        private ulong[] _castleRights = new ulong[4];
-
         public void Init()
         {
-            //var gen = new PcgRandom();
-
             var x = 0;
 
             for (var i = 0; i < 64; ++i)
                 for (var j = 0; j < 12; ++j)
-                    _squares[i, j] = _internalRandomNumbers[x++];
+                    squares[i, j] = InternalRandomNumbers[x++];
 
-            _colours[0] = 9031923140692246275;
-            _colours[1] = 2884421478730253157;
+            colours[0] = 9031923140692246275;
+            colours[1] = 2884421478730253157;
 
-            _castleRights[(int)CastleRights.WhiteCanCastleKingSide] = 24694895801582720;
-            _castleRights[(int)CastleRights.WhiteCanCastleQueenSide] = 1451876467495148394;
-            _castleRights[(int)CastleRights.BlackCanCastleKingSide] = 8474605413122637464;
-            _castleRights[(int)CastleRights.BlackCanCastleQueenSide] = 4046274221665667751;
+            castleRights[(int)CastleRights.WhiteCanCastleKingSide] = 24694895801582720;
+            castleRights[(int)CastleRights.WhiteCanCastleQueenSide] = 1451876467495148394;
+            castleRights[(int)CastleRights.BlackCanCastleKingSide] = 8474605413122637464;
+            castleRights[(int)CastleRights.BlackCanCastleQueenSide] = 4046274221665667751;
         }
 
         public ulong Hash(IPieceMap board, Colour colour)
@@ -68,13 +66,13 @@ namespace ChessSharp
             {
                 var piece = PieceMapHelpers.GetPiece(board, square);
 
-                hash ^= _squares[square.ToSquareIndex(), (int)Index(piece)];
+                hash ^= this.squares[square.ToSquareIndex(), (int)Index(piece)];
             }
 
             if (colour == Colour.White)
-                hash ^= _colours[0];
+                hash ^= colours[0];
             else
-                hash ^= _colours[1];
+                hash ^= colours[1];
 
             return hash;
         }
@@ -82,8 +80,8 @@ namespace ChessSharp
         public ulong UpdateHash(ulong hash, uint move)
         {
             // We can just immediately flip the colour
-            hash ^= _colours[0];
-            hash ^= _colours[1];
+            hash ^= colours[0];
+            hash ^= colours[1];
 
             var colour = move.GetColour();
             var moveType = move.GetMoveType();
@@ -96,12 +94,12 @@ namespace ChessSharp
                 var rookEndSquareIndex = SquareFlagConstants.WhiteKingSideCastleStep1.ToSquareIndex();
 
                 // Add/Remove pieces from start positions
-                hash ^= _squares[kingStartSquareIndex, (int)PieceIndex.WhiteKing];
-                hash ^= _squares[rookStartSquareIndex, (int)PieceIndex.WhiteRook];
+                hash ^= squares[kingStartSquareIndex, (int)PieceIndex.WhiteKing];
+                hash ^= squares[rookStartSquareIndex, (int)PieceIndex.WhiteRook];
 
                 // Add/Remove pieces from end positions
-                hash ^= _squares[kingEndSquareIndex, (int)PieceIndex.WhiteKing];
-                hash ^= _squares[rookEndSquareIndex, (int)PieceIndex.WhiteRook];
+                hash ^= squares[kingEndSquareIndex, (int)PieceIndex.WhiteKing];
+                hash ^= squares[rookEndSquareIndex, (int)PieceIndex.WhiteRook];
 
                 return hash;
             }
@@ -114,12 +112,12 @@ namespace ChessSharp
                 var rookEndSquareIndex = SquareFlagConstants.WhiteQueenSideCastleStep1.ToSquareIndex();
 
                 // Add/Remove pieces from start positions
-                hash ^= _squares[kingStartSquareIndex, (int)PieceIndex.WhiteKing];
-                hash ^= _squares[rookStartSquareIndex, (int)PieceIndex.WhiteRook];
+                hash ^= squares[kingStartSquareIndex, (int)PieceIndex.WhiteKing];
+                hash ^= squares[rookStartSquareIndex, (int)PieceIndex.WhiteRook];
 
                 // Add/Remove pieces from end positions
-                hash ^= _squares[kingEndSquareIndex, (int)PieceIndex.WhiteKing];
-                hash ^= _squares[rookEndSquareIndex, (int)PieceIndex.WhiteRook];
+                hash ^= squares[kingEndSquareIndex, (int)PieceIndex.WhiteKing];
+                hash ^= squares[rookEndSquareIndex, (int)PieceIndex.WhiteRook];
 
                 return hash;
             }
@@ -132,12 +130,12 @@ namespace ChessSharp
                 var rookEndSquareIndex = SquareFlagConstants.BlackKingSideCastleStep1.ToSquareIndex();
 
                 // Add/Remove pieces from start positions
-                hash ^= _squares[kingStartSquareIndex, (int)PieceIndex.BlackKing];
-                hash ^= _squares[rookStartSquareIndex, (int)PieceIndex.BlackRook];
+                hash ^= squares[kingStartSquareIndex, (int)PieceIndex.BlackKing];
+                hash ^= squares[rookStartSquareIndex, (int)PieceIndex.BlackRook];
 
                 // Add/Remove pieces from end positions
-                hash ^= _squares[kingEndSquareIndex, (int)PieceIndex.BlackKing];
-                hash ^= _squares[rookEndSquareIndex, (int)PieceIndex.BlackRook];
+                hash ^= squares[kingEndSquareIndex, (int)PieceIndex.BlackKing];
+                hash ^= squares[rookEndSquareIndex, (int)PieceIndex.BlackRook];
 
                 return hash;
             }
@@ -150,12 +148,12 @@ namespace ChessSharp
                 var rookEndSquareIndex = SquareFlagConstants.BlackQueenSideCastleStep1.ToSquareIndex();
 
                 // Add/Remove pieces from start positions
-                hash ^= _squares[kingStartSquareIndex, (int)PieceIndex.BlackKing];
-                hash ^= _squares[rookStartSquareIndex, (int)PieceIndex.BlackRook];
+                hash ^= squares[kingStartSquareIndex, (int)PieceIndex.BlackKing];
+                hash ^= squares[rookStartSquareIndex, (int)PieceIndex.BlackRook];
 
                 // Add/Remove pieces from end positions
-                hash ^= _squares[kingEndSquareIndex, (int)PieceIndex.BlackKing];
-                hash ^= _squares[rookEndSquareIndex, (int)PieceIndex.BlackRook];
+                hash ^= squares[kingEndSquareIndex, (int)PieceIndex.BlackKing];
+                hash ^= squares[rookEndSquareIndex, (int)PieceIndex.BlackRook];
 
                 return hash;
             }
@@ -182,22 +180,26 @@ namespace ChessSharp
 
             switch (moveType)
             {
-                case MoveType.PromotionQueen: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Queen); break;
-                case MoveType.PromotionRook: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Rook); break;
-                case MoveType.PromotionBishop: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Bishop); break;
-                case MoveType.PromotionKnight: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Knight); break;
+                case MoveType.PromotionQueen: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Queen);
+                    break;
+                case MoveType.PromotionRook: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Rook);
+                    break;
+                case MoveType.PromotionBishop: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Bishop);
+                    break;
+                case MoveType.PromotionKnight: toPieceIndex = (int)ToPieceIndex(colour, PieceType.Knight);
+                    break;
                 default: break;
             }
 
             // Add/Remove the moving piece to/from source square
-            hash ^= _squares[fromSquareIndex, fromPieceIndex];
+            hash ^= squares[fromSquareIndex, fromPieceIndex];
 
             // Add/Remove a captured piece to/from target square
             if (move.GetCapturePieceType() != PieceType.None)
-                hash ^= _squares[captureSquareIndex, capturePieceIndex];
+                hash ^= squares[captureSquareIndex, capturePieceIndex];
 
             // Add/Remove the moving piece to/from target square
-            hash ^= _squares[toSquareIndex, toPieceIndex];
+            hash ^= squares[toSquareIndex, toPieceIndex];
 
             return hash;
         }
@@ -208,6 +210,7 @@ namespace ChessSharp
             var int2 = (ulong)gen.Next();
 
             ulong result = int1 << 32;
+
             result += int2;
 
             return result;
@@ -279,8 +282,8 @@ namespace ChessSharp
             }
         }
 
-        // Pre-generated number purely so that keys are ALWAYS the same
-        private ulong[] _internalRandomNumbers = new ulong[768]
+        // Pre-generated number purely so that keys are consistent even across runs of the app
+        private static readonly ulong[] InternalRandomNumbers = new ulong[768]
             {
                 4072067707504170,
                 28195254883754324,

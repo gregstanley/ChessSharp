@@ -4,7 +4,7 @@ namespace ChessSharp.Models
 {
     public struct HistoryState
     {
-        public HistoryState(ulong key, uint move, BoardState state) : this()
+        public HistoryState(ulong key, uint move, StateFlag state) : this()
         {
             Key = key;
             Move = move;
@@ -15,6 +15,6 @@ namespace ChessSharp.Models
 
         public uint Move { get; }
 
-        public BoardState State { get; }
+        public StateFlag State { get; }
     }
 }

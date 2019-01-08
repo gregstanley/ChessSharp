@@ -12,14 +12,14 @@ namespace ChessSharp.Tests
         {
             var gameState = FenHelpers.Parse(FenHelpers.Default);
 
-            Assert.Equal(SquareFlagConstants.r2, gameState.WhitePawns);
+            Assert.Equal(SquareFlagConstants.R2, gameState.WhitePawns);
             Assert.Equal(SquareFlag.A1 | SquareFlag.H1, gameState.WhiteRooks);
             Assert.Equal(SquareFlag.B1 | SquareFlag.G1, gameState.WhiteKnights);
             Assert.Equal(SquareFlag.C1 | SquareFlag.F1, gameState.WhiteBishops);
             Assert.Equal(SquareFlag.D1, gameState.WhiteQueens);
             Assert.Equal(SquareFlag.E1, gameState.WhiteKing);
 
-            Assert.Equal(SquareFlagConstants.r7, gameState.BlackPawns);
+            Assert.Equal(SquareFlagConstants.R7, gameState.BlackPawns);
             Assert.Equal(SquareFlag.A8 | SquareFlag.H8, gameState.BlackRooks);
             Assert.Equal(SquareFlag.B8 | SquareFlag.G8, gameState.BlackKnights);
             Assert.Equal(SquareFlag.C8 | SquareFlag.F8, gameState.BlackBishops);
