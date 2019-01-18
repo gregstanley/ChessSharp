@@ -22,6 +22,8 @@ namespace ChessSharp.Engine
 
         private readonly Stack<GameHistoryNode> history = new Stack<GameHistoryNode>();
 
+        private List<GameHistoryNode> drawBuffer = new List<GameHistoryNode>(256);
+
         public Game(BitBoard board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
         {
             bitBoard = board;
@@ -301,13 +303,44 @@ namespace ChessSharp.Engine
 
             var currentState = GetGameState();
 
-            history.Push(new GameHistoryNode(bitBoard.History.First(), currentState));
+            var historyItem = new GameHistoryNode(bitBoard.History.First(), currentState);
+
+            history.Push(historyItem);
 
             if (HalfMoveClock > 50)
             {
                 Draw?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
 
                 return;
+            }
+
+            if (historyItem.IsIrreversible)
+            {
+                drawBuffer.Clear();
+            }
+            else
+            {
+                var previousCount = 0;
+
+                for (var i = drawBuffer.Count - 1; i >= 0; --i)
+                {
+                    var nextItem = drawBuffer[i];
+
+                    if (nextItem.IsIrreversible)
+                        break;
+
+                    if (nextItem.Key == bitBoard.Key)
+                        ++previousCount;
+                }
+
+                if (previousCount >= 2)
+                {
+                    Draw?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
+
+                    return;
+                }
+
+                drawBuffer.Add(historyItem);
             }
 
             var moves = new List<uint>();

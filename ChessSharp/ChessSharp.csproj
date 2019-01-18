@@ -5,14 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Enums\CastleType.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Enums\CastleType.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="PcgRandom" Version="1.1.0" />
     <PackageReference Include="Troschuetz.Random" Version="4.3.0" />
   </ItemGroup>

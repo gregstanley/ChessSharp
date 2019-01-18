@@ -127,7 +127,7 @@ namespace ChessSharp_UI
 
             foreach (var snapshot in history)
             {
-                var notation = new MoveViewer(snapshot.HistoryState.Move).GetNotation();
+                var notation = new MoveViewer(snapshot.Move).GetNotation();
 
                 if (count % 2 == 0)
                 {

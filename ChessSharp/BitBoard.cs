@@ -17,7 +17,7 @@ namespace ChessSharp
 
         private Zobrist keyGen = new Zobrist();
 
-        private Stack<HistoryState> history = new Stack<HistoryState>(256);
+        private Stack<BoardStateInfo> history = new Stack<BoardStateInfo>(256);
 
         public BitBoard()
         {
@@ -40,7 +40,7 @@ namespace ChessSharp
 
             Key = keyGen.Hash(this, Colour.White);
 
-            history.Push(new HistoryState(Key, 0, DefaultState));
+            history.Push(new BoardStateInfo(Key, 0, DefaultState, 0));
         }
 
         public BitBoard(
@@ -56,7 +56,8 @@ namespace ChessSharp
             SquareFlag blackBishops,
             SquareFlag blackQueens,
             SquareFlag blackKing,
-            StateFlag state)
+            StateFlag state,
+            SquareFlag enPassant)
         {
             WhitePawns = whitePawns;
             WhiteRooks = whiteRooks;
@@ -75,7 +76,7 @@ namespace ChessSharp
 
             Key = keyGen.Hash(this, Colour.White);
 
-            history.Push(new HistoryState(Key, 0, state));
+            history.Push(new BoardStateInfo(Key, 0, state, enPassant));
         }
 
         public SquareFlag WhitePawns { get; private set; }
@@ -103,19 +104,19 @@ namespace ChessSharp
         public SquareFlag BlackKing { get; private set; }
 
         public SquareFlag EnPassant =>
-            CurrentState.GetEnPassantSquare();
+            CurrentState.EnPassant;
 
         public bool WhiteCanCastleKingSide =>
-            CurrentState.HasFlag(StateFlag.WhiteCanCastleKingSide);
+            CurrentState.StateFlags.HasFlag(StateFlag.WhiteCanCastleKingSide);
 
         public bool WhiteCanCastleQueenSide =>
-            CurrentState.HasFlag(StateFlag.WhiteCanCastleQueenSide);
+            CurrentState.StateFlags.HasFlag(StateFlag.WhiteCanCastleQueenSide);
 
         public bool BlackCanCastleKingSide =>
-            CurrentState.HasFlag(StateFlag.BlackCanCastleKingSide);
+            CurrentState.StateFlags.HasFlag(StateFlag.BlackCanCastleKingSide);
 
         public bool BlackCanCastleQueenSide =>
-            CurrentState.HasFlag(StateFlag.BlackCanCastleQueenSide);
+            CurrentState.StateFlags.HasFlag(StateFlag.BlackCanCastleQueenSide);
 
         public SquareFlag White =>
             WhitePawns | WhiteRooks | WhiteKnights | WhiteBishops | WhiteQueens | WhiteKing;
@@ -123,11 +124,11 @@ namespace ChessSharp
         public SquareFlag Black =>
             BlackPawns | BlackRooks | BlackKnights | BlackBishops | BlackQueens | BlackKing;
 
-        public ulong Key { get; private set; } = 0;
+        public ulong Key { get; private set; }
 
-        public IReadOnlyCollection<HistoryState> History => history;
+        public IReadOnlyCollection<BoardStateInfo> History => history;
 
-        public StateFlag CurrentState => history.Peek().State;
+        public BoardStateInfo CurrentState => history.Peek();
 
         public static BitBoard FromGameState(GameState gameState)
         {
@@ -145,9 +146,6 @@ namespace ChessSharp
             if (gameState.BlackCanCastleQueenSide)
                 boardState |= StateFlag.BlackCanCastleQueenSide;
 
-            if (gameState.EnPassant != 0)
-                boardState = boardState.AddEnPassantSquare(gameState.EnPassant);
-
             return new BitBoard(
                 gameState.WhitePawns,
                 gameState.WhiteRooks,
@@ -161,7 +159,8 @@ namespace ChessSharp
                 gameState.BlackBishops,
                 gameState.BlackQueens,
                 gameState.BlackKing,
-                boardState);
+                boardState,
+                gameState.EnPassant);
         }
 
         public SquareFlag GetOccupiedSquares(Colour colour) =>
@@ -221,9 +220,9 @@ namespace ChessSharp
             var capturePieceType = move.GetCapturePieceType();
 
             // Copy current state
-            var state = history.Peek().State.Next();
+            var state = CurrentState.StateFlags;
 
-            //// TODO: Return a draw
+            var enPassantSquare = (SquareFlag)0;
 
             if (moveType == MoveType.CastleKing)
             {
@@ -302,9 +301,7 @@ namespace ChessSharp
 
                     if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                     {
-                        var enPassantSquare = fromSquare.PawnForward(colour, 1);
-
-                        state = state.AddEnPassantSquare(enPassantSquare);
+                        enPassantSquare = fromSquare.PawnForward(colour, 1);
                     }
                     else
                     {
@@ -314,9 +311,7 @@ namespace ChessSharp
 
                         if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                         {
-                            var enPassantSquare = fromSquare.PawnForward(colour, 1);
-
-                            state = state.AddEnPassantSquare(enPassantSquare);
+                            enPassantSquare = fromSquare.PawnForward(colour, 1);
                         }
                     }
                 }
@@ -378,7 +373,9 @@ namespace ChessSharp
 
             Key = keyGen.UpdateHash(Key, move);
 
-            history.Push(new HistoryState(Key, move, state));
+            var historyItem = new BoardStateInfo(Key, move, state, enPassantSquare);
+
+            history.Push(historyItem);
         }
 
         public void UnMakeMove(uint move)

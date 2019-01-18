@@ -54,7 +54,8 @@ namespace ChessSharp.MoveGeneration
                 bitBoard.GetBishopSquares(opponentColour),
                 bitBoard.GetQueenSquares(opponentColour),
                 bitBoard.GetKingSquare(opponentColour),
-                bitBoard.CurrentState);
+                bitBoard.CurrentState.StateFlags,
+                bitBoard.CurrentState.EnPassant);
 
             return RelativeBitBoard;
         }

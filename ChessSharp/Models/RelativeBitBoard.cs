@@ -71,7 +71,7 @@ namespace ChessSharp.Models
 
         public SquareFlag OpponentKing { get; private set; }
 
-        public SquareFlag EnPassant => _boardState.GetEnPassantSquare();
+        public SquareFlag EnPassant { get; private set; }
 
         public SquareFlag MySquares =>
             MyPawns | MyKnights | MyRaySquares | MyKing;
@@ -181,7 +181,8 @@ namespace ChessSharp.Models
             SquareFlag opponentBishops,
             SquareFlag opponentQueens,
             SquareFlag opponentKing,
-            StateFlag boardState)
+            StateFlag boardState,
+            SquareFlag enPassantSquare)
         {
             Colour = colour;
             OpponentColour = colour.Opposite();
@@ -198,6 +199,7 @@ namespace ChessSharp.Models
             OpponentQueens = opponentQueens;
             OpponentKing = opponentKing;
             _boardState = boardState;
+            EnPassant = enPassantSquare;
         }
 
         public Colour GetPieceColour(SquareFlag square)

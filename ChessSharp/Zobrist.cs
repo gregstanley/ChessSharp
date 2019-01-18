@@ -9,11 +9,11 @@ namespace ChessSharp
 {
     public class Zobrist
     {
-        private ulong[,] squares = new ulong[64, 12];
+        private readonly ulong[,] squares = new ulong[64, 12];
 
-        private ulong[] colours = new ulong[2];
+        private readonly ulong[] colours = new ulong[2];
 
-        private ulong[] castleRights = new ulong[4];
+        private readonly ulong[] castleRights = new ulong[4];
 
         private enum CastleRights
         {

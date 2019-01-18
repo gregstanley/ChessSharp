@@ -144,7 +144,7 @@ namespace ChessSharp.Extensions
         }
 
         /*
-        // Checking the Dictionary first is mightly expensive. Better to not look for something that doesn't exist.
+        // Checking the Dictionary first is very expensive. Better to not look for something that doesn't exist.
         //public static int ToSquareIndex(this SquareFlag square) =>
         //    _indices.ContainsKey(square) ? _indices[square] : -1;
         // Even looking up in the dictionary is slow. Better to count!

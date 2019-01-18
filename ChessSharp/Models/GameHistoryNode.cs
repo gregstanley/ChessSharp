@@ -1,14 +1,38 @@
-﻿namespace ChessSharp.Models
+﻿using ChessSharp.Enums;
+
+namespace ChessSharp.Models
 {
     public class GameHistoryNode
     {
-        public GameHistoryNode(HistoryState historyState, GameState gameState)
+        private readonly BoardStateInfo boardStateInfo;
+
+        public GameHistoryNode(BoardStateInfo boardStateInfo, GameState gameState)
         {
-            HistoryState = historyState;
+            this.boardStateInfo = boardStateInfo;
+
             GameState = gameState;
+
+            if (boardStateInfo.EnPassant != gameState.EnPassant)
+                throw new System.Exception("EnPassant not equal");
+
+            if (boardStateInfo.StateFlags.HasFlag(StateFlag.WhiteCanCastleKingSide) != gameState.WhiteCanCastleKingSide)
+                throw new System.Exception("Castling rights mismatch (White King side)");
+
+            if (boardStateInfo.StateFlags.HasFlag(StateFlag.WhiteCanCastleQueenSide) != gameState.WhiteCanCastleQueenSide)
+                throw new System.Exception("Castling rights mismatch (White Queen side");
+
+            if (boardStateInfo.StateFlags.HasFlag(StateFlag.BlackCanCastleKingSide) != gameState.BlackCanCastleKingSide)
+                throw new System.Exception("Castling rights mismatch (Black King side)");
+
+            if (boardStateInfo.StateFlags.HasFlag(StateFlag.BlackCanCastleQueenSide) != gameState.BlackCanCastleQueenSide)
+                throw new System.Exception("Castling rights mismatch (Black Queen side");
         }
 
-        public HistoryState HistoryState { get; }
+        public ulong Key => boardStateInfo.Key;
+
+        public uint Move => boardStateInfo.Move;
+
+        public bool IsIrreversible => boardStateInfo.IsIrreversible;
 
         public GameState GameState { get; }
     }
