@@ -107,8 +107,6 @@ namespace ChessSharp.Engine
 
         public int SearchedPositionsCount => search.PositionCount;
 
-        //public IReadOnlyCollection<HistoryState> History => bitBoard.History;
-
         public IReadOnlyCollection<GameHistoryNode> History => history;
 
         public GameHistoryNode CurrentState => history.Last();
@@ -301,46 +299,26 @@ namespace ChessSharp.Engine
             else
                 ++HalfMoveClock;
 
-            var currentState = GetGameState();
+            var gameState = GetGameState();
 
-            var historyItem = new GameHistoryNode(bitBoard.History.First(), currentState);
+            var currentState = bitBoard.CurrentState;
+
+            var historyItem = new GameHistoryNode(currentState, gameState);
 
             history.Push(historyItem);
 
-            if (HalfMoveClock > 50)
+            if (historyItem.IsIrreversible)
+                drawBuffer.Clear();
+            else
+                drawBuffer.Add(historyItem);
+
+            var isDrawn = IsDrawn(HalfMoveClock, drawBuffer);
+
+            if (isDrawn)
             {
-                Draw?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
+                Draw?.Invoke(this, new MoveAppliedEventArgs(move, gameState, Evaluate()));
 
                 return;
-            }
-
-            if (historyItem.IsIrreversible)
-            {
-                drawBuffer.Clear();
-            }
-            else
-            {
-                var previousCount = 0;
-
-                for (var i = drawBuffer.Count - 1; i >= 0; --i)
-                {
-                    var nextItem = drawBuffer[i];
-
-                    if (nextItem.IsIrreversible)
-                        break;
-
-                    if (nextItem.Key == bitBoard.Key)
-                        ++previousCount;
-                }
-
-                if (previousCount >= 2)
-                {
-                    Draw?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
-
-                    return;
-                }
-
-                drawBuffer.Add(historyItem);
             }
 
             var moves = new List<uint>();
@@ -351,12 +329,37 @@ namespace ChessSharp.Engine
 
             if (!AvailableMoves.Any())
             {
-                Checkmate?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
+                Checkmate?.Invoke(this, new MoveAppliedEventArgs(move, gameState, Evaluate()));
 
                 return;
             }
 
-            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, currentState, Evaluate()));
+            MoveApplied?.Invoke(this, new MoveAppliedEventArgs(move, gameState, Evaluate()));
+        }
+
+        private bool IsDrawn(int halfMoveClock, List<GameHistoryNode> gameHistoryNodes)
+        {
+            if (halfMoveClock > 50)
+                return true;
+
+            // TODO: Understand the 'fast' mathod here
+            // https://chess.stackexchange.com/questions/17127/programming-the-three-fold-repetition-for-my-chess-engine
+            // and then implement in search
+            var previousCount = 0;
+
+            // Note: We step in twos as a match must be same player to move
+            for (var i = drawBuffer.Count - 1; i >= 0; i -= 2)
+            {
+                var nextItem = drawBuffer[i];
+
+                if (nextItem.IsIrreversible)
+                    break;
+
+                if (nextItem.Key == bitBoard.Key)
+                    ++previousCount;
+            }
+
+            return previousCount >= 2 ? true : false;
         }
 
         private int Evaluate() => positionEvaluator.Evaluate(bitBoard);

@@ -4,7 +4,6 @@ using ChessSharp.Engine.Events;
 using ChessSharp.Enums;
 using ChessSharp.Helpers;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -147,8 +146,6 @@ namespace ChessSharp_UI
                 }
                 else
                 {
-                    //if (item == null)
-                    //    item = new TurnItemUserControl();
                     item.BlackMoveButton.Visibility = Visibility.Visible;
 
                     item.BlackMoveButton.Content = notation;
@@ -164,8 +161,6 @@ namespace ChessSharp_UI
 
             MovesListBox.SelectedIndex = MovesListBox.Items.Count - 1;
             MovesListBox.ScrollIntoView(MovesListBox.SelectedItem);
-
-            //GameHistoryTextBox.Text = sb.ToString();
         }
 
         private void Game_SearchCompleted(object sender, SearchCompleteEventArgs args)

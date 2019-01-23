@@ -12,6 +12,7 @@ namespace ChessSharp.Models
 
             GameState = gameState;
 
+            // These checks should only happen outside of the search (when move is actually applied)
             if (boardStateInfo.EnPassant != gameState.EnPassant)
                 throw new System.Exception("EnPassant not equal");
 

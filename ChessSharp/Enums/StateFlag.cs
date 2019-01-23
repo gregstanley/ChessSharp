@@ -3,7 +3,7 @@
 namespace ChessSharp.Enums
 {
     [Flags]
-    public enum StateFlag
+    public enum StateFlag : short
     {
         None = 0,
         WhiteCanCastleKingSide = 1 << 1,
