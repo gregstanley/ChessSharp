@@ -524,7 +524,7 @@
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
       <settingsFile>2018/12/18 21:10:53.103</settingsFile>
-      <sourceFile>2019/01/23 08:32:08.154</sourceFile>
+      <sourceFile>2019/01/25 08:23:46.296</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -553,201 +553,321 @@
         <endColumn>31</endColumn>
         <warning>False</warning>
       </violation>
+      <violation namespace="StyleCop.CSharp.OrderingRules" rule="ElementsMustBeOrderedByAccess" ruleCheckId="SA1202">
+        <context>All private methods must be placed after all public methods.</context>
+        <line>32</line>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.OrderingRules" rule="ElementsMustBeOrderedByAccess" ruleCheckId="SA1202">
+        <context>All private methods must be placed after all public methods.</context>
+        <line>35</line>
+        <warning>False</warning>
+      </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGame must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
+        <context>The call to NewGameWhite must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
         <line>27</line>
-        <index>645</index>
-        <endIndex>651</endIndex>
+        <index>678</index>
+        <endIndex>689</endIndex>
         <startLine>27</startLine>
         <startColumn>13</startColumn>
         <endLine>27</endLine>
+        <endColumn>24</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
+        <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
+        <line>27</line>
+        <index>716</index>
+        <endIndex>733</endIndex>
+        <startLine>27</startLine>
+        <startColumn>51</startColumn>
+        <endLine>27</endLine>
+        <endColumn>68</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
+        <context>The call to NewGameBlack must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
+        <line>30</line>
+        <index>860</index>
+        <endIndex>871</endIndex>
+        <startLine>30</startLine>
+        <startColumn>19</startColumn>
+        <endLine>30</endLine>
+        <endColumn>30</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
+        <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
+        <line>30</line>
+        <index>898</index>
+        <endIndex>915</endIndex>
+        <startLine>30</startLine>
+        <startColumn>57</startColumn>
+        <endLine>30</endLine>
+        <endColumn>74</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
+        <context>The call to NewGame must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
+        <line>33</line>
+        <index>997</index>
+        <endIndex>1003</endIndex>
+        <startLine>33</startLine>
+        <startColumn>13</startColumn>
+        <endLine>33</endLine>
         <endColumn>19</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to NewGame must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>31</line>
-        <index>731</index>
-        <endIndex>737</endIndex>
-        <startLine>31</startLine>
+        <line>37</line>
+        <index>1083</index>
+        <endIndex>1089</endIndex>
+        <startLine>37</startLine>
         <startColumn>13</startColumn>
-        <endLine>31</endLine>
+        <endLine>37</endLine>
         <endColumn>19</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to DoSearch must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>33</line>
-        <index>768</index>
-        <endIndex>775</endIndex>
-        <startLine>33</startLine>
+        <line>39</line>
+        <index>1120</index>
+        <endIndex>1127</endIndex>
+        <startLine>39</startLine>
         <startColumn>20</startColumn>
-        <endLine>33</endLine>
+        <endLine>39</endLine>
         <endColumn>27</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to Game_MoveApplied must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>40</line>
-        <index>928</index>
-        <endIndex>943</endIndex>
-        <startLine>40</startLine>
+        <line>46</line>
+        <index>1280</index>
+        <endIndex>1295</endIndex>
+        <startLine>46</startLine>
         <startColumn>37</startColumn>
-        <endLine>40</endLine>
+        <endLine>46</endLine>
         <endColumn>52</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to Game_SearchCompleted must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>41</line>
-        <index>987</index>
-        <endIndex>1006</endIndex>
-        <startLine>41</startLine>
+        <line>47</line>
+        <index>1339</index>
+        <endIndex>1358</endIndex>
+        <startLine>47</startLine>
         <startColumn>41</startColumn>
-        <endLine>41</endLine>
+        <endLine>47</endLine>
         <endColumn>60</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to Game_Info must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>42</line>
-        <index>1039</index>
-        <endIndex>1047</endIndex>
-        <startLine>42</startLine>
+        <line>48</line>
+        <index>1391</index>
+        <endIndex>1399</endIndex>
+        <startLine>48</startLine>
         <startColumn>30</startColumn>
-        <endLine>42</endLine>
+        <endLine>48</endLine>
         <endColumn>38</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>51</line>
-        <index>1240</index>
-        <endIndex>1257</endIndex>
-        <startLine>51</startLine>
+        <line>57</line>
+        <index>1592</index>
+        <endIndex>1609</endIndex>
+        <startLine>57</startLine>
         <startColumn>49</startColumn>
-        <endLine>51</endLine>
+        <endLine>57</endLine>
         <endColumn>66</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to Game_MoveApplied must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>54</line>
-        <index>1325</index>
-        <endIndex>1340</endIndex>
-        <startLine>54</startLine>
+        <line>60</line>
+        <index>1677</index>
+        <endIndex>1692</endIndex>
+        <startLine>60</startLine>
         <startColumn>33</startColumn>
-        <endLine>54</endLine>
+        <endLine>60</endLine>
         <endColumn>48</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to Game_SearchCompleted must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>55</line>
-        <index>1380</index>
-        <endIndex>1399</endIndex>
-        <startLine>55</startLine>
+        <line>61</line>
+        <index>1732</index>
+        <endIndex>1751</endIndex>
+        <startLine>61</startLine>
         <startColumn>37</startColumn>
-        <endLine>55</endLine>
+        <endLine>61</endLine>
         <endColumn>56</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to Game_Info must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>56</line>
-        <index>1428</index>
-        <endIndex>1436</endIndex>
-        <startLine>56</startLine>
+        <line>62</line>
+        <index>1780</index>
+        <endIndex>1788</endIndex>
+        <startLine>62</startLine>
         <startColumn>26</startColumn>
-        <endLine>56</endLine>
+        <endLine>62</endLine>
         <endColumn>34</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
+        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
+        <line>81</line>
+        <index>2485</index>
+        <endIndex>2527</endIndex>
+        <startLine>81</startLine>
+        <startColumn>17</startColumn>
+        <endLine>81</endLine>
+        <endColumn>59</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
+        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
+        <line>82</line>
+        <index>2546</index>
+        <endIndex>2548</endIndex>
+        <startLine>82</startLine>
+        <startColumn>17</startColumn>
+        <endLine>82</endLine>
+        <endColumn>19</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
+        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
+        <line>85</line>
+        <index>2665</index>
+        <endIndex>2667</endIndex>
+        <startLine>85</startLine>
+        <startColumn>17</startColumn>
+        <endLine>85</endLine>
+        <endColumn>19</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
+        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
+        <line>87</line>
+        <index>2688</index>
+        <endIndex>2722</endIndex>
+        <startLine>87</startLine>
+        <startColumn>17</startColumn>
+        <endLine>87</endLine>
+        <endColumn>51</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
+        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
+        <line>88</line>
+        <index>2741</index>
+        <endIndex>2743</endIndex>
+        <startLine>88</startLine>
+        <startColumn>17</startColumn>
+        <endLine>88</endLine>
+        <endColumn>19</endColumn>
+        <warning>False</warning>
+      </violation>
+      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
+        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
+        <line>91</line>
+        <index>2867</index>
+        <endIndex>2869</endIndex>
+        <startLine>91</startLine>
+        <startColumn>17</startColumn>
+        <endLine>91</endLine>
+        <endColumn>19</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to OnPieceMoved must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>172</line>
-        <index>5316</index>
-        <endIndex>5327</endIndex>
-        <startLine>172</startLine>
+        <line>178</line>
+        <index>5688</index>
+        <endIndex>5699</endIndex>
+        <startLine>178</startLine>
         <startColumn>19</startColumn>
-        <endLine>172</endLine>
+        <endLine>178</endLine>
         <endColumn>30</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to OnPieceSelected must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>175</line>
-        <index>5472</index>
-        <endIndex>5486</endIndex>
-        <startLine>175</startLine>
+        <line>181</line>
+        <index>5844</index>
+        <endIndex>5858</endIndex>
+        <startLine>181</startLine>
         <startColumn>19</startColumn>
-        <endLine>175</endLine>
+        <endLine>181</endLine>
         <endColumn>33</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to NewGameFromFen must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>178</line>
-        <index>5593</index>
-        <endIndex>5606</endIndex>
-        <startLine>178</startLine>
+        <line>184</line>
+        <index>5965</index>
+        <endIndex>5978</endIndex>
+        <startLine>184</startLine>
         <startColumn>19</startColumn>
-        <endLine>178</endLine>
+        <endLine>184</endLine>
         <endColumn>32</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to DoSearch must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>184</line>
-        <index>5846</index>
-        <endIndex>5853</endIndex>
-        <startLine>184</startLine>
+        <line>190</line>
+        <index>6218</index>
+        <endIndex>6225</endIndex>
+        <startLine>190</startLine>
         <startColumn>59</startColumn>
-        <endLine>184</endLine>
+        <endLine>190</endLine>
         <endColumn>66</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to DoSearch must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>191</line>
-        <index>6114</index>
-        <endIndex>6121</endIndex>
-        <startLine>191</startLine>
+        <line>197</line>
+        <index>6486</index>
+        <endIndex>6493</endIndex>
+        <startLine>197</startLine>
         <startColumn>59</startColumn>
-        <endLine>191</endLine>
+        <endLine>197</endLine>
         <endColumn>66</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>200</line>
-        <index>6357</index>
-        <endIndex>6374</endIndex>
-        <startLine>200</startLine>
+        <line>206</line>
+        <index>6729</index>
+        <endIndex>6746</endIndex>
+        <startLine>206</startLine>
         <startColumn>40</startColumn>
-        <endLine>200</endLine>
+        <endLine>206</endLine>
         <endColumn>57</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to NewGameWhite must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>204</line>
-        <index>6477</index>
-        <endIndex>6488</endIndex>
-        <startLine>204</startLine>
+        <line>210</line>
+        <index>6849</index>
+        <endIndex>6860</endIndex>
+        <startLine>210</startLine>
         <startColumn>17</startColumn>
-        <endLine>204</endLine>
+        <endLine>210</endLine>
         <endColumn>28</endColumn>
         <warning>False</warning>
       </violation>
       <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
         <context>The call to NewGameBlack must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>209</line>
-        <index>6580</index>
-        <endIndex>6591</endIndex>
-        <startLine>209</startLine>
+        <line>215</line>
+        <index>6952</index>
+        <endIndex>6963</endIndex>
+        <startLine>215</startLine>
         <startColumn>20</startColumn>
-        <endLine>209</endLine>
+        <endLine>215</endLine>
         <endColumn>31</endColumn>
         <warning>False</warning>
       </violation>

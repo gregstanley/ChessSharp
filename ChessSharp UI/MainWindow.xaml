@@ -5,10 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ChessSharp_UI"
         mc:Ignorable="d"
-        Title="ChessSharp" Height="762" Width="910" Icon="Images/Icons-40x40-BlackKing.png" WindowStartupLocation="CenterScreen" Cursor="Arrow" Background="#FF858383"  >
+        Title="ChessSharp" Height="800" Width="560" Icon="Images/Icons-40x40-BlackKing.png" WindowStartupLocation="CenterScreen" Cursor="Arrow" Background="#FF858383"  >
     <Grid>
-        <local:GameUserControl x:Name="GameUserControl" Margin="0,0,-3,-171" Height="Auto" HorizontalAlignment="Left" Width="905"/>
-        <Button x:Name="BtnNewGameWhite" Content="New Game as White" HorizontalAlignment="Left" Margin="555,310,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameWhite_Click"/>
-        <Button x:Name="BtnNewGameBlack" Content="New Game as Black" HorizontalAlignment="Left" Margin="690,310,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameBlack_Click"/>
+        <local:GameUserControl x:Name="GameUserControl" Margin="0,0,0,-171" Height="Auto" HorizontalAlignment="Left" Width="902"/>
     </Grid>
 </Window>

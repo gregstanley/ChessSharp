@@ -23,14 +23,41 @@ namespace ChessSharp_UI
 
         public Game Game { get; set; }
 
-        public void NewGameWhite(Game game) =>
+        private void BtnNewGameWhite_Click(object sender, RoutedEventArgs e) =>
+            NewGameWhite(new Game(new BitBoard(), transpositionTable, Colour.White));
+
+        private async void BtnNewGameBlack_Click(object sender, RoutedEventArgs e) =>
+            await NewGameBlack(new Game(new BitBoard(), transpositionTable, Colour.Black));
+
+        private async void GoBtn_Click(object sender, RoutedEventArgs e) =>
+            await NewGameFromFen();
+
+        private void NewGameWhite(Game game) =>
             NewGame(game);
 
-        public Task NewGameBlack(Game game)
+        private Task NewGameBlack(Game game)
         {
             NewGame(game);
 
             return DoSearch();
+        }
+
+        private Task NewGameFromFen()
+        {
+            var gameState = FenHelpers.Parse(FenTextBox.Text);
+
+            var board = BitBoard.FromGameState(gameState);
+
+            var game = new Game(board, transpositionTable, Colour.White);
+
+            if (gameState.ToPlay == Colour.White)
+            {
+                NewGameWhite(game);
+
+                return Task.CompletedTask;
+            }
+
+            return NewGameBlack(game);
         }
 
         private void NewGame(Game game)
@@ -72,17 +99,17 @@ namespace ChessSharp_UI
                 InfoTimeTextBlock.Text = args.Info.GetTimeString();
                 InfoTtTextBlock.Text = args.Info.GetTtString();
 
-                if (args.Info is InfoDepthComplete info2)
-                {
-                    InfoPvTextBlock.Text = info2.GetPvString();
-                    return;
-                }
+                //if (args.Info is InfoDepthComplete info2)
+                //{
+                //    InfoPvTextBlock.Text = info2.GetPvString();
+                //    return;
+                //}
 
-                if (args.Info is InfoNewPv info3)
-                {
-                    InfoPvTextBlock2.Text = info3.GetBestMoveString();
-                    return;
-                }
+                //if (args.Info is InfoNewPv info3)
+                //{
+                //    InfoPvTextBlock2.Text = info3.GetBestMoveString();
+                //    return;
+                //}
             }));
         }
 
@@ -174,9 +201,6 @@ namespace ChessSharp_UI
         private async void BoardUserControl_PieceSelected(object sender, PromotionTypeSelectedEventArgs args) =>
             await OnPieceSelected(args);
 
-        private async void GoBtn_Click(object sender, RoutedEventArgs e) =>
-            await NewGameFromFen();
-
         private Task OnPieceMoved(UserMovedPieceEventArgs args)
         {
             var move = Game.TryMove(args.FromSquareIndex, args.ToSquareIndex, PieceType.None);
@@ -189,24 +213,6 @@ namespace ChessSharp_UI
             var move = Game.TryMove(args.FromSquareIndex, args.ToSquareIndex, args.PieceType);
 
             return move.Value == 0 ? Task.CompletedTask : DoSearch();
-        }
-
-        private Task NewGameFromFen()
-        {
-            var gameState = FenHelpers.Parse(FenTextBox.Text);
-
-            var board = BitBoard.FromGameState(gameState);
-
-            var game = new Game(board, transpositionTable, Colour.White);
-
-            if (gameState.ToPlay == Colour.White)
-            {
-                NewGameWhite(game);
-
-                return Task.CompletedTask;
-            }
-
-            return NewGameBlack(game);
         }
 
         private async Task DoSearch()

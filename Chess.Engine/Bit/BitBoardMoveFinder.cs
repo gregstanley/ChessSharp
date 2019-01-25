@@ -23,32 +23,15 @@ namespace Chess.Engine.Bit
             var moves = new List<Move>(256);
             
             foreach (var square in squares)
-            {
                 FindMoves(moves, board, enPassantSquare, colour, square, withCastles);
-                //var pieceMoves = FindMoves(moves, board, enPassantSquare, colour, square, withCastles);
-
-                //if (pieceMoves.Any())
-                //    moves.AddRange(pieceMoves);
-            };
 
             return moves;
         }
 
-
         public void FindMoves(List<Move> moves, BitBoard board, SquareFlag enPassantSquare, Colour colour, IReadOnlyCollection<SquareState> squareStates, bool withCastles = true)
         {
-            //var moves = new List<Move>(200);
-
             foreach (var squareState in squareStates)
-            {
                 FindMoves(moves, board, enPassantSquare, colour, squareState.Square, withCastles);
-                //var pieceMoves = FindMoves(moves, board, enPassantSquare, colour, squareState.Square, withCastles);
-
-                //if (pieceMoves.Any())
-                //    moves.AddRange(pieceMoves);
-            };
-
-            //return moves;
         }
 
         private void FindMoves(List<Move> moves, BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square, bool withCastles = true)
@@ -56,17 +39,10 @@ namespace Chess.Engine.Bit
             var pieceType = board.GetPieceType(square);
             var possibleSquares = GetStandardCoveredSquares(board, colour, square, pieceType);
 
-            //var moves = new List<Move>();
-
             var startRankFile = square.ToRankFile();
 
             if (pieceType == PieceType.Pawn)
-            {
                 PawnMoves(moves, board, enPassantSquare, colour, square);
-                //var pawnMoves = PawnMoves(moves, board, enPassantSquare, colour, square);
-
-                //moves.AddRange(pawnMoves);
-            }
 
             if (pieceType == PieceType.Rook && withCastles)
             {
@@ -85,14 +61,10 @@ namespace Chess.Engine.Bit
                 else
                     moves.Add(new Move(colour, pieceType, RankFile.Get(startRankFile.Rank, startRankFile.File), RankFile.Get(rankFile.Rank, rankFile.File)));
             }
-
-            //return moves;
         }
 
         private List<Move> PawnMoves(List<Move> moves, BitBoard board, SquareFlag enPassantSquare, Colour colour, SquareFlag square)
         {
-            //var moves = new List<Move>();
-
             var startRankFile = square.ToRankFile();
             var stride = board.GetPieceColour(square) == Colour.White ? 8 : -8;
             var captureStride1 = stride + 1;
@@ -267,8 +239,6 @@ namespace Chess.Engine.Bit
             {
                 var piece = board.GetPiece(availableCaptureSquare1);
 
-                //if (board.GetPieceType(availableCaptureSquare1) != PieceType.None
-                //    && board.GetPieceColour(availableCaptureSquare1) != colour
                 if(piece.Type != PieceType.None && piece.Colour != colour
                     && !HasWrapped(captureStride1, To(square, availableCaptureSquare1)))
                     outSquares.Add(availableCaptureSquare1);
@@ -278,8 +248,6 @@ namespace Chess.Engine.Bit
             {
                 var piece = board.GetPiece(availableCaptureSquare2);
 
-                //if (board.GetPieceType(availableCaptureSquare2) != PieceType.None
-                //    && board.GetPieceColour(availableCaptureSquare2) != colour
                 if (piece.Type != PieceType.None && piece.Colour != colour
                     && !HasWrapped(captureStride2, To(square, availableCaptureSquare2)))
                     outSquares.Add(availableCaptureSquare2);
@@ -421,9 +389,6 @@ namespace Chess.Engine.Bit
 
         public bool IsCheck(BitBoard board, Colour colour, SquareFlag square)
         {
-            if (square.ToBoardIndex() == -1)
-            { var bp = true; }
-
             var attackedByPawn = FindPawnsAttackingThisSquare(board, colour, square);
 
             if (attackedByPawn.Any())
@@ -506,9 +471,6 @@ namespace Chess.Engine.Bit
 
         public List<SquareState> FindPiecesAttackingThisSquare(BitBoard board, Colour colour, SquareFlag square)
         {
-            if (square.ToBoardIndex() == -1)
-            { var bp = true; }
-
             var squares = new List<SquareState>();
 
             if (colour == Colour.None)
@@ -602,38 +564,12 @@ namespace Chess.Engine.Bit
                 if (attackedByKing.Any())
                     squares.AddRange(attackedByKing);
             }
-            //var attackedByRook = GetStandardCoveredSquares(board, colour, square, PieceType.Rook)
-            //    .Where(whereRook);
-
-            //if (attackedByRook.Any())
-            //    squares.AddRange(attackedByRook);
-
-            //var attackedByBishop = GetStandardCoveredSquares(board, colour, square, PieceType.Bishop)
-            //    .Where(whereBishop);
-
-            //if (attackedByBishop.Any())
-            //    squares.AddRange(attackedByBishop);
-
-            //var attackedByQueen = GetStandardCoveredSquares(board, colour, square, PieceType.Queen)
-            //    .Where(whereQueen);
-
-            //if (attackedByQueen.Any())
-            //    squares.AddRange(attackedByQueen);
-
-            //var attackedByKing = GetStandardCoveredSquares(board, colour, square, PieceType.King)
-            //    .Where(whereKing);
-
-            //if (attackedByKing.Any())
-            //    squares.AddRange(attackedByKing);
 
             return squares;
         }
 
         public List<SquareState> FindPiecesAttackingThisSquare2(BitBoard board, Colour colour, SquareFlag square)
         {
-            if (square.ToBoardIndex() == -1)
-            { var bp = true; }
-
             var squares = new List<SquareState>();
 
             Func<SquareState, bool> opponentColour = ss => ss.Colour == colour.Opposite();
@@ -854,16 +790,11 @@ namespace Chess.Engine.Bit
 
             if (opponentSquares.HasFlag(currentSquare))
             {
-                //var pieceType = board.GetPieceType(currentSquare);
-
-                //outSquares.Add(new SquareState(currentSquare, new Piece(opponentColour, pieceType)));
-
                 outSquares.Add(ss);
 
                 return outSquares;
             }
 
-            //outSquares.Add(new SquareState(currentSquare));
             outSquares.Add(ss);
 
             return outSquares;
@@ -888,7 +819,6 @@ namespace Chess.Engine.Bit
             var outSquares = new List<SquareState>();
             var mySquares = colour == Colour.White ? board.White : board.Black;
 
-            //var opponentSquares = colour == Colour.White ? board.Black : board.White;
             var currentStep = 1;
             var currentSquare = square;
             var startRankFile = square.ToRankFile();
