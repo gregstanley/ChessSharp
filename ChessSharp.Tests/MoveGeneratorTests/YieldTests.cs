@@ -20,15 +20,15 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("k7/2Q5/8/4p3/3K1P2/2q5/8/8 w - - 0 1");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves1 = new List<uint>(64);
 
-            MoveGenerator.Generate(0, bitBoard, Colour.White, moves1);
+            MoveGenerator.Generate(0, board, Colour.White, moves1);
 
             var moves2 = new List<uint>(64);
 
-            foreach (var move in MoveGenerator.GenerateStream(0, bitBoard, Colour.White))
+            foreach (var move in MoveGenerator.GenerateStream(0, board, Colour.White))
                 moves2.Add(move);
 
             var moveViews1 = moves1.Select(x => new MoveViewer(x));

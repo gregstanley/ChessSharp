@@ -31,7 +31,7 @@ namespace ChessSharp.Engine
 
         public int PositionCount { get; private set; }
 
-        public SearchResults Go(BitBoard bitBoard, Colour colour, int maxDepth)
+        public SearchResults Go(Board board, Colour colour, int maxDepth)
         {
             stopWatch.Restart();
 
@@ -39,11 +39,11 @@ namespace ChessSharp.Engine
 
             transpositionTable.NextIteration();
 
-            var transpositionKey = bitBoard.Key;
+            var transpositionKey = board.Key;
 
             var nodeMoves = new List<uint>(256);
 
-            moveGenerator.Generate(bitBoard, colour, nodeMoves);
+            moveGenerator.Generate(board, colour, nodeMoves);
 
             var moveEvaluations = new List<MoveEvaluation>(128);
 
@@ -95,11 +95,11 @@ namespace ChessSharp.Engine
 
                     var moveView = new MoveViewer(move);
 
-                    bitBoard.MakeMove(move);
+                    board.MakeMove(move);
 
-                    var evaluatedScore = -PrincipalVariationSearch(bitBoard, colour.Opposite(), nextDepth, 1, int.MinValue, int.MaxValue, principalVariation);
+                    var evaluatedScore = -PrincipalVariationSearch(board, colour.Opposite(), nextDepth, 1, int.MinValue, int.MaxValue, principalVariation);
 
-                    bitBoard.UnMakeMove(move);
+                    board.UnMakeMove(move);
 
                     if (evaluatedScore > bestScore)
                     {
@@ -141,14 +141,14 @@ namespace ChessSharp.Engine
             return new SearchResults(PositionCount, iterationLaps, moveEvaluations, principalVariations, transpositionTable);
         }
 
-        private int PrincipalVariationSearch(BitBoard bitBoard, Colour colour, byte depth, ushort ply, int alpha, int beta, uint[] parentPrincipalVariation)
+        private int PrincipalVariationSearch(Board board, Colour colour, byte depth, ushort ply, int alpha, int beta, uint[] parentPrincipalVariation)
         {
             ++PositionCount;
 
             if (depth == 0)
-                return positionEvaluator.Evaluate(bitBoard) * (colour == Colour.White ? 1 : -1);
+                return positionEvaluator.Evaluate(board) * (colour == Colour.White ? 1 : -1);
 
-            var transpositionKey = bitBoard.Key;
+            var transpositionKey = board.Key;
 
             var existingTransposition = transpositionTable.Find(transpositionKey);
 
@@ -170,9 +170,9 @@ namespace ChessSharp.Engine
 
             var moveCount = 1;
 
-            foreach (var move in GetNextMove(moveGenerator, ply, bitBoard, colour, previousBestMove))
+            foreach (var move in GetNextMove(moveGenerator, ply, board, colour, previousBestMove))
             {
-                bitBoard.MakeMove(move);
+                board.MakeMove(move);
 
                 var evaluatedScore = 0;
 
@@ -185,7 +185,7 @@ namespace ChessSharp.Engine
                 if (moveCount == 1)
                 {
                     // Always do a full search on the first/PV move
-                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -beta, -alpha, principalVariation);
+                    evaluatedScore = -PrincipalVariationSearch(board, oppositeColour, nextDepth, nextPly, -beta, -alpha, principalVariation);
                 }
                 else
                 {
@@ -194,16 +194,16 @@ namespace ChessSharp.Engine
                         --nextDepth;
 
                     // Search with aspiration window
-                    evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -alpha - 1, -alpha, principalVariation);
+                    evaluatedScore = -PrincipalVariationSearch(board, oppositeColour, nextDepth, nextPly, -alpha - 1, -alpha, principalVariation);
 
                     if (alpha < evaluatedScore && evaluatedScore < beta)
                     {
                         // Re-search
-                        evaluatedScore = -PrincipalVariationSearch(bitBoard, oppositeColour, nextDepth, nextPly, -beta, -evaluatedScore, principalVariation);
+                        evaluatedScore = -PrincipalVariationSearch(board, oppositeColour, nextDepth, nextPly, -beta, -evaluatedScore, principalVariation);
                     }
                 }
 
-                bitBoard.UnMakeMove(move);
+                board.UnMakeMove(move);
 
                 if (alpha < evaluatedScore)
                 {
@@ -243,12 +243,12 @@ namespace ChessSharp.Engine
             return alpha;
         }
 
-        private IEnumerable<uint> GetNextMove(MoveGenerator moveGenerator, ushort ply, BitBoard bitBoard, Colour colour, uint previousBestMove)
+        private IEnumerable<uint> GetNextMove(MoveGenerator moveGenerator, ushort ply, Board board, Colour colour, uint previousBestMove)
         {
             if (previousBestMove > 0)
                 yield return previousBestMove;
 
-            foreach (var move in moveGenerator.GenerateStream(ply, bitBoard, colour))
+            foreach (var move in moveGenerator.GenerateStream(ply, board, colour))
             {
                 if (move == previousBestMove)
                     continue;

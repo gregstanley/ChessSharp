@@ -4,13 +4,13 @@ using System;
 
 namespace ChessSharp.Models
 {
-    public class RelativeBitBoard
+    public class RelativeBoard
     {    
-        public RelativeBitBoard()
+        public RelativeBoard()
         {
         }
 
-        public RelativeBitBoard(
+        public RelativeBoard(
             Colour colour,
             SquareFlag myPawns,
             SquareFlag myRooks, 

@@ -12,7 +12,7 @@ namespace ChessSharp.Engine
 {
     public class Game : IGame
     {
-        private readonly BitBoard bitBoard;
+        private readonly Board board;
 
         private readonly MoveGenerator moveGenerator;
 
@@ -24,9 +24,9 @@ namespace ChessSharp.Engine
 
         private List<GameHistoryNode> drawBuffer = new List<GameHistoryNode>(256);
 
-        public Game(BitBoard board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
+        public Game(Board board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
         {
-            bitBoard = board;
+            this.board = board;
 
             HumanColour = humanColour;
             CpuColour = humanColour.Opposite();
@@ -41,11 +41,11 @@ namespace ChessSharp.Engine
 
             var moves = new List<uint>();
 
-            moveGenerator.Generate(bitBoard, Colour.White, moves);
+            moveGenerator.Generate(board, Colour.White, moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
 
-            history.Push(new GameHistoryNode(bitBoard.History.First(), GetGameState()));
+            history.Push(new GameHistoryNode(board.History.First(), GetGameState()));
         }
 
         public delegate void InvalidMoveEventDelegate(object sender, InvalidMoveEventArgs args);
@@ -122,7 +122,7 @@ namespace ChessSharp.Engine
             var move = TryPromotions(fromSquare, toSquare, AvailableMoves, promotionPieceType);
 
             if (move.Value == 0)
-                move = TryCastles(bitBoard, HumanColour, fromSquare, toSquare, AvailableMoves);
+                move = TryCastles(board, HumanColour, fromSquare, toSquare, AvailableMoves);
 
             if (move.Value == 0)
                 move = AvailableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare) ?? new MoveViewer(0);
@@ -137,7 +137,7 @@ namespace ChessSharp.Engine
             if (chosenMove == null)
                 return new MoveViewer(0);
 
-            ApplyMove(bitBoard, CpuColour, chosenMove);
+            ApplyMove(board, CpuColour, chosenMove);
 
             return chosenMove;
         }
@@ -146,7 +146,7 @@ namespace ChessSharp.Engine
         {
             SearchStarted?.Invoke(this, new EventArgs());
 
-            var searchResults = await Task.Run(() => search.Go(bitBoard, CpuColour, maxDepth));
+            var searchResults = await Task.Run(() => search.Go(board, CpuColour, maxDepth));
 
             SearchCompleted?.Invoke(this, new SearchCompleteEventArgs(searchResults));
 
@@ -157,7 +157,7 @@ namespace ChessSharp.Engine
             if (chosenMove == null)
                 return new MoveViewer(0);
 
-            ApplyMove(bitBoard, CpuColour, chosenMove.Move);
+            ApplyMove(board, CpuColour, chosenMove.Move);
 
             return chosenMove.Move;
         }
@@ -178,7 +178,7 @@ namespace ChessSharp.Engine
                     return new MoveViewer(0);
                 }
 
-                ApplyMove(bitBoard, HumanColour, move);
+                ApplyMove(board, HumanColour, move);
 
                 return move;
             }
@@ -202,7 +202,7 @@ namespace ChessSharp.Engine
                 return new MoveViewer(0);
             }
 
-            ApplyMove(bitBoard, HumanColour, move);
+            ApplyMove(board, HumanColour, move);
 
             return move;
         }
@@ -255,16 +255,16 @@ namespace ChessSharp.Engine
             }
         }
 
-        private MoveViewer TryCastles(BitBoard bitBoard, Colour colour, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
+        private MoveViewer TryCastles(Board board, Colour colour, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
         {
             if (colour == Colour.White && fromSquare == SquareFlagConstants.WhiteKingStartSquare)
             {
-                if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare && bitBoard.WhiteCanCastleKingSide)
+                if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare && board.WhiteCanCastleKingSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
                         ?? new MoveViewer(0);
                 }
-                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && bitBoard.WhiteCanCastleQueenSide)
+                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && board.WhiteCanCastleQueenSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
                         ?? new MoveViewer(0);
@@ -273,12 +273,12 @@ namespace ChessSharp.Engine
 
             if (colour == Colour.Black && fromSquare == SquareFlagConstants.BlackKingStartSquare)
             {
-                if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare && bitBoard.BlackCanCastleKingSide)
+                if (toSquare == SquareFlagConstants.BlackKingSideRookStartSquare && board.BlackCanCastleKingSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
                         ?? new MoveViewer(0);
                 }
-                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && bitBoard.BlackCanCastleQueenSide)
+                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && board.BlackCanCastleQueenSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
                         ?? new MoveViewer(0);
@@ -288,9 +288,9 @@ namespace ChessSharp.Engine
             return new MoveViewer(0);
         }
 
-        private void ApplyMove(BitBoard bitBoard, Colour colour, MoveViewer move)
+        private void ApplyMove(Board board, Colour colour, MoveViewer move)
         {
-            bitBoard.MakeMove(move.Value);
+            board.MakeMove(move.Value);
 
             Ply++;
 
@@ -301,7 +301,7 @@ namespace ChessSharp.Engine
 
             var gameState = GetGameState();
 
-            var currentState = bitBoard.CurrentState;
+            var currentState = board.CurrentState;
 
             var historyItem = new GameHistoryNode(currentState, gameState);
 
@@ -323,7 +323,7 @@ namespace ChessSharp.Engine
 
             var moves = new List<uint>();
 
-            moveGenerator.Generate(bitBoard, colour.Opposite(), moves);
+            moveGenerator.Generate(board, colour.Opposite(), moves);
 
             AvailableMoves = moves.Select(x => new MoveViewer(x));
 
@@ -355,14 +355,14 @@ namespace ChessSharp.Engine
                 if (nextItem.IsIrreversible)
                     break;
 
-                if (nextItem.Key == bitBoard.Key)
+                if (nextItem.Key == board.Key)
                     ++previousCount;
             }
 
             return previousCount >= 2 ? true : false;
         }
 
-        private int Evaluate() => positionEvaluator.Evaluate(bitBoard);
+        private int Evaluate() => positionEvaluator.Evaluate(board);
 
         private GameState GetGameState() =>
             new GameState(
@@ -370,22 +370,22 @@ namespace ChessSharp.Engine
                 ToPlay,
                 HalfMoveClock,
                 FullTurn,
-                bitBoard.WhiteCanCastleKingSide,
-                bitBoard.WhiteCanCastleQueenSide,
-                bitBoard.BlackCanCastleKingSide,
-                bitBoard.BlackCanCastleQueenSide,
-                bitBoard.WhitePawns,
-                bitBoard.WhiteRooks,
-                bitBoard.WhiteKnights,
-                bitBoard.WhiteBishops,
-                bitBoard.WhiteQueens,
-                bitBoard.WhiteKing,
-                bitBoard.BlackPawns,
-                bitBoard.BlackRooks,
-                bitBoard.BlackKnights,
-                bitBoard.BlackBishops,
-                bitBoard.BlackQueens,
-                bitBoard.BlackKing,
-                bitBoard.EnPassant);
+                board.WhiteCanCastleKingSide,
+                board.WhiteCanCastleQueenSide,
+                board.BlackCanCastleKingSide,
+                board.BlackCanCastleQueenSide,
+                board.WhitePawns,
+                board.WhiteRooks,
+                board.WhiteKnights,
+                board.WhiteBishops,
+                board.WhiteQueens,
+                board.WhiteKing,
+                board.BlackPawns,
+                board.BlackRooks,
+                board.BlackKnights,
+                board.BlackBishops,
+                board.BlackQueens,
+                board.BlackKing,
+                board.EnPassant);
     }
 }

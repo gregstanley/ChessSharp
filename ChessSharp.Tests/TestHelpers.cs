@@ -4,7 +4,7 @@ namespace ChessSharp.Tests
 {
     public static class TestHelpers
     {
-        public static void AssertEqual(BitBoard a, BitBoard b)
+        public static void AssertEqual(Board a, Board b)
         {
             Assert.Equal(a.WhitePawns, b.WhitePawns);
             Assert.Equal(a.WhiteRooks, b.WhiteRooks);

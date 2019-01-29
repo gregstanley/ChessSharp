@@ -14,7 +14,7 @@ namespace ChessSharp.MoveGeneration
 
         public MoveGenerator MoveGenerator { get; }
 
-        public void Go(BitBoard bitBoard, Colour colour, int depth, IDictionary<int, PerftMetrics> metrics)
+        public void Go(Board board, Colour colour, int depth, IDictionary<int, PerftMetrics> metrics)
         {
             var moves = new List<uint>[256];
 
@@ -27,7 +27,7 @@ namespace ChessSharp.MoveGeneration
             var nodeMoves = moves[depth];
             var depthMetrics = metrics[depth];
 
-            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            MoveGenerator.Generate(board, colour, nodeMoves);
 
             var movesView = nodeMoves.Select(x => new MoveViewer(x));
 
@@ -44,17 +44,17 @@ namespace ChessSharp.MoveGeneration
                 if (!depthMetrics.Moves.Where(x => x.Value == move).Any())
                     depthMetrics.Moves.Add(moveView);
 
-                bitBoard.MakeMove(move);
+                board.MakeMove(move);
 
-                //var checkers = GetCheckers(bitBoard, colour);
+                ////var checkers = GetCheckers(board, colour);
                 
-                InnerPerft(bitBoard, colour.Opposite(), depth - 1, moves, metrics);
+                InnerPerft(board, colour.Opposite(), depth - 1, moves, metrics);
 
-                bitBoard.UnMakeMove(move);
+                board.UnMakeMove(move);
             }
         }
 
-        private void InnerPerft(BitBoard bitBoard, Colour colour, int depth, List<uint>[] moves, IDictionary<int, PerftMetrics> metrics)
+        private void InnerPerft(Board board, Colour colour, int depth, List<uint>[] moves, IDictionary<int, PerftMetrics> metrics)
         {
             if (depth == 0)
                 return;
@@ -65,7 +65,7 @@ namespace ChessSharp.MoveGeneration
             // Must wipe any existing moves each time we enter a depth
             nodeMoves.Clear();
 
-            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            MoveGenerator.Generate(board, colour, nodeMoves);
 
             var movesView = nodeMoves.Select(x => new MoveViewer(x));
 
@@ -84,19 +84,19 @@ namespace ChessSharp.MoveGeneration
                 if (!depthMetrics.Moves.Where(x => x.Value == move).Any())
                     depthMetrics.Moves.Add(moveView);
 
-                bitBoard.MakeMove(move);
+                board.MakeMove(move);
 
-                //var checkers = GetCheckers(bitBoard, colour);
+                ////var checkers = GetCheckers(board, colour);
 
-                InnerPerft(bitBoard, colour.Opposite(), depth - 1, moves, metrics);
+                InnerPerft(board, colour.Opposite(), depth - 1, moves, metrics);
 
-                bitBoard.UnMakeMove(move);
+                board.UnMakeMove(move);
             }
         }
 
-        //private SquareFlag GetCheckers(BitBoard bitBoard, Colour colour)
+        //private SquareFlag GetCheckers(BitBoard board, Colour colour)
         //{
-        //    var relativeBitBoard = bitBoard.RelativeTo(colour);
+        //    var relativeBitBoard = board.RelativeTo(colour);
 
         //    var checkersPawn = MoveGenerator.GetPawnCheckers(relativeBitBoard, relativeBitBoard.MyKing);
         //    var checkersKnight = MoveGenerator.GetKnightCheckers(relativeBitBoard, relativeBitBoard.MyKing);

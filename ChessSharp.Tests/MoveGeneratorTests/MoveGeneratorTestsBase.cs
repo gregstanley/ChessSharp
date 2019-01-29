@@ -71,10 +71,10 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             .Select(x => new MoveViewer(x))
             .ToList();
 
-        protected BitBoard CreateBitBoard(string fenString) =>
-            BitBoard.FromGameState(FenHelpers.Parse(fenString));
+        protected Board CreateBoard(string fenString) =>
+            Board.FromGameState(FenHelpers.Parse(fenString));
 
-        protected BitBoard CreateBitBoard(GameState gameState) =>
-            BitBoard.FromGameState(gameState);
+        protected Board CreateBoard(GameState gameState) =>
+            Board.FromGameState(gameState);
     }
 }

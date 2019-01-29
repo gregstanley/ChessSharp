@@ -14,11 +14,11 @@ namespace ChessSharp.Tests
 
         public MoveGenerator MoveGenerator { get; }
 
-        public List<MovePerft> Go(BitBoard bitBoard, Colour colour, int depth)
+        public List<MovePerft> Go(BitBoard board, Colour colour, int depth)
         {
             var moves = new List<uint>(256);
 
-            MoveGenerator.Generate(bitBoard, colour, moves);
+            MoveGenerator.Generate(board, colour, moves);
 
             var count = 0;
 
@@ -30,30 +30,30 @@ namespace ChessSharp.Tests
             {
                 var moveView = new MoveViewer(move);
 
-                bitBoard.MakeMove(move);
+                board.MakeMove(move);
 
-                var checkers = GetCheckers(bitBoard, colour);
+                var checkers = GetCheckers(board, colour);
 
-                var nodes = InnerPerft(bitBoard, colour.Opposite(), depth - 1);
+                var nodes = InnerPerft(board, colour.Opposite(), depth - 1);
 
                 count += nodes;
 
                 movePerfts.Add(new MovePerft(moveView, nodes));
 
-                bitBoard.UnMakeMove(move);
+                board.UnMakeMove(move);
             }
 
             return movePerfts;
         }
 
-        private int InnerPerft(BitBoard bitBoard, Colour colour, int depth)
+        private int InnerPerft(BitBoard board, Colour colour, int depth)
         {
             if (depth == 0)
                 return 1;
 
             var moves = new List<uint>(256);
 
-            MoveGenerator.Generate(bitBoard, colour, moves);
+            MoveGenerator.Generate(board, colour, moves);
 
             var count = 0;
 
@@ -66,25 +66,25 @@ namespace ChessSharp.Tests
             {
                 var moveView = new MoveViewer(move);
 
-                bitBoard.MakeMove(move);
+                board.MakeMove(move);
 
-                var checkers = GetCheckers(bitBoard, colour);
+                var checkers = GetCheckers(board, colour);
 
-                var nodes = InnerPerft(bitBoard, colour.Opposite(), depth - 1);
+                var nodes = InnerPerft(board, colour.Opposite(), depth - 1);
 
                 count += nodes;
 
                 movePerfts.Add(new MovePerft(moveView, nodes));
 
-                bitBoard.UnMakeMove(move);
+                board.UnMakeMove(move);
             }
 
             return count;
         }
 
-        private SquareFlag GetCheckers(BitBoard bitBoard, Colour colour)
+        private SquareFlag GetCheckers(BitBoard board, Colour colour)
         {
-            var relativeBitBoard = bitBoard.ToRelative(colour);
+            var relativeBitBoard = board.ToRelative(colour);
 
             var checkersPawn = MoveGenerator.GetPawnCheckers(relativeBitBoard, relativeBitBoard.MyKing);
             var checkersKnight = MoveGenerator.GetKnightCheckers(relativeBitBoard, relativeBitBoard.MyKing);

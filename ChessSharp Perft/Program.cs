@@ -8,9 +8,9 @@ using System.Linq;
 
 namespace ChessSharp_Perft
 {
-    class Program
+    public class Program
     {
-        static void Main(string[] args)
+        internal static void Main(string[] args)
         {
             Console.WriteLine("ChessSharp Perft");
 
@@ -24,8 +24,8 @@ namespace ChessSharp_Perft
 
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = BitBoard.FromGameState(gameState);
-            var bitBoardReference = BitBoard.FromGameState(gameState);
+            var board = Board.FromGameState(gameState);
+            var boardReference = Board.FromGameState(gameState);
 
             Console.WriteLine("Press any key to begin");
 
@@ -33,15 +33,15 @@ namespace ChessSharp_Perft
 
             Console.WriteLine($"Starting perft for {fenString} depth 2");
 
-            PerftDepth(perftRunner, bitBoard, gameState, 2);
+            PerftDepth(perftRunner, board, gameState, 2);
 
             Console.WriteLine($"Starting perft for {fenString} depth 3");
 
-            PerftDepth(perftRunner, bitBoard, gameState, 3);
+            PerftDepth(perftRunner, board, gameState, 3);
 
             Console.WriteLine($"Starting perft for {fenString} depth 4");
 
-            PerftDepth(perftRunner, bitBoard, gameState, 4);
+            PerftDepth(perftRunner, board, gameState, 4);
 
             var results = new List<double>();
 
@@ -55,7 +55,7 @@ namespace ChessSharp_Perft
             {
                 Console.WriteLine($"Starting perft for {fenString} depth 5 - iteration {i + 1}");
 
-                var result = PerftDepth(perftRunner, bitBoard, gameState, 5);
+                var result = PerftDepth(perftRunner, board, gameState, 5);
 
                 results.Add(result);
             }
@@ -69,7 +69,7 @@ namespace ChessSharp_Perft
             Console.ReadKey();
         }
 
-        private static double PerftDepth(PerftRunner perftRunner, BitBoard bitBoard, GameState gameState, ushort depth)
+        private static double PerftDepth(PerftRunner perftRunner, Board board, GameState gameState, ushort depth)
         {
             var moves = new List<uint>(20);
 
@@ -77,7 +77,7 @@ namespace ChessSharp_Perft
 
             stopWatch.Start();
 
-            var movePerfts = perftRunner.Go(bitBoard, gameState.ToPlay, depth);
+            var movePerfts = perftRunner.Go(board, gameState.ToPlay, depth);
 
             stopWatch.Stop();
 

@@ -32,29 +32,29 @@ namespace ChessSharp.MoveGeneration
                 workspaces[i] = new MoveGenerationWorkspace(i);
         }
 
-        public void Generate(BitBoard bitBoard, Colour colour, IList<uint> moves)
+        public void Generate(Board board, Colour colour, IList<uint> moves)
         {
-            foreach (var move in GenerateStream(0, bitBoard, colour))
+            foreach (var move in GenerateStream(0, board, colour))
                 moves.Add(move);
         }
 
-        public void Generate(ushort depth, BitBoard bitBoard, Colour colour, IList<uint> moves)
+        public void Generate(ushort depth, Board board, Colour colour, IList<uint> moves)
         {
             if (depth >= workspaces.Length)
                 throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
 
-            foreach (var move in GenerateStream(depth, bitBoard, colour))
+            foreach (var move in GenerateStream(depth, board, colour))
                 moves.Add(move);
         }
 
-        public IEnumerable<uint> GenerateStream(ushort depth, BitBoard bitBoard, Colour colour)
+        public IEnumerable<uint> GenerateStream(ushort depth, Board board, Colour colour)
         {
             if (depth >= workspaces.Length)
                 throw new ArgumentException($"No buffers available for depth {depth}", nameof(depth));
 
             var workspace = workspaces[depth];
 
-            var relativeBitBoard = workspace.Reset(bitBoard, colour);
+            var relativeBitBoard = workspace.Reset(board, colour);
 
             var kingSquare = relativeBitBoard.MyKing.ToSquare();
 
@@ -798,7 +798,7 @@ namespace ChessSharp.MoveGeneration
             }
         }
 
-        private void AddIndividualKnightMoves(MoveGenerationWorkspace workspace, RelativeBitBoard relativeBitBoard, Square fromSquare, SquareFlag legalMask)
+        private void AddIndividualKnightMoves(MoveGenerationWorkspace workspace, RelativeBoard relativeBitBoard, Square fromSquare, SquareFlag legalMask)
         {
             var attackableSquaresIncludingSelfCaptures = AttackBitmaps.KnightAttacks[fromSquare.Index];
             var attackableSquares = attackableSquaresIncludingSelfCaptures & ~relativeBitBoard.MySquares;

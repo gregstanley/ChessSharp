@@ -24,10 +24,10 @@ namespace ChessSharp_UI
         public Game Game { get; set; }
 
         private void BtnNewGameWhite_Click(object sender, RoutedEventArgs e) =>
-            NewGameWhite(new Game(new BitBoard(), transpositionTable, Colour.White));
+            NewGameWhite(new Game(new Board(), transpositionTable, Colour.White));
 
         private async void BtnNewGameBlack_Click(object sender, RoutedEventArgs e) =>
-            await NewGameBlack(new Game(new BitBoard(), transpositionTable, Colour.Black));
+            await NewGameBlack(new Game(new Board(), transpositionTable, Colour.Black));
 
         private async void GoBtn_Click(object sender, RoutedEventArgs e) =>
             await NewGameFromFen();
@@ -46,7 +46,7 @@ namespace ChessSharp_UI
         {
             var gameState = FenHelpers.Parse(FenTextBox.Text);
 
-            var board = BitBoard.FromGameState(gameState);
+            var board = Board.FromGameState(gameState);
 
             var game = new Game(board, transpositionTable, Colour.White);
 
@@ -75,7 +75,7 @@ namespace ChessSharp_UI
             }
             else
             {
-                Game = new Game(new BitBoard(), transpositionTable, Colour.White);
+                Game = new Game(new Board(), transpositionTable, Colour.White);
             }
 
             Game.MoveApplied += Game_MoveApplied;

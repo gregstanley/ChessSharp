@@ -23,11 +23,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             // This is mainly checking the pawn check magic bitboards as it uses them
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -57,11 +57,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
 
@@ -81,11 +81,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
 
@@ -101,11 +101,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
             
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var kingMoves = GetKingMoveViews(moves);
 
@@ -127,11 +127,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -151,11 +151,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -167,11 +167,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("k7/2Q5/8/4p3/3K1P2/8/8/8 w - - 0 1");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -185,11 +185,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("k7/2Q5/8/4p3/3K1P2/2q5/8/8 w - - 0 1");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 
 namespace ChessSharp
 {
-    public class BitBoard : IPieceMap
+    public class Board : IPieceMap
     {
         private const StateFlag DefaultState =
             StateFlag.WhiteCanCastleKingSide
@@ -19,7 +19,7 @@ namespace ChessSharp
 
         private Stack<BoardStateInfo> history = new Stack<BoardStateInfo>(256);
 
-        public BitBoard()
+        public Board()
         {
             WhitePawns = SquareFlag.A2 | SquareFlag.B2 | SquareFlag.C2 | SquareFlag.D2
                 | SquareFlag.E2 | SquareFlag.F2 | SquareFlag.G2 | SquareFlag.H2;
@@ -43,7 +43,7 @@ namespace ChessSharp
             history.Push(new BoardStateInfo(Key, 0, DefaultState, 0));
         }
 
-        public BitBoard(
+        public Board(
             SquareFlag whitePawns,
             SquareFlag whiteRooks,
             SquareFlag whiteKnights,
@@ -130,7 +130,7 @@ namespace ChessSharp
 
         public BoardStateInfo CurrentState => history.Peek();
 
-        public static BitBoard FromGameState(GameState gameState)
+        public static Board FromGameState(GameState gameState)
         {
             var boardState = (StateFlag)0;
 
@@ -146,7 +146,7 @@ namespace ChessSharp
             if (gameState.BlackCanCastleQueenSide)
                 boardState |= StateFlag.BlackCanCastleQueenSide;
 
-            return new BitBoard(
+            return new Board(
                 gameState.WhitePawns,
                 gameState.WhiteRooks,
                 gameState.WhiteKnights,

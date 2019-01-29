@@ -19,7 +19,7 @@ namespace ChessSharp.Engine
             PieceValues.Init();
         }
 
-        public int Evaluate(BitBoard bitBoard)
+        public int Evaluate(Board board)
         {
             var whiteScore = 0;
             var blackScore = 0;
@@ -32,21 +32,16 @@ namespace ChessSharp.Engine
             var buffer1 = new ulong[4];
             var buffer2 = new ulong[4];
 
-            foreach (var squareIndex in bitBoard.White.ToSquareIndexList())
+            foreach (var squareIndex in board.White.ToSquareIndexList())
             {
                 var square = squareIndex.ToSquareFlagUlong();
 
                 if (Vector<ulong>.Count == 4)
                 {
-                    buffer1[0] = (ulong)bitBoard.WhitePawns;
-                    buffer1[1] = (ulong)bitBoard.WhiteRooks;
-                    buffer1[2] = (ulong)bitBoard.WhiteKnights;
-                    buffer1[3] = (ulong)bitBoard.WhiteBishops;
-
-                    //buffer2[0] = square;
-                    //buffer2[1] = square;
-                    //buffer2[2] = square;
-                    //buffer2[3] = square;
+                    buffer1[0] = (ulong)board.WhitePawns;
+                    buffer1[1] = (ulong)board.WhiteRooks;
+                    buffer1[2] = (ulong)board.WhiteKnights;
+                    buffer1[3] = (ulong)board.WhiteBishops;
 
                     var vector1 = new Vector<ulong>(buffer1);
                     var vector2 = new Vector<ulong>(square);
@@ -60,10 +55,10 @@ namespace ChessSharp.Engine
                 }
                 else
                 {
-                    isPawn = (ulong)bitBoard.WhitePawns & square;
-                    isRook = (ulong)bitBoard.WhiteRooks & square;
-                    isKnight = (ulong)bitBoard.WhiteKnights & square;
-                    isBishop = (ulong)bitBoard.WhiteBishops & square;
+                    isPawn = (ulong)board.WhitePawns & square;
+                    isRook = (ulong)board.WhiteRooks & square;
+                    isKnight = (ulong)board.WhiteKnights & square;
+                    isBishop = (ulong)board.WhiteBishops & square;
                 }
 
                 if (isPawn > 0)
@@ -90,7 +85,7 @@ namespace ChessSharp.Engine
                     continue;
                 }
 
-                var isQueen = (ulong)bitBoard.WhiteQueens & square;
+                var isQueen = (ulong)board.WhiteQueens & square;
                 
                 if (isQueen > 0)
                 {
@@ -98,7 +93,7 @@ namespace ChessSharp.Engine
                     continue;
                 }
 
-                var isKing = (ulong)bitBoard.WhiteKing & square;
+                var isKing = (ulong)board.WhiteKing & square;
 
                 if (isKing > 0)
                 {
@@ -107,21 +102,16 @@ namespace ChessSharp.Engine
                 }
             }
 
-            foreach (var squareIndex in bitBoard.Black.ToSquareIndexList())
+            foreach (var squareIndex in board.Black.ToSquareIndexList())
             {
                 var square = squareIndex.ToSquareFlagUlong();
 
                 if (Vector<ulong>.Count == 4)
                 {
-                    buffer1[0] = (ulong)bitBoard.BlackPawns;
-                    buffer1[1] = (ulong)bitBoard.BlackRooks;
-                    buffer1[2] = (ulong)bitBoard.BlackKnights;
-                    buffer1[3] = (ulong)bitBoard.BlackBishops;
-
-                    //buffer2[0] = square;
-                    //buffer2[1] = square;
-                    //buffer2[2] = square;
-                    //buffer2[3] = square;
+                    buffer1[0] = (ulong)board.BlackPawns;
+                    buffer1[1] = (ulong)board.BlackRooks;
+                    buffer1[2] = (ulong)board.BlackKnights;
+                    buffer1[3] = (ulong)board.BlackBishops;
 
                     var vector1 = new Vector<ulong>(buffer1);
                     var vector2 = new Vector<ulong>(square);
@@ -135,10 +125,10 @@ namespace ChessSharp.Engine
                 }
                 else
                 {
-                    isPawn = (ulong)bitBoard.BlackPawns & square;
-                    isRook = (ulong)bitBoard.BlackRooks & square;
-                    isKnight = (ulong)bitBoard.BlackKnights & square;
-                    isBishop = (ulong)bitBoard.BlackBishops & square;
+                    isPawn = (ulong)board.BlackPawns & square;
+                    isRook = (ulong)board.BlackRooks & square;
+                    isKnight = (ulong)board.BlackKnights & square;
+                    isBishop = (ulong)board.BlackBishops & square;
                 }
 
                 if (isPawn > 0)
@@ -165,7 +155,7 @@ namespace ChessSharp.Engine
                     continue;
                 }
 
-                var isQueen = (ulong)bitBoard.BlackQueens & square;
+                var isQueen = (ulong)board.BlackQueens & square;
 
                 if (isQueen > 0)
                 {
@@ -173,7 +163,7 @@ namespace ChessSharp.Engine
                     continue;
                 }
 
-                var isKing = (ulong)bitBoard.BlackKing & square;
+                var isKing = (ulong)board.BlackKing & square;
 
                 if (isKing > 0)
                 {
@@ -182,10 +172,7 @@ namespace ChessSharp.Engine
                 }
             }
 
-            var eval = whiteScore - blackScore;
-
-            return eval;
-            //return Math.Round(eval * 0.1, 2);
+            return whiteScore - blackScore;
         }
     }
 }

@@ -4,16 +4,6 @@ namespace ChessSharp.Engine
 {
     public struct Transposition
     {
-        public void Set(ulong key, byte depth, Colour colour, int evaluation, uint bestMove, byte age)
-        {
-            Key = key;
-            Depth = depth;
-            Colour = colour;
-            Evaluation = evaluation;
-            BestMove = bestMove;
-            Age = age;
-        }
-
         public ulong Key { get; private set; }
 
         public byte Depth { get; private set; }
@@ -25,5 +15,15 @@ namespace ChessSharp.Engine
         public uint BestMove { get; private set; }
 
         public byte Age { get; private set; }
+
+        public void Set(ulong key, byte depth, Colour colour, int evaluation, uint bestMove, byte age)
+        {
+            Key = key;
+            Depth = depth;
+            Colour = colour;
+            Evaluation = evaluation;
+            BestMove = bestMove;
+            Age = age;
+        }
     }
 }

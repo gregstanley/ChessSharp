@@ -19,11 +19,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetBishopMoveViews(moves);
 
@@ -44,11 +44,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetBishopMoveViews(moves);
 
@@ -68,11 +68,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetBishopMoveViews(moves);
 

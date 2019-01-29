@@ -6,14 +6,24 @@ namespace ChessSharp.Engine
 { 
     public class InfoDepthComplete : Info
     {
-        private uint[] _principalVariation = new uint[64];
+        private readonly uint[] principalVariation = new uint[64];
 
-        public InfoDepthComplete(int positionCount, long elapsedMilliseconds, int depth,
-            uint[] principalVariation, TranspositionTable transpositionTable)
+        public InfoDepthComplete(
+            int positionCount,
+            long elapsedMilliseconds,
+            int depth,
+            uint[] principalVariation,
+            TranspositionTable transpositionTable)
             : base(positionCount, elapsedMilliseconds, depth, transpositionTable)
         {
-            principalVariation.CopyTo(_principalVariation, 0);
+            principalVariation.CopyTo(this.principalVariation, 0);
         }
+
+        public IReadOnlyCollection<MoveViewer> PrincipalVariation =>
+            this.principalVariation
+                .Where(x => x > 0)
+                .Select(x => new MoveViewer(x))
+                .ToList();
 
         public string GetPvString()
         {
@@ -21,16 +31,10 @@ namespace ChessSharp.Engine
 
             sb.Append($"Depth: {Depth} ");
 
-            foreach (var move in PrincipalVariation)
+            foreach (var move in this.PrincipalVariation)
                 sb.Append($"{move.GetNotation()} ");
 
             return sb.ToString();
         }
-
-        public IReadOnlyCollection<MoveViewer> PrincipalVariation =>
-            _principalVariation
-                .Where(x => x > 0)
-                .Select(x => new MoveViewer(x))
-                .ToList();
     }
 }

@@ -18,11 +18,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [Fact]
         public void Castle_BothSidesCreated()
         {
-            var bitBoard = CreateBitBoard("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
+            var board = CreateBoard("r3k2r/8/8/8/8/8/8/R3K2R w KQkq - 0 1");
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, Colour.White, moves);
+            MoveGenerator.Generate(board, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -47,11 +47,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         [InlineData("7p", 0, 1)]
         public void Castle_BlockedByPassingThroughCheck(string partialFen, int castleKingExpectedCount, int castleQueenExpectedCount)
         {
-            var bitBoard = CreateBitBoard($"r3k2r/8/8/8/8/8/{partialFen}/R3K2R w KQkq - 0 1");
+            var board = CreateBoard($"r3k2r/8/8/8/8/8/{partialFen}/R3K2R w KQkq - 0 1");
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, Colour.White, moves);
+            MoveGenerator.Generate(board, Colour.White, moves);
 
             var moveCount = moves.Count;
 
@@ -78,11 +78,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 

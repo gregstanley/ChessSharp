@@ -36,11 +36,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(fenString);
+            var board = CreateBoard(fenString);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var queenMoves = GetQueenMoveViews(moves);
 
@@ -73,11 +73,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var movesViews = GetQueenMoveViews(moves);
 
@@ -89,11 +89,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("8/8/8/k7/8/8/1Q6/4K3 w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var movesViews = GetQueenMoveViews(moves);
 
@@ -105,11 +105,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K7/8/2p1p1p1/8/2p1Q1p1/8/2p1p1p1/k7 w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
             var captureViews = GetCaptureMoveViews(moves);

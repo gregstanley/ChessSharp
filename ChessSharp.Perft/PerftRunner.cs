@@ -13,7 +13,7 @@ namespace ChessSharp.MoveGeneration
 
         public MoveGenerator MoveGenerator { get; }
 
-        public List<MovePerft> Go(BitBoard bitBoard, Colour colour, ushort depth)
+        public List<MovePerft> Go(Board board, Colour colour, ushort depth)
         {
             var depthMoves = new List<uint>[64];
 
@@ -22,7 +22,7 @@ namespace ChessSharp.MoveGeneration
 
             var nodeMoves = depthMoves[depth];
 
-            MoveGenerator.Generate(bitBoard, colour, nodeMoves);
+            MoveGenerator.Generate(board, colour, nodeMoves);
 
             var count = 0;
 
@@ -32,21 +32,21 @@ namespace ChessSharp.MoveGeneration
             {
                 var moveView = new MoveViewer(move);
 
-                bitBoard.MakeMove(move);
+                board.MakeMove(move);
 
-                var nodes = InnerPerft(bitBoard, colour.Opposite(), (ushort)(depth - 1), depthMoves);
+                var nodes = InnerPerft(board, colour.Opposite(), (ushort)(depth - 1), depthMoves);
 
                 count += nodes;
 
                 movePerfts.Add(new MovePerft(moveView, nodes));
 
-                bitBoard.UnMakeMove(move);
+                board.UnMakeMove(move);
             }
 
             return movePerfts;
         }
 
-        private int InnerPerft(BitBoard bitBoard, Colour colour, ushort depth, List<uint>[] depthMoves)
+        private int InnerPerft(Board board, Colour colour, ushort depth, List<uint>[] depthMoves)
         {
             if (depth == 0)
                 return 1;
@@ -58,17 +58,17 @@ namespace ChessSharp.MoveGeneration
 
             var count = 0;
 
-            foreach(var move in MoveGenerator.GenerateStream(depth, bitBoard, colour))
+            foreach(var move in MoveGenerator.GenerateStream(depth, board, colour))
             {
                 var moveView = new MoveViewer(move);
 
-                bitBoard.MakeMove(move);
+                board.MakeMove(move);
 
-                var nodes = InnerPerft(bitBoard, colour.Opposite(), (ushort)(depth - 1), depthMoves);
+                var nodes = InnerPerft(board, colour.Opposite(), (ushort)(depth - 1), depthMoves);
 
                 count += nodes;
 
-                bitBoard.UnMakeMove(move);
+                board.UnMakeMove(move);
             }
 
             return count;

@@ -28,11 +28,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var pawnMoveViews = GetPawnMoveViews(moves);
 
@@ -48,11 +48,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveCount = moves.Count;
 
@@ -62,17 +62,17 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Theory]
-        [InlineData("8/8/8/1rP1K3/8/8/8/7k w - - 0 1", SquareFlag.D6, SquareFlag.D7)]
-        [InlineData("8/8/2p5/1r1P1K2/8/8/8/7k w - - 0 1", SquareFlag.D6, SquareFlag.D7)]
-        public void DiscoverCheckRook(string fenString, SquareFlag fromSquare, SquareFlag toSquare)
+        [InlineData("8/8/8/1rP1K3/8/8/8/7k w - - 0 1")]
+        [InlineData("8/8/2p5/1r1P1K2/8/8/8/7k w - - 0 1")]
+        public void DiscoverCheckRook(string fenString)
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -85,11 +85,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(20);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -101,11 +101,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/8/8/8/8/8/PPPPPPPP/8 w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var pawnMoves = GetPawnMoveViews(moves);
 
@@ -149,11 +149,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/pppppppp/8/8/8/8/8/8 b - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             // Purely for debugging
             var pawnMoves = GetPawnMoveViews(moves);
@@ -198,11 +198,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/8/8/8/8/1p1p1p1p/1P1P1P1P/8 b - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -214,11 +214,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/1p1p1p1p/1P1P1P1P/8/8/8/8/8 b - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -230,11 +230,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/8/8/8/8/p1p2p1p/1P4P1/8 w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var move1 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.B3.ToSquare(), PieceType.None, MoveType.Ordinary);
             var move2 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.G2.ToSquare(), SquareFlag.G3.ToSquare(), PieceType.None, MoveType.Ordinary);
@@ -260,11 +260,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/3P4/8/8/8/8/8/8 w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var promotion1 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionQueen);
             var promotion2 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionRook);
@@ -282,11 +282,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("3nn3/3P4/8/8/8/8/8/K6k w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var promotion1 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.E8.ToSquare(), PieceType.Knight, MoveType.PromotionQueen);
             var promotion2 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.E8.ToSquare(), PieceType.Knight, MoveType.PromotionRook);
@@ -304,11 +304,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("4k3/8/8/8/8/8/1p6/R2QK3 b - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var promotion1 = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.A1.ToSquare(), PieceType.Rook, MoveType.PromotionQueen);
             var promotion2 = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.A1.ToSquare(), PieceType.Rook, MoveType.PromotionRook);
@@ -328,11 +328,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/8/8/8/8/3p4/4P3/8 w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var capture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.E2.ToSquare(), SquareFlag.D3.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
 
@@ -346,11 +346,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("K6k/8/8/3Pp3/8/8/8/8 w - e6");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var enPassantCapture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D5.ToSquare(), SquareFlag.E6.ToSquare(), PieceType.Pawn, MoveType.EnPassant);
 
@@ -364,11 +364,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("8/8/8/q1rPp2K/8/7p/8/8 w - e6");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var enPassantCapture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D6.ToSquare(), SquareFlag.E7.ToSquare(), PieceType.Pawn, MoveType.EnPassant);
 
@@ -382,11 +382,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse("8/2b5/3P4/4K3/8/8/8/7k w - -");
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var illegalMove = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D6.ToSquare(), SquareFlag.D7.ToSquare(), PieceType.None, MoveType.Ordinary);
 

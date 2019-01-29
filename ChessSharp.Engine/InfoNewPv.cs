@@ -2,12 +2,17 @@
 {
     public class InfoNewPv : Info
     {
-        public InfoNewPv(int positionCount, long elapsedMilliseconds, int depth,
-            uint currentMove, double score, TranspositionTable transpositionTable)
+        public InfoNewPv(
+            int positionCount,
+            long elapsedMilliseconds,
+            int depth,
+            uint currentMove,
+            double score,
+            TranspositionTable transpositionTable)
             : base(positionCount, elapsedMilliseconds, depth, transpositionTable)
         {
-            CurrentMove = currentMove;
-            Score = score;
+            this.CurrentMove = currentMove;
+            this.Score = score;
         }
 
         public uint CurrentMove { get; }
@@ -16,8 +21,9 @@
 
         public string GetBestMoveString()
         {
-            var move = new MoveViewer(CurrentMove);
-            return $"Move: {move.GetNotation()} Evaluation: {Score}";
+            var move = new MoveViewer(this.CurrentMove);
+
+            return $"Move: {move.GetNotation()} Evaluation: {this.Score}";
         }
     }
 }

@@ -18,8 +18,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Chess.Engine\Chess.Engine.csproj" />
-  </ItemGroup>
-
 </Project>

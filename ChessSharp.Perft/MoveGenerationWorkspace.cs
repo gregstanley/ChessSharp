@@ -18,7 +18,7 @@ namespace ChessSharp.MoveGeneration
 
         internal Colour Colour => RelativeBitBoard.Colour;
 
-        internal RelativeBitBoard RelativeBitBoard { get; } = new RelativeBitBoard();
+        internal RelativeBoard RelativeBitBoard { get; } = new RelativeBoard();
 
         internal ulong[] Buffer1 { get; } = new ulong[4];
 
@@ -34,7 +34,7 @@ namespace ChessSharp.MoveGeneration
 
         internal List<uint> NonCaptureMoveBuffer { get; } = new List<uint>(64);
 
-        public RelativeBitBoard Reset(BitBoard bitBoard, Colour colour)
+        public RelativeBoard Reset(Board board, Colour colour)
         {
             ClearBuffers();
 
@@ -42,20 +42,20 @@ namespace ChessSharp.MoveGeneration
 
             RelativeBitBoard.Set(
                 colour,
-                bitBoard.GetPawnSquares(colour),
-                bitBoard.GetRookSquares(colour),
-                bitBoard.GetKnightSquares(colour),
-                bitBoard.GetBishopSquares(colour),
-                bitBoard.GetQueenSquares(colour),
-                bitBoard.GetKingSquare(colour),
-                bitBoard.GetPawnSquares(opponentColour),
-                bitBoard.GetRookSquares(opponentColour),
-                bitBoard.GetKnightSquares(opponentColour),
-                bitBoard.GetBishopSquares(opponentColour),
-                bitBoard.GetQueenSquares(opponentColour),
-                bitBoard.GetKingSquare(opponentColour),
-                bitBoard.CurrentState.StateFlags,
-                bitBoard.CurrentState.EnPassant);
+                board.GetPawnSquares(colour),
+                board.GetRookSquares(colour),
+                board.GetKnightSquares(colour),
+                board.GetBishopSquares(colour),
+                board.GetQueenSquares(colour),
+                board.GetKingSquare(colour),
+                board.GetPawnSquares(opponentColour),
+                board.GetRookSquares(opponentColour),
+                board.GetKnightSquares(opponentColour),
+                board.GetBishopSquares(opponentColour),
+                board.GetQueenSquares(opponentColour),
+                board.GetKingSquare(opponentColour),
+                board.CurrentState.StateFlags,
+                board.CurrentState.EnPassant);
 
             return RelativeBitBoard;
         }

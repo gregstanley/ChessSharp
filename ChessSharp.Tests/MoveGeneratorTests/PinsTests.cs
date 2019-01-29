@@ -19,11 +19,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -31,32 +31,32 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         }
 
         [Theory]
-        [InlineData(1, "8/8/8/K7/1R2Pp1k/8/6P1/8 b - e3 0 1", 1)]
-        [InlineData(2, "8/8/8/K7/1R3pPk/8/4P3/8 b - g3 0 1", 1)]
-        [InlineData(3, "8/8/8/K7/1R3p1k/6P1/4P3/8 b - - 0 1", 0)]
-        [InlineData(4, "8/8/8/K7/1R3p1k/4P3/6P1/8 b - - 0 1", 0)]
-        [InlineData(5, "8/8/8/K7/1R2PpPk/8/8/8 b - e3 0 1", 2)]
-        [InlineData(6, "8/8/8/K7/1R2PpPk/8/8/8 b - g3 0 1", 2)]
-        [InlineData(7, "8/8/8/K7/1R2Pp1k/6P1/8/8 b - e3 0 1", 1)]
-        [InlineData(8, "8/8/8/K7/1R3pPk/4P3/8/8 b - g3 0 1", 2)]
-        [InlineData(9, "8/8/8/K7/4Pp2/1R5k/6P1/8 b - e3 0 1", 0)]
-        [InlineData(10, "8/8/8/K7/5pP1/1R5k/4P3/8 b - g3 0 1", 2)]
-        [InlineData(11, "8/8/8/K7/5p2/1R2P2k/6P1/8 b - - 0 1", 0)]
-        [InlineData(12, "8/8/8/K7/5p2/1R4Pk/4P3/8 b - - 0 1", 2)]
-        [InlineData(13, "8/8/8/K6k/1R2Pp2/8/6P1/8 b - e3 0 1", 2)]
-        [InlineData(14, "8/8/8/K6k/1R3pP1/8/4P3/8 b - g3 0 1", 1)]
-        [InlineData(15, "8/8/8/KR5k/4Pp2/8/6P1/8 b - e3 0 1", 0)]
-        [InlineData(16, "8/8/8/KR5k/5pP1/8/4P3/8 b - g3 0 1", 0)]
-        [InlineData(17, "8/8/8/8/KR2Ppk1/8/6P1/8 b - e3 0 1", 1)]
-        public void Position3_Variants_EnPassantDiscovered(int id, string fenString, int expectedMoveCount)
+        [InlineData("8/8/8/K7/1R2Pp1k/8/6P1/8 b - e3 0 1", 1)]
+        [InlineData("8/8/8/K7/1R3pPk/8/4P3/8 b - g3 0 1", 1)]
+        [InlineData("8/8/8/K7/1R3p1k/6P1/4P3/8 b - - 0 1", 0)]
+        [InlineData("8/8/8/K7/1R3p1k/4P3/6P1/8 b - - 0 1", 0)]
+        [InlineData("8/8/8/K7/1R2PpPk/8/8/8 b - e3 0 1", 2)]
+        [InlineData("8/8/8/K7/1R2PpPk/8/8/8 b - g3 0 1", 2)]
+        [InlineData("8/8/8/K7/1R2Pp1k/6P1/8/8 b - e3 0 1", 1)]
+        [InlineData("8/8/8/K7/1R3pPk/4P3/8/8 b - g3 0 1", 2)]
+        [InlineData("8/8/8/K7/4Pp2/1R5k/6P1/8 b - e3 0 1", 0)]
+        [InlineData("8/8/8/K7/5pP1/1R5k/4P3/8 b - g3 0 1", 2)]
+        [InlineData("8/8/8/K7/5p2/1R2P2k/6P1/8 b - - 0 1", 0)]
+        [InlineData("8/8/8/K7/5p2/1R4Pk/4P3/8 b - - 0 1", 2)]
+        [InlineData("8/8/8/K6k/1R2Pp2/8/6P1/8 b - e3 0 1", 2)]
+        [InlineData("8/8/8/K6k/1R3pP1/8/4P3/8 b - g3 0 1", 1)]
+        [InlineData("8/8/8/KR5k/4Pp2/8/6P1/8 b - e3 0 1", 0)]
+        [InlineData("8/8/8/KR5k/5pP1/8/4P3/8 b - g3 0 1", 0)]
+        [InlineData("8/8/8/8/KR2Ppk1/8/6P1/8 b - e3 0 1", 1)]
+        public void Position3_Variants_EnPassantDiscovered(string fenString, int expectedMoveCount)
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -70,11 +70,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -88,11 +88,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetPawnMoveViews(moves);
 
@@ -106,11 +106,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetKnightMoveViews(moves);
 
@@ -128,11 +128,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetRookMoveViews(moves);
 
@@ -146,11 +146,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetKnightMoveViews(moves);
 
@@ -164,11 +164,11 @@ namespace ChessSharp.Tests.MoveGeneratorTests
         {
             var gameState = FenHelpers.Parse(fenString);
 
-            var bitBoard = CreateBitBoard(gameState);
+            var board = CreateBoard(gameState);
 
             var moves = new List<uint>(10);
 
-            MoveGenerator.Generate(bitBoard, gameState.ToPlay, moves);
+            MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveViews = GetBishopMoveViews(moves);
 

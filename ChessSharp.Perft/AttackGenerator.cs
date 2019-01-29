@@ -118,8 +118,8 @@ namespace ChessSharp.MoveGeneration
             {
                 bit <<= 8;
                 attackableSquares |= bit;
-
-            } while (bit != 0 && ((bit & occupancyAsLong) == 0));
+            }
+            while (bit != 0 && ((bit & occupancyAsLong) == 0));
 
             bit = 1ul << squareIndex;
 
@@ -127,8 +127,8 @@ namespace ChessSharp.MoveGeneration
             {
                 bit >>= 8;
                 attackableSquares |= bit;
-
-            } while (bit != 0 && ((bit & occupancyAsLong) == 0));
+            }
+            while (bit != 0 && ((bit & occupancyAsLong) == 0));
 
             bit = 1ul << squareIndex;
 
@@ -140,8 +140,8 @@ namespace ChessSharp.MoveGeneration
                     attackableSquares |= bit;
                 else
                     break;
-
-            } while ((bit & occupancyAsLong) == 0);
+            }
+            while ((bit & occupancyAsLong) == 0);
 
             bit = 1ul << squareIndex;
 
@@ -153,8 +153,8 @@ namespace ChessSharp.MoveGeneration
                     attackableSquares |= bit;
                 else
                     break;
-
-            } while ((bit & occupancyAsLong) == 0);
+            }
+            while ((bit & occupancyAsLong) == 0);
 
             return (SquareFlag)attackableSquares;
         }
@@ -179,8 +179,8 @@ namespace ChessSharp.MoveGeneration
                     attackableSquares |= bit;
                 else
                     break;
-
-            } while (bit != 0 && ((bit & occupancyAsLong) == 0));
+            }
+            while (bit != 0 && ((bit & occupancyAsLong) == 0));
 
             bit = 1ul << squareIndex;
             bit2 = bit;
@@ -194,8 +194,8 @@ namespace ChessSharp.MoveGeneration
                     attackableSquares |= bit;
                 else
                     break;
-
-            } while (bit != 0 && ((bit & occupancyAsLong) == 0));
+            }
+            while (bit != 0 && ((bit & occupancyAsLong) == 0));
 
             bit = 1ul << squareIndex;
             bit2 = bit;
@@ -209,8 +209,8 @@ namespace ChessSharp.MoveGeneration
                     attackableSquares |= bit;
                 else
                     break;
-
-            } while (bit != 0 && ((bit & occupancyAsLong) == 0));
+            }
+            while (bit != 0 && ((bit & occupancyAsLong) == 0));
 
             bit = 1ul << squareIndex;
             bit2 = bit;
@@ -224,8 +224,8 @@ namespace ChessSharp.MoveGeneration
                     attackableSquares |= bit;
                 else
                     break;
-
-            } while (bit != 0 && ((bit & occupancyAsLong) == 0));
+            }
+            while (bit != 0 && ((bit & occupancyAsLong) == 0));
 
             return (SquareFlag)attackableSquares;
         }
@@ -245,8 +245,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.North;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static void GenerateSouthPath(int squareIndex, SquareFlag[] paths)
@@ -264,8 +264,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.South;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static void GenerateEastPath(int squareIndex, SquareFlag[] paths)
@@ -285,8 +285,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.East;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static void GenerateWestPath(int squareIndex, SquareFlag[] paths)
@@ -306,8 +306,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.West;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static void GenerateNorthEastPath(int squareIndex, SquareFlag[] paths)
@@ -329,8 +329,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.NorthEast;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static void GenerateSouthEastPath(int squareIndex, SquareFlag[] paths)
@@ -352,8 +352,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.SouthEast;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static void GenerateSouthWestPath(int squareIndex, SquareFlag[] paths)
@@ -375,8 +375,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.SouthWest;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static void GenerateNorthWestPath(int squareIndex, SquareFlag[] paths)
@@ -398,8 +398,8 @@ namespace ChessSharp.MoveGeneration
                     toSquareIndex += (int)MoveDirection.NorthWest;
                     paths[toSquareIndex] = (SquareFlag)(path |= bit);
                 }
-
-            } while (bit != 0);
+            }
+            while (bit != 0);
         }
 
         private static ulong AllBitsOnForRankAtOffset(int squareIndex, int offset)

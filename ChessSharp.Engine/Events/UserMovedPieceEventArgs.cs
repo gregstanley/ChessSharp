@@ -6,8 +6,8 @@ namespace ChessSharp.Engine.Events
     {
         public UserMovedPieceEventArgs(int fromSquareIndex, int toSquareIndex)
         {
-            FromSquareIndex = fromSquareIndex;
-            ToSquareIndex = toSquareIndex;
+            this.FromSquareIndex = fromSquareIndex;
+            this.ToSquareIndex = toSquareIndex;
         }
 
         public int FromSquareIndex { get; }

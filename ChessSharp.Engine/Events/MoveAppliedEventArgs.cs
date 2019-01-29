@@ -6,9 +6,9 @@ namespace ChessSharp.Engine.Events
     {
         public MoveAppliedEventArgs(MoveViewer move, GameState gameState, int evaluation)
         {
-            Move = move;
-            GameState = gameState;
-            Evaluation = evaluation;
+            this.Move = move;
+            this.GameState = gameState;
+            this.Evaluation = evaluation;
         }
 
         public MoveViewer Move { get; }
