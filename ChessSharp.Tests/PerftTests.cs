@@ -10,15 +10,15 @@ namespace ChessSharp.Tests
 {
     public class PerftTests : IClassFixture<MoveGeneratorFixture>
     {
-        private Logger _log;
+        private readonly Logger log;
 
-        MoveGeneratorFixture _moveGeneratorFixture;
+        private MoveGeneratorFixture moveGeneratorFixture;
 
         public PerftTests(MoveGeneratorFixture moveGeneratorFixture)
         {
-            _moveGeneratorFixture = moveGeneratorFixture;
+            this.moveGeneratorFixture = moveGeneratorFixture;
 
-            _log = new LoggerConfiguration()
+            log = new LoggerConfiguration()
                 .WriteTo.File("PerftTests-log.txt", rollingInterval: RollingInterval.Minute)
                 .CreateLogger();
         }
@@ -34,7 +34,7 @@ namespace ChessSharp.Tests
 
             var moves = new List<uint>(20);
 
-            _moveGeneratorFixture.MoveGenerator.Generate(board, gameState.ToPlay, moves);
+            moveGeneratorFixture.MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
             var moveView = moves.Select(x => new MoveViewer(x));
             var moveCount = moves.Count;
@@ -47,7 +47,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void Default_Metrics_ToDepth5()
         {
-            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunnerMetrics(moveGeneratorFixture.MoveGenerator);
 
             // "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
             var gameState = FenHelpers.Parse(FenHelpers.Default);
@@ -69,25 +69,25 @@ namespace ChessSharp.Tests
             Assert.Equal(0, metrics[depth].Captures);
             Assert.Equal(0, metrics[depth].EnPassantCaptures);
             Assert.Equal(0, metrics[depth].Castles);
-            //Assert.Equal(0, metrics[depth].Checks);
+            ////Assert.Equal(0, metrics[depth].Checks);
 
             Assert.Equal(400, metrics[depth - 1].Legal);
             Assert.Equal(0, metrics[depth - 1].Captures);
             Assert.Equal(0, metrics[depth - 1].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 1].Castles);
-            //Assert.Equal(0, metrics[depth - 1].Checks);
+            ////Assert.Equal(0, metrics[depth - 1].Checks);
 
             Assert.Equal(8902, metrics[depth - 2].Legal);
             Assert.Equal(34, metrics[depth - 2].Captures);
             Assert.Equal(0, metrics[depth - 2].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 2].Castles);
-            //Assert.Equal(12, metrics[depth - 2].Checks);
+            ////Assert.Equal(12, metrics[depth - 2].Checks);
 
             Assert.Equal(197281, metrics[depth - 3].Legal);
             Assert.Equal(1576, metrics[depth - 3].Captures);
             Assert.Equal(0, metrics[depth - 3].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 3].Castles);
-            //Assert.Equal(12, metrics[depth - 3].Checks);
+            ////Assert.Equal(12, metrics[depth - 3].Checks);
 
             Assert.Equal(4865609, metrics[depth - 4].Legal);
         }
@@ -105,7 +105,7 @@ namespace ChessSharp.Tests
 
             var depth = 3;
 
-            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunnerMetrics(moveGeneratorFixture.MoveGenerator);
 
             perftRunner.Go(board, gameState.ToPlay, depth, metrics);
 
@@ -115,20 +115,20 @@ namespace ChessSharp.Tests
             Assert.Equal(8, metrics[depth].Captures);
             Assert.Equal(0, metrics[depth].EnPassantCaptures);
             Assert.Equal(2, metrics[depth].Castles);
-            //Assert.Equal(0, metrics[depth].Checks);
+            ////Assert.Equal(0, metrics[depth].Checks);
 
             Assert.Equal(2039, metrics[depth - 1].Legal);
             Assert.Equal(351, metrics[depth - 1].Captures);
             Assert.Equal(1, metrics[depth - 1].EnPassantCaptures);
             Assert.Equal(91, metrics[depth - 1].Castles);
-            //Assert.Equal(3, metrics[depth - 1].Checks);
+            ////Assert.Equal(3, metrics[depth - 1].Checks);
 
             Assert.Equal(97862, metrics[depth - 2].Legal);
             Assert.Equal(17102, metrics[depth - 2].Captures);
             Assert.Equal(45, metrics[depth - 2].EnPassantCaptures);
             Assert.Equal(3162, metrics[depth - 2].Castles);
-            //Assert.Equal(993, metrics[depth - 2].Checks);
-            //Assert.Equal(1, metrics[depth - 2].Checkmates);
+            ////Assert.Equal(993, metrics[depth - 2].Checks);
+            ////Assert.Equal(1, metrics[depth - 2].Checkmates);
         }
 
         [Fact]
@@ -144,7 +144,7 @@ namespace ChessSharp.Tests
 
             var depth = 5;
 
-            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunnerMetrics(moveGeneratorFixture.MoveGenerator);
 
             perftRunner.Go(board, gameState.ToPlay, depth, metrics);
 
@@ -154,31 +154,31 @@ namespace ChessSharp.Tests
             Assert.Equal(1, metrics[depth].Captures);
             Assert.Equal(0, metrics[depth].EnPassantCaptures);
             Assert.Equal(0, metrics[depth].Castles);
-            //Assert.Equal(2, metrics[depth].Checks);
+            ////Assert.Equal(2, metrics[depth].Checks);
 
             Assert.Equal(191, metrics[depth - 1].Legal);
             Assert.Equal(14, metrics[depth - 1].Captures);
             Assert.Equal(0, metrics[depth - 1].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 1].Castles);
-            //Assert.Equal(10, metrics[depth - 1].Checks);
+            ////Assert.Equal(10, metrics[depth - 1].Checks);
 
             Assert.Equal(2812, metrics[depth - 2].Legal);
             Assert.Equal(209, metrics[depth - 2].Captures);
             Assert.Equal(2, metrics[depth - 2].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 2].Castles);
-            //Assert.Equal(267, metrics[depth - 2].Checks);
+            ////Assert.Equal(267, metrics[depth - 2].Checks);
 
             Assert.Equal(43238, metrics[depth - 3].Legal);
             Assert.Equal(3348, metrics[depth - 3].Captures);
             Assert.Equal(123, metrics[depth - 3].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 3].Castles);
-            //Assert.Equal(1680, metrics[depth - 3].Checks);
+            ////Assert.Equal(1680, metrics[depth - 3].Checks);
 
             Assert.Equal(674624, metrics[depth - 4].Legal);
             Assert.Equal(52051, metrics[depth - 4].Captures);
             Assert.Equal(1165, metrics[depth - 4].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 4].Castles);
-            //Assert.Equal(52950, metrics[depth - 4].Checks);
+            ////Assert.Equal(52950, metrics[depth - 4].Checks);
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace ChessSharp.Tests
 
             var depth = 3;
 
-            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunnerMetrics(moveGeneratorFixture.MoveGenerator);
 
             perftRunner.Go(board, gameState.ToPlay, depth, metrics);
 
@@ -204,26 +204,26 @@ namespace ChessSharp.Tests
             Assert.Equal(0, metrics[depth].Captures);
             Assert.Equal(0, metrics[depth].EnPassantCaptures);
             Assert.Equal(0, metrics[depth].Castles);
-            //Assert.Equal(0, metrics[depth].Checks);
+            ////Assert.Equal(0, metrics[depth].Checks);
 
             Assert.Equal(264, metrics[depth - 1].Legal);
             Assert.Equal(87, metrics[depth - 1].Captures);
             Assert.Equal(0, metrics[depth - 1].EnPassantCaptures);
             Assert.Equal(6, metrics[depth - 1].Castles);
-            //Assert.Equal(10, metrics[depth - 1].Checks);
+            ////Assert.Equal(10, metrics[depth - 1].Checks);
 
             Assert.Equal(9467, metrics[depth - 2].Legal);
             Assert.Equal(1021, metrics[depth - 2].Captures);
             Assert.Equal(4, metrics[depth - 2].EnPassantCaptures);
             Assert.Equal(0, metrics[depth - 2].Castles);
-            //Assert.Equal(38, metrics[depth - 2].Checks);
+            ////Assert.Equal(38, metrics[depth - 2].Checks);
         }
 
         // http://cinnamonchess.altervista.org/perft.html
         [Fact]
         public void CinnamonChess_PromotionsPosition_ToDepth5()
         {
-            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunnerMetrics(moveGeneratorFixture.MoveGenerator);
 
             // "8/PPP4k/8/8/8/8/4Kppp/8 w - - 0 1"
             var gameState = FenHelpers.Parse("8/PPP4k/8/8/8/8/4Kppp/8 w - - 0 1");
@@ -252,7 +252,7 @@ namespace ChessSharp.Tests
         [Fact]
         public void CinnamonChess_EnPassantPosition_Metrics_ToDepth5()
         {
-            var perftRunner = new PerftRunnerMetrics(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunnerMetrics(moveGeneratorFixture.MoveGenerator);
 
             // "8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28"
             var gameState = FenHelpers.Parse("8/7p/p5pb/4k3/P1pPn3/8/P5PP/1rB2RK1 b - d3 0 28");
@@ -277,7 +277,7 @@ namespace ChessSharp.Tests
             Assert.Equal(1881089, metrics[depth - 4].Legal);
         }
 
-        // https://gist.github.com/peterellisjones/8c46c28141c162d1d8a0f0badbc9cff9
+        //// https://gist.github.com/peterellisjones/8c46c28141c162d1d8a0f0badbc9cff9
         [Theory]
         [InlineData("r6r/1b2k1bq/8/8/7B/8/8/R3K2R b QK - 3 2", 1, 8)]
         [InlineData("8/8/8/2k5/2pP4/8/B7/4K3 b - d3 5 3", 1, 8)]
@@ -288,7 +288,7 @@ namespace ChessSharp.Tests
         [InlineData("2r5/3pk3/8/2P5/8/2K5/8/8 w - - 5 4", 1, 9)]
         [InlineData("rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8", 3, 62379)]
         [InlineData("r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10", 3, 89890)]
-        // https://www.chessprogramming.net/perfect-perft/
+        //// https://www.chessprogramming.net/perfect-perft/
         [InlineData("3k4/3p4/8/K1P4r/8/8/8/8 b - - 0 1", 6, 1134888)] //--Illegal ep move #1
         [InlineData("8/8/4k3/8/2p5/8/B2P2K1/8 w - - 0 1", 6, 1015133)] //--Illegal ep move #2
         [InlineData("8/8/1k6/2b5/2pP4/8/5K2/8 b - d3 0 1", 6, 1440467)] //--EP Capture Checks Opponent
@@ -305,7 +305,7 @@ namespace ChessSharp.Tests
         [InlineData("8/8/2k5/5q2/5n2/8/5K2/8 b - - 0 1", 4, 23527)] //--Stalemate & Checkmate
         public void PeterEllisJones(string fenString, ushort depth, int expectedNodeCount)
         {
-            var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunner(moveGeneratorFixture.MoveGenerator);
 
             var gameState = FenHelpers.Parse(fenString);
 
@@ -325,7 +325,7 @@ namespace ChessSharp.Tests
         [InlineData("r3k2r/1b4bq/8/8/8/8/7B/1R2K2R w Kkq - 0 1", 2, 1101)]
         public void PeterEllisJones3(string fenString, ushort depth, int expectedNodeCount)
         {
-            var perftRunner = new PerftRunner(_moveGeneratorFixture.MoveGenerator);
+            var perftRunner = new PerftRunner(moveGeneratorFixture.MoveGenerator);
 
             var gameState = FenHelpers.Parse(fenString);
 

@@ -23,7 +23,8 @@ namespace ChessSharp.Tests
 
             var asList = square.ToList();
 
-            Assert.Collection(asList,
+            Assert.Collection(
+                asList,
                 item => Assert.Equal(SquareFlag.H1, item),
                 item => Assert.Equal(SquareFlag.H8, item));
         }
@@ -35,7 +36,8 @@ namespace ChessSharp.Tests
 
             var asList = square.ToList();
 
-            Assert.Collection(asList,
+            Assert.Collection(
+                asList,
                 item => Assert.Equal(SquareFlag.H1, item),
                 item => Assert.Equal(SquareFlag.A5, item),
                 item => Assert.Equal(SquareFlag.H8, item));
@@ -48,7 +50,8 @@ namespace ChessSharp.Tests
 
             var asList = square.ToList();
 
-            Assert.Collection(asList,
+            Assert.Collection(
+                asList,
                 item => Assert.Equal(SquareFlag.H1, item),
                 item => Assert.Equal(SquareFlag.A5, item),
                 item => Assert.Equal(SquareFlag.E6, item),

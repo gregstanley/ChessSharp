@@ -16,7 +16,7 @@
                 </LinearGradientBrush>
             </Rectangle.Fill>
         </Rectangle>
-        <Border BorderBrush="#FF8F8F8F" BorderThickness="1" HorizontalAlignment="Left" Height="490" Margin="10,10,0,0" VerticalAlignment="Top" Width="530" Background="#FFE2E2E2" Opacity="0.5"/>
+        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Height="490" Margin="10,10,0,0" VerticalAlignment="Top" Width="530" Background="#FFBFBFBF"/>
         <local:BoardUserControl x:Name="BoardUserControl" HorizontalAlignment="Left" Width="346" Height="346" Margin="25,54,0,0" VerticalAlignment="Top" Background="Black" PieceMoved="BoardUserControl_PieceMoved" PromotionTypeSelected="BoardUserControl_PieceSelected" >
             <local:BoardUserControl.Effect>
                 <DropShadowEffect ShadowDepth="6" BlurRadius="8" RenderingBias="Quality" Color="#FF666666"/>
@@ -44,7 +44,7 @@
             </Image.Effect>
         </Image>
         <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="449,49,0,0" VerticalAlignment="Top" Width="38" />
-        <Label x:Name="EvaluationLabel" HorizontalContentAlignment="Center" Content="0" HorizontalAlignment="Left" Margin="160,22,0,0" VerticalAlignment="Top" Width="75" FontWeight="Bold" FontSize="20" Foreground="#FFEFE9F3" Background="{x:Null}" Height="32" >
+        <Label x:Name="EvaluationLabel" HorizontalContentAlignment="Center" Content="0" HorizontalAlignment="Left" Margin="160,22,0,0" VerticalAlignment="Top" Width="75" FontWeight="Bold" FontSize="20" Foreground="#FFF1F1F1" Background="{x:Null}" Height="32" >
             <Label.Effect>
                 <DropShadowEffect ShadowDepth="2" RenderingBias="Quality" Opacity="0.6"/>
             </Label.Effect>

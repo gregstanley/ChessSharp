@@ -11,14 +11,14 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 {
     public class MoveGeneratorTestsBase : IClassFixture<MoveGeneratorFixture>
     {
-        protected MoveGenerator MoveGenerator => _moveGeneratorFixture.MoveGenerator;
-        
-        private MoveGeneratorFixture _moveGeneratorFixture;
+        private MoveGeneratorFixture moveGeneratorFixture;
 
         public MoveGeneratorTestsBase(MoveGeneratorFixture moveGeneratorFixture)
         {
-            _moveGeneratorFixture = moveGeneratorFixture;
+            this.moveGeneratorFixture = moveGeneratorFixture;
         }
+
+        protected MoveGenerator MoveGenerator => moveGeneratorFixture.MoveGenerator;
 
         protected IList<MoveViewer> GetKingMoveViews(IList<uint> moves) =>
             GetMoveViews(moves, PieceType.King);

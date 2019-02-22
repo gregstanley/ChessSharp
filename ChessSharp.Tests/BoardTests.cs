@@ -5,7 +5,7 @@ using Xunit;
 
 namespace ChessSharp.Tests
 {
-    public class BitBoardTests
+    public class BoardTests
     {
         [Theory]
         [InlineData("8/P3p3", SquareFlag.D3)]
@@ -48,7 +48,7 @@ namespace ChessSharp.Tests
         {
             var board = Create("7k/8/3p4/8/4N3/8/8/K7 w - - 0 1");
             var boardReference = Create("7k/8/3p4/8/4N3/8/8/K7 w - - 0 1");
-            var boardAfterMake= Create("7k/8/3N4/8/8/8/8/K7 w - - 0 1");
+            var boardAfterMake = Create("7k/8/3N4/8/8/8/8/K7 w - - 0 1");
 
             var fromSquare = SquareFlag.E4;
             var toSquare = SquareFlag.D6;

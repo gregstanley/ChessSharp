@@ -43,8 +43,6 @@ namespace ChessSharp.Tests
         {
             var gameState = FenHelpers.Parse(FenHelpers.Position2);
 
-            //Assert.Equal("r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R", gameState.Board);
-
             Assert.Equal(SquareFlag.E1, gameState.WhiteKing);
             Assert.Equal(SquareFlag.E8, gameState.BlackKing);
 
@@ -59,12 +57,11 @@ namespace ChessSharp.Tests
         [Fact]
         public void Fen_Parse_Position5_Correct()
         {
-            //"rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ - 1 8"
             var gameState = FenHelpers.Parse(FenHelpers.Position5);
 
             Assert.Equal(Colour.White, gameState.ToPlay);
-            Assert.True( gameState.WhiteCanCastleKingSide);
-            Assert.True( gameState.WhiteCanCastleQueenSide);
+            Assert.True(gameState.WhiteCanCastleKingSide);
+            Assert.True(gameState.WhiteCanCastleQueenSide);
             Assert.False(gameState.BlackCanCastleKingSide);
             Assert.False(gameState.BlackCanCastleQueenSide);
             Assert.Equal((SquareFlag)0, gameState.EnPassant);

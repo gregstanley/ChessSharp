@@ -1,10 +1,14 @@
 <stylecopresultscache>
   <version>12</version>
+  <project key="-920090874">
+    <configuration>
+    </configuration>
+  </project>
   <sourcecode name="AttackBitmaps.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2018/11/10 14:07:31.362</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.525</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -90,11 +94,34 @@
       </violation>
     </violations>
   </sourcecode>
+  <sourcecode name="AttackGenerator.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2018/12/06 08:26:48.414</styleCop>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.526</sourceFile>
+      <parser>2018/12/06 08:26:48.414</parser>
+      <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2018/12/06 08:26:48.414</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2018/12/06 08:26:48.414</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2018/12/06 08:26:48.414</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
   <sourcecode name="MagicIndexHelpers.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2018/11/10 14:01:17.548</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.527</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -116,8 +143,8 @@
   <sourcecode name="MagicNumbers.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2018/11/10 14:05:02.899</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.528</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -139,8 +166,8 @@
   <sourcecode name="MoveGenerationWorkspace.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2019/01/29 08:12:32.214</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.528</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -162,8 +189,8 @@
   <sourcecode name="MoveGenerator.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2019/01/29 08:12:32.229</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.529</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -185,8 +212,8 @@
   <sourcecode name="MovePerft.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2018/10/18 08:03:39.582</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.530</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -208,8 +235,8 @@
   <sourcecode name="PerftMetrics.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2018/10/18 08:02:30.942</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.530</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -231,8 +258,8 @@
   <sourcecode name="PerftRunner.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2019/01/29 08:11:25.957</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.531</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -263,38 +290,11 @@
       </violation>
     </violations>
   </sourcecode>
-  <sourcecode name="AttackGenerator.cs" parser="StyleCop.CSharp.CsParser">
-    <timestamps>
-      <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2019/01/29 08:23:27.887</sourceFile>
-      <parser>2018/12/06 08:26:48.414</parser>
-      <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
-      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
-      <StyleCop.CSharp.LayoutRules>2018/12/06 08:26:48.414</StyleCop.CSharp.LayoutRules>
-      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
-      <StyleCop.CSharp.MaintainabilityRules>2018/12/06 08:26:48.414</StyleCop.CSharp.MaintainabilityRules>
-      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
-      <StyleCop.CSharp.NamingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.NamingRules>
-      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
-      <StyleCop.CSharp.OrderingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.OrderingRules>
-      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
-      <StyleCop.CSharp.ReadabilityRules>2018/12/06 08:26:48.414</StyleCop.CSharp.ReadabilityRules>
-      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
-      <StyleCop.CSharp.SpacingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.SpacingRules>
-      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
-    </timestamps>
-    <violations />
-  </sourcecode>
-  <project key="-920090874">
-    <configuration>
-    </configuration>
-  </project>
   <sourcecode name="PerftRunnerMetrics.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/15 16:18:53.691</settingsFile>
-      <sourceFile>2019/01/29 08:20:10.718</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.531</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -380,4 +380,8 @@
       </violation>
     </violations>
   </sourcecode>
+  <project key="212080828">
+    <configuration>
+    </configuration>
+  </project>
 </stylecopresultscache>

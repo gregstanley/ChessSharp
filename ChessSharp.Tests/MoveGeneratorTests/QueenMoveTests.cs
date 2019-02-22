@@ -125,7 +125,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             var captures = captureViews.Select(x => x.Value);
 
-            //Assert.Equal(16, moveCount);
             Assert.Contains(capture1, captures);
             Assert.Contains(capture2, captures);
             Assert.Contains(capture3, captures);

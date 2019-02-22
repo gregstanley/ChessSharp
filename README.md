@@ -8,15 +8,21 @@ As I experimented it became clear that programming any Chess game touches on man
 
 On my development machine the code searches about 500k nodes per second (and depending on you're background that performance may seem extremely fast or extremely slow :-)). 
 
-## Feature summary
-* AspNet Standard 2.0.
+## C# and programming techniques summary
+* [.NET Standard 2.0](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) based projects.
+* [Expression-bodied memebers](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members)
+
+## Chess programming specific feature summary
 * [Principal variation search](https://www.chessprogramming.org/Principal_Variation)
 * [Transposition table](https://www.chessprogramming.org/Transposition_Table)
 * [Zobrist hash keys](https://www.chessprogramming.org/Zobrist_Hashing)
+* [Legal Move generation tool](https://www.chessprogramming.org/Move_Generation). Generates roughly 3.5 million moves per second on an AMD Ryzen 2600 (it's faster than 'in-game' because the nodes are not evaluated).
+* That uses [a form of magic numbers based move generation](https://www.chessprogramming.org/Magic_Bitboards).
 
 ## What's missing
 * [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component
 * [Quiescence search] (https://www.chessprogramming.org/Quiescence_Search)
+* Draw detection within search. The game will detect a draw one a move has been played, it does not however detect draws during the search i.e. it just burns time investigating positions that are already drawn.
 
 ## Getting Started
 
@@ -36,11 +42,16 @@ TODO: Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b2467940
 
 * **Greg Stanley** - *Initial work* - [Greg Stanley](https://github.com/gregstanley)
 
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
 
+
 ## Acknowledgments
 
 * README.md template from [PurpleBooth](https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/8254b53ab8dcb18afc64287aaddd9e5b6059f880/README-Template.md)
-* Peter Ellis Jones for this [Generating Legal Chess Moves](https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/) article that I must have read ten times or more.
+* Peter Ellis Jones for [this Generating Legal Chess Moves article](https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/) that I must have read ten times or more.
+* [JetChess](https://zipproth.de/jetchess/) notes as inspiration and reference.
+* [Thomas Petzke](https://macechess.blogspot.com/?m=1) and his mACE/iCE chess programming journey blog.
+* [Jaco van Neikerk's magic numbers article](http://vicki-chess.blogspot.com/2013/04/magics.html) which really helped me get my head round it.
