@@ -8,12 +8,8 @@ namespace ChessSharp.MoveGeneration
 {
     internal class AttackBitmaps
     {
-        public SquareFlag[][] Paths = new SquareFlag[64][];
-        public SquareFlag[] PawnCapturesWhite = new SquareFlag[64];
-        public SquareFlag[] PawnCapturesBlack = new SquareFlag[64];
-        public SquareFlag[] KnightAttacks = new SquareFlag[64];
-        public SquareFlag[] KingAttacks = new SquareFlag[64];
         public readonly SquareFlag[][] RookAttacks = new SquareFlag[64][];
+
         public readonly SquareFlag[][] BishopAttacks = new SquareFlag[64][];
 
         public AttackBitmaps()
@@ -25,6 +21,16 @@ namespace ChessSharp.MoveGeneration
             InitRookAttacks();
             InitBishopAttacks();
         }
+
+        public SquareFlag[][] Paths { get; private set; } = new SquareFlag[64][];
+
+        public SquareFlag[] PawnCapturesWhite { get; private set; } = new SquareFlag[64];
+
+        public SquareFlag[] PawnCapturesBlack { get; private set; } = new SquareFlag[64];
+
+        public SquareFlag[] KnightAttacks { get; private set; } = new SquareFlag[64];
+
+        public SquareFlag[] KingAttacks { get; private set; } = new SquareFlag[64];
 
         private void InitPaths()
         {
@@ -115,7 +121,6 @@ namespace ChessSharp.MoveGeneration
         {
             var squares = new List<SquareFlag>();
 
-            //var squares = occupancyMask.ToList();
             foreach (var occupancyMaskSquare in occupancyMask.ToList())
                 squares.Add(occupancyMaskSquare);
 
@@ -131,8 +136,16 @@ namespace ChessSharp.MoveGeneration
         // if there are 10 elements to sort then a combinationLenght of 5 will find all the combinations that 
         // use exactly 5 elements. Therefore, it must be called once 'end' times to find all combinations of 
         // any length
-        private void CombinationUtil(IReadOnlyList<SquareFlag> squares, int rootSquare, SquareFlag[] combination,
-            int start, int end, int index, int combinationLength, Action<SortedDictionary<int, SquareFlag>, int, SquareFlag> addToList, SortedDictionary<int, SquareFlag> dictionary)
+        private void CombinationUtil(
+            IReadOnlyList<SquareFlag> squares,
+            int rootSquare,
+            SquareFlag[] combination,
+            int start,
+            int end,
+            int index,
+            int combinationLength,
+            Action<SortedDictionary<int, SquareFlag>, int, SquareFlag> addToList,
+            SortedDictionary<int, SquareFlag> dictionary)
         {
             if (index == combinationLength)
             {

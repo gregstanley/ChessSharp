@@ -1,4 +1,6 @@
-﻿namespace ChessSharp.Tests
+﻿using ChessSharp.Keys;
+
+namespace ChessSharp.Tests
 {
     public class KeyGeneratorFixture
     {

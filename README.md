@@ -8,9 +8,12 @@ As I experimented it became clear that programming any Chess game touches on man
 
 On my development machine the code searches about 500k nodes per second (and depending on you're background that performance may seem extremely fast or extremely slow :-)). 
 
+
 ## C# and programming techniques summary
 * [.NET Standard 2.0](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) based projects.
 * [Expression-bodied memebers](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members)
+* [StyleCop](https://github.com/StyleCop/StyleCop) used to enforce code consistency.
+
 
 ## Chess programming specific feature summary
 * [Principal variation search](https://www.chessprogramming.org/Principal_Variation)
@@ -19,10 +22,12 @@ On my development machine the code searches about 500k nodes per second (and dep
 * [Legal Move generation tool](https://www.chessprogramming.org/Move_Generation). Generates roughly 3.5 million moves per second on an AMD Ryzen 2600 (it's faster than 'in-game' because the nodes are not evaluated).
 * That uses [a form of magic numbers based move generation](https://www.chessprogramming.org/Magic_Bitboards).
 
+
 ## What's missing
 * [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component
 * [Quiescence search] (https://www.chessprogramming.org/Quiescence_Search)
 * Draw detection within search. The game will detect a draw one a move has been played, it does not however detect draws during the search i.e. it just burns time investigating positions that are already drawn.
+
 
 ## Getting Started
 

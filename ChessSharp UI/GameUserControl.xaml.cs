@@ -18,28 +18,28 @@ namespace ChessSharp_UI
 
         public GameUserControl()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
         public Game Game { get; set; }
 
         private void BtnNewGameWhite_Click(object sender, RoutedEventArgs e) =>
-            NewGameWhite(new Game(new Board(), transpositionTable, Colour.White));
+            this.NewGameWhite(new Game(new Board(), this.transpositionTable, Colour.White));
 
         private async void BtnNewGameBlack_Click(object sender, RoutedEventArgs e) =>
-            await NewGameBlack(new Game(new Board(), transpositionTable, Colour.Black));
+            await this.NewGameBlack(new Game(new Board(), this.transpositionTable, Colour.Black));
 
         private async void GoBtn_Click(object sender, RoutedEventArgs e) =>
-            await NewGameFromFen();
+            await this.NewGameFromFen();
 
         private void NewGameWhite(Game game) =>
-            NewGame(game);
+            this.NewGame(game);
 
         private Task NewGameBlack(Game game)
         {
-            NewGame(game);
+            this.NewGame(game);
 
-            return DoSearch();
+            return this.DoSearch();
         }
 
         private Task NewGameFromFen()
@@ -48,25 +48,25 @@ namespace ChessSharp_UI
 
             var board = Board.FromGameState(gameState);
 
-            var game = new Game(board, transpositionTable, Colour.White);
+            var game = new Game(board, this.transpositionTable, Colour.White);
 
             if (gameState.ToPlay == Colour.White)
             {
-                NewGameWhite(game);
+                this.NewGameWhite(game);
 
                 return Task.CompletedTask;
             }
 
-            return NewGameBlack(game);
+            return this.NewGameBlack(game);
         }
 
         private void NewGame(Game game)
         {
             if (Game != null)
             {
-                Game.MoveApplied -= Game_MoveApplied;
-                Game.SearchCompleted -= Game_SearchCompleted;
-                Game.Info -= Game_Info;
+                Game.MoveApplied -= this.Game_MoveApplied;
+                Game.SearchCompleted -= this.Game_SearchCompleted;
+                Game.Info -= this.Game_Info;
             }
 
             if (game != null)
@@ -75,12 +75,12 @@ namespace ChessSharp_UI
             }
             else
             {
-                Game = new Game(new Board(), transpositionTable, Colour.White);
+                Game = new Game(new Board(), this.transpositionTable, Colour.White);
             }
 
-            Game.MoveApplied += Game_MoveApplied;
-            Game.SearchCompleted += Game_SearchCompleted;
-            Game.Info += Game_Info;
+            Game.MoveApplied += this.Game_MoveApplied;
+            Game.SearchCompleted += this.Game_SearchCompleted;
+            Game.Info += this.Game_Info;
 
             WhiteCastleKingSide.Visibility = Visibility.Visible;
             WhiteCastleQueenSide.Visibility = Visibility.Visible;
@@ -98,18 +98,6 @@ namespace ChessSharp_UI
             {
                 InfoTimeTextBlock.Text = args.Info.GetTimeString();
                 InfoTtTextBlock.Text = args.Info.GetTtString();
-
-                //if (args.Info is InfoDepthComplete info2)
-                //{
-                //    InfoPvTextBlock.Text = info2.GetPvString();
-                //    return;
-                //}
-
-                //if (args.Info is InfoNewPv info3)
-                //{
-                //    InfoPvTextBlock2.Text = info3.GetBestMoveString();
-                //    return;
-                //}
             }));
         }
 
@@ -196,23 +184,23 @@ namespace ChessSharp_UI
         }
         
         private async void BoardUserControl_PieceMoved(object sender, UserMovedPieceEventArgs args) =>
-            await OnPieceMoved(args); 
+            await this.OnPieceMoved(args); 
 
         private async void BoardUserControl_PieceSelected(object sender, PromotionTypeSelectedEventArgs args) =>
-            await OnPieceSelected(args);
+            await this.OnPieceSelected(args);
 
         private Task OnPieceMoved(UserMovedPieceEventArgs args)
         {
             var move = Game.TryMove(args.FromSquareIndex, args.ToSquareIndex, PieceType.None);
 
-            return move.Value == 0 ? Task.CompletedTask : DoSearch();
+            return move.Value == 0 ? Task.CompletedTask : this.DoSearch();
         }
 
         private Task OnPieceSelected(PromotionTypeSelectedEventArgs args)
         {
             var move = Game.TryMove(args.FromSquareIndex, args.ToSquareIndex, args.PieceType);
 
-            return move.Value == 0 ? Task.CompletedTask : DoSearch();
+            return move.Value == 0 ? Task.CompletedTask : this.DoSearch();
         }
 
         private async Task DoSearch()

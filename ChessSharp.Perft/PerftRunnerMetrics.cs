@@ -46,8 +46,6 @@ namespace ChessSharp.MoveGeneration
 
                 board.MakeMove(move);
 
-                ////var checkers = GetCheckers(board, colour);
-                
                 InnerPerft(board, colour.Opposite(), depth - 1, moves, metrics);
 
                 board.UnMakeMove(move);
@@ -86,28 +84,10 @@ namespace ChessSharp.MoveGeneration
 
                 board.MakeMove(move);
 
-                ////var checkers = GetCheckers(board, colour);
-
                 InnerPerft(board, colour.Opposite(), depth - 1, moves, metrics);
 
                 board.UnMakeMove(move);
             }
         }
-
-        //private SquareFlag GetCheckers(BitBoard board, Colour colour)
-        //{
-        //    var relativeBitBoard = board.RelativeTo(colour);
-
-        //    var checkersPawn = MoveGenerator.GetPawnCheckers(relativeBitBoard, relativeBitBoard.MyKing);
-        //    var checkersKnight = MoveGenerator.GetKnightCheckers(relativeBitBoard, relativeBitBoard.MyKing);
-        //    var checkersRook = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Rook, PieceType.Rook);
-        //    var checkersBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Bishop);
-        //    var checkersQueenAsRook = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Rook, PieceType.Queen);
-        //    var checkersQueenAsBishop = MoveGenerator.GetCheckers(relativeBitBoard, relativeBitBoard.MyKing, PieceType.Bishop, PieceType.Queen);
-
-        //    var checkers = checkersPawn | checkersKnight | checkersRook | checkersBishop | checkersQueenAsRook | checkersQueenAsBishop;
-
-        //    return checkers;
-        //}
     }
 }

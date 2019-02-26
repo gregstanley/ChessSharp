@@ -32,7 +32,7 @@ namespace ChessSharp_UI
 
         public BoardUserControl()
         {
-            InitializeComponent();
+            this.InitializeComponent();
 
             IllegalMoveLabel.Visibility = Visibility.Collapsed;
             ThinkingLabel.Visibility = Visibility.Collapsed;
@@ -41,9 +41,9 @@ namespace ChessSharp_UI
 
             PromotionUserControl.Visibility = Visibility.Collapsed;
 
-            dispatcherTimer.Tick += DispatcherTimer_Tick;
+            this.dispatcherTimer.Tick += this.DispatcherTimer_Tick;
 
-            dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
+            this.dispatcherTimer.Interval = new TimeSpan(0, 0, 1);
         }
 
         public delegate void UserMovedPieceEventDelegate(object sender, UserMovedPieceEventArgs args);
@@ -62,29 +62,29 @@ namespace ChessSharp_UI
         {
             this.gameEvents = game ?? throw new ArgumentNullException(nameof(game));
 
-            this.gameEvents.InvalidMove += GameEvents_InvalidMove;
-            this.gameEvents.PromotionTypeRequired += GameEvents_PromotionTypeRequired;
-            this.gameEvents.SearchStarted += GameEvents_SearchStarted;
-            this.gameEvents.SearchCompleted += GameEvents_SearchCompleted;
-            this.gameEvents.MoveApplied += GameEvents_MoveApplied;
-            this.gameEvents.Draw += GameEvents_Draw;
-            this.gameEvents.Checkmate += GameEvents_Checkmate;
+            this.gameEvents.InvalidMove += this.GameEvents_InvalidMove;
+            this.gameEvents.PromotionTypeRequired += this.GameEvents_PromotionTypeRequired;
+            this.gameEvents.SearchStarted += this.GameEvents_SearchStarted;
+            this.gameEvents.SearchCompleted += this.GameEvents_SearchCompleted;
+            this.gameEvents.MoveApplied += this.GameEvents_MoveApplied;
+            this.gameEvents.Draw += this.GameEvents_Draw;
+            this.gameEvents.Checkmate += this.GameEvents_Checkmate;
 
-            PromotionUserControl.PromotionTypeSelected += PromotionUserControl_PromotionTypeSelected;
+            this.PromotionUserControl.PromotionTypeSelected += this.PromotionUserControl_PromotionTypeSelected;
 
-            Update(new MoveViewer(0), game.CurrentState.GameState);
+            this.Update(new MoveViewer(0), game.CurrentState.GameState);
         }
 
         private void GameEvents_InvalidMove(object sender, InvalidMoveEventArgs args)
         {
             IllegalMoveLabel.Visibility = Visibility.Visible;
 
-            dispatcherTimer.Start();
+            this.dispatcherTimer.Start();
         }
 
         private void DispatcherTimer_Tick(object sender, EventArgs e)
         {
-            dispatcherTimer.Stop();
+            this.dispatcherTimer.Stop();
 
             IllegalMoveLabel.Visibility = Visibility.Collapsed;
         }
@@ -94,43 +94,43 @@ namespace ChessSharp_UI
 
         private void GameEvents_SearchStarted(object sender, EventArgs args)
         {
-            isThinking = true;
+            this.isThinking = true;
 
             ThinkingLabel.Visibility = Visibility.Visible;
         }
 
         private void GameEvents_SearchCompleted(object sender, EventArgs args)
         {
-            isThinking = false;
+            this.isThinking = false;
 
             ThinkingLabel.Visibility = Visibility.Collapsed;
         }
 
         private void GameEvents_MoveApplied(object sender, MoveAppliedEventArgs args) =>
-            Update(args.Move, args.GameState);
+            this.Update(args.Move, args.GameState);
 
         private void GameEvents_Draw(object sender, MoveAppliedEventArgs args)
         {
-            Update(args.Move, args.GameState);
+            this.Update(args.Move, args.GameState);
 
             DrawLabel.Visibility = Visibility.Visible;
         }
 
         private void GameEvents_Checkmate(object sender, MoveAppliedEventArgs args)
         {
-            Update(args.Move, args.GameState);
+            this.Update(args.Move, args.GameState);
 
             CheckmateLabel.Visibility = Visibility.Visible;
         }
 
         private void PromotionUserControl_PromotionTypeSelected(object sender, PromotionTypeSelectedEventArgs args) =>
-            PromotionTypeSelected?.Invoke(this, args);
+            this.PromotionTypeSelected?.Invoke(this, args);
 
         private void Update(MoveViewer move, GameState gameState)
         {
-            currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
+            this.currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
 
-            isThinking = false;
+            this.isThinking = false;
 
             IllegalMoveLabel.Visibility = Visibility.Collapsed;
             ThinkingLabel.Visibility = Visibility.Collapsed;
@@ -139,20 +139,20 @@ namespace ChessSharp_UI
 
             BoardCanvas.Children.Clear();
 
-            var board = currentGameState;
+            var board = this.currentGameState;
 
-            AddPieces(Colour.White, PieceType.Pawn, board.WhitePawns, GridSizeInPixels);
-            AddPieces(Colour.White, PieceType.Rook, board.WhiteRooks, GridSizeInPixels);
-            AddPieces(Colour.White, PieceType.Knight, board.WhiteKnights, GridSizeInPixels);
-            AddPieces(Colour.White, PieceType.Bishop, board.WhiteBishops, GridSizeInPixels);
-            AddPieces(Colour.White, PieceType.Queen, board.WhiteQueens, GridSizeInPixels);
-            AddPieces(Colour.White, PieceType.King, board.WhiteKing, GridSizeInPixels);
-            AddPieces(Colour.Black, PieceType.Pawn, board.BlackPawns, GridSizeInPixels);
-            AddPieces(Colour.Black, PieceType.Rook, board.BlackRooks, GridSizeInPixels);
-            AddPieces(Colour.Black, PieceType.Knight, board.BlackKnights, GridSizeInPixels);
-            AddPieces(Colour.Black, PieceType.Bishop, board.BlackBishops, GridSizeInPixels);
-            AddPieces(Colour.Black, PieceType.Queen, board.BlackQueens, GridSizeInPixels);
-            AddPieces(Colour.Black, PieceType.King, board.BlackKing, GridSizeInPixels);
+            this.AddPieces(Colour.White, PieceType.Pawn, board.WhitePawns, GridSizeInPixels);
+            this.AddPieces(Colour.White, PieceType.Rook, board.WhiteRooks, GridSizeInPixels);
+            this.AddPieces(Colour.White, PieceType.Knight, board.WhiteKnights, GridSizeInPixels);
+            this.AddPieces(Colour.White, PieceType.Bishop, board.WhiteBishops, GridSizeInPixels);
+            this.AddPieces(Colour.White, PieceType.Queen, board.WhiteQueens, GridSizeInPixels);
+            this.AddPieces(Colour.White, PieceType.King, board.WhiteKing, GridSizeInPixels);
+            this.AddPieces(Colour.Black, PieceType.Pawn, board.BlackPawns, GridSizeInPixels);
+            this.AddPieces(Colour.Black, PieceType.Rook, board.BlackRooks, GridSizeInPixels);
+            this.AddPieces(Colour.Black, PieceType.Knight, board.BlackKnights, GridSizeInPixels);
+            this.AddPieces(Colour.Black, PieceType.Bishop, board.BlackBishops, GridSizeInPixels);
+            this.AddPieces(Colour.Black, PieceType.Queen, board.BlackQueens, GridSizeInPixels);
+            this.AddPieces(Colour.Black, PieceType.King, board.BlackKing, GridSizeInPixels);
         }
 
         private void AddPieces(Colour colour, PieceType pieceType, SquareFlag squares, int gridSize)
@@ -188,10 +188,10 @@ namespace ChessSharp_UI
 
                 image.Visibility = Visibility.Visible;
 
-                var rank = IndexToRank(squareIndex);
-                var file = IndexToFile(squareIndex);
+                var rank = this.IndexToRank(squareIndex);
+                var file = this.IndexToFile(squareIndex);
 
-                var xy = GetScreenPosition(GridSizeInPixels, rank, file);
+                var xy = this.GetScreenPosition(GridSizeInPixels, rank, file);
 
                 Canvas.SetLeft(image, xy.X);
                 Canvas.SetTop(image, xy.Y); 
@@ -200,7 +200,7 @@ namespace ChessSharp_UI
         
         private void Board_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (isThinking)
+            if (this.isThinking)
                 return;
 
             Point p = e.GetPosition(this);
@@ -211,14 +211,14 @@ namespace ChessSharp_UI
             var file = (int)(x / GridSizeInPixels);
             var rank = (int)(8 - (y / GridSizeInPixels));
 
-            FromSquareIndex = ConvertToSquareIndex(rank, file);
+            this.FromSquareIndex = this.ConvertToSquareIndex(rank, file);
 
-            FromLabel.Content = FromSquareIndex;
+            FromLabel.Content = this.FromSquareIndex;
         }
         
         private void Board_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            if (isThinking)
+            if (this.isThinking)
                 return;
 
             Point p = e.GetPosition(this);
@@ -229,11 +229,11 @@ namespace ChessSharp_UI
             var file = (int)(x / GridSizeInPixels);
             var rank = (int)(8 - (y / GridSizeInPixels));
 
-            ToSquareIndex = ConvertToSquareIndex(rank, file);
+            this.ToSquareIndex = this.ConvertToSquareIndex(rank, file);
 
-            ToLabel.Content = ToSquareIndex;
+            ToLabel.Content = this.ToSquareIndex;
 
-            PieceMoved?.Invoke(this, new UserMovedPieceEventArgs(FromSquareIndex, ToSquareIndex));
+            this.PieceMoved?.Invoke(this, new UserMovedPieceEventArgs(this.FromSquareIndex, this.ToSquareIndex));
         }
 
         private Point GetScreenPosition(int gridSize, int rank, int file)

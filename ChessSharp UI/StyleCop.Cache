@@ -1,530 +1,14 @@
 <stylecopresultscache>
   <version>12</version>
-  <sourcecode name="BoardUserControl.xaml.cs" parser="StyleCop.CSharp.CsParser">
-    <timestamps>
-      <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/18 21:10:53.103</settingsFile>
-      <sourceFile>2018/12/18 21:14:07.691</sourceFile>
-      <parser>2018/12/06 08:26:48.414</parser>
-      <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
-      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
-      <StyleCop.CSharp.LayoutRules>2018/12/06 08:26:48.414</StyleCop.CSharp.LayoutRules>
-      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
-      <StyleCop.CSharp.MaintainabilityRules>2018/12/06 08:26:48.414</StyleCop.CSharp.MaintainabilityRules>
-      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
-      <StyleCop.CSharp.NamingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.NamingRules>
-      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
-      <StyleCop.CSharp.OrderingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.OrderingRules>
-      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
-      <StyleCop.CSharp.ReadabilityRules>2018/12/06 08:26:48.414</StyleCop.CSharp.ReadabilityRules>
-      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
-      <StyleCop.CSharp.SpacingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.SpacingRules>
-      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
-    </timestamps>
-    <violations>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to InitializeComponent must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>31</line>
-        <index>754</index>
-        <endIndex>772</endIndex>
-        <startLine>31</startLine>
-        <startColumn>13</startColumn>
-        <endLine>31</endLine>
-        <endColumn>31</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to gameEvents_InvalidMove must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>56</line>
-        <index>1779</index>
-        <endIndex>1800</endIndex>
-        <startLine>56</startLine>
-        <startColumn>44</startColumn>
-        <endLine>56</endLine>
-        <endColumn>65</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to gameEvents_PromotionTypeRequired must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>57</line>
-        <index>1857</index>
-        <endIndex>1888</endIndex>
-        <startLine>57</startLine>
-        <startColumn>54</startColumn>
-        <endLine>57</endLine>
-        <endColumn>85</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to gameEvents_SearchStarted must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>58</line>
-        <index>1937</index>
-        <endIndex>1960</endIndex>
-        <startLine>58</startLine>
-        <startColumn>46</startColumn>
-        <endLine>58</endLine>
-        <endColumn>69</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to gameEvents_SearchCompleted must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>59</line>
-        <index>2011</index>
-        <endIndex>2036</endIndex>
-        <startLine>59</startLine>
-        <startColumn>48</startColumn>
-        <endLine>59</endLine>
-        <endColumn>73</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to gameEvents_MoveApplied must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>60</line>
-        <index>2083</index>
-        <endIndex>2104</endIndex>
-        <startLine>60</startLine>
-        <startColumn>44</startColumn>
-        <endLine>60</endLine>
-        <endColumn>65</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to gameEvents_Checkmate must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>61</line>
-        <index>2149</index>
-        <endIndex>2168</endIndex>
-        <startLine>61</startLine>
-        <startColumn>42</startColumn>
-        <endLine>61</endLine>
-        <endColumn>61</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to PromotionUserControl_PromotionTypeSelected must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>63</line>
-        <index>2232</index>
-        <endIndex>2273</endIndex>
-        <startLine>63</startLine>
-        <startColumn>59</startColumn>
-        <endLine>63</endLine>
-        <endColumn>100</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Update must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>65</line>
-        <index>2291</index>
-        <endIndex>2296</endIndex>
-        <startLine>65</startLine>
-        <startColumn>13</startColumn>
-        <endLine>65</endLine>
-        <endColumn>18</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.NamingRules" rule="ElementMustBeginWithUpperCaseLetter" ruleCheckId="SA1300">
-        <context>method names begin with an upper-case letter: gameEvents_InvalidMove.</context>
-        <line>68</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.NamingRules" rule="ElementMustBeginWithUpperCaseLetter" ruleCheckId="SA1300">
-        <context>method names begin with an upper-case letter: gameEvents_PromotionTypeRequired.</context>
-        <line>71</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.NamingRules" rule="ElementMustBeginWithUpperCaseLetter" ruleCheckId="SA1300">
-        <context>method names begin with an upper-case letter: gameEvents_SearchStarted.</context>
-        <line>74</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to isThinking must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>76</line>
-        <index>2757</index>
-        <endIndex>2766</endIndex>
-        <startLine>76</startLine>
-        <startColumn>13</startColumn>
-        <endLine>76</endLine>
-        <endColumn>22</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.NamingRules" rule="ElementMustBeginWithUpperCaseLetter" ruleCheckId="SA1300">
-        <context>method names begin with an upper-case letter: gameEvents_SearchCompleted.</context>
-        <line>81</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to isThinking must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>83</line>
-        <index>2955</index>
-        <endIndex>2964</endIndex>
-        <startLine>83</startLine>
-        <startColumn>13</startColumn>
-        <endLine>83</endLine>
-        <endColumn>22</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.NamingRules" rule="ElementMustBeginWithUpperCaseLetter" ruleCheckId="SA1300">
-        <context>method names begin with an upper-case letter: gameEvents_MoveApplied.</context>
-        <line>88</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Update must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>89</line>
-        <index>3155</index>
-        <endIndex>3160</endIndex>
-        <startLine>89</startLine>
-        <startColumn>13</startColumn>
-        <endLine>89</endLine>
-        <endColumn>18</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.NamingRules" rule="ElementMustBeginWithUpperCaseLetter" ruleCheckId="SA1300">
-        <context>method names begin with an upper-case letter: gameEvents_Checkmate.</context>
-        <line>91</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to PromotionTypeSelected must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>97</line>
-        <index>3484</index>
-        <endIndex>3504</endIndex>
-        <startLine>97</startLine>
-        <startColumn>13</startColumn>
-        <endLine>97</endLine>
-        <endColumn>33</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to currentGameState must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>101</line>
-        <index>3620</index>
-        <endIndex>3635</endIndex>
-        <startLine>101</startLine>
-        <startColumn>13</startColumn>
-        <endLine>101</endLine>
-        <endColumn>28</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to isThinking must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>103</line>
-        <index>3719</index>
-        <endIndex>3728</endIndex>
-        <startLine>103</startLine>
-        <startColumn>13</startColumn>
-        <endLine>103</endLine>
-        <endColumn>22</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to currentGameState must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>111</line>
-        <index>4003</index>
-        <endIndex>4018</endIndex>
-        <startLine>111</startLine>
-        <startColumn>25</startColumn>
-        <endLine>111</endLine>
-        <endColumn>40</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>113</line>
-        <index>4036</index>
-        <endIndex>4044</endIndex>
-        <startLine>113</startLine>
-        <startColumn>13</startColumn>
-        <endLine>113</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>114</line>
-        <index>4126</index>
-        <endIndex>4134</endIndex>
-        <startLine>114</startLine>
-        <startColumn>13</startColumn>
-        <endLine>114</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>115</line>
-        <index>4216</index>
-        <endIndex>4224</endIndex>
-        <startLine>115</startLine>
-        <startColumn>13</startColumn>
-        <endLine>115</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>116</line>
-        <index>4310</index>
-        <endIndex>4318</endIndex>
-        <startLine>116</startLine>
-        <startColumn>13</startColumn>
-        <endLine>116</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>117</line>
-        <index>4404</index>
-        <endIndex>4412</endIndex>
-        <startLine>117</startLine>
-        <startColumn>13</startColumn>
-        <endLine>117</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>118</line>
-        <index>4496</index>
-        <endIndex>4504</endIndex>
-        <startLine>118</startLine>
-        <startColumn>13</startColumn>
-        <endLine>118</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>119</line>
-        <index>4585</index>
-        <endIndex>4593</endIndex>
-        <startLine>119</startLine>
-        <startColumn>13</startColumn>
-        <endLine>119</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>120</line>
-        <index>4675</index>
-        <endIndex>4683</endIndex>
-        <startLine>120</startLine>
-        <startColumn>13</startColumn>
-        <endLine>120</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>121</line>
-        <index>4765</index>
-        <endIndex>4773</endIndex>
-        <startLine>121</startLine>
-        <startColumn>13</startColumn>
-        <endLine>121</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>122</line>
-        <index>4859</index>
-        <endIndex>4867</endIndex>
-        <startLine>122</startLine>
-        <startColumn>13</startColumn>
-        <endLine>122</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>123</line>
-        <index>4953</index>
-        <endIndex>4961</endIndex>
-        <startLine>123</startLine>
-        <startColumn>13</startColumn>
-        <endLine>123</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to AddPieces must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>124</line>
-        <index>5045</index>
-        <endIndex>5053</endIndex>
-        <startLine>124</startLine>
-        <startColumn>13</startColumn>
-        <endLine>124</endLine>
-        <endColumn>21</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to IndexToRank must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>160</line>
-        <index>6272</index>
-        <endIndex>6282</endIndex>
-        <startLine>160</startLine>
-        <startColumn>28</startColumn>
-        <endLine>160</endLine>
-        <endColumn>38</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to IndexToFile must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>161</line>
-        <index>6326</index>
-        <endIndex>6336</endIndex>
-        <startLine>161</startLine>
-        <startColumn>28</startColumn>
-        <endLine>161</endLine>
-        <endColumn>38</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to GetScreenPosition must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>163</line>
-        <index>6380</index>
-        <endIndex>6396</endIndex>
-        <startLine>163</startLine>
-        <startColumn>26</startColumn>
-        <endLine>163</endLine>
-        <endColumn>42</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to isThinking must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>172</line>
-        <index>6664</index>
-        <endIndex>6673</endIndex>
-        <startLine>172</startLine>
-        <startColumn>17</startColumn>
-        <endLine>172</endLine>
-        <endColumn>26</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to FromSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>183</line>
-        <index>6978</index>
-        <endIndex>6992</endIndex>
-        <startLine>183</startLine>
-        <startColumn>13</startColumn>
-        <endLine>183</endLine>
-        <endColumn>27</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to ConvertToSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>183</line>
-        <index>6996</index>
-        <endIndex>7015</endIndex>
-        <startLine>183</startLine>
-        <startColumn>31</startColumn>
-        <endLine>183</endLine>
-        <endColumn>50</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to FromSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>185</line>
-        <index>7065</index>
-        <endIndex>7079</endIndex>
-        <startLine>185</startLine>
-        <startColumn>33</startColumn>
-        <endLine>185</endLine>
-        <endColumn>47</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to isThinking must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>190</line>
-        <index>7206</index>
-        <endIndex>7215</endIndex>
-        <startLine>190</startLine>
-        <startColumn>17</startColumn>
-        <endLine>190</endLine>
-        <endColumn>26</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to ToSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>201</line>
-        <index>7520</index>
-        <endIndex>7532</endIndex>
-        <startLine>201</startLine>
-        <startColumn>13</startColumn>
-        <endLine>201</endLine>
-        <endColumn>25</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to ConvertToSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>201</line>
-        <index>7536</index>
-        <endIndex>7555</endIndex>
-        <startLine>201</startLine>
-        <startColumn>29</startColumn>
-        <endLine>201</endLine>
-        <endColumn>48</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to ToSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>203</line>
-        <index>7603</index>
-        <endIndex>7615</endIndex>
-        <startLine>203</startLine>
-        <startColumn>31</startColumn>
-        <endLine>203</endLine>
-        <endColumn>43</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to PieceMoved must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>205</line>
-        <index>7633</index>
-        <endIndex>7642</endIndex>
-        <startLine>205</startLine>
-        <startColumn>13</startColumn>
-        <endLine>205</endLine>
-        <endColumn>22</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to FromSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>205</line>
-        <index>7686</index>
-        <endIndex>7700</endIndex>
-        <startLine>205</startLine>
-        <startColumn>66</startColumn>
-        <endLine>205</endLine>
-        <endColumn>80</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to ToSquareIndex must begin with the 'this.', 'base.', 'object.' or 'BoardUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>205</line>
-        <index>7703</index>
-        <endIndex>7715</endIndex>
-        <startLine>205</startLine>
-        <startColumn>83</startColumn>
-        <endLine>205</endLine>
-        <endColumn>95</endColumn>
-        <warning>False</warning>
-      </violation>
-    </violations>
-  </sourcecode>
   <project key="-377940488">
     <configuration>
     </configuration>
   </project>
-  <sourcecode name="GameUserControl.xaml.cs" parser="StyleCop.CSharp.CsParser">
+  <sourcecode name="ImageMap.cs" parser="StyleCop.CSharp.CsParser">
     <timestamps>
       <styleCop>2018/12/06 08:26:48.414</styleCop>
-      <settingsFile>2018/12/18 21:10:53.103</settingsFile>
-      <sourceFile>2019/01/25 08:23:46.296</sourceFile>
+      <settingsFile>2019/02/05 07:59:47.566</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.479</sourceFile>
       <parser>2018/12/06 08:26:48.414</parser>
       <StyleCop.CSharp.DocumentationRules>2018/12/06 08:26:48.414</StyleCop.CSharp.DocumentationRules>
       <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1412485698</StyleCop.CSharp.DocumentationRules.FilesHashCode>
@@ -541,336 +25,217 @@
       <StyleCop.CSharp.SpacingRules>2018/12/06 08:26:48.414</StyleCop.CSharp.SpacingRules>
       <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
     </timestamps>
-    <violations>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to InitializeComponent must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>21</line>
-        <index>506</index>
-        <endIndex>524</endIndex>
-        <startLine>21</startLine>
-        <startColumn>13</startColumn>
-        <endLine>21</endLine>
-        <endColumn>31</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.OrderingRules" rule="ElementsMustBeOrderedByAccess" ruleCheckId="SA1202">
-        <context>All private methods must be placed after all public methods.</context>
-        <line>32</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.OrderingRules" rule="ElementsMustBeOrderedByAccess" ruleCheckId="SA1202">
-        <context>All private methods must be placed after all public methods.</context>
-        <line>35</line>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGameWhite must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>27</line>
-        <index>678</index>
-        <endIndex>689</endIndex>
-        <startLine>27</startLine>
-        <startColumn>13</startColumn>
-        <endLine>27</endLine>
-        <endColumn>24</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>27</line>
-        <index>716</index>
-        <endIndex>733</endIndex>
-        <startLine>27</startLine>
-        <startColumn>51</startColumn>
-        <endLine>27</endLine>
-        <endColumn>68</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGameBlack must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>30</line>
-        <index>860</index>
-        <endIndex>871</endIndex>
-        <startLine>30</startLine>
-        <startColumn>19</startColumn>
-        <endLine>30</endLine>
-        <endColumn>30</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>30</line>
-        <index>898</index>
-        <endIndex>915</endIndex>
-        <startLine>30</startLine>
-        <startColumn>57</startColumn>
-        <endLine>30</endLine>
-        <endColumn>74</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGame must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>33</line>
-        <index>997</index>
-        <endIndex>1003</endIndex>
-        <startLine>33</startLine>
-        <startColumn>13</startColumn>
-        <endLine>33</endLine>
-        <endColumn>19</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGame must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>37</line>
-        <index>1083</index>
-        <endIndex>1089</endIndex>
-        <startLine>37</startLine>
-        <startColumn>13</startColumn>
-        <endLine>37</endLine>
-        <endColumn>19</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to DoSearch must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>39</line>
-        <index>1120</index>
-        <endIndex>1127</endIndex>
-        <startLine>39</startLine>
-        <startColumn>20</startColumn>
-        <endLine>39</endLine>
-        <endColumn>27</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Game_MoveApplied must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>46</line>
-        <index>1280</index>
-        <endIndex>1295</endIndex>
-        <startLine>46</startLine>
-        <startColumn>37</startColumn>
-        <endLine>46</endLine>
-        <endColumn>52</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Game_SearchCompleted must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>47</line>
-        <index>1339</index>
-        <endIndex>1358</endIndex>
-        <startLine>47</startLine>
-        <startColumn>41</startColumn>
-        <endLine>47</endLine>
-        <endColumn>60</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Game_Info must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>48</line>
-        <index>1391</index>
-        <endIndex>1399</endIndex>
-        <startLine>48</startLine>
-        <startColumn>30</startColumn>
-        <endLine>48</endLine>
-        <endColumn>38</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>57</line>
-        <index>1592</index>
-        <endIndex>1609</endIndex>
-        <startLine>57</startLine>
-        <startColumn>49</startColumn>
-        <endLine>57</endLine>
-        <endColumn>66</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Game_MoveApplied must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>60</line>
-        <index>1677</index>
-        <endIndex>1692</endIndex>
-        <startLine>60</startLine>
-        <startColumn>33</startColumn>
-        <endLine>60</endLine>
-        <endColumn>48</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Game_SearchCompleted must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>61</line>
-        <index>1732</index>
-        <endIndex>1751</endIndex>
-        <startLine>61</startLine>
-        <startColumn>37</startColumn>
-        <endLine>61</endLine>
-        <endColumn>56</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to Game_Info must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>62</line>
-        <index>1780</index>
-        <endIndex>1788</endIndex>
-        <startLine>62</startLine>
-        <startColumn>26</startColumn>
-        <endLine>62</endLine>
-        <endColumn>34</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
-        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
-        <line>81</line>
-        <index>2485</index>
-        <endIndex>2527</endIndex>
-        <startLine>81</startLine>
-        <startColumn>17</startColumn>
-        <endLine>81</endLine>
-        <endColumn>59</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
-        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
-        <line>82</line>
-        <index>2546</index>
-        <endIndex>2548</endIndex>
-        <startLine>82</startLine>
-        <startColumn>17</startColumn>
-        <endLine>82</endLine>
-        <endColumn>19</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
-        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
-        <line>85</line>
-        <index>2665</index>
-        <endIndex>2667</endIndex>
-        <startLine>85</startLine>
-        <startColumn>17</startColumn>
-        <endLine>85</endLine>
-        <endColumn>19</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
-        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
-        <line>87</line>
-        <index>2688</index>
-        <endIndex>2722</endIndex>
-        <startLine>87</startLine>
-        <startColumn>17</startColumn>
-        <endLine>87</endLine>
-        <endColumn>51</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
-        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
-        <line>88</line>
-        <index>2741</index>
-        <endIndex>2743</endIndex>
-        <startLine>88</startLine>
-        <startColumn>17</startColumn>
-        <endLine>88</endLine>
-        <endColumn>19</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.SpacingRules" rule="SingleLineCommentsMustBeginWithSingleSpace" ruleCheckId="SA1005">
-        <context>The comment must start with a single space. To ignore this error when commenting out a line of code, begin the comment with '////' rather than '//'.</context>
-        <line>91</line>
-        <index>2867</index>
-        <endIndex>2869</endIndex>
-        <startLine>91</startLine>
-        <startColumn>17</startColumn>
-        <endLine>91</endLine>
-        <endColumn>19</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to OnPieceMoved must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>178</line>
-        <index>5688</index>
-        <endIndex>5699</endIndex>
-        <startLine>178</startLine>
-        <startColumn>19</startColumn>
-        <endLine>178</endLine>
-        <endColumn>30</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to OnPieceSelected must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>181</line>
-        <index>5844</index>
-        <endIndex>5858</endIndex>
-        <startLine>181</startLine>
-        <startColumn>19</startColumn>
-        <endLine>181</endLine>
-        <endColumn>33</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGameFromFen must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>184</line>
-        <index>5965</index>
-        <endIndex>5978</endIndex>
-        <startLine>184</startLine>
-        <startColumn>19</startColumn>
-        <endLine>184</endLine>
-        <endColumn>32</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to DoSearch must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>190</line>
-        <index>6218</index>
-        <endIndex>6225</endIndex>
-        <startLine>190</startLine>
-        <startColumn>59</startColumn>
-        <endLine>190</endLine>
-        <endColumn>66</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to DoSearch must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>197</line>
-        <index>6486</index>
-        <endIndex>6493</endIndex>
-        <startLine>197</startLine>
-        <startColumn>59</startColumn>
-        <endLine>197</endLine>
-        <endColumn>66</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to transpositionTable must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>206</line>
-        <index>6729</index>
-        <endIndex>6746</endIndex>
-        <startLine>206</startLine>
-        <startColumn>40</startColumn>
-        <endLine>206</endLine>
-        <endColumn>57</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGameWhite must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>210</line>
-        <index>6849</index>
-        <endIndex>6860</endIndex>
-        <startLine>210</startLine>
-        <startColumn>17</startColumn>
-        <endLine>210</endLine>
-        <endColumn>28</endColumn>
-        <warning>False</warning>
-      </violation>
-      <violation namespace="StyleCop.CSharp.ReadabilityRules" rule="PrefixCallsCorrectly" ruleCheckId="SA1126">
-        <context>The call to NewGameBlack must begin with the 'this.', 'base.', 'object.' or 'GameUserControl.' or 'UserControl.' prefix to indicate the intended method call. </context>
-        <line>215</line>
-        <index>6952</index>
-        <endIndex>6963</endIndex>
-        <startLine>215</startLine>
-        <startColumn>20</startColumn>
-        <endLine>215</endLine>
-        <endColumn>31</endColumn>
-        <warning>False</warning>
-      </violation>
-    </violations>
+    <violations />
+  </sourcecode>
+  <project key="-116644384">
+    <configuration>
+    </configuration>
+  </project>
+  <sourcecode name="AssemblyInfo.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/26 08:20:13.907</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="Resources.Designer.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.506</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="App.xaml.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/26 07:44:43.549</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="BoardUserControl.xaml.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/26 07:42:57.268</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="GameUserControl.xaml.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/26 07:44:09.180</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="MainWindow.xaml.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/26 07:45:43.894</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="PromotionTypeSelectorUserControl.xaml.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/26 07:40:04.381</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="Settings.Designer.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/05 07:59:47.507</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
+  </sourcecode>
+  <sourcecode name="TurnItemUserControl.xaml.cs" parser="StyleCop.CSharp.CsParser">
+    <timestamps>
+      <styleCop>2019/02/26 07:26:02.294</styleCop>
+      <settingsFile>2019/02/26 07:26:02.275</settingsFile>
+      <sourceFile>2019/02/26 07:44:28.914</sourceFile>
+      <parser>2019/02/26 07:26:02.294</parser>
+      <StyleCop.CSharp.DocumentationRules>2019/02/26 07:26:02.294</StyleCop.CSharp.DocumentationRules>
+      <StyleCop.CSharp.DocumentationRules.FilesHashCode>-1324295604</StyleCop.CSharp.DocumentationRules.FilesHashCode>
+      <StyleCop.CSharp.LayoutRules>2019/02/26 07:26:02.294</StyleCop.CSharp.LayoutRules>
+      <StyleCop.CSharp.LayoutRules.FilesHashCode>0</StyleCop.CSharp.LayoutRules.FilesHashCode>
+      <StyleCop.CSharp.MaintainabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.MaintainabilityRules>
+      <StyleCop.CSharp.MaintainabilityRules.FilesHashCode>0</StyleCop.CSharp.MaintainabilityRules.FilesHashCode>
+      <StyleCop.CSharp.NamingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.NamingRules>
+      <StyleCop.CSharp.NamingRules.FilesHashCode>0</StyleCop.CSharp.NamingRules.FilesHashCode>
+      <StyleCop.CSharp.OrderingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.OrderingRules>
+      <StyleCop.CSharp.OrderingRules.FilesHashCode>0</StyleCop.CSharp.OrderingRules.FilesHashCode>
+      <StyleCop.CSharp.ReadabilityRules>2019/02/26 07:26:02.294</StyleCop.CSharp.ReadabilityRules>
+      <StyleCop.CSharp.ReadabilityRules.FilesHashCode>0</StyleCop.CSharp.ReadabilityRules.FilesHashCode>
+      <StyleCop.CSharp.SpacingRules>2019/02/26 07:26:02.294</StyleCop.CSharp.SpacingRules>
+      <StyleCop.CSharp.SpacingRules.FilesHashCode>0</StyleCop.CSharp.SpacingRules.FilesHashCode>
+    </timestamps>
+    <violations />
   </sourcecode>
 </stylecopresultscache>

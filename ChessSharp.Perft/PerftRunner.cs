@@ -58,7 +58,7 @@ namespace ChessSharp.MoveGeneration
 
             var count = 0;
 
-            foreach(var move in MoveGenerator.GenerateStream(depth, board, colour))
+            foreach (var move in MoveGenerator.GenerateStream(depth, board, colour))
             {
                 var moveView = new MoveViewer(move);
 

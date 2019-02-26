@@ -6,7 +6,7 @@ namespace ChessSharp_UI
     {
         public MainWindow()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

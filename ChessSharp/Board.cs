@@ -1,6 +1,7 @@
 ﻿using ChessSharp.Enums;
 using ChessSharp.Extensions;
 using ChessSharp.Helpers;
+using ChessSharp.Keys;
 using ChessSharp.Models;
 using System;
 using System.Collections.Generic;
