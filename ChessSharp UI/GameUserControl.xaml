@@ -16,13 +16,19 @@
                 </LinearGradientBrush>
             </Rectangle.Fill>
         </Rectangle>
-        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Height="490" Margin="10,10,0,0" VerticalAlignment="Top" Width="530" Background="#FFBFBFBF"/>
-        <local:BoardUserControl x:Name="BoardUserControl" HorizontalAlignment="Left" Width="346" Height="346" Margin="25,54,0,0" VerticalAlignment="Top" Background="Black" PieceMoved="BoardUserControl_PieceMoved" PromotionTypeSelected="BoardUserControl_PieceSelected" >
+        <Border BorderBrush="White" BorderThickness="1" HorizontalAlignment="Left" Height="490" Margin="10,10,0,0" VerticalAlignment="Top" Width="530" Background="#FFABA1B0"/>
+        <local:BoardUserControl x:Name="BoardUserControl" HorizontalAlignment="Left" Width="346" Height="346" Margin="25,55,0,0" VerticalAlignment="Top" Background="Black" PieceMoved="BoardUserControl_PieceMoved" PromotionTypeSelected="BoardUserControl_PieceSelected" >
             <local:BoardUserControl.Effect>
                 <DropShadowEffect ShadowDepth="6" BlurRadius="8" RenderingBias="Quality" Color="#FF666666"/>
             </local:BoardUserControl.Effect>
         </local:BoardUserControl>
-        <Label x:Name="HalfTurnCountLabel" Content="1" HorizontalAlignment="Left" Margin="449,66,0,0" VerticalAlignment="Top" Width="38" />
+        <Rectangle Fill="#FFDAD3D6" Stroke="#FFABADB3" Width="140" Margin="385,55,16,655"/>
+        <Label x:Name="HalfTurnCountLabel1" Content="Half turns:" HorizontalAlignment="Left" Margin="388,74,0,0" VerticalAlignment="Top" Foreground="#FF373638"/>
+        <Label x:Name="FullTurnsCountLabel" Content="Full turns:" HorizontalAlignment="Left" Margin="388,57,0,0" VerticalAlignment="Top" Foreground="#FF373638"/>
+        <Label x:Name="HalfTurnCountLabel" Content="0" HorizontalAlignment="Left" Margin="453,74,0,0" VerticalAlignment="Top" Width="38" Foreground="#FF373638" />
+        <Label x:Name="FullTurnNumberLabel" HorizontalAlignment="Left" Margin="453,58,0,0" VerticalAlignment="Top" Width="37" Height="28" Content="0" Foreground="#FF373638" />
+        <TextBlock x:Name="InfoTimeTextBlock" HorizontalAlignment="Left" Margin="393,97,0,0" TextWrapping="Wrap" Text="-" VerticalAlignment="Top" Width="122" Height="42" Foreground="#FF373638"/>
+        <ListBox x:Name="MovesListBox" HorizontalAlignment="Left" Height="251" Margin="385,150,0,0" VerticalAlignment="Top" Width="140" Opacity="0.8" Background="#FFE6E0E0"/>
         <Image x:Name="WhiteCastleQueenSide" HorizontalAlignment="Left" Height="32" Margin="25,400,0,0" VerticalAlignment="Top" Width="32" Source="Images/iconfinder_gnome-session-switch_30685.png">
             <Image.Effect>
                 <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
@@ -43,15 +49,11 @@
                 <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>
             </Image.Effect>
         </Image>
-        <Label x:Name="FullTurnNumberLabel" Content="1" HorizontalAlignment="Left" Margin="449,49,0,0" VerticalAlignment="Top" Width="38" />
         <Label x:Name="EvaluationLabel" HorizontalContentAlignment="Center" Content="0" HorizontalAlignment="Left" Margin="160,22,0,0" VerticalAlignment="Top" Width="75" FontWeight="Bold" FontSize="20" Foreground="#FFF1F1F1" Background="{x:Null}" Height="32" >
             <Label.Effect>
                 <DropShadowEffect ShadowDepth="2" RenderingBias="Quality" Opacity="0.6"/>
             </Label.Effect>
         </Label>
-        <TextBlock x:Name="InfoTimeTextBlock" HorizontalAlignment="Left" Margin="390,89,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="131" Height="42"/>
-        <Label x:Name="HalfTurnCountLabel1" Content="Half turns:" HorizontalAlignment="Left" Margin="385,66,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="FullTurnsCountLabel" Content="Full turns:" HorizontalAlignment="Left" Margin="385,49,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="FenTextBox" HorizontalAlignment="Left" Height="23" Margin="25,442,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="500" Background="#FFE6E6E6" Foreground="#FF303068" Text="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" RenderTransformOrigin="0.5,-1.087" Opacity="0.8"/>
         <Button x:Name="GoBtn" Content="Go" HorizontalAlignment="Left" Margin="25,470,0,0" VerticalAlignment="Top" Width="75" Click="GoBtn_Click"/>
         <Button x:Name="BtnNewGameWhite" Content="New Game as White" HorizontalAlignment="Left" Margin="260,470,0,0" VerticalAlignment="Top" Width="130" Click="BtnNewGameWhite_Click"/>
@@ -68,7 +70,5 @@
                 </Grid>
             </TabItem>
         </TabControl>
-        <ListBox x:Name="MovesListBox" HorizontalAlignment="Left" Height="270" Margin="385,130,0,0" VerticalAlignment="Top" Width="140" Opacity="0.8"/>
-
     </Grid>
 </UserControl>
