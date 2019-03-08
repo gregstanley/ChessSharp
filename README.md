@@ -1,12 +1,15 @@
 # ChessSharp
 
-ChessSharp is a basic C# based Chess game (note *game* not *engine* as there is not yet a [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component). It started as a little experiment when my son took an interest in Chess and then grew rapidly as I started to research how 'real' Chess programs worked.
-
-As I experimented it became clear that Chess programming is an art in its own right and touches on many different aspects of programming but also that many examples I encountered required high levels of understanding due to their highly optimised implementations. In my day job I take an interest in implementing clean programming techniques so the goal for this project became:
-* Identifying areas for use of programming techniques e.g. trying to keep classes small, variable names that convey purpose, using the latest C# syntax.
-* Trying to keep a *reasonable* level of performance (turns out searching to ply 7 is harder than I initially thought).
-
-On my development machine the code searches about 500k nodes per second (and depending on you're background that performance may seem extremely fast or extremely slow :-)). 
+ChessSharp is a basic C# based Chess game (note *game* not *engine* as there is not yet a [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component).
+It started as a little experiment when my son took an interest in Chess and then grew rapidly as I started to research how 'real' Chess programs worked.
+While experimenting it became clear that programming Chess is an art in it's own right and uses skills from all aspects of the discipline.
+The many years of academic research in the area has led to many advanced solutions to problems you don't even realise you have when you start but fortunately there is a lot of guidance out there to help.
+That said, I found many of the examples I encountered hard to get to grips with due to their highly optimised implementations.
+I also have a general interest in making sure any code I produce not only does the job but is also as simple and easy to access as possible and techniques so I set myself the goal of trying to produce a project to demonstrate: 
+* Appropriate use of the latest C# syntax and general best practise thinking.
+* Simple implementations of core Chess programming concepts.
+While trying to keep a *reasonable* level of performance (this code is not intended to beat [Stockfish](https://stockfishchess.org/) but it turns out searching to ply 7 is harder than I initially thought).
+On my development machine the code searches about 500k nodes per second (and depending on your background that performance may seem extremely fast or extremely slow :-)). 
 
 
 ## C# and programming techniques summary
@@ -34,6 +37,14 @@ On my development machine the code searches about 500k nodes per second (and dep
 
 Clone the project to your local machine and launch in your IDE.
 
+Projects:
+* ChessSharp - Core types and data structures.
+* ChessSharp Perft - Executable to test the perfromance of the move generation logic.
+* ChessSharp UI - [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) based user interface for playing games of Chess (I'm not that familiar with [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) so I'm sure there's plenty of sccope for improvement here).
+* ChessSharp.Engine - All logic that is not directly move generation related.
+* ChessSharp.MoveGeneration - Legal move generation.
+* ChessSharp.Tests - [xUnit](https://xunit.github.io/docs/getting-started/netfx/visual-studio)
+
 
 ## Running the tests
 
@@ -52,9 +63,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Acknowledgments
 
-* [CPW](https://www.chessprogramming.org/Main_Page)
-* README.md template from [PurpleBooth](https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/8254b53ab8dcb18afc64287aaddd9e5b6059f880/README-Template.md)
+* [CPW](https://www.chessprogramming.org/Main_Page) for the hundreds of in-depth definitions and examples.
 * Peter Ellis Jones for [this Generating Legal Chess Moves article](https://peterellisjones.com/posts/generating-legal-chess-moves-efficiently/) that I must have read ten times or more.
 * [JetChess](https://zipproth.de/jetchess/) notes as inspiration and reference.
 * [Thomas Petzke](https://macechess.blogspot.com/?m=1) and his mACE/iCE chess programming journey blog.
-* [Jaco van Neikerk's magic numbers article](http://vicki-chess.blogspot.com/2013/04/magics.html) which really helped me get my head round it.
+* [Jaco van Neikerk's magic numbers article](http://vicki-chess.blogspot.com/2013/04/magics.html) which really helped me get my head round a rather unusual topic.
+* README.md template from [PurpleBooth](https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/8254b53ab8dcb18afc64287aaddd9e5b6059f880/README-Template.md)
