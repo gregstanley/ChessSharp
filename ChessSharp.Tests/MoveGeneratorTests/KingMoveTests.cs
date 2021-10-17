@@ -102,7 +102,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var gameState = FenHelpers.Parse(fenString);
 
             var board = CreateBoard(gameState);
-            
+
             var moves = new List<uint>(20);
 
             MoveGenerator.Generate(board, gameState.ToPlay, moves);

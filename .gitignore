@@ -38,3 +38,5 @@ Generated\ Files/
 [Bb]uild[Ll]og.*
 
 [Pp]ackages
+.fake
+.ionide
