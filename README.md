@@ -13,7 +13,7 @@ On my development machine the code searches about 500k nodes per second (and dep
 
 
 ## C# and programming techniques summary
-* [.NET Standard 2.0](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) based projects.
+* [.NET 5.0](https://docs.microsoft.com/en-us/dotnet/standard/net-standard#net-5-and-net-standard) based projects.
 * [Expression-bodied memebers](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members)
 * [StyleCop](https://github.com/StyleCop/StyleCop) used to enforce code consistency.
 * [System.Numerics.Vector](https://docs.microsoft.com/en-us/dotnet/api/system.numerics.vector-1?view=netcore-2.2) to allow a small amount of parallel computation.
@@ -28,7 +28,7 @@ On my development machine the code searches about 500k nodes per second (and dep
 
 
 ## What's missing
-* [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component
+* [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component.
 * [Quiescence search] (https://www.chessprogramming.org/Quiescence_Search)
 * Draw detection within search. The game will detect a draw one a move has been played, it does not however detect draws during the search i.e. it just burns time investigating positions that are already drawn.
 
@@ -40,7 +40,7 @@ Clone the project to your local machine and launch in your IDE.
 Projects:
 * ChessSharp - Core types and data structures.
 * ChessSharp Perft - Executable to test the perfromance of the move generation logic.
-* ChessSharp UI - [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) based user interface for playing games of Chess (I'm not that familiar with [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) so I'm sure there's plenty of sccope for improvement here).
+* ChessSharp UI - [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) based user interface for playing games of Chess (I'm not that familiar with [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) so I'm sure there's plenty of scope for improvement here).
 * ChessSharp.Engine - All logic that is not directly move generation related.
 * ChessSharp.MoveGeneration - Legal move generation.
 * ChessSharp.Tests - [xUnit](https://xunit.github.io/docs/getting-started/netfx/visual-studio)
@@ -48,7 +48,7 @@ Projects:
 
 ## Running the tests
 
-These are xUnit based tests so you may need to install xUnit to run them.
+These are xUnit based tests so you may need to install [xUnit](https://xunit.net/) to run them.
 
 
 ## Authors
@@ -58,7 +58,7 @@ These are xUnit based tests so you may need to install xUnit to run them.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
 
 
 ## Acknowledgments
