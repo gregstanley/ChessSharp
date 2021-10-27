@@ -1,26 +1,29 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31702.278
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{341D7D2B-1981-4C79-A743-62A21C54DE52}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 		README.md = README.md
-		Settings.StyleCop = Settings.StyleCop
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp", "ChessSharp\ChessSharp.csproj", "{55560F9A-EF04-4FD7-9440-A811FB0FFA37}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp Perft", "src\ChessSharp Perft\ChessSharp Perft.csproj", "{8BA7832C-1F87-4AC0-B210-CED4C8E4B891}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.Tests", "ChessSharp.Tests\ChessSharp.Tests.csproj", "{2FD0F0D5-BC62-486F-8289-8055D32D875F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp UCI Engine", "src\ChessSharp UCI Engine\ChessSharp UCI Engine.csproj", "{EC13FAC7-7219-4A03-9515-72EA3BC7278C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp Perft", "ChessSharp Perft\ChessSharp Perft.csproj", "{8BA7832C-1F87-4AC0-B210-CED4C8E4B891}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp UI", "src\ChessSharp UI\ChessSharp UI.csproj", "{4F613A7E-0606-4EC9-AEA3-C9D593ADDDFC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.MoveGeneration", "ChessSharp.Perft\ChessSharp.MoveGeneration.csproj", "{51868C9F-D04F-4A81-8276-6E315D22D852}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.Common", "src\ChessSharp.Common\ChessSharp.Common.csproj", "{E754115A-7C19-4354-B2E9-4C67E51C34A8}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.Engine", "ChessSharp.Engine\ChessSharp.Engine.csproj", "{7D3CDE19-976D-44A4-B510-7C78BC584EC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.Engine", "src\ChessSharp.Engine\ChessSharp.Engine.csproj", "{7D3CDE19-976D-44A4-B510-7C78BC584EC4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChessSharp UI", "ChessSharp UI\ChessSharp UI.csproj", "{4F613A7E-0606-4EC9-AEA3-C9D593ADDDFC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp.MoveGeneration", "src\ChessSharp.MoveGeneration\ChessSharp.MoveGeneration.csproj", "{98F3005B-CFA6-4725-B99E-BF89C12D906F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UCI Explorer", "src\UCI Explorer\UCI Explorer.csproj", "{9B80C742-B58E-4EB8-8BD7-345A2A765CA5}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ChessSharp Tests", "tests\ChessSharp Tests\ChessSharp Tests.csproj", "{BBB1DCF3-C5B0-4F63-BA31-839C2D4CD2BE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -28,30 +31,38 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{55560F9A-EF04-4FD7-9440-A811FB0FFA37}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{55560F9A-EF04-4FD7-9440-A811FB0FFA37}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{55560F9A-EF04-4FD7-9440-A811FB0FFA37}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{55560F9A-EF04-4FD7-9440-A811FB0FFA37}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FD0F0D5-BC62-486F-8289-8055D32D875F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FD0F0D5-BC62-486F-8289-8055D32D875F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FD0F0D5-BC62-486F-8289-8055D32D875F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FD0F0D5-BC62-486F-8289-8055D32D875F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8BA7832C-1F87-4AC0-B210-CED4C8E4B891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8BA7832C-1F87-4AC0-B210-CED4C8E4B891}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8BA7832C-1F87-4AC0-B210-CED4C8E4B891}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8BA7832C-1F87-4AC0-B210-CED4C8E4B891}.Release|Any CPU.Build.0 = Release|Any CPU
-		{51868C9F-D04F-4A81-8276-6E315D22D852}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{51868C9F-D04F-4A81-8276-6E315D22D852}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{51868C9F-D04F-4A81-8276-6E315D22D852}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{51868C9F-D04F-4A81-8276-6E315D22D852}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC13FAC7-7219-4A03-9515-72EA3BC7278C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC13FAC7-7219-4A03-9515-72EA3BC7278C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC13FAC7-7219-4A03-9515-72EA3BC7278C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC13FAC7-7219-4A03-9515-72EA3BC7278C}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4F613A7E-0606-4EC9-AEA3-C9D593ADDDFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4F613A7E-0606-4EC9-AEA3-C9D593ADDDFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4F613A7E-0606-4EC9-AEA3-C9D593ADDDFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4F613A7E-0606-4EC9-AEA3-C9D593ADDDFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E754115A-7C19-4354-B2E9-4C67E51C34A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E754115A-7C19-4354-B2E9-4C67E51C34A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E754115A-7C19-4354-B2E9-4C67E51C34A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E754115A-7C19-4354-B2E9-4C67E51C34A8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D3CDE19-976D-44A4-B510-7C78BC584EC4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F3005B-CFA6-4725-B99E-BF89C12D906F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98F3005B-CFA6-4725-B99E-BF89C12D906F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98F3005B-CFA6-4725-B99E-BF89C12D906F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98F3005B-CFA6-4725-B99E-BF89C12D906F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B80C742-B58E-4EB8-8BD7-345A2A765CA5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B80C742-B58E-4EB8-8BD7-345A2A765CA5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B80C742-B58E-4EB8-8BD7-345A2A765CA5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B80C742-B58E-4EB8-8BD7-345A2A765CA5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBB1DCF3-C5B0-4F63-BA31-839C2D4CD2BE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBB1DCF3-C5B0-4F63-BA31-839C2D4CD2BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBB1DCF3-C5B0-4F63-BA31-839C2D4CD2BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBB1DCF3-C5B0-4F63-BA31-839C2D4CD2BE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

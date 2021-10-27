@@ -1,6 +1,6 @@
 # ChessSharp
 
-ChessSharp is a basic C# based Chess game (note *game* not *engine* as there is not yet a [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component).
+ChessSharp is a basic C# based Chess game (note *game* not *engine* as the [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component is just bare bones at the moment).
 It started as a little experiment when my son took an interest in Chess and then grew rapidly as I started to research how 'real' Chess programs worked.
 While experimenting it became clear that programming Chess is an art in it's own right and uses skills from all aspects of the discipline.
 The many years of academic research in the area has led to many advanced solutions to problems you don't even realise you have when you start but fortunately there is a lot of guidance out there to help.
@@ -14,8 +14,7 @@ On my development machine the code searches about 500k nodes per second (and dep
 
 ## C# and programming techniques summary
 * [.NET 5.0](https://docs.microsoft.com/en-us/dotnet/standard/net-standard#net-5-and-net-standard) based projects.
-* [Expression-bodied memebers](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members)
-* [StyleCop](https://github.com/StyleCop/StyleCop) used to enforce code consistency.
+* [Expression-bodied members](https://docs.microsoft.com/en-us/dotnet/csharp/programming-guide/statements-expressions-operators/expression-bodied-members)
 * [System.Numerics.Vector](https://docs.microsoft.com/en-us/dotnet/api/system.numerics.vector-1?view=netcore-2.2) to allow a small amount of parallel computation.
 
 
@@ -27,28 +26,36 @@ On my development machine the code searches about 500k nodes per second (and dep
 * That uses [a form of magic numbers based move generation](https://www.chessprogramming.org/Magic_Bitboards).
 
 
-## What's missing
+## In progress
 * [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) compatible component.
-* [Quiescence search] (https://www.chessprogramming.org/Quiescence_Search)
-* Draw detection within search. The game will detect a draw one a move has been played, it does not however detect draws during the search i.e. it just burns time investigating positions that are already drawn.
+
+
+## What's missing
+* [Quiescence search](https://www.chessprogramming.org/Quiescence_Search)
+* 'Match drawn' detection within search. The game will detect a draw one a move has been played, it does not however detect draws during the search i.e. it just burns time investigating positions that are already drawn.
 
 
 ## Getting Started
 
 Clone the project to your local machine and launch in your IDE.
 
-Projects:
-* ChessSharp - Core types and data structures.
+Source (src) projects:
+
 * ChessSharp Perft - Executable to test the perfromance of the move generation logic.
+* ChessSharp UCI Engine - Executable [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) engine.
 * ChessSharp UI - [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) based user interface for playing games of Chess (I'm not that familiar with [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/getting-started/introduction-to-wpf-in-vs) so I'm sure there's plenty of scope for improvement here).
+* ChessSharp.Common - Core types and data structures.
 * ChessSharp.Engine - All logic that is not directly move generation related.
 * ChessSharp.MoveGeneration - Legal move generation.
-* ChessSharp.Tests - [xUnit](https://xunit.github.io/docs/getting-started/netfx/visual-studio)
+* UCI Explorer - Console application to load [UCI](https://en.wikipedia.org/wiki/Universal_Chess_Interface) engines.
+
+Test (tests) projects:
+* ChessSharp Tests - [xUnit](https://xunit.github.io/docs/getting-started/netfx/visual-studio)
 
 
 ## Running the tests
 
-These are xUnit based tests so you may need to install [xUnit](https://xunit.net/) to run them.
+These are [xUnit](https://xunit.net/) based tests so you may need to install [xUnit](https://xunit.net/) to run them.
 
 
 ## Authors
@@ -69,3 +76,8 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * [Thomas Petzke](https://macechess.blogspot.com/?m=1) and his mACE/iCE chess programming journey blog.
 * [Jaco van Neikerk's magic numbers article](http://vicki-chess.blogspot.com/2013/04/magics.html) which really helped me get my head round a rather unusual topic.
 * README.md template from [PurpleBooth](https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/8254b53ab8dcb18afc64287aaddd9e5b6059f880/README-Template.md)
+
+
+## Known issues
+
+Crash on user checkmate

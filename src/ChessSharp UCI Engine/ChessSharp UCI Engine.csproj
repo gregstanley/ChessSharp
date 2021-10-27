@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+    <!-- Configure for SINGLE exe https://stackoverflow.com/a/65418065/8931881 -->
+    <!-- <PublishSingleFile>true</PublishSingleFile> -->
+    <!-- <SelfContained>true</SelfContained> -->
+    <!-- <RuntimeIdentifier>win-x64</RuntimeIdentifier> -->
+    <!-- <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract> -->
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="..\ChessSharp.Common\ChessSharp.Common.csproj" />
+    <ProjectReference Include="..\ChessSharp.Engine\ChessSharp.Engine.csproj" />
+  </ItemGroup>
+
+</Project>

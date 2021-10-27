@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ChessSharp.Common\ChessSharp.Common.csproj" />
+    <ProjectReference Include="..\ChessSharp.MoveGeneration\ChessSharp.MoveGeneration.csproj" />
+  </ItemGroup>
+
+</Project>

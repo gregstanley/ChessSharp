@@ -1,0 +1,1 @@
+Place UCI compliant chess engines in this directory.
