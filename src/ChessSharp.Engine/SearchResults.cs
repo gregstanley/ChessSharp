@@ -40,6 +40,9 @@ namespace ChessSharp.Engine
 
         public string ToResultsString()
         {
+            // TODO: In Checkmate situation there still seem to be multiple PrincipalVarition values which seems wrong
+            if (!ElapsedMilliseconds.Any()) return string.Empty;
+
             var sb = new StringBuilder();
 
             sb.AppendLine("=== Principal variations ===");

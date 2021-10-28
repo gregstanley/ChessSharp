@@ -1,2 +1,5 @@
 /Engine Binaries/*.exe
 /Engine Binaries/*.ini
+
+# The WildCat engine seems to generate 'WildCat.ini' at the root
+*.ini

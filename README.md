@@ -57,6 +57,15 @@ Test (tests) projects:
 
 These are [xUnit](https://xunit.net/) based tests so you may need to install [xUnit](https://xunit.net/) to run them.
 
+## Test cases
+
+Mate in two:
+Fen: 8/6K1/1p1B1RB1/8/2Q5/2n1kP1N/3b4/4n3 w  - 0 1
+
+* Bd6a3
+* e4#
+
+More: https://sites.google.com/site/darktemplarchess/mate-in-2-puzzles
 
 ## Authors
 
@@ -80,4 +89,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 
 ## Known issues
 
-Crash on user checkmate
+* Doesn't show final move in on Checkmate

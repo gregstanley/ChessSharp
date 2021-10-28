@@ -98,7 +98,7 @@ namespace ChessSharp_UI
 
             BoardUserControl.Load(this.Game);
         }
-
+        
         private void Game_Info(object sender, InfoEventArgs args)
         {
             Dispatcher.BeginInvoke(new Action(() =>
@@ -203,7 +203,7 @@ namespace ChessSharp_UI
         {
             var move = Game.TryMove(args.FromSquareIndex, args.ToSquareIndex, PieceType.None);
 
-            return move.Value == 0 ? Task.CompletedTask : this.DoSearch();
+            return (move.Value == 0 || Game.Mate) ? Task.CompletedTask : this.DoSearch();
         }
 
         private Task OnPieceSelected(PromotionTypeSelectedEventArgs args)
