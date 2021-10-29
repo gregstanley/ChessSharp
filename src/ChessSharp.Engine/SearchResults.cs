@@ -22,8 +22,11 @@ namespace ChessSharp.Engine
 
             var output = new List<List<MoveViewer>>();
 
-            foreach (var principalVariation in principalVariations)
-                output.Add(principalVariation.Select(x => new MoveViewer(x)).ToList());
+            if (positionCount > 0)
+            {
+                foreach (var principalVariation in principalVariations)
+                    output.Add(principalVariation.Select(x => new MoveViewer(x)).ToList());
+            }
 
             PrincipalVariations = output;
 
@@ -40,8 +43,7 @@ namespace ChessSharp.Engine
 
         public string ToResultsString()
         {
-            // TODO: In Checkmate situation there still seem to be multiple PrincipalVarition values which seems wrong
-            if (!ElapsedMilliseconds.Any()) return string.Empty;
+            if (!PrincipalVariations.Any()) return "Mate";
 
             var sb = new StringBuilder();
 

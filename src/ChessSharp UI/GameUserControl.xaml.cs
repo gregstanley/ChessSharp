@@ -80,7 +80,8 @@ namespace ChessSharp_UI
             if (game != null)
             {
                 Game = game;
-            } else
+            }
+            else
             {
                 Game = new Game(new Board(), this.transpositionTable, Colour.White);
             }
@@ -98,7 +99,7 @@ namespace ChessSharp_UI
 
             BoardUserControl.Load(this.Game);
         }
-        
+
         private void Game_Info(object sender, InfoEventArgs args)
         {
             Dispatcher.BeginInvoke(new Action(() =>
@@ -165,7 +166,8 @@ namespace ChessSharp_UI
                     item.WhiteMoveButton.Content = notation;
 
                     MovesListBox.Items.Add(item);
-                } else
+                }
+                else
                 {
                     item.BlackMoveButton.Visibility = Visibility.Visible;
 
@@ -203,7 +205,7 @@ namespace ChessSharp_UI
         {
             var move = Game.TryMove(args.FromSquareIndex, args.ToSquareIndex, PieceType.None);
 
-            return (move.Value == 0 || Game.Mate) ? Task.CompletedTask : this.DoSearch();
+            return move.Value == 0 ? Task.CompletedTask : this.DoSearch();
         }
 
         private Task OnPieceSelected(PromotionTypeSelectedEventArgs args)

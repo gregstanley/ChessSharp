@@ -26,9 +26,6 @@ namespace ChessSharp.Engine
 
         private readonly List<GameHistoryNode> drawBuffer = new(256);
 
-        // TODO: This is a bit of a hack just to stop wasted searches
-        private bool mate = false;
-
         public Game(Board board, TranspositionTable transpositionTable, Colour humanColour = Colour.None)
         {
             this.board = board;
@@ -106,8 +103,6 @@ namespace ChessSharp.Engine
         public IReadOnlyCollection<GameHistoryNode> History => history;
 
         public GameHistoryNode CurrentState => history.Last();
-
-        public bool Mate { get => mate; set => mate = value; }
 
         public MoveViewer TryFindMove(int fromSquareIndex, int toSquareIndex, PieceType promotionPieceType = PieceType.None)
         {
@@ -261,7 +256,8 @@ namespace ChessSharp.Engine
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
                         ?? new MoveViewer(0);
-                } else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && board.WhiteCanCastleQueenSide)
+                }
+                else if (toSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare && board.WhiteCanCastleQueenSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
                         ?? new MoveViewer(0);
@@ -274,7 +270,8 @@ namespace ChessSharp.Engine
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleKing)
                         ?? new MoveViewer(0);
-                } else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && board.BlackCanCastleQueenSide)
+                }
+                else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare && board.BlackCanCastleQueenSide)
                 {
                     return availableMoves.SingleOrDefault(x => x.MoveType == MoveType.CastleQueen)
                         ?? new MoveViewer(0);
@@ -325,8 +322,6 @@ namespace ChessSharp.Engine
 
             if (!AvailableMoves.Any())
             {
-                Mate = true;
-
                 Checkmate?.Invoke(this, new MoveAppliedEventArgs(move, gameState, Evaluate()));
 
                 return;

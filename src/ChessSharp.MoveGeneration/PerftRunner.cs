@@ -16,60 +16,43 @@ namespace ChessSharp.MoveGeneration
 
         public List<MovePerft> Go(Board board, Colour colour, ushort depth)
         {
-            var depthMoves = new List<uint>[64];
-
-            for (var i = 0; i <= depth; i++)
-                depthMoves[i] = new List<uint>(256);
-
-            var nodeMoves = depthMoves[depth];
-
-            MoveGenerator.Generate(board, colour, nodeMoves);
-
-            var count = 0;
-
+            // This outer method is 'dividing' the results i.e. showing nodes per moves.
             var movePerfts = new List<MovePerft>(64);
 
-            foreach (var move in nodeMoves)
-            {
-                var moveView = new MoveViewer(move);
-
-                board.MakeMove(move);
-
-                var nodes = InnerPerft(board, colour.Opposite(), (ushort)(depth - 1), depthMoves);
-
-                count += nodes;
-
-                movePerfts.Add(new MovePerft(moveView, nodes));
-
-                board.UnMakeMove(move);
-            }
+            // Only this 'oter' method will pass in an object for perft 'divide' results.
+            Perft(board, colour, depth, movePerfts);
 
             return movePerfts;
         }
 
-        private int InnerPerft(Board board, Colour colour, ushort depth, List<uint>[] depthMoves)
+        private int Perft(Board board, Colour colour, ushort depth, List<MovePerft> movePerfts = null)
         {
-            if (depth == 0)
-                return 1;
-
-            var nodeMoves = depthMoves[depth];
-
-            // Must wipe any existing moves each time we enter a depth
-            nodeMoves.Clear();
-
             var count = 0;
 
+            // Using 'Stream' as that is what is used by engine (rather than pre-allocating)
             foreach (var move in MoveGenerator.GenerateStream(depth, board, colour))
             {
-                var moveView = new MoveViewer(move);
+                // We generate legal moves so there is no need to make/unmake the final move.
+                // See 'Bulk-counting' here: https://www.chessprogramming.org/Perft
+                if (depth == 1)
+                {
+                    // Count each generated move at final depth
+                    ++count;
 
-                board.MakeMove(move);
+                    // If search started at depth 1 it's also the root so populate results.
+                    // We do not want to do this at any other level as we will not see values
+                    // and will wate time allocating with 'new'.
+                    movePerfts?.Add(new MovePerft(new MoveViewer(move), 1));
+                }
+                else
+                {
+                    board.MakeMove(move);
+                    var nodes = Perft(board, colour.Opposite(), (ushort)(depth - 1));
+                    count += nodes;
+                    board.UnMakeMove(move);
 
-                var nodes = InnerPerft(board, colour.Opposite(), (ushort)(depth - 1), depthMoves);
-
-                count += nodes;
-
-                board.UnMakeMove(move);
+                    movePerfts?.Add(new MovePerft(new MoveViewer(move), nodes));
+                }
             }
 
             return count;
