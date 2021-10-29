@@ -60,7 +60,7 @@ These are [xUnit](https://xunit.net/) based tests so you may need to install [xU
 ## Test cases
 
 Mate in two:
-Fen: 8/6K1/1p1B1RB1/8/2Q5/2n1kP1N/3b4/4n3 w  - 0 1
+Fen: 8/6K1/1p1B1RB1/8/2Q5/2n1kP1N/3b4/4n3 w - - 0 1
 
 * Bd6a3
 * e4#

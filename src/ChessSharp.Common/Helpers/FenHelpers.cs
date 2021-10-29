@@ -50,7 +50,8 @@ namespace ChessSharp.Common.Helpers
                     if (piece.Type == PieceType.None)
                     {
                         ++spaceCount;
-                    } else
+                    }
+                    else
                     {
                         if (spaceCount > 0)
                             sb.Append(spaceCount);
@@ -159,7 +160,8 @@ namespace ChessSharp.Common.Helpers
                             whiteKing |= square.Square;
                             break;
                     }
-                } else
+                }
+                else
                 {
                     switch (square.Type)
                     {

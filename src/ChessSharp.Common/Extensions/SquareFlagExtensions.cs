@@ -83,22 +83,22 @@ namespace ChessSharp.Common.Extensions
         public static SquareFlag PawnForward(this SquareFlag square, Colour colour, int numRanks)
         {
             return colour == Colour.White
-? (SquareFlag)((ulong)square << (8 * numRanks))
-: (SquareFlag)((ulong)square >> (8 * numRanks));
+                ? (SquareFlag)((ulong)square << (8 * numRanks))
+                : (SquareFlag)((ulong)square >> (8 * numRanks));
         }
 
         public static SquareFlag PawnCaptureWest(this SquareFlag square, Colour colour)
         {
             return colour == Colour.White
-? (SquareFlag)((ulong)square << 7)
-: (SquareFlag)((ulong)square >> 9);
+                ? (SquareFlag)((ulong)square << 7)
+                : (SquareFlag)((ulong)square >> 9);
         }
 
         public static SquareFlag PawnCaptureEast(this SquareFlag square, Colour colour)
         {
             return colour == Colour.White
-? (SquareFlag)((ulong)square << 9)
-: (SquareFlag)((ulong)square >> 7);
+                ? (SquareFlag)((ulong)square << 9)
+                : (SquareFlag)((ulong)square >> 7);
         }
 
         public static SquareFlag ShiftRankUp(this SquareFlag square, int numRanks)
@@ -192,12 +192,14 @@ namespace ChessSharp.Common.Extensions
                     {
                         a >>= 24;
                         x = 24;
-                    } else
+                    }
+                    else
                     {
                         a >>= 16;
                         x = 16;
                     }
-                } else
+                }
+                else
                 {
                     var ac = aa & 0b00000000_00000000_11111111_0000000;
 
@@ -232,12 +234,14 @@ namespace ChessSharp.Common.Extensions
                     {
                         b >>= 24;
                         x = 24;
-                    } else
+                    }
+                    else
                     {
                         b >>= 16;
                         x = 16;
                     }
-                } else
+                }
+                else
                 {
                     var bc = ba & 0b00000000_00000000_11111111_0000000;
 

@@ -289,11 +289,6 @@ namespace ChessSharp.Tests
             TestHelpers.AssertEqual(board, boardReference);
         }
 
-        private Board Create(string fenString)
-        {
-            var gameState = FenHelpers.Parse(fenString);
-
-            return Board.FromGameState(gameState);
-        }
+        private static Board Create(string fenString) => Board.FromGameState(FenHelpers.Parse(fenString));
     }
 }

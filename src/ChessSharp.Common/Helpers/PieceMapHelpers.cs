@@ -21,7 +21,8 @@ namespace ChessSharp.Common.Helpers
                 if (board.WhiteBishops.HasFlag(square)) return new Piece(colour, PieceType.Bishop);
                 if (board.WhiteQueens.HasFlag(square)) return new Piece(colour, PieceType.Queen);
                 if (board.WhiteKing.HasFlag(square)) return new Piece(colour, PieceType.King);
-            } else
+            }
+            else
             {
                 if (board.BlackPawns.HasFlag(square)) return new Piece(colour, PieceType.Pawn);
                 if (board.BlackRooks.HasFlag(square)) return new Piece(colour, PieceType.Rook);

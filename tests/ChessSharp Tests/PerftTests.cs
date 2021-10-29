@@ -56,8 +56,6 @@ namespace ChessSharp.Tests
             var board = Board.FromGameState(gameState);
             var boardReference = Board.FromGameState(gameState);
 
-            var moves = new List<uint>(20);
-
             var metrics = new Dictionary<int, PerftMetrics>();
 
             var depth = 5;
@@ -232,8 +230,6 @@ namespace ChessSharp.Tests
             var board = Board.FromGameState(gameState);
             var boardReference = Board.FromGameState(gameState);
 
-            var moves = new List<uint>(20);
-
             var metrics = new Dictionary<int, PerftMetrics>();
 
             var depth = 5;
@@ -260,8 +256,6 @@ namespace ChessSharp.Tests
 
             var board = Board.FromGameState(gameState);
             var boardReference = Board.FromGameState(gameState);
-
-            var moves = new List<uint>(20);
 
             var metrics = new Dictionary<int, PerftMetrics>();
 

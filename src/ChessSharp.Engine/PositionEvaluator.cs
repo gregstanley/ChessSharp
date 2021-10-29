@@ -23,14 +23,12 @@ namespace ChessSharp.Engine
         {
             var whiteScore = 0;
             var blackScore = 0;
-
-            var isPawn = 0ul;
-            var isRook = 0ul;
-            var isKnight = 0ul;
-            var isBishop = 0ul;
+            ulong isBishop = 0;
+            ulong isPawn;
+            ulong isRook;
+            ulong isKnight;
 
             var buffer1 = new ulong[4];
-            var buffer2 = new ulong[4];
 
             foreach (var squareIndex in board.White.ToSquareIndexList())
             {
@@ -43,8 +41,8 @@ namespace ChessSharp.Engine
                     buffer1[2] = (ulong)board.WhiteKnights;
                     buffer1[3] = (ulong)board.WhiteBishops;
 
-                    var vector1 = new Vector<ulong>(buffer1);
-                    var vector2 = new Vector<ulong>(square);
+                    Vector<ulong> vector1 = new(buffer1);
+                    Vector<ulong> vector2 = new(square);
 
                     var vectorOut = Vector.BitwiseAnd(vector1, vector2);
 
@@ -52,7 +50,8 @@ namespace ChessSharp.Engine
                     isRook = vectorOut[1];
                     isKnight = vectorOut[2];
                     isKnight = vectorOut[2];
-                } else
+                }
+                else
                 {
                     isPawn = (ulong)board.WhitePawns & square;
                     isRook = (ulong)board.WhiteRooks & square;
@@ -112,8 +111,8 @@ namespace ChessSharp.Engine
                     buffer1[2] = (ulong)board.BlackKnights;
                     buffer1[3] = (ulong)board.BlackBishops;
 
-                    var vector1 = new Vector<ulong>(buffer1);
-                    var vector2 = new Vector<ulong>(square);
+                    Vector<ulong> vector1 = new(buffer1);
+                    Vector<ulong> vector2 = new(square);
 
                     var vectorOut = Vector.BitwiseAnd(vector1, vector2);
 
@@ -121,7 +120,8 @@ namespace ChessSharp.Engine
                     isRook = vectorOut[1];
                     isKnight = vectorOut[2];
                     isKnight = vectorOut[2];
-                } else
+                }
+                else
                 {
                     isPawn = (ulong)board.BlackPawns & square;
                     isRook = (ulong)board.BlackRooks & square;

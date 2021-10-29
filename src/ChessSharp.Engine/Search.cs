@@ -55,7 +55,7 @@ namespace ChessSharp.Engine
                 principalVariations[i] = new uint[i + 1];
 
             if (!nodeMoves.Any())
-                return new SearchResults(PositionCount, new List<long>(), moveEvaluations, principalVariations, transpositionTable);
+                return new SearchResults(PositionCount, new List<long>(), moveEvaluations, principalVariations);
 
             var existingTransposition = transpositionTable.Find(transpositionKey);
 
@@ -139,7 +139,7 @@ namespace ChessSharp.Engine
 
             stopWatch.Reset();
 
-            return new SearchResults(PositionCount, iterationLaps, moveEvaluations, principalVariations, transpositionTable);
+            return new SearchResults(PositionCount, iterationLaps, moveEvaluations, principalVariations);
         }
 
         private int PrincipalVariationSearch(Board board, Colour colour, byte depth, ushort ply, int alpha, int beta, uint[] parentPrincipalVariation)
@@ -187,7 +187,8 @@ namespace ChessSharp.Engine
                 {
                     // Always do a full search on the first/PV move
                     evaluatedScore = -PrincipalVariationSearch(board, oppositeColour, nextDepth, nextPly, -beta, -alpha, principalVariation);
-                } else
+                }
+                else
                 {
                     // Late Move Reduction http://mediocrechess.blogspot.com/2007/03/other-late-move-reduction-lmr.html
                     if (ply > 3 && moveCount > 3 && move.GetCapturePieceType() == PieceType.None && move.GetNumCheckers() == 0 && nextDepth > 0)
@@ -243,7 +244,7 @@ namespace ChessSharp.Engine
             return alpha;
         }
 
-        private IEnumerable<uint> GetNextMove(MoveGenerator moveGenerator, ushort ply, Board board, Colour colour, uint previousBestMove)
+        private static IEnumerable<uint> GetNextMove(MoveGenerator moveGenerator, ushort ply, Board board, Colour colour, uint previousBestMove)
         {
             if (previousBestMove > 0)
                 yield return previousBestMove;
@@ -257,7 +258,7 @@ namespace ChessSharp.Engine
             }
         }
 
-        private void UpdatePrincipalVariation(uint[] source, uint[] target, ushort ply, uint move)
+        private static void UpdatePrincipalVariation(uint[] source, uint[] target, ushort ply, uint move)
         {
             var i = ply;
 

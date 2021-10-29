@@ -83,8 +83,6 @@ namespace ChessSharp.Engine.Tests
         {
             var board = CreateBitBoard("K6k/8/8/8/8/3p4/4P3/8 w - -");
 
-            var rootKey = KeyGenerator.Hash(board, Colour.White);
-
             var capture = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.E2.ToSquare(), SquareFlag.D3.ToSquare(), PieceType.Pawn, MoveType.Ordinary);
 
             var beforeKey = board.Key;
@@ -179,9 +177,6 @@ namespace ChessSharp.Engine.Tests
             var rootKey = KeyGenerator.Hash(board, Colour.White);
 
             var promotion1 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionQueen);
-            var promotion2 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionRook);
-            var promotion3 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionBishop);
-            var promotion4 = MoveBuilder.Create(Colour.White, PieceType.Pawn, SquareFlag.D7.ToSquare(), SquareFlag.D8.ToSquare(), PieceType.None, MoveType.PromotionKnight);
 
             var beforeKey = board.Key;
 
@@ -207,9 +202,6 @@ namespace ChessSharp.Engine.Tests
             Assert.Equal(beforeKey, board.Key);
         }
 
-        protected Board CreateBitBoard(string fen)
-        {
-            return Board.FromGameState(FenHelpers.Parse(fen));
-        }
+        protected static Board CreateBitBoard(string fen) => Board.FromGameState(FenHelpers.Parse(fen));
     }
 }

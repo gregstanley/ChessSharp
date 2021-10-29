@@ -39,7 +39,7 @@ namespace ChessSharp.Engine
 
             search = new Search(moveGenerator, positionEvaluator, transpositionTable);
 
-            search.Info += _search_Info;
+            search.Info += Search_Info;
 
             var moves = new List<uint>();
 
@@ -200,7 +200,7 @@ namespace ChessSharp.Engine
             return move;
         }
 
-        private void _search_Info(object sender, InfoEventArgs args)
+        private void Search_Info(object sender, InfoEventArgs args)
         {
             Info?.Invoke(this, args);
         }
@@ -227,28 +227,23 @@ namespace ChessSharp.Engine
             return true;
         }
 
-        private MoveViewer TryPromotions(SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves, PieceType promotionPieceType = PieceType.None)
+        private static MoveViewer TryPromotions(SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves, PieceType promotionPieceType = PieceType.None)
         {
-            switch (promotionPieceType)
+            return promotionPieceType switch
             {
-                case PieceType.Queen:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen)
-                        ?? new MoveViewer(0);
-                case PieceType.Rook:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook)
-                        ?? new MoveViewer(0);
-                case PieceType.Bishop:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop)
-                        ?? new MoveViewer(0);
-                case PieceType.Knight:
-                    return availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight)
-                        ?? new MoveViewer(0);
-                default:
-                    return new MoveViewer(0);
-            }
+                PieceType.Queen => availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionQueen)
+                    ?? new MoveViewer(0),
+                PieceType.Rook => availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionRook)
+                    ?? new MoveViewer(0),
+                PieceType.Bishop => availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionBishop)
+                    ?? new MoveViewer(0),
+                PieceType.Knight => availableMoves.SingleOrDefault(x => x.From == fromSquare && x.To == toSquare && x.MoveType == MoveType.PromotionKnight)
+                    ?? new MoveViewer(0),
+                _ => new MoveViewer(0),
+            };
         }
 
-        private MoveViewer TryCastles(Board board, Colour colour, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
+        private static MoveViewer TryCastles(Board board, Colour colour, SquareFlag fromSquare, SquareFlag toSquare, IEnumerable<MoveViewer> availableMoves)
         {
             if (colour == Colour.White && fromSquare == SquareFlagConstants.WhiteKingStartSquare)
             {
@@ -341,9 +336,9 @@ namespace ChessSharp.Engine
             var previousCount = 0;
 
             // Note: We step in twos as a match must be same player to move
-            for (var i = drawBuffer.Count - 1; i >= 0; i -= 2)
+            for (var i = gameHistoryNodes.Count - 1; i >= 0; i -= 2)
             {
-                var nextItem = drawBuffer[i];
+                var nextItem = gameHistoryNodes[i];
 
                 if (nextItem.IsIrreversible)
                     break;

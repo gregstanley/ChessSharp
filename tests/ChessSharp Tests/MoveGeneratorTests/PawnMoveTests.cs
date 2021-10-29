@@ -55,8 +55,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
-            var moveCount = moves.Count;
-
             var illegalMove = MoveBuilder.Create(Colour.White, PieceType.Pawn, fromSquare.ToSquare(), toSquare.ToSquare(), PieceType.None, MoveType.Ordinary);
 
             Assert.DoesNotContain(illegalMove, moves);
@@ -108,8 +106,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
-            var pawnMoves = GetPawnMoveViews(moves);
-
             var moveA3 = MoveBuilder.Create(gameState.ToPlay, PieceType.Pawn, SquareFlag.A2.ToSquare(), SquareFlag.A3.ToSquare(), PieceType.None, MoveType.Ordinary);
             var moveA4 = MoveBuilder.Create(gameState.ToPlay, PieceType.Pawn, SquareFlag.A2.ToSquare(), SquareFlag.A4.ToSquare(), PieceType.None, MoveType.Ordinary);
             var moveB3 = MoveBuilder.Create(gameState.ToPlay, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.B3.ToSquare(), PieceType.None, MoveType.Ordinary);
@@ -155,9 +151,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var moves = new List<uint>(10);
 
             MoveGenerator.Generate(board, gameState.ToPlay, moves);
-
-            // Purely for debugging
-            var pawnMoves = GetPawnMoveViews(moves);
 
             var moveA3 = MoveBuilder.Create(gameState.ToPlay, PieceType.Pawn, SquareFlag.A7.ToSquare(), SquareFlag.A6.ToSquare(), PieceType.None, MoveType.Ordinary);
             var moveA4 = MoveBuilder.Create(gameState.ToPlay, PieceType.Pawn, SquareFlag.A7.ToSquare(), SquareFlag.A5.ToSquare(), PieceType.None, MoveType.Ordinary);
@@ -315,8 +308,6 @@ namespace ChessSharp.Tests.MoveGeneratorTests
             var promotion2 = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.A1.ToSquare(), PieceType.Rook, MoveType.PromotionRook);
             var promotion3 = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.A1.ToSquare(), PieceType.Rook, MoveType.PromotionBishop);
             var promotion4 = MoveBuilder.Create(Colour.Black, PieceType.Pawn, SquareFlag.B2.ToSquare(), SquareFlag.A1.ToSquare(), PieceType.Rook, MoveType.PromotionKnight);
-
-            var pawnMoves = GetPawnMoveViews(moves);
 
             Assert.Contains(promotion1, moves);
             Assert.Contains(promotion2, moves);

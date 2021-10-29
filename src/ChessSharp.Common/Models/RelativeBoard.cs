@@ -40,7 +40,7 @@ namespace ChessSharp.Common.Models
             OpponentBishops = opponentBishops;
             OpponentQueens = opponentQueens;
             OpponentKing = opponentKing;
-            _boardState = boardState;
+            BoardState = boardState;
         }
 
         public Colour Colour { get; private set; }
@@ -157,15 +157,15 @@ namespace ChessSharp.Common.Models
 
         public bool CanCastleKingSide =>
             Colour == Colour.White
-            ? _boardState.HasFlag(StateFlag.WhiteCanCastleKingSide)
-            : _boardState.HasFlag(StateFlag.BlackCanCastleKingSide);
+            ? BoardState.HasFlag(StateFlag.WhiteCanCastleKingSide)
+            : BoardState.HasFlag(StateFlag.BlackCanCastleKingSide);
 
         public bool CanCastleQueenSide =>
             Colour == Colour.White
-            ? _boardState.HasFlag(StateFlag.WhiteCanCastleQueenSide)
-            : _boardState.HasFlag(StateFlag.BlackCanCastleQueenSide);
+            ? BoardState.HasFlag(StateFlag.WhiteCanCastleQueenSide)
+            : BoardState.HasFlag(StateFlag.BlackCanCastleQueenSide);
 
-        private StateFlag _boardState { get; set; }
+        private StateFlag BoardState { get; set; }
 
         public void Set(
             Colour colour,
@@ -198,7 +198,7 @@ namespace ChessSharp.Common.Models
             OpponentBishops = opponentBishops;
             OpponentQueens = opponentQueens;
             OpponentKing = opponentKing;
-            _boardState = boardState;
+            BoardState = boardState;
             EnPassant = enPassantSquare;
         }
 
@@ -228,7 +228,8 @@ namespace ChessSharp.Common.Models
                 if (MyBishops.HasFlag(square)) return PieceType.Bishop;
                 if (MyQueens.HasFlag(square)) return PieceType.Queen;
                 if (MyKing.HasFlag(square)) return PieceType.King;
-            } else
+            }
+            else
             {
                 if (OpponentPawns.HasFlag(square)) return PieceType.Pawn;
                 if (OpponentRooks.HasFlag(square)) return PieceType.Rook;

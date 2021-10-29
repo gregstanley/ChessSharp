@@ -209,7 +209,8 @@ namespace ChessSharp.Common
                 if (piece.Type == PieceType.Bishop) return WhiteBishops.GetInstanceNumber(square);
                 if (piece.Type == PieceType.Queen) return WhiteQueens.GetInstanceNumber(square);
                 if (piece.Type == PieceType.King) return WhiteKing.GetInstanceNumber(square);
-            } else
+            }
+            else
             {
                 if (piece.Type == PieceType.Pawn) return BlackPawns.GetInstanceNumber(square);
                 if (piece.Type == PieceType.Rook) return BlackRooks.GetInstanceNumber(square);
@@ -226,9 +227,9 @@ namespace ChessSharp.Common
         {
             var colour = move.GetColour();
             var fromSquare = move.GetFrom();
-            var fromSquareIndex = move.GetFromIndex();
+            //var fromSquareIndex = move.GetFromIndex();
             var toSquare = move.GetTo();
-            var toSquareIndex = move.GetToIndex();
+            //var toSquareIndex = move.GetToIndex();
             var moveType = move.GetMoveType();
             var pieceType = move.GetPieceType();
             var capturePieceType = move.GetCapturePieceType();
@@ -246,7 +247,8 @@ namespace ChessSharp.Common
                     MakeBlackKingSideCastle();
 
                 state = RemoveCastleAvailability(colour, state);
-            } else if (moveType == MoveType.CastleQueen)
+            }
+            else if (moveType == MoveType.CastleQueen)
             {
                 if (colour == Colour.White)
                     MakeWhiteQueenSideCastle();
@@ -254,7 +256,8 @@ namespace ChessSharp.Common
                     MakeBlackQueenSideCastle();
 
                 state = RemoveCastleAvailability(colour, state);
-            } else if (moveType == MoveType.EnPassant)
+            }
+            else if (moveType == MoveType.EnPassant)
             {
                 MovePiece(colour, pieceType, fromSquare, toSquare);
 
@@ -262,7 +265,8 @@ namespace ChessSharp.Common
                 var captureSquare = toSquare.PawnForward(colour.Opposite(), 1);
 
                 RemovePiece(colour.Opposite(), captureSquare);
-            } else if (moveType == MoveType.PromotionQueen)
+            }
+            else if (moveType == MoveType.PromotionQueen)
             {
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
@@ -270,7 +274,8 @@ namespace ChessSharp.Common
                 MovePiece(colour, pieceType, fromSquare, toSquare);
 
                 PromotePiece(colour, PieceType.Queen, toSquare);
-            } else if (moveType == MoveType.PromotionRook)
+            }
+            else if (moveType == MoveType.PromotionRook)
             {
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
@@ -278,7 +283,8 @@ namespace ChessSharp.Common
                 MovePiece(colour, pieceType, fromSquare, toSquare);
 
                 PromotePiece(colour, PieceType.Rook, toSquare);
-            } else if (moveType == MoveType.PromotionBishop)
+            }
+            else if (moveType == MoveType.PromotionBishop)
             {
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
@@ -286,7 +292,8 @@ namespace ChessSharp.Common
                 MovePiece(colour, pieceType, fromSquare, toSquare);
 
                 PromotePiece(colour, PieceType.Bishop, toSquare);
-            } else if (moveType == MoveType.PromotionKnight)
+            }
+            else if (moveType == MoveType.PromotionKnight)
             {
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
@@ -294,7 +301,8 @@ namespace ChessSharp.Common
                 MovePiece(colour, pieceType, fromSquare, toSquare);
 
                 PromotePiece(colour, PieceType.Knight, toSquare);
-            } else if (pieceType == PieceType.Pawn)
+            }
+            else if (pieceType == PieceType.Pawn)
             {
                 // We can only move forward two from start square
                 var toSquareTemp = fromSquare.PawnForward(colour, 2);
@@ -309,7 +317,8 @@ namespace ChessSharp.Common
                     if (targetPiece.Colour == colour.Opposite() && targetPiece.Type == PieceType.Pawn)
                     {
                         enPassantSquare = fromSquare.PawnForward(colour, 1);
-                    } else
+                    }
+                    else
                     {
                         targetSquare = (SquareFlag)((ulong)toSquare << (int)MoveDirection.East);
 
@@ -326,7 +335,8 @@ namespace ChessSharp.Common
 
                 if (capturePieceType != PieceType.None)
                     RemovePiece(colour.Opposite(), toSquare);
-            } else
+            }
+            else
             {
                 MovePiece(colour, pieceType, fromSquare, toSquare);
 
@@ -338,14 +348,16 @@ namespace ChessSharp.Common
                             state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
                         else if (fromSquare == SquareFlagConstants.WhiteQueenSideRookStartSquare)
                             state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
-                    } else
+                    }
+                    else
                     {
                         if (fromSquare == SquareFlagConstants.BlackKingSideRookStartSquare)
                             state = RemoveCastleAvailability(colour, MoveType.CastleKing, state);
                         else if (fromSquare == SquareFlagConstants.BlackQueenSideRookStartSquare)
                             state = RemoveCastleAvailability(colour, MoveType.CastleQueen, state);
                     }
-                } else if (pieceType == PieceType.King)
+                }
+                else if (pieceType == PieceType.King)
                 {
                     state = RemoveCastleAvailability(colour, state);
                 }
@@ -362,7 +374,8 @@ namespace ChessSharp.Common
                                 state = RemoveCastleAvailability(Colour.Black, MoveType.CastleKing, state);
                             else if (toSquare == SquareFlagConstants.BlackQueenSideRookStartSquare)
                                 state = RemoveCastleAvailability(Colour.Black, MoveType.CastleQueen, state);
-                        } else
+                        }
+                        else
                         {
                             if (toSquare == SquareFlagConstants.WhiteKingSideRookStartSquare)
                                 state = RemoveCastleAvailability(Colour.White, MoveType.CastleKing, state);
@@ -384,9 +397,9 @@ namespace ChessSharp.Common
         {
             var colour = move.GetColour();
             var fromSquare = move.GetFrom();
-            var fromSquareIndex = move.GetFromIndex();
+            //var fromSquareIndex = move.GetFromIndex();
             var toSquare = move.GetTo();
-            var toSquareIndex = move.GetToIndex();
+            //var toSquareIndex = move.GetToIndex();
             var moveType = move.GetMoveType();
             var pieceType = move.GetPieceType();
             var capturePieceType = move.GetCapturePieceType();
@@ -397,13 +410,15 @@ namespace ChessSharp.Common
                     UnMakeWhiteKingSideCastle();
                 else
                     UnMakeBlackKingSideCastle();
-            } else if (moveType == MoveType.CastleQueen)
+            }
+            else if (moveType == MoveType.CastleQueen)
             {
                 if (colour == Colour.White)
                     UnMakeWhiteQueenSideCastle();
                 else
                     UnMakeBlackQueenSideCastle();
-            } else if (pieceType == PieceType.Pawn)
+            }
+            else if (pieceType == PieceType.Pawn)
             {
                 if (moveType == MoveType.EnPassant)
                 {
@@ -413,7 +428,8 @@ namespace ChessSharp.Common
                     MovePiece(colour.Opposite(), PieceType.Pawn, captureSquare, captureSquare);
 
                     MovePiece(colour, pieceType, toSquare, fromSquare);
-                } else if (moveType == MoveType.PromotionQueen)
+                }
+                else if (moveType == MoveType.PromotionQueen)
                 {
                     DemotePiece(colour, PieceType.Queen, toSquare);
 
@@ -421,7 +437,8 @@ namespace ChessSharp.Common
 
                     if (capturePieceType != PieceType.None)
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
-                } else if (moveType == MoveType.PromotionRook)
+                }
+                else if (moveType == MoveType.PromotionRook)
                 {
                     DemotePiece(colour, PieceType.Rook, toSquare);
 
@@ -429,7 +446,8 @@ namespace ChessSharp.Common
 
                     if (capturePieceType != PieceType.None)
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
-                } else if (moveType == MoveType.PromotionBishop)
+                }
+                else if (moveType == MoveType.PromotionBishop)
                 {
                     DemotePiece(colour, PieceType.Bishop, toSquare);
 
@@ -437,7 +455,8 @@ namespace ChessSharp.Common
 
                     if (capturePieceType != PieceType.None)
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
-                } else if (moveType == MoveType.PromotionKnight)
+                }
+                else if (moveType == MoveType.PromotionKnight)
                 {
                     DemotePiece(colour, PieceType.Knight, toSquare);
 
@@ -445,14 +464,16 @@ namespace ChessSharp.Common
 
                     if (capturePieceType != PieceType.None)
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
-                } else
+                }
+                else
                 {
                     MovePiece(colour, pieceType, toSquare, fromSquare);
 
                     if (capturePieceType != PieceType.None)
                         MovePiece(colour.Opposite(), capturePieceType, toSquare, toSquare);
                 }
-            } else
+            }
+            else
             {
                 MovePiece(colour, pieceType, toSquare, fromSquare);
 
@@ -523,13 +544,14 @@ namespace ChessSharp.Common
             MovePiece(Colour.Black, PieceType.Rook, SquareFlagConstants.BlackQueenSideCastleStep1, SquareFlagConstants.BlackQueenSideRookStartSquare);
         }
 
-        private StateFlag RemoveCastleAvailability(Colour colour, MoveType moveType, StateFlag boardState)
+        private static StateFlag RemoveCastleAvailability(Colour colour, MoveType moveType, StateFlag boardState)
         {
             if (colour == Colour.White)
             {
                 if (moveType == MoveType.CastleKing) boardState &= ~StateFlag.WhiteCanCastleKingSide;
                 if (moveType == MoveType.CastleQueen) boardState &= ~StateFlag.WhiteCanCastleQueenSide;
-            } else
+            }
+            else
             {
                 if (moveType == MoveType.CastleKing) boardState &= ~StateFlag.BlackCanCastleKingSide;
                 if (moveType == MoveType.CastleQueen) boardState &= ~StateFlag.BlackCanCastleQueenSide;
@@ -538,7 +560,7 @@ namespace ChessSharp.Common
             return boardState;
         }
 
-        private StateFlag RemoveCastleAvailability(Colour colour, StateFlag boardState)
+        private static StateFlag RemoveCastleAvailability(Colour colour, StateFlag boardState)
         {
             boardState = RemoveCastleAvailability(colour, MoveType.CastleKing, boardState);
             return RemoveCastleAvailability(colour, MoveType.CastleQueen, boardState);
@@ -555,7 +577,8 @@ namespace ChessSharp.Common
                 WhiteBishops &= ~square;
                 WhiteQueens &= ~square;
                 WhiteKing &= ~square;
-            } else
+            }
+            else
             {
                 BlackPawns &= ~square;
                 BlackRooks &= ~square;

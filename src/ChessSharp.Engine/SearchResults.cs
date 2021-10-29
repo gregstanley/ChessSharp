@@ -7,14 +7,11 @@ namespace ChessSharp.Engine
 {
     public class SearchResults
     {
-        private readonly TranspositionTable transpositionTable;
-
         public SearchResults(
             int positionCount,
             IReadOnlyCollection<long> elapsedMilliseconds,
             IReadOnlyCollection<MoveEvaluation> moveEvaluations,
-            uint[][] principalVariations,
-            TranspositionTable transpositionTable)
+            uint[][] principalVariations)
         {
             SearchedPositionCount = positionCount;
             ElapsedMilliseconds = elapsedMilliseconds;
@@ -29,8 +26,6 @@ namespace ChessSharp.Engine
             }
 
             PrincipalVariations = output;
-
-            this.transpositionTable = transpositionTable;
         }
 
         public int SearchedPositionCount { get; }

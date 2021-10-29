@@ -24,10 +24,7 @@ namespace ChessSharp.Tests.MoveGeneratorTests
 
             MoveGenerator.Generate(board, gameState.ToPlay, moves);
 
-            var pawnMoveViews = GetPawnMoveViews(moves);
             var rookMoveViews = GetRookMoveViews(moves);
-            var knightMoveViews = GetKnightMoveViews(moves);
-            var bishopMoveViews = GetBishopMoveViews(moves);
             var queenMoveViews = GetQueenMoveViews(moves);
             var kingMoveViews = GetKingMoveViews(moves);
 

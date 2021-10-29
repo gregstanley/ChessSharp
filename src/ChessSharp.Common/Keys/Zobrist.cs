@@ -208,19 +208,7 @@ namespace ChessSharp.Common.Keys
             return hash;
         }
 
-        private ulong Random64(PcgRandom gen)
-        {
-            var int1 = (ulong)gen.Next();
-            var int2 = (ulong)gen.Next();
-
-            ulong result = int1 << 32;
-
-            result += int2;
-
-            return result;
-        }
-
-        private PieceIndex ToPieceIndex(Colour colour, PieceType type)
+        private static PieceIndex ToPieceIndex(Colour colour, PieceType type)
         {
             return type switch
             {
@@ -240,7 +228,7 @@ namespace ChessSharp.Common.Keys
             };
         }
 
-        private PieceIndex Index(Piece piece)
+        private static PieceIndex Index(Piece piece)
         {
             return piece.Type switch
             {

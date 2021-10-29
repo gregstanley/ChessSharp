@@ -72,7 +72,7 @@ namespace ChessSharp_UI
 
             this.PromotionUserControl.PromotionTypeSelected += this.PromotionUserControl_PromotionTypeSelected;
 
-            this.Update(new MoveViewer(0), game.CurrentState.GameState);
+            this.Update(game.CurrentState.GameState);
         }
 
         private void GameEvents_InvalidMove(object sender, InvalidMoveEventArgs args)
@@ -110,19 +110,19 @@ namespace ChessSharp_UI
 
         private void GameEvents_MoveApplied(object sender, MoveAppliedEventArgs args)
         {
-            this.Update(args.Move, args.GameState);
+            this.Update(args.GameState);
         }
 
         private void GameEvents_Draw(object sender, MoveAppliedEventArgs args)
         {
-            this.Update(args.Move, args.GameState);
+            this.Update(args.GameState);
 
             DrawLabel.Visibility = Visibility.Visible;
         }
 
         private void GameEvents_Checkmate(object sender, MoveAppliedEventArgs args)
         {
-            this.Update(args.Move, args.GameState);
+            this.Update(args.GameState);
 
             CheckmateLabel.Visibility = Visibility.Visible;
         }
@@ -132,7 +132,7 @@ namespace ChessSharp_UI
             this.PromotionTypeSelected?.Invoke(this, args);
         }
 
-        private void Update(MoveViewer move, GameState gameState)
+        private void Update(GameState gameState)
         {
             this.currentGameState = gameState ?? throw new ArgumentNullException(nameof(gameState));
 
@@ -147,21 +147,21 @@ namespace ChessSharp_UI
 
             var board = this.currentGameState;
 
-            this.AddPieces(Colour.White, PieceType.Pawn, board.WhitePawns, GridSizeInPixels);
-            this.AddPieces(Colour.White, PieceType.Rook, board.WhiteRooks, GridSizeInPixels);
-            this.AddPieces(Colour.White, PieceType.Knight, board.WhiteKnights, GridSizeInPixels);
-            this.AddPieces(Colour.White, PieceType.Bishop, board.WhiteBishops, GridSizeInPixels);
-            this.AddPieces(Colour.White, PieceType.Queen, board.WhiteQueens, GridSizeInPixels);
-            this.AddPieces(Colour.White, PieceType.King, board.WhiteKing, GridSizeInPixels);
-            this.AddPieces(Colour.Black, PieceType.Pawn, board.BlackPawns, GridSizeInPixels);
-            this.AddPieces(Colour.Black, PieceType.Rook, board.BlackRooks, GridSizeInPixels);
-            this.AddPieces(Colour.Black, PieceType.Knight, board.BlackKnights, GridSizeInPixels);
-            this.AddPieces(Colour.Black, PieceType.Bishop, board.BlackBishops, GridSizeInPixels);
-            this.AddPieces(Colour.Black, PieceType.Queen, board.BlackQueens, GridSizeInPixels);
-            this.AddPieces(Colour.Black, PieceType.King, board.BlackKing, GridSizeInPixels);
+            this.AddPieces(Colour.White, PieceType.Pawn, board.WhitePawns);
+            this.AddPieces(Colour.White, PieceType.Rook, board.WhiteRooks);
+            this.AddPieces(Colour.White, PieceType.Knight, board.WhiteKnights);
+            this.AddPieces(Colour.White, PieceType.Bishop, board.WhiteBishops);
+            this.AddPieces(Colour.White, PieceType.Queen, board.WhiteQueens);
+            this.AddPieces(Colour.White, PieceType.King, board.WhiteKing);
+            this.AddPieces(Colour.Black, PieceType.Pawn, board.BlackPawns);
+            this.AddPieces(Colour.Black, PieceType.Rook, board.BlackRooks);
+            this.AddPieces(Colour.Black, PieceType.Knight, board.BlackKnights);
+            this.AddPieces(Colour.Black, PieceType.Bishop, board.BlackBishops);
+            this.AddPieces(Colour.Black, PieceType.Queen, board.BlackQueens);
+            this.AddPieces(Colour.Black, PieceType.King, board.BlackKing);
         }
 
-        private void AddPieces(Colour colour, PieceType pieceType, SquareFlag squares, int gridSize)
+        private void AddPieces(Colour colour, PieceType pieceType, SquareFlag squares)
         {
             var dropShadowEffect = new DropShadowEffect
             {
@@ -194,10 +194,10 @@ namespace ChessSharp_UI
 
                 image.Visibility = Visibility.Visible;
 
-                var rank = this.IndexToRank(squareIndex);
-                var file = this.IndexToFile(squareIndex);
+                var rank = IndexToRank(squareIndex);
+                var file = IndexToFile(squareIndex);
 
-                var xy = this.GetScreenPosition(GridSizeInPixels, rank, file);
+                var xy = GetScreenPosition(GridSizeInPixels, rank, file);
 
                 Canvas.SetLeft(image, xy.X);
                 Canvas.SetTop(image, xy.Y);
@@ -217,7 +217,7 @@ namespace ChessSharp_UI
             var file = (int)(x / GridSizeInPixels);
             var rank = (int)(8 - (y / GridSizeInPixels));
 
-            this.FromSquareIndex = this.ConvertToSquareIndex(rank, file);
+            this.FromSquareIndex = ConvertToSquareIndex(rank, file);
 
             FromLabel.Content = this.FromSquareIndex;
         }
@@ -235,14 +235,14 @@ namespace ChessSharp_UI
             var file = (int)(x / GridSizeInPixels);
             var rank = (int)(8 - (y / GridSizeInPixels));
 
-            this.ToSquareIndex = this.ConvertToSquareIndex(rank, file);
+            this.ToSquareIndex = ConvertToSquareIndex(rank, file);
 
             ToLabel.Content = this.ToSquareIndex;
 
             this.PieceMoved?.Invoke(this, new UserMovedPieceEventArgs(this.FromSquareIndex, this.ToSquareIndex));
         }
 
-        private Point GetScreenPosition(int gridSize, int rank, int file)
+        private static Point GetScreenPosition(int gridSize, int rank, int file)
         {
             double x = (file - 1) * gridSize;
             double y = (8 - rank) * gridSize;
@@ -254,17 +254,17 @@ namespace ChessSharp_UI
             return new Point(x + padding, y + padding);
         }
 
-        private int ConvertToSquareIndex(int rank, int file)
+        private static int ConvertToSquareIndex(int rank, int file)
         {
             return (rank * 8) + file;
         }
 
-        private int IndexToRank(int squareIndex)
+        private static int IndexToRank(int squareIndex)
         {
             return (squareIndex / 8) + 1;
         }
 
-        private int IndexToFile(int squareIndex)
+        private static int IndexToFile(int squareIndex)
         {
             return (squareIndex % 8) + 1;
         }
