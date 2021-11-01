@@ -79,8 +79,22 @@ namespace ChessSharp.Engine
 
             Info info;
 
+            var alpha = int.MinValue;
+            var beta = int.MaxValue;
+            // TODO: This is added either side of the first 'real' alpha-beta values to create a 'window' - it's value is arbitrary at the moment
+            var delta = 10;
+            int previousBest = alpha;
+
             while (currentMaxDepth <= maxDepth)
             {
+                // We get a score after each iteration so use this as the 'centre' point for next iterations
+                // Stockfish https://github.com/official-stockfish/Stockfish/blob/2046d5da30b2cd505b69bddb40062b0d37b43bc7/src/search.cpp#:~:text=delta%20%3D%20Value(17,prev%20%2B%20delta%2C%20VALUE_INFINITE)%3B
+                if (previousBest > int.MinValue && previousBest >= alpha)
+                {
+                    alpha = previousBest - delta;
+                    beta = previousBest + delta;
+                }
+
                 var masterPrincipalVariation = principalVariations[currentMaxDepth - 1];
 
                 var principalVariation = new uint[64];
@@ -98,7 +112,7 @@ namespace ChessSharp.Engine
 
                     board.MakeMove(move);
 
-                    var evaluatedScore = -PrincipalVariationSearch(board, colour.Opposite(), nextDepth, 1, int.MinValue, int.MaxValue, principalVariation);
+                    var evaluatedScore = -PrincipalVariationSearch(board, colour.Opposite(), nextDepth, 1, alpha, beta, principalVariation);
 
                     board.UnMakeMove(move);
 
@@ -123,6 +137,9 @@ namespace ChessSharp.Engine
                     .ToList();
 
                 transpositionTable.Set(transpositionKey, (byte)currentMaxDepth, colour, bestScore, bestMove);
+
+                // TODO: Debug this value
+                previousBest = bestScore;
 
                 var iterationLength = stopWatch.ElapsedMilliseconds - lap;
 
@@ -206,24 +223,24 @@ namespace ChessSharp.Engine
 
                 board.UnMakeMove(move);
 
-                if (alpha < evaluatedScore)
+                ++moveCount;
+
+                // Looks like I did NegaMax from https://www.chessprogramming.org/Alpha-Beta
+                if (evaluatedScore >= beta)
+                    return beta;
+
+                if (evaluatedScore > bestScore)
                 {
                     // alpha = Math.Max(bestScore, evaluatedScore); // alpha acts like max in MiniMax
-                    alpha = evaluatedScore;
 
                     bestMove = move;
                     bestScore = evaluatedScore;
 
+                    if (evaluatedScore > alpha)
+                        alpha = evaluatedScore;
+
                     UpdatePrincipalVariation(principalVariation, parentPrincipalVariation, ply, move);
                 }
-
-                if (alpha > beta)
-                {
-                    // Fail-hard beta-cutoff
-                    break;
-                }
-
-                ++moveCount;
 
                 if (ply == 1)
                 {

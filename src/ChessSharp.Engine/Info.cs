@@ -39,6 +39,8 @@ namespace ChessSharp.Engine
 
             sb.AppendLine($"Time: {ElapsedMilliseconds} ms");
 
+            sb.AppendLine($"Positions: {SearchedPositionCount}");
+
             var nodesPerMilli = (double)SearchedPositionCount / ElapsedMilliseconds;
             var nps = Math.Round(nodesPerMilli * 1000, 2);
 

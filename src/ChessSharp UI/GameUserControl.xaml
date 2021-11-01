@@ -22,13 +22,13 @@
                 <DropShadowEffect ShadowDepth="6" BlurRadius="8" RenderingBias="Quality" Color="#FF666666"/>
             </local:BoardUserControl.Effect>
         </local:BoardUserControl>
-        <Rectangle Fill="#FFDAD3D6" Stroke="#FFABADB3" Width="140" Margin="385,55,16,655"/>
+        <Rectangle Fill="#FFDAD3D6" Stroke="#FFABADB3" Width="140" Margin="385,55,15,640"/>
         <Label x:Name="HalfTurnCountLabel1" Content="Half turns:" HorizontalAlignment="Left" Margin="388,74,0,0" VerticalAlignment="Top" Foreground="#FF373638"/>
         <Label x:Name="FullTurnsCountLabel" Content="Full turns:" HorizontalAlignment="Left" Margin="388,57,0,0" VerticalAlignment="Top" Foreground="#FF373638"/>
         <Label x:Name="HalfTurnCountLabel" Content="0" HorizontalAlignment="Left" Margin="453,74,0,0" VerticalAlignment="Top" Width="38" Foreground="#FF373638" />
         <Label x:Name="FullTurnNumberLabel" HorizontalAlignment="Left" Margin="453,58,0,0" VerticalAlignment="Top" Width="37" Height="28" Content="0" Foreground="#FF373638" />
-        <TextBlock x:Name="InfoTimeTextBlock" HorizontalAlignment="Left" Margin="393,97,0,0" TextWrapping="Wrap" Text="-" VerticalAlignment="Top" Width="122" Height="42" Foreground="#FF373638"/>
-        <ListBox x:Name="MovesListBox" HorizontalAlignment="Left" Height="251" Margin="385,150,0,0" VerticalAlignment="Top" Width="140" Opacity="0.8" Background="#FFE6E0E0"/>
+        <TextBlock x:Name="InfoTimeTextBlock" HorizontalAlignment="Left" Margin="393,97,0,0" TextWrapping="Wrap" Text="-" VerticalAlignment="Top" Width="122" Height="53" Foreground="#FF373638"/>
+        <ListBox x:Name="MovesListBox" HorizontalAlignment="Left" Height="236" Margin="385,165,0,0" VerticalAlignment="Top" Width="140" Opacity="0.8" Background="#FFE6E0E0"/>
         <Image x:Name="WhiteCastleQueenSide" HorizontalAlignment="Left" Height="32" Margin="25,400,0,0" VerticalAlignment="Top" Width="32" Source="Images/iconfinder_gnome-session-switch_30685.png">
             <Image.Effect>
                 <DropShadowEffect Color="#FF8B8B8B" ShadowDepth="2"/>

@@ -217,7 +217,8 @@ namespace ChessSharp_UI
 
         private async Task DoSearch()
         {
-            await Game.CpuMove(5);
+            // Search depth
+            await Game.CpuMove(7);
 
             FenTextBox.Text = FenHelpers.ToFen(Game.CurrentState.GameState);
 

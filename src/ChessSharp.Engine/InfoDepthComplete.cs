@@ -30,7 +30,7 @@ namespace ChessSharp.Engine
         {
             var sb = new StringBuilder();
 
-            sb.Append($"Depth: {Depth} ");
+            sb.Append($"Depth: {Depth} Positions: { SearchedPositionCount}");
 
             foreach (var move in this.PrincipalVariation)
                 sb.Append($"{move.GetNotation()} ");
