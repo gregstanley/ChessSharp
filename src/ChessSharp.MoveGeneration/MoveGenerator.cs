@@ -14,25 +14,33 @@ namespace ChessSharp.MoveGeneration
      */
     public class MoveGenerator
     {
-        private static readonly AttackBitmaps AttackBitmaps = new();
+        private static AttackBitmaps AttackBitmaps;
 
-        private static readonly Vector<ulong> VectorZero = new(0);
+        private static Vector<ulong> VectorZero = new(0);
 
+        // We need one workspace for each depth we are searching at;
         private readonly MoveGenerationWorkspace[] workspaces;
 
         public MoveGenerator()
         {
+            if (AttackBitmaps is null)
+                AttackBitmaps = new AttackBitmaps();
+
             workspaces = new MoveGenerationWorkspace[] { new MoveGenerationWorkspace(0) };
         }
 
         public MoveGenerator(int workspaceCount)
         {
+            if (AttackBitmaps is null)
+                AttackBitmaps = new AttackBitmaps();
+
             workspaces = new MoveGenerationWorkspace[workspaceCount];
 
             for (var i = 0; i < workspaceCount; ++i)
                 workspaces[i] = new MoveGenerationWorkspace(i);
         }
 
+        // Used for ROOT search as it does allocation
         public void Generate(Board board, Colour colour, IList<uint> moves)
         {
             foreach (var move in GenerateStream(0, board, colour))
@@ -48,6 +56,8 @@ namespace ChessSharp.MoveGeneration
             foreach (var move in GenerateStream(depth, board, colour))
                 moves.Add(move);
         }
+
+        public IEnumerable<uint> GenerateStream(Board board, Colour colour) => GenerateStream(0, board, colour);
 
         public IEnumerable<uint> GenerateStream(ushort depth, Board board, Colour colour)
         {

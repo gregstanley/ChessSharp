@@ -31,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\ChessSharp.Common\ChessSharp.Common.csproj" />
+    <ProjectReference Include="..\..\src\ChessSharp.Engine\ChessSharp.Engine.csproj" />
     <ProjectReference Include="..\..\src\ChessSharp.MoveGeneration\ChessSharp.MoveGeneration.csproj" />
   </ItemGroup>
 

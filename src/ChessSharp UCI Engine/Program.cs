@@ -8,23 +8,39 @@ using ChessSharp.Common.Enums;
 using ChessSharp.Common.Helpers;
 using ChessSharp.Engine;
 using ChessSharp.Engine.Events;
+using ChessSharp.Engine.NegaMax;
+using ChessSharp.Engine.NegaMax.Events;
+using ChessSharp.MoveGeneration;
 
 namespace ChessSharp_UCI_Engine
 {
     internal class Program
     {
-        private static readonly TranspositionTable transpositionTable = new();
+
         private static readonly string Name = "ChessSharp";
-        private static readonly string Version = "1";
+        private static readonly string Version = "v1";
         private static readonly string Author = "Greg Stanley";
         private static readonly Regex trimmer = new(@"\s\s+");
+
         private static BackgroundWorker workerThread = null;
+
+        private static TranspositionTable transpositionTable;
+        private static MoveGenerator moveGenerator;
+        private static NegaMaxEvaluator evaluator;
+        private static NegaMaxSearch negaMaxSearch;
 
         private static Game Game { get; set; }
 
         private static void Main(string[] args)
         {
-            Console.WriteLine("♔ ChessSharp v1 UCI Engine ♔");
+            Console.WriteLine($"{Name} {Version} UCI Engine");
+
+            transpositionTable = new TranspositionTable();
+            moveGenerator = new MoveGenerator(64);
+            evaluator = new NegaMaxEvaluator();
+            negaMaxSearch = new NegaMaxSearch(moveGenerator, evaluator);
+
+            negaMaxSearch.SearchProgress += Search_Progress;
 
             bool done = false;
 
@@ -59,7 +75,7 @@ namespace ChessSharp_UCI_Engine
                         break;
                     case "position":
                         // position fen N7/P3pk1p/3p2p1/r4p2/8/4b2B/4P1KP/1R6 w - - 0 34
-                        CommandPosition(commandArgs);
+                        _ = CommandPosition(commandArgs);
                         break;
                     case "go":
                         if (workerThread != null && workerThread.IsBusy)
@@ -74,6 +90,20 @@ namespace ChessSharp_UCI_Engine
                             workerThread.RunWorkerAsync();
                         }
                         break;
+                    case "go2":
+                        if (workerThread != null && workerThread.IsBusy)
+                        {
+                            Console.WriteLine("Thread is already running");
+                        }
+                        else
+                        {
+                            Console.WriteLine("Starting thread...");
+
+                            InstantiateWorkerThread2();
+
+                            workerThread.RunWorkerAsync();
+                        }
+                        break;
                     default:
                         Console.WriteLine(input + " is not a recognised command");
                         break;
@@ -83,19 +113,60 @@ namespace ChessSharp_UCI_Engine
             }
         }
 
-        private static void CommandPosition(string[] commandArgs)
+        private static Board CommandPosition(string[] commandArgs)
         {
             var firstArg = commandArgs.First();
+            Board board;
 
             if (firstArg == "startpos")
             {
                 NewGameFromFen(FenHelpers.Default);
+                board = NewBoardFromFen(FenHelpers.Default);
             }
             else
             {
                 NewGameFromFen(string.Join(" ", commandArgs.Skip(1)));
+                board = NewBoardFromFen(FenHelpers.Default);
             }
+            return board;
+        }
 
+        private static void InstantiateWorkerThread2()
+        {
+            workerThread = new BackgroundWorker();
+            // workerThread.ProgressChanged += WorkerThread_ProgressChanged;
+            workerThread.DoWork += WorkerThread_DoWork2;
+            workerThread.RunWorkerCompleted += WorkerThread_RunWorkerCompleted2;
+            workerThread.WorkerReportsProgress = false;
+            workerThread.WorkerSupportsCancellation = false;
+        }
+
+        private static void WorkerThread_DoWork2(object sender, DoWorkEventArgs e)
+        {
+            if (e is null) return;
+
+            var gameState = FenHelpers.Parse(FenHelpers.Default);
+            var board = Board.FromGameState(gameState);
+            e.Result = negaMaxSearch.Go(board, gameState.ToPlay, 1);
+        }
+
+        private static void Search_Progress(object sender, SearchProgressEventArgs args)
+        {
+            var s = args.Status;
+            Console.WriteLine($"d {s.Depth} t {s.ElapsedMilliseconds}ms nodes {s.PositionCount}");
+        }
+
+        private static void WorkerThread_RunWorkerCompleted2(object sender, RunWorkerCompletedEventArgs e)
+        {
+            if (e.Cancelled)
+            {
+                Console.WriteLine("Cancelled");
+            }
+            else
+            {
+                var moveViewer = new MoveViewer((uint)e.Result);
+                Console.WriteLine($"Complete: {moveViewer.GetUciNotation()}");
+            }
         }
 
         // COPY FROM UI
@@ -125,7 +196,7 @@ namespace ChessSharp_UCI_Engine
             {
                 Game.MoveApplied -= Game_MoveApplied;
                 Game.SearchCompleted -= Game_SearchCompleted;
-                // Game.Info -= Game_Info;
+                Game.Info -= Game_Info;
             }
 
             if (game != null)
@@ -139,7 +210,15 @@ namespace ChessSharp_UCI_Engine
 
             Game.MoveApplied += Game_MoveApplied;
             Game.SearchCompleted += Game_SearchCompleted;
-            // Game.Info += Game_Info;
+            Game.Info += Game_Info;
+        }
+
+        private static void Game_Info(object sender, InfoEventArgs args)
+        {
+            var depthComplete = args.Info as InfoDepthComplete;
+
+            if (depthComplete != null)
+                Console.WriteLine($"d {depthComplete.Depth} t {depthComplete.ElapsedMilliseconds}ms nodes {depthComplete.SearchedPositionCount}");
         }
 
         private static void InstantiateWorkerThread()
@@ -152,8 +231,17 @@ namespace ChessSharp_UCI_Engine
             workerThread.WorkerSupportsCancellation = true;
         }
 
+        private static Board NewBoardFromFen(string fen)
+        {
+            var gameState = FenHelpers.Parse(fen);
+
+            return Board.FromGameState(gameState);
+        }
+
         private static void WorkerThread_DoWork(object sender, DoWorkEventArgs e)
         {
+            if (e is null) return;
+
             e.Result = Game.CpuMove(5);
         }
 
