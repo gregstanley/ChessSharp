@@ -86,6 +86,9 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 * [Jaco van Neikerk's magic numbers article](http://vicki-chess.blogspot.com/2013/04/magics.html) which really helped me get my head round a rather unusual topic.
 * README.md template from [PurpleBooth](https://gist.githubusercontent.com/PurpleBooth/109311bb0361f32d87a2/raw/8254b53ab8dcb18afc64287aaddd9e5b6059f880/README-Template.md)
 
+## Resources
+
+* [Alpha-beta pruning explanation](http://web.cs.ucla.edu/~rosen/161/notes/alphabeta.html).
 
 ## Known issues
 
