@@ -147,7 +147,7 @@ namespace ChessSharp_UCI_Engine
 
             var gameState = FenHelpers.Parse(FenHelpers.Default);
             var board = Board.FromGameState(gameState);
-            e.Result = negaMaxSearch.Go(board, gameState.ToPlay, 1);
+            e.Result = negaMaxSearch.GoNoIterativeDeepening(board, gameState.ToPlay, 1);
         }
 
         private static void Search_Progress(object sender, SearchProgressEventArgs args)

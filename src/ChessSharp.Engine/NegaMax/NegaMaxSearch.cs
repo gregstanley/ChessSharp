@@ -32,12 +32,12 @@ namespace ChessSharp.Engine.NegaMax
             this.positionEvaluator = positionEvaluator;
         }
 
-        public uint Go(Board board, Colour colour, int maxDepth)
+        public SearchStatus GoNoIterativeDeepening(Board board, Colour colour, int maxDepth)
         {
             stopWatch.Restart();
 
             var counters = new Counters { Positions = 0 };
-            var depth = maxDepth + 1;
+            var depth = maxDepth;
             var ply = 0;
             var alpha = int.MinValue;
             var beta = int.MaxValue;
@@ -47,14 +47,18 @@ namespace ChessSharp.Engine.NegaMax
             // TODO: This seems to perform very badly on the very first run
             var rootMoves = rootMovesEnumerable.ToArray();
 
+            var rootMoveEvaluations = new List<MoveEvaluation>();
             var bestMove = 0u;
 
             foreach (var move in rootMoves)
             {
                 counters.Positions++;
+
                 board.MakeMove(move);
                 var score = -NegaMax(board, colour.Opposite(), counters, depth - 1, ply + 1, alpha, beta);
                 board.UnMakeMove(move);
+
+                rootMoveEvaluations.Add(new MoveEvaluation(new MoveViewer(move), 0));
 
                 if (score >= alpha)
                 {
@@ -65,10 +69,10 @@ namespace ChessSharp.Engine.NegaMax
 
             stopWatch.Stop();
 
-            var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha);
+            var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, bestMove);
             SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
 
-            return bestMove;
+            return status;
         }
 
         private int NegaMax(Board board, Colour colour, Counters counters, int depth, int ply, int alpha, int beta)
@@ -77,7 +81,10 @@ namespace ChessSharp.Engine.NegaMax
 
             if (depth == 0)
             {
-                return positionEvaluator.Evaluate(board) * (colour == Colour.White ? 1 : -1);
+                var score = positionEvaluator.Evaluate(board) * (colour == Colour.White ? 1 : -1);
+                var status1 = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, score);
+                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status1));
+                return score;
             }
 
             foreach (var move in GetNextMove(moveGenerator, ply, board, colour))
