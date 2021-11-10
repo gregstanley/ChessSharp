@@ -9,7 +9,7 @@ using ChessSharp.MoveGeneration;
 
 namespace ChessSharp.Engine.NegaMax
 {
-    public class NegaMaxSearch
+    public class NegaMaxSearch_v2
     {
         internal class Counters
         {
@@ -26,7 +26,7 @@ namespace ChessSharp.Engine.NegaMax
 
         private readonly IPositionEvaluator positionEvaluator;
 
-        public NegaMaxSearch(MoveGenerator moveGenerator, IPositionEvaluator positionEvaluator)
+        public NegaMaxSearch_v2(MoveGenerator moveGenerator, IPositionEvaluator positionEvaluator)
         {
             this.moveGenerator = moveGenerator;
             this.positionEvaluator = positionEvaluator;
@@ -54,7 +54,7 @@ namespace ChessSharp.Engine.NegaMax
                 return new NegaMaxSearchResult(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv);
 
             var rootMoveEvaluations = new List<MoveEvaluation>();
-            //var bestMove = 0u;
+
             pv[ply] = rootMoves[0];
 
             foreach (var move in rootMoves)
@@ -65,8 +65,6 @@ namespace ChessSharp.Engine.NegaMax
                 var score = -NegaMax(board, colour.Opposite(), counters, depth - 1, ply + 1, alpha, beta, pv);
                 board.UnMakeMove(move);
 
-                rootMoveEvaluations.Add(new MoveEvaluation(new MoveViewer(move), 0));
-
                 if (score >= alpha)
                 {
                     alpha = score;
@@ -75,6 +73,8 @@ namespace ChessSharp.Engine.NegaMax
 
                 var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv, pv[ply]);
                 SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
+
+                rootMoveEvaluations.Add(new MoveEvaluation(new MoveViewer(move), 0));
             }
 
             stopWatch.Stop();
@@ -89,8 +89,8 @@ namespace ChessSharp.Engine.NegaMax
             if (depth == 0)
             {
                 var score = positionEvaluator.Evaluate(board) * (colour == Colour.White ? 1 : -1);
-                var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, score, pv);
-                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
+                var status1 = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, score, pv);
+                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status1));
                 return score;
             }
 
@@ -106,8 +106,8 @@ namespace ChessSharp.Engine.NegaMax
                     pv[ply] = move;
                 }
 
-                var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv);
-                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
+                var status1 = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv);
+                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status1));
             }
 
             return alpha;

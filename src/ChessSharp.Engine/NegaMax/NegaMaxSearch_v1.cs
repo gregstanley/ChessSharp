@@ -9,7 +9,7 @@ using ChessSharp.MoveGeneration;
 
 namespace ChessSharp.Engine.NegaMax
 {
-    public class NegaMaxSearch
+    public class NegaMaxSearch_v1
     {
         internal class Counters
         {
@@ -26,13 +26,13 @@ namespace ChessSharp.Engine.NegaMax
 
         private readonly IPositionEvaluator positionEvaluator;
 
-        public NegaMaxSearch(MoveGenerator moveGenerator, IPositionEvaluator positionEvaluator)
+        public NegaMaxSearch_v1(MoveGenerator moveGenerator, IPositionEvaluator positionEvaluator)
         {
             this.moveGenerator = moveGenerator;
             this.positionEvaluator = positionEvaluator;
         }
 
-        public NegaMaxSearchResult GoNoIterativeDeepening(Board board, Colour colour, int maxDepth)
+        public NegaMaxSearchResult GoNoIterativeDeepeningAndNoPv(Board board, Colour colour, int maxDepth)
         {
             stopWatch.Restart();
 
@@ -47,22 +47,18 @@ namespace ChessSharp.Engine.NegaMax
             // TODO: This seems to perform very badly on the very first run
             var rootMoves = rootMovesEnumerable.ToArray();
 
-            // http://mediocrechess.blogspot.com/2006/12/programming-extracting-principal.html
-            var pv = new uint[maxDepth];
-
             if (!rootMoves.Any())
-                return new NegaMaxSearchResult(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv);
+                return new NegaMaxSearchResult(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, System.Array.Empty<uint>());
 
             var rootMoveEvaluations = new List<MoveEvaluation>();
-            //var bestMove = 0u;
-            pv[ply] = rootMoves[0];
+            var bestMove = 0u;
 
             foreach (var move in rootMoves)
             {
                 counters.Positions++;
 
                 board.MakeMove(move);
-                var score = -NegaMax(board, colour.Opposite(), counters, depth - 1, ply + 1, alpha, beta, pv);
+                var score = -NegaMaxNoPv(board, colour.Opposite(), counters, depth - 1, ply + 1, alpha, beta);
                 board.UnMakeMove(move);
 
                 rootMoveEvaluations.Add(new MoveEvaluation(new MoveViewer(move), 0));
@@ -70,45 +66,42 @@ namespace ChessSharp.Engine.NegaMax
                 if (score >= alpha)
                 {
                     alpha = score;
-                    pv[ply] = move;
+                    bestMove = move;
                 }
-
-                var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv, pv[ply]);
-                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
             }
 
             stopWatch.Stop();
 
-            return new NegaMaxSearchResult(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv, pv[ply]);
+            return new NegaMaxSearchResult(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, System.Array.Empty<uint>(), bestMove);
         }
 
-        private int NegaMax(Board board, Colour colour, Counters counters, int depth, int ply, int alpha, int beta, uint[] pv)
+
+        private int NegaMaxNoPv(Board board, Colour colour, Counters counters, int depth, int ply, int alpha, int beta)
         {
             counters.Positions++;
 
             if (depth == 0)
             {
                 var score = positionEvaluator.Evaluate(board) * (colour == Colour.White ? 1 : -1);
-                var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, score, pv);
-                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
+                var status1 = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, score, System.Array.Empty<uint>());
+                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status1));
                 return score;
             }
 
             foreach (var move in GetNextMove(moveGenerator, ply, board, colour))
             {
                 board.MakeMove(move);
-                var score = -NegaMax(board, colour.Opposite(), counters, depth - 1, ply + 1, alpha, beta, pv);
+                var score = -NegaMaxNoPv(board, colour.Opposite(), counters, depth - 1, ply + 1, alpha, beta);
                 board.UnMakeMove(move);
 
                 if (score >= alpha)
                 {
                     alpha = score;
-                    pv[ply] = move;
                 }
-
-                var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, pv);
-                SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
             }
+
+            var status = new SearchStatus(depth, ply, stopWatch.ElapsedMilliseconds, counters.Positions, alpha, System.Array.Empty<uint>());
+            SearchProgress?.Invoke(this, new SearchProgressEventArgs(status));
 
             return alpha;
         }

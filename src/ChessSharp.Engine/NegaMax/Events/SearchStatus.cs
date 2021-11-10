@@ -1,16 +1,19 @@
 ﻿using System;
+using System.Linq;
+using ChessSharp.Common;
 
 namespace ChessSharp.Engine.NegaMax.Events
 {
     public struct SearchStatus
     {
-        public SearchStatus(int depth, int ply, long elapsedMilliseconds, int positionCount, int score, uint? bestMove = null)
+        public SearchStatus(int depth, int ply, long elapsedMilliseconds, int positionCount, int score, uint[] pv, uint? bestMove = null)
         {
             Depth = depth;
             Ply = ply;
             ElapsedMilliseconds = elapsedMilliseconds;
             PositionCount = positionCount;
             Score = score;
+            Pv = pv;
             BestMove = bestMove;
         }
 
@@ -26,13 +29,17 @@ namespace ChessSharp.Engine.NegaMax.Events
 
         public uint? BestMove { get; }
 
+        public uint[] Pv { get; }
+
         public override string ToString()
         {
             var elapsedMilliseconds = ElapsedMilliseconds == 0 ? 1 : ElapsedMilliseconds;
 
             var nps = Math.Floor((double)PositionCount / elapsedMilliseconds * 1000);
 
-            return $"info depth {Ply} score cp {Score} nodes {PositionCount} nps {nps} time {ElapsedMilliseconds} pv -";
+            var moves = Pv.Select(x => new MoveViewer(x).GetUciNotation());
+
+            return $"info depth {Ply} score cp {Score} nodes {PositionCount} nps {nps} time {ElapsedMilliseconds} pv {string.Join(" ", moves)}";
             // Stockfish 14
             // go movetime 1000
             // info depth 1 seldepth 1 multipv 1 score cp 43 nodes 20 nps 6666 tbhits 0 time 3 pv d2d4
